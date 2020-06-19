@@ -1,4 +1,4 @@
-#' sm: this is just a placeholder
+#' r6 sagemaker: this is just a placeholder
 #'
 #' @import paws
 #' @import jsonlite

@@ -1,5 +1,5 @@
-Package: sm
-Type: Package
+Package: R6sagemaker
+Type: R SDK for `AWS Sagemaker`
 Title: What the Package Does (Title Case)
 Version: 0.1.0
 Author: Who wrote it
@@ -9,8 +9,34 @@ Description: More about what it does (maybe more than one line)
 Import: R6,
         paws,
         jsonlite,
-        logger
+        logger,
+        httr
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
+Collate: 
+    'fw_registry.R'
+    'xgboost_estimator.R'
+    'utils.R'
+    'amazon_estimator.R'
+    'analytics.R'
+    'data_capture_config.R'
+    'debugger.R'
+    'vpc_utils.R'
+    'set_credentials.R'
+    'logs.R'
+    'session.R'
+    'transformer.R'
+    'fw_utils.R'
+    'model.R'
+    'estimator.R'
+    'input.R'
+    'job.R'
+    'model_monitoring.R'
+    'pkg_variables.R'
+    'predictor.R'
+    'r6sagemaker.R'
+    's3.R'
+    'xgboost_default.R'
+    'zzz.R'
