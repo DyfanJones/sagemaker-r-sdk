@@ -1,13 +1,13 @@
-
-registry <- function(region_name){
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/6a8bb6df1a0c34990a52fbfe4bbc6ec840d1bdcd/src/sagemaker/fw_registry.py
+fw_registry <- function(region_name){
   tryCatch(account_id <- image_registry_map[[region_name]],
            error = function(e) stop("The specific image or region does not exist", call. = F))
   sprintf("%s.dkr.ecr.%s.amazonaws.com", account_id, region_name)
 }
 
-default_framework_uri <- function(framework, region_name, image_tag){
+fw_default_framework_uri <- function(framework, region_name, image_tag){
   repository_name = sprintf("sagemaker-%s", framework)
-  account_name = registry(region_name)
+  account_name = fw_registry(region_name)
   return(sprintf("%s/%s:%s",account_name, repository_name, image_tag))
 }
 

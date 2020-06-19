@@ -1,3 +1,5 @@
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger.py
+
 #' @import paws
 #' @import jsonlite
 #' @import R6
@@ -21,7 +23,7 @@ DebuggerHookConfig <- R6Class("DebuggerHookConfig",
                               self$collection_configs = collection_configs
                               },
 
-                              to_list = function(){
+                              to_request_list = function(){
                                 debugger_hook_config_request = list("S3OutputPath"= self$s3_output_path)
                                 debugger_hook_config_request[["LocalPath"]] = self$container_local_output_path
                                 debugger_hook_config_request[["HookParameters"]] = self$hook_parameters

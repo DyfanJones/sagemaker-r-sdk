@@ -7,16 +7,22 @@
 Manage interactions with the Amazon SageMaker APIs and any other AWS services needed.
 This class provides convenient methods for manipulating entities and resources that Amazon
 SageMaker uses, such as training jobs, endpoints, and input datasets in S3.
-AWS service calls are delegated to an underlying Boto3 session, which by default
+AWS service calls are delegated to an underlying paws session, which by default
 is initialized using the AWS configuration chain. When you make an Amazon SageMaker API call
 that accesses an S3 bucket location and one is not specified, the ``Session`` creates a default
 bucket based on a naming convention which includes the current AWS account ID.
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{paws_region_name}}{Returns aws region associated with Session}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Session$new()}}
-\item \href{#method-get_caller_identity_arn}{\code{Session$get_caller_identity_arn()}}
 \item \href{#method-upload_data}{\code{Session$upload_data()}}
 \item \href{#method-download_data}{\code{Session$download_data()}}
 \item \href{#method-list_s3_files}{\code{Session$list_s3_files()}}
@@ -36,6 +42,44 @@ bucket based on a naming convention which includes the current AWS account ID.
 \item \href{#method-stop_processing_job}{\code{Session$stop_processing_job()}}
 \item \href{#method-stop_training_job}{\code{Session$stop_training_job()}}
 \item \href{#method-describe_training_job}{\code{Session$describe_training_job()}}
+\item \href{#method-auto_ml}{\code{Session$auto_ml()}}
+\item \href{#method-describe_auto_ml_job}{\code{Session$describe_auto_ml_job()}}
+\item \href{#method-list_candidates}{\code{Session$list_candidates()}}
+\item \href{#method-wait_for_auto_ml_job}{\code{Session$wait_for_auto_ml_job()}}
+\item \href{#method-logs_for_auto_ml}{\code{Session$logs_for_auto_ml()}}
+\item \href{#method-compile_model}{\code{Session$compile_model()}}
+\item \href{#method-tune}{\code{Session$tune()}}
+\item \href{#method-create_tune_job}{\code{Session$create_tune_job()}}
+\item \href{#method-stop_tuning_job}{\code{Session$stop_tuning_job()}}
+\item \href{#method-transform}{\code{Session$transform()}}
+\item \href{#method-create_model}{\code{Session$create_model()}}
+\item \href{#method-create_model_from_job}{\code{Session$create_model_from_job()}}
+\item \href{#method-create_model_package_from_algorithm}{\code{Session$create_model_package_from_algorithm()}}
+\item \href{#method-wait_for_model_package}{\code{Session$wait_for_model_package()}}
+\item \href{#method-create_endpoint_config}{\code{Session$create_endpoint_config()}}
+\item \href{#method-create_endpoint_config_from_existing}{\code{Session$create_endpoint_config_from_existing()}}
+\item \href{#method-create_endpoint}{\code{Session$create_endpoint()}}
+\item \href{#method-update_endpoint}{\code{Session$update_endpoint()}}
+\item \href{#method-delete_endpoint}{\code{Session$delete_endpoint()}}
+\item \href{#method-delete_endpoint_config}{\code{Session$delete_endpoint_config()}}
+\item \href{#method-delete_model}{\code{Session$delete_model()}}
+\item \href{#method-list_tags}{\code{Session$list_tags()}}
+\item \href{#method-wait_for_job}{\code{Session$wait_for_job()}}
+\item \href{#method-wait_for_processing_job}{\code{Session$wait_for_processing_job()}}
+\item \href{#method-wait_for_compilation_job}{\code{Session$wait_for_compilation_job()}}
+\item \href{#method-wait_for_tuning_job}{\code{Session$wait_for_tuning_job()}}
+\item \href{#method-describe_transform_job}{\code{Session$describe_transform_job()}}
+\item \href{#method-wait_for_transform_job}{\code{Session$wait_for_transform_job()}}
+\item \href{#method-stop_transform_job}{\code{Session$stop_transform_job()}}
+\item \href{#method-wait_for_endpoint}{\code{Session$wait_for_endpoint()}}
+\item \href{#method-endpoint_from_job}{\code{Session$endpoint_from_job()}}
+\item \href{#method-endpoint_from_model_data}{\code{Session$endpoint_from_model_data()}}
+\item \href{#method-endpoint_from_production_variants}{\code{Session$endpoint_from_production_variants()}}
+\item \href{#method-expand_role}{\code{Session$expand_role()}}
+\item \href{#method-get_caller_identity_arn}{\code{Session$get_caller_identity_arn()}}
+\item \href{#method-logs_for_job}{\code{Session$logs_for_job()}}
+\item \href{#method-logs_for_processing_job}{\code{Session$logs_for_processing_job()}}
+\item \href{#method-logs_for_transform_job}{\code{Session$logs_for_transform_job()}}
 \item \href{#method-print}{\code{Session$print()}}
 \item \href{#method-clone}{\code{Session$clone()}}
 }
@@ -44,60 +88,136 @@ bucket based on a naming convention which includes the current AWS account ID.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Creates a new instance of this [R6][R6::R6Class] class.
+             Initialize a SageMaker \code{Session}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$new(paws_credentials = NULL, bucket = NULL)}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_caller_identity_arn"></a>}}
-\if{latex}{\out{\hypertarget{method-get_caller_identity_arn}{}}}
-\subsection{Method \code{get_caller_identity_arn()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$get_caller_identity_arn()}\if{html}{\out{</div>}}
-}
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{paws_credentials}}{(PawsCredentials): The underlying AWS credentails passed to paws SDK.}
 
+\item{\code{bucket}}{(str): The default Amazon S3 bucket to be used by this session.
+This will be created the next time an Amazon S3 bucket is needed (by calling
+:func:\code{default_bucket}).
+If not provided, a default bucket will be created based on the following format:
+"sagemaker-{region}-{aws-account-id}". Example: "sagemaker-my-custom-bucket".}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-upload_data"></a>}}
 \if{latex}{\out{\hypertarget{method-upload_data}{}}}
 \subsection{Method \code{upload_data()}}{
+Upload local file or directory to S3.If a single file is specified for upload, the resulting S3 object key is
+             ``{key_prefix}/{filename}`` (filename does not include the local path, if any specified).
+             If a directory is specified for upload, the API uploads all content, recursively,
+             preserving relative structure of subdirectories. The resulting object key names are:
+             ``{key_prefix}/{relative_subdirectory_path}/filename``.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$upload_data(path, bucket = NULL, key_prefix = "data", ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{(str): Path (absolute or relative) of local file or directory to upload.}
+
+\item{\code{bucket}}{(str): Name of the S3 Bucket to upload to (default: None). If not specified, the
+default bucket of the ``Session`` is used (if default bucket does not exist, the
+``Session`` creates it).}
+
+\item{\code{key_prefix}}{(str): Optional S3 object key name prefix (default: 'data'). S3 uses the
+prefix to create a directory structure for the bucket content that it display in
+the S3 console.}
+
+\item{\code{...}}{(any): Optional extra arguments that may be passed to the upload operation.
+Similar to ExtraArgs parameter in S3 upload_file function. Please refer to the
+ExtraArgs parameter documentation here:
+https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html#the-extraargs-parameter}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: The S3 URI of the uploaded file(s). If a file is specified in the path argument,
+             the URI format is: ``s3://{bucket name}/{key_prefix}/{original_file_name}``.
+             If a directory is specified in the path argument, the URI format is ``s3://{bucket name}/{key_prefix}``.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-download_data"></a>}}
 \if{latex}{\out{\hypertarget{method-download_data}{}}}
 \subsection{Method \code{download_data()}}{
+Download file or directory from S3.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$download_data(path = "", bucket, key_prefix = NULL, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{(str): Local path where the file or directory should be downloaded to.}
+
+\item{\code{bucket}}{(str): Name of the S3 Bucket to download from.}
+
+\item{\code{key_prefix}}{(str): Optional S3 object key name prefix.}
+
+\item{\code{...}}{(any): Optional extra arguments that may be passed to the
+download operation. Please refer to the ExtraArgs parameter in the boto3
+documentation here:
+https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-example-download-file.html}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+NULL invisibly
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-list_s3_files"></a>}}
 \if{latex}{\out{\hypertarget{method-list_s3_files}{}}}
 \subsection{Method \code{list_s3_files()}}{
+Lists the S3 files given an S3 bucket and key.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$list_s3_files(bucket, key_prefix)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bucket}}{(str): Name of the S3 Bucket to download from.}
+
+\item{\code{key_prefix}}{(str): S3 object key name prefix.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(str): The list of files at the S3 path.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-default_bucket"></a>}}
 \if{latex}{\out{\hypertarget{method-default_bucket}{}}}
 \subsection{Method \code{default_bucket()}}{
+Return the name of the default bucket to use in relevant Amazon SageMaker interactions.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$default_bucket()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+(str): The name of the default bucket, which is of the form:
+ ``sagemaker-{region}-{AWS account ID}``.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-train"></a>}}
 \if{latex}{\out{\hypertarget{method-train}{}}}
 \subsection{Method \code{train()}}{
+Create an Amazon SageMaker training job. Train the learner on a set of observations of the provided `task`.
+             Mutates the learner by reference, i.e. stores the model alongside other information in field `$state`.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$train(
   input_mode,
@@ -126,11 +246,110 @@ bucket based on a naming convention which includes the current AWS account ID.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{input_mode}}{(str): The input mode that the algorithm supports. Valid modes:
+\itemize{
+  \item{\strong{'File':} Amazon SageMaker copies the training dataset from the S3 location to
+          a directory in the Docker container.}
+  \item{\strong{'Pipe':} Amazon SageMaker streams data directly from S3 to the container via a
+          Unix-named pipe.}}}
+
+\item{\code{input_config}}{(list): A list of Channel objects. Each channel is a named input source.
+Please refer to the format details described:
+https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#SageMaker.Client.create_training_job}
+
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon SageMaker training
+jobs and APIs that create Amazon SageMaker endpoints use this role to access
+training data and model artifacts. You must grant sufficient permissions to this
+role.}
+
+\item{\code{job_name}}{(str): Name of the training job being created.}
+
+\item{\code{output_config}}{(dict): The S3 URI where you want to store the training results and
+optional KMS key ID.}
+
+\item{\code{resource_config}}{(dict): Contains values for ResourceConfig:
+\itemize{
+  \item{\strong{instance_count (int):} Number of EC2 instances to use for training.
+                The key in resource_config is 'InstanceCount'.}
+  \item{\strong{instance_type (str):} Type of EC2 instance to use for training, for example,
+                'ml.c4.xlarge'. The key in resource_config is 'InstanceType'.}}}
+
+\item{\code{vpc_config}}{(dict): Contains values for VpcConfig:
+\itemize{
+  \item{\strong{subnets (list[str]):} List of subnet ids.
+                The key in vpc_config is 'Subnets'.}
+  \item{\strong{security_group_ids (list[str]):} List of security group ids.
+                The key in vpc_config is 'SecurityGroupIds'.}}}
+
+\item{\code{hyperparameters}}{(dict): Hyperparameters for model training. The hyperparameters are
+made accessible as a dict[str, str] to the training code on SageMaker. For
+convenience, this accepts other types for keys and values, but ``str()`` will be
+called to convert them before training.}
+
+\item{\code{stop_condition}}{(dict): Defines when training shall finish. Contains entries that can
+be understood by the service like ``MaxRuntimeInSeconds``.}
+
+\item{\code{tags}}{(list[dict]): List of tags for labeling a training job. For more, see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+
+\item{\code{metric_definitions}}{(list[dict]): A list of dictionaries that defines the metric(s)
+used to evaluate the training jobs. Each dictionary contains two keys: 'Name' for
+the name of the metric, and 'Regex' for the regular expression used to extract the
+metric from the logs.}
+
+\item{\code{enable_network_isolation}}{(bool): Whether to request for the training job to run with
+network isolation or not.}
+
+\item{\code{image}}{(str): Docker image containing training code.}
+
+\item{\code{algorithm_arn}}{(str): Algorithm Arn from Marketplace.}
+
+\item{\code{encrypt_inter_container_traffic}}{(bool): Specifies whether traffic between training
+containers is encrypted for the training job (default: ``False``).}
+
+\item{\code{train_use_spot_instances}}{(bool): whether to use spot instances for training.}
+
+\item{\code{checkpoint_s3_uri}}{(str): The S3 URI in which to persist checkpoints
+that the algorithm persists (if any) during training. (default: ``None``).}
+
+\item{\code{checkpoint_local_path}}{(str): The local path that the algorithm
+writes its checkpoints to. SageMaker will persist all files
+under this path to `checkpoint_s3_uri` continually during
+training. On job startup the reverse happens - data from the
+s3 location is downloaded to this path before the algorithm is
+started. If the path is unset then SageMaker assumes the
+checkpoints will be provided under `/opt/ml/checkpoints/`.
+(Default: \code{NULL}).}
+
+\item{\code{experiment_config}}{(dict): Experiment management configuration. Dictionary contains
+three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+(Default: \code{NULL})}
+
+\item{\code{debugger_rule_configs}}{Configuration information for debugging rules}
+
+\item{\code{debugger_hook_config}}{Configuration information for debugging rules}
+
+\item{\code{tensorboard_output_config}}{Xonfiguration information for tensorboard output}
+
+\item{\code{enable_sagemaker_metrics}}{(bool): enable SageMaker Metrics Time
+Series. For more information see:
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_AlgorithmSpecification.html#SageMaker-Type-AlgorithmSpecification-EnableSageMakerMetricsTimeSeries
+(Default: \code{NULL}).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: ARN of the training job, if it is created.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-process"></a>}}
 \if{latex}{\out{\hypertarget{method-process}{}}}
 \subsection{Method \code{process()}}{
+Create an Amazon SageMaker processing job.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$process(
   inputs = NULL,
@@ -147,11 +366,55 @@ bucket based on a naming convention which includes the current AWS account ID.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{inputs}}{([dict]): List of up to 10 ProcessingInput dictionaries.}
+
+\item{\code{output_config}}{(dict): A config dictionary, which contains a list of up
+to 10 ProcessingOutput dictionaries, as well as an optional KMS key ID.}
+
+\item{\code{job_name}}{(str): The name of the processing job. The name must be unique
+within an AWS Region in an AWS account. Names should have minimum
+length of 1 and maximum length of 63 characters.}
+
+\item{\code{resources}}{(dict): Encapsulates the resources, including ML instances
+and storage, to use for the processing job.}
+
+\item{\code{stopping_condition}}{(dict[str,int]): Specifies a limit to how long
+the processing job can run, in seconds.}
+
+\item{\code{app_specification}}{(dict[str,str]): Configures the processing job to
+run the given image. Details are in the processing container
+specification.}
+
+\item{\code{environment}}{(dict): Environment variables to start the processing
+container with.}
+
+\item{\code{network_config}}{(dict): Specifies networking options, such as network
+traffic encryption between processing containers, whether to allow
+inbound and outbound network calls to and from processing containers,
+and VPC subnets and security groups to use for VPC-enabled processing
+jobs.}
+
+\item{\code{role_arn}}{(str): The Amazon Resource Name (ARN) of an IAM role that
+Amazon SageMaker can assume to perform tasks on your behalf.}
+
+\item{\code{tags}}{([dict[str,str]]): A list of dictionaries containing key-value
+pairs.}
+
+\item{\code{experiment_config}}{(dict): Experiment management configuration. Dictionary contains
+three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+(Default: \code{NULL})}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-create_monitoring_schedule"></a>}}
 \if{latex}{\out{\hypertarget{method-create_monitoring_schedule}{}}}
 \subsection{Method \code{create_monitoring_schedule()}}{
+Create an Amazon SageMaker monitoring schedule.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$create_monitoring_schedule(
   monitoring_schedule_name,
@@ -185,56 +448,236 @@ bucket based on a naming convention which includes the current AWS account ID.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The name of the monitoring schedule. The name must be
+unique within an AWS Region in an AWS account. Names should have a minimum length
+of 1 and a maximum length of 63 characters.}
+
+\item{\code{schedule_expression}}{(str): The cron expression that dictates the monitoring execution
+schedule.}
+
+\item{\code{statistics_s3_uri}}{(str): The S3 uri of the statistics file to use.}
+
+\item{\code{constraints_s3_uri}}{(str): The S3 uri of the constraints file to use.}
+
+\item{\code{monitoring_inputs}}{([dict]): List of MonitoringInput dictionaries.}
+
+\item{\code{monitoring_output_config}}{(dict): A config dictionary, which contains a list of
+MonitoringOutput dictionaries, as well as an optional KMS key ID.}
+
+\item{\code{instance_count}}{(int): The number of instances to run.}
+
+\item{\code{instance_type}}{(str): The type of instance to run.}
+
+\item{\code{volume_size_in_gb}}{(int): Size of the volume in GB.}
+
+\item{\code{volume_kms_key}}{(str): KMS key to use when encrypting the volume.}
+
+\item{\code{image_uri}}{(str): The image uri to use for monitoring executions.}
+
+\item{\code{entrypoint}}{(str): The entrypoint to the monitoring execution image.}
+
+\item{\code{arguments}}{(str): The arguments to pass to the monitoring execution image.}
+
+\item{\code{record_preprocessor_source_uri}}{(str or None): The S3 uri that points to the script that
+pre-processes the dataset (only applicable to first-party images).}
+
+\item{\code{post_analytics_processor_source_uri}}{(str or None): The S3 uri that points to the script
+that post-processes the dataset (only applicable to first-party images).}
+
+\item{\code{max_runtime_in_seconds}}{(int): Specifies a limit to how long
+the processing job can run, in seconds.}
+
+\item{\code{environment}}{(dict): Environment variables to start the monitoring execution
+container with.}
+
+\item{\code{network_config}}{(dict): Specifies networking options, such as network
+traffic encryption between processing containers, whether to allow
+inbound and outbound network calls to and from processing containers,
+and VPC subnets and security groups to use for VPC-enabled processing
+jobs.}
+
+\item{\code{role_arn}}{(str): The Amazon Resource Name (ARN) of an IAM role that
+Amazon SageMaker can assume to perform tasks on your behalf.}
+
+\item{\code{tags}}{([dict[str,str]]): A list of dictionaries containing key-value
+pairs.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-update_monitoring_schedule"></a>}}
 \if{latex}{\out{\hypertarget{method-update_monitoring_schedule}{}}}
 \subsection{Method \code{update_monitoring_schedule()}}{
+Update an Amazon SageMaker monitoring schedule.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$update_monitoring_schedule()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$update_monitoring_schedule(
+  monitoring_schedule_name,
+  schedule_expression = NULL,
+  statistics_s3_uri = NULL,
+  constraints_s3_uri = NULL,
+  monitoring_inputs = NULL,
+  monitoring_output_config = NULL,
+  instance_count = NULL,
+  instance_type = NULL,
+  volume_size_in_gb = NULL,
+  volume_kms_key = NULL,
+  image_uri = NULL,
+  entrypoint = NULL,
+  arguments = NULL,
+  record_preprocessor_source_uri = NULL,
+  post_analytics_processor_source_uri = NULL,
+  max_runtime_in_seconds = NULL,
+  environment = NULL,
+  network_config = NULL,
+  role_arn = NULL
+)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The name of the monitoring schedule. The name must be
+unique within an AWS Region in an AWS account. Names should have a minimum length
+of 1 and a maximum length of 63 characters.}
+
+\item{\code{schedule_expression}}{(str): The cron expression that dictates the monitoring execution
+schedule.}
+
+\item{\code{statistics_s3_uri}}{(str): The S3 uri of the statistics file to use.}
+
+\item{\code{constraints_s3_uri}}{(str): The S3 uri of the constraints file to use.}
+
+\item{\code{monitoring_inputs}}{([dict]): List of MonitoringInput dictionaries.}
+
+\item{\code{monitoring_output_config}}{(dict): A config dictionary, which contains a list of
+MonitoringOutput dictionaries, as well as an optional KMS key ID.}
+
+\item{\code{instance_count}}{(int): The number of instances to run.}
+
+\item{\code{instance_type}}{(str): The type of instance to run.}
+
+\item{\code{volume_size_in_gb}}{(int): Size of the volume in GB.}
+
+\item{\code{volume_kms_key}}{(str): KMS key to use when encrypting the volume.}
+
+\item{\code{image_uri}}{(str): The image uri to use for monitoring executions.}
+
+\item{\code{entrypoint}}{(str): The entrypoint to the monitoring execution image.}
+
+\item{\code{arguments}}{(str): The arguments to pass to the monitoring execution image.}
+
+\item{\code{record_preprocessor_source_uri}}{(str or None): The S3 uri that points to the script that}
+
+\item{\code{post_analytics_processor_source_uri}}{(str or None): The S3 uri that points to the script
+that post-processes the dataset (only applicable to first-party images).}
+
+\item{\code{max_runtime_in_seconds}}{(int): Specifies a limit to how long
+the processing job can run, in seconds.}
+
+\item{\code{environment}}{(dict): Environment variables to start the monitoring execution
+container with.}
+
+\item{\code{network_config}}{(dict): Specifies networking options, such as network
+traffic encryption between processing containers, whether to allow
+inbound and outbound network calls to and from processing containers,
+and VPC subnets and security groups to use for VPC-enabled processing
+jobs.}
+
+\item{\code{role_arn}}{(str): The Amazon Resource Name (ARN) of an IAM role that
+Amazon SageMaker can assume to perform tasks on your behalf.}
+
+\item{\code{pre-processes}}{the dataset (only applicable to first-party images).}
+
+\item{\code{tags}}{([dict[str,str]]): A list of dictionaries containing key-value
+pairs.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-start_monitoring_schedule"></a>}}
 \if{latex}{\out{\hypertarget{method-start_monitoring_schedule}{}}}
 \subsection{Method \code{start_monitoring_schedule()}}{
+Starts a monitoring schedule.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$start_monitoring_schedule(monitoring_schedule_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The name of the Amazon SageMaker Monitoring
+Schedule to start.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stop_monitoring_schedule"></a>}}
 \if{latex}{\out{\hypertarget{method-stop_monitoring_schedule}{}}}
 \subsection{Method \code{stop_monitoring_schedule()}}{
+Stops a monitoring schedule.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$stop_monitoring_schedule(monitoring_schedule_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The name of the Amazon SageMaker Monitoring
+Schedule to stop.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-delete_monitoring_schedule"></a>}}
 \if{latex}{\out{\hypertarget{method-delete_monitoring_schedule}{}}}
 \subsection{Method \code{delete_monitoring_schedule()}}{
+Deletes a monitoring schedule.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$delete_monitoring_schedule(monitoring_schedule_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The name of the Amazon SageMaker Monitoring
+Schedule to delete.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-describe_monitoring_schedule"></a>}}
 \if{latex}{\out{\hypertarget{method-describe_monitoring_schedule}{}}}
 \subsection{Method \code{describe_monitoring_schedule()}}{
+Calls the DescribeMonitoringSchedule API for the given monitoring schedule name
+              and returns the response.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$describe_monitoring_schedule(monitoring_schedule_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The name of the processing job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: A dictionary response with the processing job description.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-list_monitoring_executions"></a>}}
 \if{latex}{\out{\hypertarget{method-list_monitoring_executions}{}}}
 \subsection{Method \code{list_monitoring_executions()}}{
+Lists the monitoring executions associated with the given monitoring_schedule_name.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$list_monitoring_executions(
   monitoring_schedule_name,
@@ -244,11 +687,31 @@ bucket based on a naming convention which includes the current AWS account ID.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{monitoring_schedule_name}}{(str): The monitoring_schedule_name for which to retrieve the
+monitoring executions.}
+
+\item{\code{sort_by}}{(str): The field to sort by. Can be one of: "CreationTime", "ScheduledTime",
+"Status". Default: "ScheduledTime".}
+
+\item{\code{sort_order}}{(str): The sort order. Can be one of: "Ascending", "Descending".
+Default: "Descending".}
+
+\item{\code{max_results}}{(int): The maximum number of results to return. Must be between 1 and 100.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: Dictionary of monitoring schedule executions.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-list_monitoring_schedules"></a>}}
 \if{latex}{\out{\hypertarget{method-list_monitoring_schedules}{}}}
 \subsection{Method \code{list_monitoring_schedules()}}{
+Lists the monitoring executions associated with the given monitoring_schedule_name.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$list_monitoring_schedules(
   endpoint_name = NULL,
@@ -258,60 +721,1480 @@ bucket based on a naming convention which includes the current AWS account ID.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{endpoint_name}}{(str): The name of the endpoint to filter on. If not provided, does not
+filter on it. Default: None.}
+
+\item{\code{sort_by}}{(str): The field to sort by. Can be one of: "Name", "CreationTime", "Status".
+Default: "CreationTime".}
+
+\item{\code{sort_order}}{(str): The sort order. Can be one of: "Ascending", "Descending".
+Default: "Descending".}
+
+\item{\code{max_results}}{(int): The maximum number of results to return. Must be between 1 and 100.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: Dictionary of monitoring schedule executions.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-was_processing_job_successful"></a>}}
 \if{latex}{\out{\hypertarget{method-was_processing_job_successful}{}}}
 \subsection{Method \code{was_processing_job_successful()}}{
+Calls the DescribeProcessingJob API for the given job name
+             and returns the True if the job was successful. False otherwise.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$was_processing_job_successful(job_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the processing job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+bool: Whether the processing job was successful.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-describe_processing_job"></a>}}
 \if{latex}{\out{\hypertarget{method-describe_processing_job}{}}}
 \subsection{Method \code{describe_processing_job()}}{
+Calls the DescribeProcessingJob API for the given job name
+             and returns the response.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$describe_processing_job(job_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the processing job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: A dictionary response with the processing job description.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stop_processing_job"></a>}}
 \if{latex}{\out{\hypertarget{method-stop_processing_job}{}}}
 \subsection{Method \code{stop_processing_job()}}{
+Calls the StopProcessingJob API for the given job name.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$stop_processing_job(job_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the processing job to stop.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stop_training_job"></a>}}
 \if{latex}{\out{\hypertarget{method-stop_training_job}{}}}
 \subsection{Method \code{stop_training_job()}}{
+Calls the StopTrainingJob API for the given job name.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$stop_training_job(job_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the training job to stop.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-describe_training_job"></a>}}
 \if{latex}{\out{\hypertarget{method-describe_training_job}{}}}
 \subsection{Method \code{describe_training_job()}}{
+Calls the DescribeTrainingJob API for the given job name
+             and returns the response.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$describe_training_job(job_name)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the training job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: A dictionary response with the training job description.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-auto_ml"></a>}}
+\if{latex}{\out{\hypertarget{method-auto_ml}{}}}
+\subsection{Method \code{auto_ml()}}{
+Create an Amazon SageMaker AutoML job.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$auto_ml(
+  input_config,
+  output_config,
+  auto_ml_job_config,
+  role,
+  job_name,
+  problem_type = NULL,
+  job_objective = NULL,
+  generate_candidate_definitions_only = FALSE,
+  tags = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{input_config}}{(list[dict]): A list of Channel objects. Each channel contains "DataSource"
+and "TargetAttributeName", "CompressionType" is an optional field.}
+
+\item{\code{output_config}}{(dict): The S3 URI where you want to store the training results and
+optional KMS key ID.}
+
+\item{\code{auto_ml_job_config}}{(dict): A dict of AutoMLJob config, containing "StoppingCondition",
+"SecurityConfig", optionally contains "VolumeKmsKeyId".}
+
+\item{\code{role}}{(str): The Amazon Resource Name (ARN) of an IAM role that
+Amazon SageMaker can assume to perform tasks on your behalf.}
+
+\item{\code{job_name}}{(str): A string that can be used to identify an AutoMLJob. Each AutoMLJob
+should have a unique job name.}
+
+\item{\code{problem_type}}{(str): The type of problem of this AutoMLJob. Valid values are
+"Regression", "BinaryClassification", "MultiClassClassification". If None,
+SageMaker AutoMLJob will infer the problem type automatically.}
+
+\item{\code{job_objective}}{(dict): AutoMLJob objective, contains "AutoMLJobObjectiveType" (optional),
+"MetricName" and "Value".}
+
+\item{\code{generate_candidate_definitions_only}}{(bool): Indicates whether to only generate candidate
+definitions. If True, AutoML.list_candidates() cannot be called. Default: False.}
+
+\item{\code{tags}}{([dict[str,str]]): A list of dictionaries containing key-value
+pairs.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+NULL invisible
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-describe_auto_ml_job"></a>}}
+\if{latex}{\out{\hypertarget{method-describe_auto_ml_job}{}}}
+\subsection{Method \code{describe_auto_ml_job()}}{
+Calls the DescribeAutoMLJob API for the given job name
+             and returns the response.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$describe_auto_ml_job(job_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the AutoML job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: A dictionary response with the AutoML Job description.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-list_candidates"></a>}}
+\if{latex}{\out{\hypertarget{method-list_candidates}{}}}
+\subsection{Method \code{list_candidates()}}{
+Returns the list of candidates of an AutoML job for a given name.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$list_candidates(
+  job_name,
+  status_equals = NULL,
+  candidate_name = NULL,
+  candidate_arn = NULL,
+  sort_order = NULL,
+  sort_by = NULL,
+  max_results = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the AutoML job. If None, will use object's
+latest_auto_ml_job name.}
+
+\item{\code{status_equals}}{(str): Filter the result with candidate status, values could be
+"Completed", "InProgress", "Failed", "Stopped", "Stopping"}
+
+\item{\code{candidate_name}}{(str): The name of a specified candidate to list.
+Default to NULL}
+
+\item{\code{candidate_arn}}{(str): The Arn of a specified candidate to list.
+Default to NULL.}
+
+\item{\code{sort_order}}{(str): The order that the candidates will be listed in result.
+Default to NULL.}
+
+\item{\code{sort_by}}{(str): The value that the candidates will be sorted by.
+Default to NULL.}
+
+\item{\code{max_results}}{(int): The number of candidates will be listed in results,
+between 1 to 100. Default to None. If None, will return all the candidates.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+list: A list of dictionaries with candidates information
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_auto_ml_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_auto_ml_job}{}}}
+\subsection{Method \code{wait_for_auto_ml_job()}}{
+Wait for an Amazon SageMaker AutoML job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_auto_ml_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the auto ml job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeAutoMLJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-logs_for_auto_ml"></a>}}
+\if{latex}{\out{\hypertarget{method-logs_for_auto_ml}{}}}
+\subsection{Method \code{logs_for_auto_ml()}}{
+Display the logs for a given AutoML job, optionally tailing them until the
+             job is complete. If the output is a tty or a Jupyter cell, it will be color-coded
+             based on which instance the log entry is from.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$logs_for_auto_ml(job_name, wait = False, poll = 10)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the Auto ML job to display the logs for.}
+
+\item{\code{wait}}{(bool): Whether to keep looking for new log entries until the job completes
+(Default: FALSE).}
+
+\item{\code{poll}}{(int): The interval in seconds between polling for new log entries and job
+completion (Default: 10).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-compile_model"></a>}}
+\if{latex}{\out{\hypertarget{method-compile_model}{}}}
+\subsection{Method \code{compile_model()}}{
+Create an Amazon SageMaker Neo compilation job.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$compile_model(
+  input_model_config,
+  output_model_config,
+  role,
+  job_name,
+  stop_condition,
+  tags
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{input_model_config}}{(dict): the trained model and the Amazon S3 location where it is
+stored.}
+
+\item{\code{output_model_config}}{(dict): Identifies the Amazon S3 location where you want Amazon
+SageMaker Neo to save the results of compilation job}
+
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon SageMaker Neo
+compilation jobs use this role to access model artifacts. You must grant
+sufficient permissions to this role.}
+
+\item{\code{job_name}}{(str): Name of the compilation job being created.}
+
+\item{\code{stop_condition}}{(dict): Defines when compilation job shall finish. Contains entries
+that can be understood by the service like ``MaxRuntimeInSeconds``.}
+
+\item{\code{tags}}{(list[dict]): List of tags for labeling a compile model job. For more, see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: ARN of the compile model job, if it is created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tune"></a>}}
+\if{latex}{\out{\hypertarget{method-tune}{}}}
+\subsection{Method \code{tune()}}{
+Create an Amazon SageMaker hyperparameter tuning job
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$tune(
+  job_name,
+  strategy = c("Bayesian", "Random"),
+  objective_type,
+  objective_metric_name,
+  max_jobs,
+  max_parallel_jobs,
+  parameter_ranges,
+  static_hyperparameters,
+  input_mode,
+  metric_definitions,
+  role,
+  input_config,
+  output_config,
+  resource_config,
+  stop_condition,
+  tags,
+  warm_start_config,
+  enable_network_isolation = FALSE,
+  image = NULL,
+  algorithm_arn = NULL,
+  early_stopping_type = "Off",
+  encrypt_inter_container_traffic = FALSE,
+  vpc_config = NULL,
+  train_use_spot_instances = FALSE,
+  checkpoint_s3_uri = NULL,
+  checkpoint_local_path = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the tuning job being created.}
+
+\item{\code{strategy}}{(str): Strategy to be used for hyperparameter estimations.}
+
+\item{\code{objective_type}}{(str): The type of the objective metric for evaluating training jobs.
+This value can be either 'Minimize' or 'Maximize'.}
+
+\item{\code{objective_metric_name}}{(str): Name of the metric for evaluating training jobs.}
+
+\item{\code{max_jobs}}{(int): Maximum total number of training jobs to start for the hyperparameter
+tuning job.}
+
+\item{\code{max_parallel_jobs}}{(int): Maximum number of parallel training jobs to start.}
+
+\item{\code{parameter_ranges}}{(dict): Dictionary of parameter ranges. These parameter ranges can be
+one of three types: Continuous, Integer, or Categorical.}
+
+\item{\code{static_hyperparameters}}{(dict): Hyperparameters for model training. These
+hyperparameters remain unchanged across all of the training jobs for the
+hyperparameter tuning job. The hyperparameters are made accessible as a dictionary
+for the training code on SageMaker.}
+
+\item{\code{input_mode}}{(str): The input mode that the algorithm supports. Valid modes:
+\itemize{
+  \item{\strong{'File'} - Amazon SageMaker copies the training dataset from the S3 location to
+        a directory in the Docker container.}
+  \item{\strong{'Pipe'} - Amazon SageMaker streams data directly from S3 to the container via a
+        Unix-named pipe.}}}
+
+\item{\code{metric_definitions}}{(list[dict]): A list of dictionaries that defines the metric(s)
+used to evaluate the training jobs. Each dictionary contains two keys: 'Name' for
+the name of the metric, and 'Regex' for the regular expression used to extract the
+metric from the logs. This should be defined only for jobs that don't use an
+Amazon algorithm.}
+
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon SageMaker
+training jobs and APIs that create Amazon SageMaker endpoints use this role to
+access training data and model artifacts. You must grant sufficient permissions
+to this role.}
+
+\item{\code{input_config}}{(list): A list of Channel objects. Each channel is a named input source.
+Please refer to the format details described:
+https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#SageMaker.Client.create_training_job}
+
+\item{\code{output_config}}{(dict): The S3 URI where you want to store the training results and
+optional KMS key ID.}
+
+\item{\code{resource_config}}{(dict): Contains values for ResourceConfig:
+\itemize{
+  \item{\strong{instance_count (int):} Number of EC2 instances to use for training.
+                The key in resource_config is 'InstanceCount'.}
+  \item{\strong{instance_type (str):} Type of EC2 instance to use for training, for example,
+                'ml.c4.xlarge'. The key in resource_config is 'InstanceType'.}}}
+
+\item{\code{stop_condition}}{(dict): When training should finish, e.g. ``MaxRuntimeInSeconds``.}
+
+\item{\code{tags}}{(list[dict]): List of tags for labeling the tuning job. For more, see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+
+\item{\code{warm_start_config}}{(dict): Configuration defining the type of warm start and
+other required configurations.}
+
+\item{\code{enable_network_isolation}}{(bool): Specifies whether to isolate the training container
+(Default: \code{FALSE}).}
+
+\item{\code{image}}{(str): Docker image containing training code.}
+
+\item{\code{algorithm_arn}}{(str): Resource ARN for training algorithm created on or subscribed from
+AWS Marketplace (Default: \code{NULL}).}
+
+\item{\code{early_stopping_type}}{(str): Specifies whether early stopping is enabled for the job.
+Can be either 'Auto' or 'Off'. If set to 'Off', early stopping will not be
+attempted. If set to 'Auto', early stopping of some training jobs may happen, but
+is not guaranteed to.}
+
+\item{\code{encrypt_inter_container_traffic}}{(bool): Specifies whether traffic between training
+containers is encrypted for the training jobs started for this hyperparameter
+tuning job (Default: \code{FALSE}).}
+
+\item{\code{vpc_config}}{(dict): Contains values for VpcConfig (default: None):
+\itemize{
+  \item{\strong{subnets (list[str]):} List of subnet ids.
+                The key in vpc_config is 'Subnets'.}
+  \item{\strong{security_group_ids (list[str]):} List of security group ids.
+                The key in vpc_config is 'SecurityGroupIds'.}}}
+
+\item{\code{train_use_spot_instances}}{(bool): whether to use spot instances for training.}
+
+\item{\code{checkpoint_s3_uri}}{(str): The S3 URI in which to persist checkpoints
+that the algorithm persists (if any) during training. (Default: \code{FALSE}).}
+
+\item{\code{checkpoint_local_path}}{(str): The local path that the algorithm
+writes its checkpoints to. SageMaker will persist all files
+under this path to `checkpoint_s3_uri` continually during
+training. On job startup the reverse happens - data from the
+s3 location is downloaded to this path before the algorithm is
+started. If the path is unset then SageMaker assumes the
+checkpoints will be provided under `/opt/ml/checkpoints/`.
+(Default: \code{NULL}).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_tune_job"></a>}}
+\if{latex}{\out{\hypertarget{method-create_tune_job}{}}}
+\subsection{Method \code{create_tune_job()}}{
+Create an Amazon SageMaker hyperparameter tuning job. This method supports creating
+             tuning jobs with single or multiple training algorithms (estimators), while the ``tune()``
+             method above only supports creating tuning jobs with single training algorithm.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_tune_job(
+  job_name,
+  tuning_config,
+  training_config = NULL,
+  training_config_list = NULL,
+  warm_start_config = NULL,
+  tags = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the tuning job being created.}
+
+\item{\code{tuning_config}}{(dict): Configuration to launch the tuning job.}
+
+\item{\code{training_config}}{(dict): Configuration to launch training jobs under the tuning job
+using a single algorithm.}
+
+\item{\code{training_config_list}}{(list[dict]): A list of configurations to launch training jobs
+under the tuning job using one or multiple algorithms. Either training_config
+or training_config_list should be provided, but not both.}
+
+\item{\code{warm_start_config}}{(dict): Configuration defining the type of warm start and
+other required configurations.}
+
+\item{\code{tags}}{(list[dict]): List of tags for labeling the tuning job. For more, see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-stop_tuning_job"></a>}}
+\if{latex}{\out{\hypertarget{method-stop_tuning_job}{}}}
+\subsection{Method \code{stop_tuning_job()}}{
+Stop the Amazon SageMaker hyperparameter tuning job with the specified name.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$stop_tuning_job(name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(str): Name of the Amazon SageMaker hyperparameter tuning job.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-transform"></a>}}
+\if{latex}{\out{\hypertarget{method-transform}{}}}
+\subsection{Method \code{transform()}}{
+Create an Amazon SageMaker transform job.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$transform(
+  job_name = NULL,
+  model_name = NULL,
+  strategy = NULL,
+  max_concurrent_transforms = NULL,
+  max_payload = NULL,
+  env = NULL,
+  input_config = NULL,
+  output_config = NULL,
+  resource_config = NULL,
+  experiment_config = NULL,
+  tags = NULL,
+  data_processing = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the transform job being created.}
+
+\item{\code{model_name}}{(str): Name of the SageMaker model being used for the transform job.}
+
+\item{\code{strategy}}{(str): The strategy used to decide how to batch records in a single request.
+Possible values are 'MultiRecord' and 'SingleRecord'.}
+
+\item{\code{max_concurrent_transforms}}{(int): The maximum number of HTTP requests to be made to
+each individual transform container at one time.}
+
+\item{\code{max_payload}}{(int): Maximum size of the payload in a single HTTP request to the
+container in MB.}
+
+\item{\code{env}}{(dict): Environment variables to be set for use during the transform job.}
+
+\item{\code{input_config}}{(dict): A dictionary describing the input data (and its location) for the
+job.}
+
+\item{\code{output_config}}{(dict): A dictionary describing the output location for the job.}
+
+\item{\code{resource_config}}{(dict): A dictionary describing the resources to complete the job.}
+
+\item{\code{experiment_config}}{(dict): A dictionary describing the experiment configuration for the
+job. Dictionary contains three optional keys,
+'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.}
+
+\item{\code{tags}}{(list[dict]): List of tags for labeling a transform job.}
+
+\item{\code{data_processing}}{(dict): A dictionary describing config for combining the input data and
+transformed data. For more, see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_model"></a>}}
+\if{latex}{\out{\hypertarget{method-create_model}{}}}
+\subsection{Method \code{create_model()}}{
+Create an Amazon SageMaker ``Model``.
+             Specify the S3 location of the model artifacts and Docker image containing
+             the inference code. Amazon SageMaker uses this information to deploy the
+             model in Amazon SageMaker. This method can also be used to create a Model for an Inference
+             Pipeline if you pass the list of container definitions through the containers parameter.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_model(
+  name,
+  role,
+  container_defs = NULL,
+  vpc_config = NULL,
+  enable_network_isolation = FALSE,
+  primary_container = NULL,
+  tags = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(str): Name of the Amazon SageMaker ``Model`` to create.}
+
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon SageMaker training
+jobs and APIs that create Amazon SageMaker endpoints use this role to access
+training data and model artifacts. You must grant sufficient permissions to this
+role.}
+
+\item{\code{container_defs}}{(list[dict[str, str]] or [dict[str, str]]): A single container
+definition or a list of container definitions which will be invoked sequentially
+while performing the prediction. If the list contains only one container, then
+it'll be passed to SageMaker Hosting as the ``PrimaryContainer`` and otherwise,
+it'll be passed as ``Containers``.You can also specify the  return value of
+``sagemaker.get_container_def()`` or ``sagemaker.pipeline_container_def()``,
+which will used to create more advanced container configurations, including model
+containers which need artifacts from S3.}
+
+\item{\code{vpc_config}}{(dict[str, list[str]]): The VpcConfig set on the model (default: None)
+\itemize{
+  \item{\strong{'Subnets' (list[str]):} List of subnet ids.}
+  \item{\strong{'SecurityGroupIds' (list[str]):} List of security group ids.}}}
+
+\item{\code{enable_network_isolation}}{(bool): Wether the model requires network isolation or not.}
+
+\item{\code{primary_container}}{(str or dict[str, str]): Docker image which defines the inference
+code. You can also specify the return value of ``sagemaker.container_def()``,
+which is used to create more advanced container configurations, including model
+containers which need artifacts from S3. This field is deprecated, please use
+container_defs instead.}
+
+\item{\code{tags}}{(list[list[str, str]]): Optional. The list of tags to add to the model.
+Example: \code{tags = list(list('Key'= 'tagname', 'Value'= 'tagvalue'))}
+For more information about tags, see
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html#SageMaker.Client.add_tags}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the Amazon SageMaker ``Model`` created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_model_from_job"></a>}}
+\if{latex}{\out{\hypertarget{method-create_model_from_job}{}}}
+\subsection{Method \code{create_model_from_job()}}{
+Create an Amazon SageMaker ``Model`` from a SageMaker Training Job.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_model_from_job(
+  training_job_name,
+  name = NULL,
+  role = NULL,
+  primary_container_image = NULL,
+  model_data_url = NULL,
+  env = NULL,
+  vpc_config_override = "VPC_CONFIG_DEFAULT",
+  tags = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{training_job_name}}{(str): The Amazon SageMaker Training Job name.}
+
+\item{\code{name}}{(str): The name of the SageMaker ``Model`` to create (default: None).
+If not specified, the training job name is used.}
+
+\item{\code{role}}{(str): The ``ExecutionRoleArn`` IAM Role ARN for the ``Model``, specified either
+by an IAM role name or role ARN. If None, the ``RoleArn`` from the SageMaker
+Training Job will be used.}
+
+\item{\code{primary_container_image}}{(str): The Docker image reference (default: None). If None, it
+defaults to the Training Image in ``training_job_name``.}
+
+\item{\code{model_data_url}}{(str): S3 location of the model data (default: None). If None, defaults
+to the ``ModelS3Artifacts`` of ``training_job_name``.}
+
+\item{\code{env}}{(dict[string,string]): Model environment variables (default: {}).}
+
+\item{\code{vpc_config_override}}{(dict[str, list[str]]): Optional override for VpcConfig set on the
+model. Default: use VpcConfig from training job.
+\itemize{
+  \item{\strong{'Subnets' (list[str])} List of subnet ids.}
+  \item{\strong{'SecurityGroupIds' (list[str])} List of security group ids.}}}
+
+\item{\code{tags}}{(list[list[str, str]]): Optional. The list of tags to add to the model.
+For more, see https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: The name of the created ``Model``.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_model_package_from_algorithm"></a>}}
+\if{latex}{\out{\hypertarget{method-create_model_package_from_algorithm}{}}}
+\subsection{Method \code{create_model_package_from_algorithm()}}{
+Create a SageMaker Model Package from the results of training with an Algorithm Package
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_model_package_from_algorithm(
+  name,
+  description = NULL,
+  algorithm_arn = NULL,
+  model_data = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(str): ModelPackage name}
+
+\item{\code{description}}{(str): Model Package description}
+
+\item{\code{algorithm_arn}}{(str): arn or name of the algorithm used for training.}
+
+\item{\code{model_data}}{(str): s3 URI to the model artifacts produced by training}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_model_package"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_model_package}{}}}
+\subsection{Method \code{wait_for_model_package()}}{
+Wait for an Amazon SageMaker endpoint deployment to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_model_package(model_package_name, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_package_name}}{(str): Name of the ``Endpoint`` to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: Return value from the ``DescribeEndpoint`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_endpoint_config"></a>}}
+\if{latex}{\out{\hypertarget{method-create_endpoint_config}{}}}
+\subsection{Method \code{create_endpoint_config()}}{
+Create an Amazon SageMaker endpoint configuration.
+             The endpoint configuration identifies the Amazon SageMaker model (created using the
+             ``CreateModel`` API) and the hardware configuration on which to deploy the model. Provide
+             this endpoint configuration to the ``CreateEndpoint`` API, which then launches the
+             hardware and deploys the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_endpoint_config(
+  name,
+  model_name,
+  initial_instance_count,
+  instance_type,
+  accelerator_type = NULL,
+  tags = NULL,
+  kms_key = NULL,
+  data_capture_config_dict = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(str): Name of the Amazon SageMaker endpoint configuration to create.}
+
+\item{\code{model_name}}{(str): Name of the Amazon SageMaker ``Model``.}
+
+\item{\code{initial_instance_count}}{(int): Minimum number of EC2 instances to launch. The actual
+number of active instances for an endpoint at any given time varies due to
+autoscaling.}
+
+\item{\code{instance_type}}{(str): Type of EC2 instance to launch, for example, 'ml.c4.xlarge'.}
+
+\item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to attach to the
+instance. For example, 'ml.eia1.medium'.
+For more information: https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html}
+
+\item{\code{tags}}{(list[list[str, str]]): Optional. The list of tags to add to the endpoint config.}
+
+\item{\code{kms_key}}{(str): The KMS key that is used to encrypt the data on the storage volume
+attached to the instance hosting the endpoint.}
+
+\item{\code{data_capture_config_dict}}{(dict): Specifies configuration related to Endpoint data
+capture for use with Amazon SageMaker Model Monitoring. Default: None.
+Example: \code{tags = list(list('Key'= 'tagname', 'Value'= 'tagvalue'))}
+For more information about tags, see
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html#SageMaker.Client.add_tags}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the endpoint point configuration created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_endpoint_config_from_existing"></a>}}
+\if{latex}{\out{\hypertarget{method-create_endpoint_config_from_existing}{}}}
+\subsection{Method \code{create_endpoint_config_from_existing()}}{
+Create an Amazon SageMaker endpoint configuration from an existing one. Updating any
+             values that were passed in.
+             The endpoint configuration identifies the Amazon SageMaker model (created using the
+             ``CreateModel`` API) and the hardware configuration on which to deploy the model. Provide
+             this endpoint configuration to the ``CreateEndpoint`` API, which then launches the
+             hardware and deploys the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_endpoint_config_from_existing(
+  existing_config_name,
+  new_config_name,
+  new_tags = NULL,
+  new_kms_key = NULL,
+  new_data_capture_config_dict = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{existing_config_name}}{(str): Name of the existing Amazon SageMaker endpoint
+configuration.}
+
+\item{\code{new_config_name}}{(str): Name of the Amazon SageMaker endpoint configuration to create.}
+
+\item{\code{new_tags}}{(List[list[str, str]]): Optional. The list of tags to add to the endpoint
+config. If not specified, the tags of the existing endpoint configuration are used.
+If any of the existing tags are reserved AWS ones (i.e. begin with "aws"),
+they are not carried over to the new endpoint configuration.}
+
+\item{\code{new_kms_key}}{(str): The KMS key that is used to encrypt the data on the storage volume
+attached to the instance hosting the endpoint (default: None). If not specified,
+the KMS key of the existing endpoint configuration is used.}
+
+\item{\code{new_data_capture_config_dict}}{(dict): Specifies configuration related to Endpoint data
+capture for use with Amazon SageMaker Model Monitoring (default: None).
+If not specified, the data capture configuration of the existing
+endpoint configuration is used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the endpoint point configuration created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_endpoint"></a>}}
+\if{latex}{\out{\hypertarget{method-create_endpoint}{}}}
+\subsection{Method \code{create_endpoint()}}{
+Create an Amazon SageMaker ``Endpoint`` according to the endpoint configuration
+             specified in the request.
+             Once the ``Endpoint`` is created, client applications can send requests to obtain
+             inferences. The endpoint configuration is created using the ``CreateEndpointConfig`` API.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_endpoint(endpoint_name, config_name, tags = NULL, wait = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{endpoint_name}}{(str): Name of the Amazon SageMaker ``Endpoint`` being created.}
+
+\item{\code{config_name}}{(str): Name of the Amazon SageMaker endpoint configuration to deploy.}
+
+\item{\code{tags}}{(list[list[str, str]]): Optional. The list of tags to add to the endpoint config.}
+
+\item{\code{wait}}{(bool): Whether to wait for the endpoint deployment to complete before returning
+(Default: \code{TRUE}).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the Amazon SageMaker ``Endpoint`` created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-update_endpoint"></a>}}
+\if{latex}{\out{\hypertarget{method-update_endpoint}{}}}
+\subsection{Method \code{update_endpoint()}}{
+Update an Amazon SageMaker ``Endpoint`` according to the endpoint configuration
+             specified in the request
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$update_endpoint(endpoint_name, endpoint_config_name, wait = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{endpoint_name}}{(str): Name of the Amazon SageMaker ``Endpoint`` being created.}
+
+\item{\code{endpoint_config_name}}{(str): Name of the Amazon SageMaker endpoint configuration to deploy.}
+
+\item{\code{wait}}{(bool): Whether to wait for the endpoint deployment to complete before returning
+(Default: \code{TRUE}).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the Amazon SageMaker ``Endpoint`` being updated.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-delete_endpoint"></a>}}
+\if{latex}{\out{\hypertarget{method-delete_endpoint}{}}}
+\subsection{Method \code{delete_endpoint()}}{
+Delete an Amazon SageMaker ``Endpoint``.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$delete_endpoint(endpoint_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{endpoint_name}}{(str): Name of the Amazon SageMaker ``Endpoint`` to delete.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-delete_endpoint_config"></a>}}
+\if{latex}{\out{\hypertarget{method-delete_endpoint_config}{}}}
+\subsection{Method \code{delete_endpoint_config()}}{
+Delete an Amazon SageMaker endpoint configuration.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$delete_endpoint_config(endpoint_config_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{endpoint_config_name}}{(str): Name of the Amazon SageMaker endpoint configuration to
+delete.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-delete_model"></a>}}
+\if{latex}{\out{\hypertarget{method-delete_model}{}}}
+\subsection{Method \code{delete_model()}}{
+Delete an Amazon SageMaker Model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$delete_model(model_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_name}}{(str): Name of the Amazon SageMaker model to delete.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-list_tags"></a>}}
+\if{latex}{\out{\hypertarget{method-list_tags}{}}}
+\subsection{Method \code{list_tags()}}{
+List the tags given an Amazon Resource Name
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$list_tags(resource_arn, max_results = 50)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{resource_arn}}{(str): The Amazon Resource Name (ARN) for which to get the tags list.}
+
+\item{\code{max_results}}{(int): The maximum number of results to include in a single page.
+This method takes care of that abstraction and returns a full list.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_job}{}}}
+\subsection{Method \code{wait_for_job()}}{
+Wait for an Amazon SageMaker training job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the training job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeTrainingJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_processing_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_processing_job}{}}}
+\subsection{Method \code{wait_for_processing_job()}}{
+Wait for an Amazon SageMaker Processing job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_processing_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the processing job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (Default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeProcessingJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_compilation_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_compilation_job}{}}}
+\subsection{Method \code{wait_for_compilation_job()}}{
+Wait for an Amazon SageMaker Neo compilation job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_compilation_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the compilation job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (Default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeCompilationJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_tuning_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_tuning_job}{}}}
+\subsection{Method \code{wait_for_tuning_job()}}{
+Wait for an Amazon SageMaker hyperparameter tuning job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_tuning_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the tuning job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeHyperParameterTuningJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-describe_transform_job"></a>}}
+\if{latex}{\out{\hypertarget{method-describe_transform_job}{}}}
+\subsection{Method \code{describe_transform_job()}}{
+Calls the DescribeTransformJob API for the given job name
+             and returns the response.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$describe_transform_job(job_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the transform job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: A dictionary response with the transform job description.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_transform_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_transform_job}{}}}
+\subsection{Method \code{wait_for_transform_job()}}{
+Wait for an Amazon SageMaker transform job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_transform_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the transform job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeTransformJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-stop_transform_job"></a>}}
+\if{latex}{\out{\hypertarget{method-stop_transform_job}{}}}
+\subsection{Method \code{stop_transform_job()}}{
+Stop the Amazon SageMaker hyperparameter tuning job with the specified name.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$stop_transform_job(name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(str): Name of the Amazon SageMaker batch transform job.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_endpoint"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_endpoint}{}}}
+\subsection{Method \code{wait_for_endpoint()}}{
+Wait for an Amazon SageMaker endpoint deployment to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_endpoint(endpoint, poll = 30)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{endpoint}}{(str): Name of the ``Endpoint`` to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (Default: 30).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: Return value from the ``DescribeEndpoint`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-endpoint_from_job"></a>}}
+\if{latex}{\out{\hypertarget{method-endpoint_from_job}{}}}
+\subsection{Method \code{endpoint_from_job()}}{
+Create an ``Endpoint`` using the results of a successful training job.
+             Specify the job name, Docker image containing the inference code, and hardware
+             configuration to deploy the model. Internally the API, creates an Amazon SageMaker model
+             (that describes the model artifacts and the Docker image containing inference code),
+             endpoint configuration (describing the hardware to deploy for hosting the model), and
+             creates an ``Endpoint`` (launches the EC2 instances and deploys the model on them). In
+             response, the API returns the endpoint name to which you can send requests for inferences.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$endpoint_from_job(
+  job_name,
+  initial_instance_count,
+  instance_type,
+  deployment_image = NULL,
+  name = NULL,
+  role = NULL,
+  wait = True,
+  model_environment_vars = NULL,
+  vpc_config_override = "VPC_CONFIG_DEFAULT",
+  accelerator_type = NULL,
+  data_capture_config = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the training job to deploy the results of.}
+
+\item{\code{initial_instance_count}}{(int): Minimum number of EC2 instances to launch. The actual
+number of active instances for an endpoint at any given time varies due to
+autoscaling.}
+
+\item{\code{instance_type}}{(str): Type of EC2 instance to deploy to an endpoint for prediction,
+for example, 'ml.c4.xlarge'.}
+
+\item{\code{deployment_image}}{(str): The Docker image which defines the inference code to be used
+as the entry point for accepting prediction requests. If not specified, uses the
+image used for the training job.}
+
+\item{\code{name}}{(str): Name of the ``Endpoint`` to create. If not specified, uses the training job
+name.}
+
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon SageMaker training
+jobs and APIs that create Amazon SageMaker endpoints use this role to access
+training data and model artifacts. You must grant sufficient permissions to this
+role.}
+
+\item{\code{wait}}{(bool): Whether to wait for the endpoint deployment to complete before returning
+(Default: True).}
+
+\item{\code{model_environment_vars}}{(dict[str, str]): Environment variables to set on the model
+container (Default: NULL).}
+
+\item{\code{vpc_config_override}}{(dict[str, list[str]]): Overrides VpcConfig set on the model.
+Default: use VpcConfig from training job.
+\itemize{
+  \item{\strong{'Subnets' (list[str]):} List of subnet ids.}
+  \item{\strong{'SecurityGroupIds' (list[str]):} List of security group ids.}}}
+
+\item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to attach to the
+instance. For example, 'ml.eia1.medium'.
+For more information: https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html}
+
+\item{\code{data_capture_config}}{(DataCaptureConfig): Specifies
+configuration related to Endpoint data capture for use with
+Amazon SageMaker Model Monitoring. Default: None.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the ``Endpoint`` that is created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-endpoint_from_model_data"></a>}}
+\if{latex}{\out{\hypertarget{method-endpoint_from_model_data}{}}}
+\subsection{Method \code{endpoint_from_model_data()}}{
+Create and deploy to an ``Endpoint`` using existing model data stored in S3.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$endpoint_from_model_data(
+  model_s3_location,
+  deployment_image,
+  initial_instance_count,
+  instance_type,
+  name = NULL,
+  role = NULL,
+  wait = True,
+  model_environment_vars = NULL,
+  model_vpc_config = NULL,
+  accelerator_type = NULL,
+  data_capture_config = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_s3_location}}{(str): S3 URI of the model artifacts to use for the endpoint.}
+
+\item{\code{deployment_image}}{(str): The Docker image which defines the runtime code to be used as
+the entry point for accepting prediction requests.}
+
+\item{\code{initial_instance_count}}{(int): Minimum number of EC2 instances to launch. The actual
+number of active instances for an endpoint at any given time varies due to
+autoscaling.}
+
+\item{\code{instance_type}}{(str): Type of EC2 instance to deploy to an endpoint for prediction,
+e.g. 'ml.c4.xlarge'.}
+
+\item{\code{name}}{(str): Name of the ``Endpoint`` to create. If not specified, uses a name
+generated by combining the image name with a timestamp.}
+
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon SageMaker training
+jobs and APIs that create Amazon SageMaker endpoints use this role to access
+training data and model artifacts.
+You must grant sufficient permissions to this role.}
+
+\item{\code{wait}}{(bool): Whether to wait for the endpoint deployment to complete before returning
+(Default: True).}
+
+\item{\code{model_environment_vars}}{(dict[str, str]): Environment variables to set on the model
+container (Default: NULL).}
+
+\item{\code{model_vpc_config}}{(dict[str, list[str]]): The VpcConfig set on the model (default: None)
+\itemize{
+  \item{\strong{'Subnets' (list[str]):} List of subnet ids.}
+  \item{\strong{'SecurityGroupIds' (list[str]):} List of security group ids.}}}
+
+\item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to attach to the instance.
+For example, 'ml.eia1.medium'.
+For more information: https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html}
+
+\item{\code{data_capture_config}}{(DataCaptureConfig): Specifies
+configuration related to Endpoint data capture for use with
+Amazon SageMaker Model Monitoring. Default: None.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: Name of the ``Endpoint`` that is created.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-endpoint_from_production_variants"></a>}}
+\if{latex}{\out{\hypertarget{method-endpoint_from_production_variants}{}}}
+\subsection{Method \code{endpoint_from_production_variants()}}{
+Create an SageMaker ``Endpoint`` from a list of production variants.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$endpoint_from_production_variants(
+  name,
+  production_variants = NULL,
+  tags = NULL,
+  kms_key = NULL,
+  wait = TRUE,
+  data_capture_config_list = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(str): The name of the ``Endpoint`` to create.}
+
+\item{\code{production_variants}}{(list[dict[str, str]]): The list of production variants to deploy.}
+
+\item{\code{tags}}{(list[dict[str, str]]): A list of key-value pairs for tagging the endpoint
+(Default: None).}
+
+\item{\code{kms_key}}{(str): The KMS key that is used to encrypt the data on the storage volume
+attached to the instance hosting the endpoint.}
+
+\item{\code{wait}}{(bool): Whether to wait for the endpoint deployment to complete before returning
+(Default: True).}
+
+\item{\code{data_capture_config_list}}{(list): Specifies configuration related to Endpoint data
+capture for use with Amazon SageMaker Model Monitoring. Default: None.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: The name of the created ``Endpoint``.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-expand_role"></a>}}
+\if{latex}{\out{\hypertarget{method-expand_role}{}}}
+\subsection{Method \code{expand_role()}}{
+Expand an IAM role name into an ARN.
+             If the role is already in the form of an ARN, then the role is simply returned. Otherwise
+             we retrieve the full ARN and return it.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$expand_role(role)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{role}}{(str): An AWS IAM role (either name or full ARN).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: The corresponding AWS IAM role ARN.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_caller_identity_arn"></a>}}
+\if{latex}{\out{\hypertarget{method-get_caller_identity_arn}{}}}
+\subsection{Method \code{get_caller_identity_arn()}}{
+Returns the ARN user or role whose credentials are used to call the API.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$get_caller_identity_arn()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+str: The ARN user or role
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-logs_for_job"></a>}}
+\if{latex}{\out{\hypertarget{method-logs_for_job}{}}}
+\subsection{Method \code{logs_for_job()}}{
+Display the logs for a given training job, optionally tailing them until the
+             job is complete. If the output is a tty or a Jupyter cell, it will be color-coded
+             based on which instance the log entry is from.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$logs_for_job(job_name, wait = FALSE, poll = 10, log_type = "All")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the training job to display the logs for.}
+
+\item{\code{wait}}{(bool): Whether to keep looking for new log entries until the job completes
+(Default: False).}
+
+\item{\code{poll}}{(int): The interval in seconds between polling for new log entries and job
+completion (Default: 10).}
+
+\item{\code{log_type}}{(str): Type of logs to return from building sagemaker process}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-logs_for_processing_job"></a>}}
+\if{latex}{\out{\hypertarget{method-logs_for_processing_job}{}}}
+\subsection{Method \code{logs_for_processing_job()}}{
+Display the logs for a given processing job, optionally tailing them until the
+             job is complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$logs_for_processing_job(job_name, wait = FALSE, poll = 10)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the training job to display the logs for.}
+
+\item{\code{wait}}{(bool): Whether to keep looking for new log entries until the job completes
+(Default: False).}
+
+\item{\code{poll}}{(int): The interval in seconds between polling for new log entries and job
+completion (Default: 10).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-logs_for_transform_job"></a>}}
+\if{latex}{\out{\hypertarget{method-logs_for_transform_job}{}}}
+\subsection{Method \code{logs_for_transform_job()}}{
+Display the logs for a given transform job, optionally tailing them until the
+             job is complete. If the output is a tty or a Jupyter cell, it will be color-coded
+             based on which instance the log entry is from.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$logs_for_transform_job(job_name, wait = FALSE, poll = 10)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the transform job to display the logs for.}
+
+\item{\code{wait}}{(bool): Whether to keep looking for new log entries until the job completes
+(Default: FALSE).}
+
+\item{\code{poll}}{(int): The interval in seconds between polling for new log entries and job
+completion (Default: 10).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
+Printer.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Session$print(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
