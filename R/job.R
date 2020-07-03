@@ -4,6 +4,7 @@
 #' @include session.R
 #' @include input.R
 
+#' @import R6
 
 .Job = R6Class(".Job",
               public = list(
@@ -240,6 +241,6 @@
                       return(list("MaxRuntimeInSeconds"= max_run, "MaxWaitTimeInSeconds"= max_wait))
                     return(list("MaxRuntimeInSeconds"= max_run))
                   }
-                )
-
-              )
+                ),
+              lock_objects = F
+)
