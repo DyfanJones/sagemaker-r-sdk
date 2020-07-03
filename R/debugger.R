@@ -1,11 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger.py
 
-#' @import paws
-#' @import jsonlite
 #' @import R6
-#' @import logger
 #' @import utils
-#' @export
 DebuggerHookConfig <- R6Class("DebuggerHookConfig",
                           public = list(
                             s3_output_path = NULL,
