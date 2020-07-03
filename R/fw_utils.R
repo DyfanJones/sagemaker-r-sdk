@@ -61,8 +61,6 @@ INFERENTIA_SUPPORTED_REGIONS = c("us-east-1", "us-west-2")
 
 DEBUGGER_UNSUPPORTED_REGIONS = c("us-gov-west-1", "us-iso-east-1")
 
-
-
 # Return the ECR URI of an image.
 #   Args:
 #       region (str): AWS region where the image is uploaded.
@@ -281,4 +279,128 @@ is_version_equal_or_lower <- function(highest_version,
   highest_version_list = INFERENTIA_VERSION_RANGES[[framework]][1]
   return(is_version_equal_or_higher(lowest_version_list, framework_version)
   && is_version_equal_or_lower(highest_version_list, framework_version))
+}
+
+
+UploadedCode = list("s3_prefix" = NULL, "script_name" = NULL)
+
+# Package source files and upload a compress tar file to S3. The S3
+# location will be ``s3://<bucket>/s3_key_prefix/sourcedir.tar.gz``.
+# If directory is an S3 URI, an UploadedCode object will be returned, but
+# nothing will be uploaded to S3 (this allow reuse of code already in S3).
+# If directory is None, the script will be added to the archive at
+# ``./<basename of script>``.
+# If directory is not None, the (recursive) contents of the directory will
+# be added to the archive. directory is treated as the base path of the
+# archive, and the script name is assumed to be a filename or relative path
+# inside the directory.
+# Args:
+#   sagemaker_session (sagemaker.Session): sagemaker_session session used to access S3.
+# bucket (str): S3 bucket to which the compressed file is uploaded.
+# s3_key_prefix (str): Prefix for the S3 key.
+# script (str): Script filename or path.
+# directory (str): Optional. Directory containing the source file. If it
+# starts with "s3://", no action is taken.
+# dependencies (List[str]): Optional. A list of paths to directories
+# (absolute or relative) containing additional libraries that will be
+# copied into /opt/ml/lib
+# kms_key (str): Optional. KMS key ID used to upload objects to the bucket
+# (default: None).
+# s3_resource (boto3.resource("s3")): Optional. Pre-instantiated Boto3 Resource
+# for S3 connections, can be used to customize the configuration,
+# e.g. set the endpoint URL (default: None).
+# Returns:
+#   sagemaker.fw_utils.UserCode: An object with the S3 bucket and key (S3 prefix) and
+# script name.
+tar_and_upload_dir = function(sagemaker_session,
+                              bucket,
+                              s3_key_prefix,
+                              script,
+                              directory=NULL,
+                              dependencies=NULL,
+                              kms_key=NULL){
+  if (!is.null(directory) && tolower(startsWith(directory,"s3://"))){
+    UploadedCode$s3_prefix=directory
+    UploadedCode$script_name= basename(script)
+    return(UploadedCode)}
+
+  script_name =  if(!is.null(directory)) script else basename(script)
+  dependencies = dependencies %||% list()
+  key = sprintf("%s/sourcedir.tar.gz",s3_key_prefix)
+  tmp = tempdir()
+
+  tryCatch({source_files = c(.list_files_to_compress(script, directory), dependencies)
+            tar_file = create_tar_file(source_files, file.path(tmp, "source.tar.gz"))})
+
+  if (!is.null(kms_key)) {
+    ServerSideEncryption = "aws:kms"
+    SSEKMSKeyId =  kms_key
+  } else {
+    ServerSideEncryption = NULL
+    SSEKMSKeyId =  NULL
+    }
+
+  s3_resource = paws::s3(sagemaker_session$paws_credentials$credentials)
+
+  obj <- readBin(tar_file, "raw", n = file.size(tar_file))
+  s3_resource$put_object(Body = obj, Bucket = bucket, Key = key,
+                         ServerSideEncryption = ServerSideEncryption,
+                         SSEKMSKeyId = SSEKMSKeyId)
+
+  on.exit(unlink(tmp, recursive = T))
+
+  UploadedCode$s3_prefix=sprintf("s3://%s/%s",bucket, key)
+  UploadedCode$script_name=script_name
+
+  return(UploadedCode)
+}
+
+.list_files_to_compress = function(script, directory){
+  if(is.null(directory))
+    return(list(script))
+
+  basedir = directory %||% dirname(script)
+
+  return(list.files(basedir, full.names = T))
+}
+
+# Returns the s3 key prefix for uploading code during model deployment
+# The location returned is a potential concatenation of 2 parts
+# 1. code_location_key_prefix if it exists
+# 2. model_name or a name derived from the image
+# Args:
+#   code_location_key_prefix (str): the s3 key prefix from code_location
+# model_name (str): the name of the model
+# image (str): the image from which a default name can be extracted
+# Returns:
+#   str: the key prefix to be used in uploading code
+model_code_key_prefix <- function(code_location_key_prefix, model_name, image){
+  training_job_name = name_from_image(image)
+  return(paste0(Filter(Negate(is.null), list(code_location_key_prefix, model_name %||% training_job_name)), collapse = "/"))
+}
+
+
+# Validate that the source directory exists and it contains the user script
+# Args:
+#   script (str): Script filename.
+# directory (str): Directory containing the source file.
+# Raises:
+#   ValueError: If ``directory`` does not exist, is not a directory, or does
+# not contain ``script``.
+validate_source_dir <- function(script, directory){
+  if (is.character(directory)){
+    if (!file_test("-f",file.path(directory, script))){
+      stop(sprintf('No file named "%s" was found in directory "%s".',script, directory), call. = F)
+    }
+  }
+  return(TRUE)
+}
+
+# Returns boolean indicating whether the region supports Amazon SageMaker Debugger.
+# Args:
+#   region_name (str): Name of the region to check against.
+# Returns:
+#   bool: Whether or not the region supports Amazon SageMaker Debugger.
+.region_supports_debugger = function(region_name){
+  return (!(tolower(region_name) %in% DEBUGGER_UNSUPPORTED_REGIONS))
 }
