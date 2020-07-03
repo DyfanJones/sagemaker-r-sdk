@@ -1,16 +1,15 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/logs.py
 
+#' @import logger
+
 sagemaker_logging_format <- function(){
   log_formatter(formatter = logger::formatter_sprintf)
-  if (requireNamespace("crayon", quietly = TRUE))
-    log_layout(layout_sagemaker_colour)
-  else
-    log_layout(layout_sagemaker)
+  log_layout(layout_sagemaker_colour)
 }
 
 layout_sagemaker_colour <- structure(function(level, msg, namespace = NA_character_,
                                               .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
-  sprintf('[%s:%s] %s', crayon::italic(format(Sys.time(), "%Y-%m-%d %H:%M:%S")), crayon::bold(colorize_by_log_level(attr(level,'level'), level)), grayscale_by_log_level(msg, level))
+  sprintf('[%s:%s] %s', crayon::italic(format(Sys.time(), "%Y-%m-%d %H:%M:%S")), sagemaker_log_colour(attr(level,'level'), level), msg, level)
 }, generator = quote(layout_simple()))
 
 layout_sagemaker <- structure(function(level, msg, namespace = NA_character_,
@@ -20,6 +19,19 @@ layout_sagemaker <- structure(function(level, msg, namespace = NA_character_,
 
   sprintf('[%s:%s] %s', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), attr(level,'level'), msg, level)
 }, generator = quote(layout_simple()))
+
+sagemaker_log_colour = function (msg, level) {
+  color <- switch(attr(level, "level"),
+                  FATAL =  sprintf("\033[38;5;%sm%s\033[39m", 196, msg),
+                  ERROR = sprintf("\033[38;5;%sm%s\033[39m", 124, msg),
+                  WARN = sprintf("\033[38;5;%sm%s\033[39m", 214, msg),
+                  SUCCESS = sprintf("\033[38;5;%sm%s\033[39m", 34, msg),
+                  INFO = sprintf("\x1b[%sm%s\x1b[0m", 34, msg),
+                  DEBUG = sprintf("\033[38;5;%sm%s\033[39m", 31, msg),
+                  TRACE = sprintf("\033[38;5;%sm%s\033[39m", 25, msg),
+                  stop("Unknown log level"))
+  color
+}
 
 # format logs
 sagemaker_colour_wrapper <- function(logs){
