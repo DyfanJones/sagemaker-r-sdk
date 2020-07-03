@@ -1,4 +1,10 @@
 #########################################################################
+# This example is an adaptation from
+# https://github.com/awslabs/amazon-sagemaker-examples/blob/master/introduction_to_applying_machine_learning/xgboost_direct_marketing/xgboost_direct_marketing_sagemaker.ipynb
+#
+#########################################################################
+
+#########################################################################
 # packages required
 #########################################################################
 library(R6sagemaker)
