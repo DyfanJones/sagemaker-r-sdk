@@ -3,7 +3,7 @@
 
 # get XGBoost framework image URI
 
-#' @include fw_registery.R
+#' @include fw_registry.R
 
 #' @title Get XGBoost framework image URI
 #' @param region (str): The aws region in which docker image is stored.
