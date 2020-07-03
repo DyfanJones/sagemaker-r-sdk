@@ -2,11 +2,30 @@
 % Please edit documentation in R/predictor.R
 \name{RealTimePredictor}
 \alias{RealTimePredictor}
-\title{Make prediction requests to an Amazon SageMaker endpoint.}
+\title{RealTimePredictor Class}
 \description{
 Make prediction requests to an Amazon SageMaker endpoint.
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{endpoint}}{Name of the Amazon SageMaker endpoint}
 
-Make prediction requests to an Amazon SageMaker endpoint.
+\item{\code{sagemaker_session}}{A SageMaker Session object}
+
+\item{\code{serializer}}{Class to convert data into raw to send to endpoint}
+
+\item{\code{deserializer}}{Class to convert raw data back from the endpoint}
+
+\item{\code{content_type}}{Format to of data to send endpoint}
+
+\item{\code{accept}}{Format returning from endpoint}
+
+\item{\code{.endpoint_config_name}}{Endpoint configuration name}
+
+\item{\code{.model_names}}{Model names being used at endpoint}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -108,7 +127,7 @@ single model (Default: NULL)}
 
 \item{\code{target_variant}}{(str): The name of the production variant to run an inference
 request on (Default: NULL). Note that the ProductionVariant identifies the model
-you want to host and the resources you want to deploy for hosting it.}
+you want to host and the resources you want to deploy for hosting it. Currently not implemented.}
 }
 \if{html}{\out{</div>}}
 }

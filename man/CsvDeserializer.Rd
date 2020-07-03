@@ -4,8 +4,7 @@
 \alias{CsvDeserializer}
 \title{CsvDeserializer Class}
 \description{
-All deserializer are children of this class. If a custom
-              deserializer is desired, inherit this class.
+Use csv format to deserialize raw data stream
 }
 \section{Super class}{
 \code{\link[R6sagemaker:Deserializer]{R6sagemaker::Deserializer}} -> \code{CsvDeserializer}

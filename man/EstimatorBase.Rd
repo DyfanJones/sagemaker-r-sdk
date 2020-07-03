@@ -10,6 +10,15 @@ For introduction to model training and deployment, see
              what hyperparameters to use, and how to create an appropriate predictor
              instance.
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{model_data}}{The model location in S3. Only set if Estimator has been ``fit()``.}
+
+\item{\code{training_job_analytics}}{Return a ``TrainingJobAnalytics`` object for the current training job.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -25,12 +34,11 @@ For introduction to model training and deployment, see
 \item \href{#method-compile_model}{\code{EstimatorBase$compile_model()}}
 \item \href{#method-attach}{\code{EstimatorBase$attach()}}
 \item \href{#method-deploy}{\code{EstimatorBase$deploy()}}
-\item \href{#method-model_data}{\code{EstimatorBase$model_data()}}
 \item \href{#method-create_model}{\code{EstimatorBase$create_model()}}
 \item \href{#method-delete_endpoint}{\code{EstimatorBase$delete_endpoint()}}
 \item \href{#method-transform}{\code{EstimatorBase$transform()}}
-\item \href{#method-training_job_analytics}{\code{EstimatorBase$training_job_analytics()}}
 \item \href{#method-get_vpc_config}{\code{EstimatorBase$get_vpc_config()}}
+\item \href{#method-.prepare_for_training}{\code{EstimatorBase$.prepare_for_training()}}
 \item \href{#method-print}{\code{EstimatorBase$print()}}
 \item \href{#method-clone}{\code{EstimatorBase$clone()}}
 }
@@ -585,17 +593,6 @@ sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()``
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-model_data"></a>}}
-\if{latex}{\out{\hypertarget{method-model_data}{}}}
-\subsection{Method \code{model_data()}}{
-The model location in S3. Only set if Estimator has been
-             ``fit()``.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$model_data()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-create_model"></a>}}
 \if{latex}{\out{\hypertarget{method-create_model}{}}}
 \subsection{Method \code{create_model()}}{
@@ -723,17 +720,6 @@ model. If not specified, the name of the training job is used.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-training_job_analytics"></a>}}
-\if{latex}{\out{\hypertarget{method-training_job_analytics}{}}}
-\subsection{Method \code{training_job_analytics()}}{
-Return a ``TrainingJobAnalytics`` object for the current training
-             job.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$training_job_analytics()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-get_vpc_config"></a>}}
 \if{latex}{\out{\hypertarget{method-get_vpc_config}{}}}
 \subsection{Method \code{get_vpc_config()}}{
@@ -747,6 +733,25 @@ Returns VpcConfig dict either from this Estimator's subnets and
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{vpc_config_override}}{:}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-.prepare_for_training"></a>}}
+\if{latex}{\out{\hypertarget{method-.prepare_for_training}{}}}
+\subsection{Method \code{.prepare_for_training()}}{
+Set any values in the estimator that need to be set before training.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$.prepare_for_training(job_name = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): Name of the training job to be created. If not
+specified, one is generated, using the base name given to the
+constructor if applicable.}
 }
 \if{html}{\out{</div>}}
 }

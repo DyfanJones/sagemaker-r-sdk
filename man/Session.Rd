@@ -24,7 +24,9 @@ bucket based on a naming convention which includes the current AWS account ID.
 \itemize{
 \item \href{#method-new}{\code{Session$new()}}
 \item \href{#method-upload_data}{\code{Session$upload_data()}}
+\item \href{#method-upload_string_as_file_body}{\code{Session$upload_string_as_file_body()}}
 \item \href{#method-download_data}{\code{Session$download_data()}}
+\item \href{#method-read_s3_file}{\code{Session$read_s3_file()}}
 \item \href{#method-list_s3_files}{\code{Session$list_s3_files()}}
 \item \href{#method-default_bucket}{\code{Session$default_bucket()}}
 \item \href{#method-train}{\code{Session$train()}}
@@ -148,6 +150,35 @@ str: The S3 URI of the uploaded file(s). If a file is specified in the path argu
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-upload_string_as_file_body"></a>}}
+\if{latex}{\out{\hypertarget{method-upload_string_as_file_body}{}}}
+\subsection{Method \code{upload_string_as_file_body()}}{
+Upload a string as a file body.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$upload_string_as_file_body(body, bucket, key, kms_key = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{body}}{(str): String representing the body of the file.}
+
+\item{\code{bucket}}{(str): Name of the S3 Bucket to upload to (default: None). If not specified, the
+default bucket of the ``Session`` is used (if default bucket does not exist, the
+``Session`` creates it).}
+
+\item{\code{key}}{(str): S3 object key. This is the s3 path to the file.}
+
+\item{\code{kms_key}}{(str): The KMS key to use for encrypting the file.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: The S3 URI of the uploaded file.
+             The URI format is: ``s3://{bucket name}/{key}``.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-download_data"></a>}}
 \if{latex}{\out{\hypertarget{method-download_data}{}}}
 \subsection{Method \code{download_data()}}{
@@ -174,6 +205,28 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-example-downloa
 }
 \subsection{Returns}{
 NULL invisibly
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_s3_file"></a>}}
+\if{latex}{\out{\hypertarget{method-read_s3_file}{}}}
+\subsection{Method \code{read_s3_file()}}{
+Read a single file from S3.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$read_s3_file(bucket, key_prefix)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{bucket}}{(str): Name of the S3 Bucket to download from.}
+
+\item{\code{key_prefix}}{(str): S3 object key name prefix.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: The body of the s3 file as a string.
 }
 }
 \if{html}{\out{<hr>}}

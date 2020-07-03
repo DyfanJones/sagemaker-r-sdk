@@ -20,6 +20,7 @@ A Sagemaker File System ``DataSource``.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{FileSystemInput$new()}}
+\item \href{#method-print}{\code{FileSystemInput$print()}}
 \item \href{#method-clone}{\code{FileSystemInput$clone()}}
 }
 }
@@ -55,6 +56,23 @@ https://docs.aws.amazon.com/fsx/latest/LustreGuide/mount-fs-auto-mount-onreboot.
 Valid values: 'ro' or 'rw'. Defaults to 'ro'.}
 
 \item{\code{content_type}}{:}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FileSystemInput$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

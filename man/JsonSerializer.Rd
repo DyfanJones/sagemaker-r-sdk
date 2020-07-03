@@ -2,11 +2,9 @@
 % Please edit documentation in R/predictor.R
 \name{JsonSerializer}
 \alias{JsonSerializer}
-\title{Make Raw data using csv format}
+\title{JsonSerializer Class}
 \description{
-Make Raw data using csv format
-
-Make Raw data using csv format
+Make Raw data using json format
 }
 \section{Super class}{
 \code{\link[R6sagemaker:Serializer]{R6sagemaker::Serializer}} -> \code{JsonSerializer}

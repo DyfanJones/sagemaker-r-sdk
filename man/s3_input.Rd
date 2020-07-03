@@ -12,6 +12,7 @@ Create a definition for input data used by an SageMaker training job.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{s3_input$new()}}
+\item \href{#method-print}{\code{s3_input$print()}}
 \item \href{#method-clone}{\code{s3_input$clone()}}
 }
 }
@@ -78,6 +79,23 @@ in a SageMaker AutoML job. It is required if the input is for SageMaker AutoML j
 \item{\code{shuffle_config}}{(ShuffleConfig): If specified this configuration enables shuffling on
 this channel. See the SageMaker API documentation for more info:
 https://docs.aws.amazon.com/sagemaker/latest/dg/API_ShuffleConfig.html}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{s3_input$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

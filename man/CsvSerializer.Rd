@@ -2,10 +2,8 @@
 % Please edit documentation in R/predictor.R
 \name{CsvSerializer}
 \alias{CsvSerializer}
-\title{Make Raw data using text/csv format}
+\title{CsvSerializer Class}
 \description{
-Make Raw data using text/csv format
-
 Make Raw data using text/csv format
 }
 \section{Super class}{

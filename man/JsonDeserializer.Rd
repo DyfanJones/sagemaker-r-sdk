@@ -2,11 +2,9 @@
 % Please edit documentation in R/predictor.R
 \name{JsonDeserializer}
 \alias{JsonDeserializer}
-\title{StringDeserializer Class}
+\title{JsonDeserializer Class}
 \description{
-StringDeserializer Class
-
-StringDeserializer Class
+Use json format to deserialize raw data stream
 }
 \section{Super class}{
 \code{\link[R6sagemaker:Deserializer]{R6sagemaker::Deserializer}} -> \code{JsonDeserializer}

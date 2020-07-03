@@ -4,9 +4,7 @@
 \alias{StringDeserializer}
 \title{StringDeserializer Class}
 \description{
-StringDeserializer Class
-
-StringDeserializer Class
+Deserialize raw data stream into a character string
 }
 \section{Super class}{
 \code{\link[R6sagemaker:Deserializer]{R6sagemaker::Deserializer}} -> \code{StringDeserializer}

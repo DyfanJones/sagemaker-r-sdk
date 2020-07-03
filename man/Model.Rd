@@ -2,10 +2,8 @@
 % Please edit documentation in R/model.R
 \name{Model}
 \alias{Model}
-\title{Initialize an SageMaker ``Model``.}
+\title{Model Class}
 \description{
-Initialize an SageMaker ``Model``.
-
 Initialize an SageMaker ``Model``.
 }
 \section{Methods}{
@@ -19,6 +17,7 @@ Initialize an SageMaker ``Model``.
 \item \href{#method-deploy}{\code{Model$deploy()}}
 \item \href{#method-transformer}{\code{Model$transformer()}}
 \item \href{#method-delete_model}{\code{Model$delete_model()}}
+\item \href{#method-.create_sagemaker_model}{\code{Model$.create_sagemaker_model()}}
 \item \href{#method-print}{\code{Model$print()}}
 \item \href{#method-clone}{\code{Model$clone()}}
 }
@@ -31,7 +30,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Model$new(
   model_data,
-  image,
+  image_uri,
   role = NULL,
   predictor_cls = NULL,
   env = NULL,
@@ -49,7 +48,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \item{\code{model_data}}{(str): The S3 location of a SageMaker model data
 ``.tar.gz`` file.}
 
-\item{\code{image}}{(str): A Docker image URI.}
+\item{\code{image_uri}}{(str): A Docker image URI.}
 
 \item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon
 SageMaker training jobs and APIs that create Amazon SageMaker
@@ -364,6 +363,39 @@ Delete an Amazon SageMaker Model.
 \if{html}{\out{<div class="r">}}\preformatted{Model$delete_model()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-.create_sagemaker_model"></a>}}
+\if{latex}{\out{\hypertarget{method-.create_sagemaker_model}{}}}
+\subsection{Method \code{.create_sagemaker_model()}}{
+Create a SageMaker Model Entity
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Model$.create_sagemaker_model(
+  instance_type,
+  accelerator_type = NULL,
+  tags = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{instance_type}}{(str): The EC2 instance type that this Model will be
+used for, this is only used to determine if the image needs GPU
+support or not.}
+
+\item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to
+attach to an endpoint for model loading and inference, for
+example, 'ml.eia1.medium'. If not specified, no Elastic
+Inference accelerator will be attached to the endpoint.}
+
+\item{\code{tags}}{(List[dict[str, str]]): Optional. The list of tags to add to
+the model. Example: >>> tags = [{'Key': 'tagname', 'Value':
+'tagvalue'}] For more information about tags, see
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html#SageMaker.Client.add_tags}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
