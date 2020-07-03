@@ -1,5 +1,5 @@
 # Warning!!!
-This repo is in constant development and is not stable.
+This repo is in constant development and is not currently stable.
 
 # Brief overview
 
@@ -8,4 +8,4 @@ This is repo is currently me experimenting with R6 classes and AWS Sagemaker Pyt
 
 # API overview
 
-This package aims to mimic python's AWS Sagemaker SDK api.
+This package aims to mimic python's AWS Sagemaker SDK api, but using `R6` and `paws`
