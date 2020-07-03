@@ -3,7 +3,6 @@
 #' @include utils.R
 #' @include fw_utils.R
 #' @include model.R
-#' @include fw_utils.R
 #' @include session.R
 #' @include vpc_utils.R
 #' @include analytics.R
@@ -13,7 +12,7 @@
 #' @import R6
 #' @import logger
 #' @import utils
-#' @import httr
+#' @importFrom urltools url_parse
 #' @import uuid
 
 #' @title Handle end-to-end Amazon SageMaker training and deployment tasks.
@@ -254,7 +253,7 @@ EstimatorBase = R6Class("EstimatorBase",
                           #'              specified, one is generated, using the base name given to the
                           #'              constructor if applicable.
                           prepare_workflow_for_training = function(job_name = NULL){
-                            private$.prepare_for_training(job_name=job_name)
+                            self$.prepare_for_training(job_name=job_name)
                           },
 
                           #' @description Gets the path to the DebuggerHookConfig output artifacts.
@@ -320,10 +319,10 @@ EstimatorBase = R6Class("EstimatorBase",
                                          job_name=NULL,
                                          experiment_config=NULL){
 
-                            private$.prepare_for_training(job_name=job_name)
+                            self$.prepare_for_training(job_name=job_name)
 
-                            self$latest_training_job = private$.start_new(inputs, experiment_config)$TrainingJobArn
-                            return(self$latest_training_job)
+                            # return job only
+                            self$latest_training_job = gsub(".*/","", private$.start_new(inputs, experiment_config)$TrainingJobArn)
 
                             self$jobs = c(self$jobs, self$latest_training_job)
 
@@ -547,8 +546,8 @@ EstimatorBase = R6Class("EstimatorBase",
                                 }
                               model = self$.compiled_models[[family]]
                             } else{
-                              create_model_args$model_kms_key = self$output_kms_key}
-                            model = do.call(self$create_model, create_model_args)
+                              create_model_args$model_kms_key = self$output_kms_key
+                              model = do.call(self$create_model, create_model_args)}
                             model$name = model_name
 
                             return (model$deploy(
@@ -563,21 +562,6 @@ EstimatorBase = R6Class("EstimatorBase",
                                         data_capture_config=data_capture_config))
                           },
 
-                          #' @description The model location in S3. Only set if Estimator has been
-                          #'              ``fit()``.
-                          model_data = function(){
-                            if (!is.null(self$latest_training_job)){
-                              model_uri = self$sagemaker_session$sagemaker$describe_training_job(
-                                              TrainingJobName=self$latest_training_job)$ModelArtifacts$S3ModelArtifacts
-                            } else {
-                                log_warn(
-                                  "No finished training job found associated with this estimator. Please make sure this estimator is only used for building workflow config")
-                                model_uri = file.path(self$output_path, self$.current_job_name, "output", "model.tar.gz")
-                            }
-
-                            return(model_uri)
-                          },
-
                           #' @description Create a SageMaker ``Model`` object that can be deployed to an
                           #'              ``Endpoint``.
                           #' @param ... : Keyword arguments used by the implemented method for
@@ -588,7 +572,7 @@ EstimatorBase = R6Class("EstimatorBase",
 
                           #' @description Delete an Amazon SageMaker ``Endpoint``.
                           delete_endpoint = function(){
-                            self$.ensure_latest_training_job(error_message="Endpoint was not created yet")
+                            private$.ensure_latest_training_job(error_message="Endpoint was not created yet")
                             self$sagemaker_session$delete_endpoint(self$latest_training_job)
                           },
 
@@ -696,17 +680,6 @@ EstimatorBase = R6Class("EstimatorBase",
                               sagemaker_session=self$sagemaker_session))
                             },
 
-                          #' @description Return a ``TrainingJobAnalytics`` object for the current training
-                          #'              job.
-                          training_job_analytics = function() {
-                            if (is.null(self$.current_job_name))
-                              stop("Estimator is not associated with a TrainingJob", call. = F)
-
-                            # TODO: create TrainingJobAnalytics class
-                            return(TrainingJobAnalytics$new(
-                              self$.current_job_name, sagemaker_session=self$sagemaker_session))
-                            },
-
                           #' @description Returns VpcConfig dict either from this Estimator's subnets and
                           #'              security groups, or else validate and return an optional override value.
                           #' @param vpc_config_override :
@@ -716,27 +689,22 @@ EstimatorBase = R6Class("EstimatorBase",
                             return (vpc_sanitize(vpc_config_override))
                           },
 
-                          #' @description
-                          #' Printer.
-                          #' @param ... (ignored).
-                          print = function(...){
-                            cat("<EstimatorBase>")
-                            invisible(self)
-                          }
-                          ),
-                        private = list(
+                          #' @description Set any values in the estimator that need to be set before training.
+                          #' @param job_name (str): Name of the training job to be created. If not
+                          #'              specified, one is generated, using the base name given to the
+                          #'              constructor if applicable.
                           .prepare_for_training = function(job_name = NULL) {
                             if(!is.null(job_name)){
                               self$.current_job_name = job_name
-                              } else {
-                                # honor supplied base_job_name or generate it
-                                if (!is.null(self$base_job_name)){
+                            } else {
+                              # honor supplied base_job_name or generate it
+                              if (!is.null(self$base_job_name)){
                                 base_name = self$base_job_name
-                                } else if (inherits(self$base_job_name, "AlgorithmEstimator")){ # need to work on this alittle more :)
-                                  base_name = split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))]
-                                } else {
-                                  base_name = base_name_from_image(self$train_image())}
-                                self$.current_job_name = name_from_base(base_name)}
+                              } else if (inherits(self$base_job_name, "AlgorithmEstimator")){ # need to work on this alittle more :)
+                                base_name = split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))]
+                              } else {
+                                base_name = base_name_from_image(self$train_image())}
+                              self$.current_job_name = name_from_base(base_name)}
 
                             # if output_path was specified we use it otherwise initialize here.
                             # For Local Mode with local_code=True we don't need an explicit output_path
@@ -758,6 +726,16 @@ EstimatorBase = R6Class("EstimatorBase",
                             private$.prepare_collection_configs()
                           },
 
+
+                          #' @description
+                          #' Printer.
+                          #' @param ... (ignored).
+                          print = function(...){
+                            cat("<EstimatorBase>")
+                            invisible(self)
+                          }
+                          ),
+                        private = list(
                         .prepare_rules = function(){
                           self$debugger_rule_configs = list()
                           if (!is.null(self$rules)){
@@ -771,7 +749,7 @@ EstimatorBase = R6Class("EstimatorBase",
                               }
                               # If source was provided as a rule parameter, upload to S3 and save the S3 uri.
                               if ("source_s3_uri" %in% rule$rule_parameters){
-                                parse_result = parse_url(rule$rule_parameters$source_s3_uri)
+                                parse_result = url_parse(rule$rule_parameters$source_s3_uri)
                                 }
                               if (parse_result$scheme != "s3"){
                                 desired_s3_uri = file.path(
@@ -804,8 +782,8 @@ EstimatorBase = R6Class("EstimatorBase",
                             self$collection_configs$update(self$debugger_hook_config$collection_configs %||% list())
                         },
 
-                        .ensure_latest_training_job = function(error_mesage = "Estimator is not associated with a training job"){
-                          if (is.null(self.latest_training_job))
+                        .ensure_latest_training_job = function(error_message = "Estimator is not associated with a training job"){
+                          if (is.null(self$latest_training_job))
                             stop(error_message, call. =F)
                         },
 
@@ -980,6 +958,34 @@ EstimatorBase = R6Class("EstimatorBase",
                           return(init_params)
                         }
 
+                        ),
+
+                        active = list(
+                          #' @field model_data
+                          #'        The model location in S3. Only set if Estimator has been ``fit()``.
+                          model_data = function(){
+                            if (!is.null(self$latest_training_job)){
+                              model_uri = self$sagemaker_session$sagemaker$describe_training_job(
+                                TrainingJobName=self$latest_training_job)$ModelArtifacts$S3ModelArtifacts
+                            } else {
+                              log_warn(
+                                "No finished training job found associated with this estimator. Please make sure this estimator is only used for building workflow config")
+                              model_uri = file.path(self$output_path, self$.current_job_name, "output", "model.tar.gz")
+                            }
+
+                            return(model_uri)
+                          },
+
+                          #' @field training_job_analytics
+                          #'        Return a ``TrainingJobAnalytics`` object for the current training job.
+                          training_job_analytics = function() {
+                            if (is.null(self$.current_job_name))
+                              stop("Estimator is not associated with a TrainingJob", call. = F)
+
+                            # TODO: create TrainingJobAnalytics class
+                            return(TrainingJobAnalytics$new(
+                              self$.current_job_name, sagemaker_session=self$sagemaker_session))
+                          }
                         ),
                         lock_objects = F
                       )
@@ -1171,7 +1177,7 @@ Estimator = R6Class("Estimator",
                           tensorboard_output_config=tensorboard_output_config,
                           enable_sagemaker_metrics=enable_sagemaker_metrics,
                           enable_network_isolation=enable_network_isolation)
-
+                        attr(self, "__module__") = environmentName(Estimator$parent_env)
                       },
 
                       #' @description Returns the docker image to use for training.
@@ -1197,7 +1203,6 @@ Estimator = R6Class("Estimator",
                       hyperparameters = function(){
                         return (self$hyperparam_list)
                       },
-
 
                       #' @description Create a model to deploy.
                       #'              The serializer, deserializer, content_type, and accept arguments are only used to define a
@@ -1240,8 +1245,12 @@ Estimator = R6Class("Estimator",
                                               accept=NULL,
                                               vpc_config_override="VPC_CONFIG_DEFAULT",
                                               ...){
-                        args = c(as.list(environment()), list(...))
-                        args$vpc_config_override = NULL
+                        args = list(role = role %||% self$role,
+                                    image_uri = image %||% self$train_image(),
+                                    vpc_config = self$get_vpc_config(vpc_config_override),
+                                    sagemaker_session = self$sagemaker_session,
+                                    model_data = self$model_data,
+                                    ...)
 
                         if(is.null(args$predictor_cls)){
 
@@ -1250,14 +1259,10 @@ Estimator = R6Class("Estimator",
                               endpoint, session, serializer, deserializer, content_type, accept))
                           }
 
-                          args$predictor_cls = predict_wrapper
+                          predictor_cls = predict_wrapper
                         }
 
-                        args$role = args$role %||% self$role
-                        args$image = args$image %||% self$train_image()
-                        args$vpc_config = self$get_vpc_config(vpc_config_override)
-                        args$sagemaker_session = self$sagemaker_session
-                        args$model_data = self$model_data
+                        args$predictor_cls = predictor_cls
 
                         if (!("enable_network_isolation" %in% names(args)))
                             args$enable_network_isolation = self$enable_network_isolation()
@@ -1291,6 +1296,562 @@ Estimator = R6Class("Estimator",
 
                         init_params$image_name = init_params$image
                         init_params$image <- NULL
+                        return(init_params)
+                      }
+                    ),
+                    lock_objects = F
+)
+
+
+#' @title FrameWork Class
+#' @description Base class that cannot be instantiated directly.
+#'              Subclasses define functionality pertaining to specific ML frameworks,
+#'              such as training/deployment images and predictor instances.
+#' @export
+FrameWork = R6Class("FrameWork",
+                    inherit = EstimatorBase,
+                    public = list(
+                      #' @field LAUNCH_PS_ENV_NAME
+                      #' class metadata
+                      LAUNCH_PS_ENV_NAME = "sagemaker_parameter_server_enabled",
+
+                      #' @field LAUNCH_MPI_ENV_NAME
+                      #' class metadata
+                      LAUNCH_MPI_ENV_NAME = "sagemaker_mpi_enabled",
+
+                      #' @field MPI_NUM_PROCESSES_PER_HOST
+                      #' class metadata
+                      MPI_NUM_PROCESSES_PER_HOST = "sagemaker_mpi_num_of_processes_per_host",
+
+                      #' @field MPI_CUSTOM_MPI_OPTIONS
+                      #' class metadata
+                      MPI_CUSTOM_MPI_OPTIONS = "sagemaker_mpi_custom_mpi_options",
+
+                      #' @field CONTAINER_CODE_CHANNEL_SOURCEDIR_PATH
+                      #' class metadata
+                      CONTAINER_CODE_CHANNEL_SOURCEDIR_PATH = "/opt/ml/input/data/code/sourcedir.tar.gz",
+
+                      #' @description Base class initializer. Subclasses which override ``__init__`` should
+                      #'              invoke ``super()``
+                      #' @param entry_point (str): Path (absolute or relative) to the local Python
+                      #'              source file which should be executed as the entry point to
+                      #'              training. If ``source_dir`` is specified, then ``entry_point``
+                      #'              must point to a file located at the root of ``source_dir``.
+                      #'              If 'git_config' is provided, 'entry_point' should be
+                      #'              a relative location to the Python source file in the Git repo.
+                      #'              Example:
+                      #'              With the following GitHub repo directory structure:
+                      #'              >>> |----- README.md
+                      #'              >>> |----- src
+                      #'              >>>         |----- train.py
+                      #'              >>>         |----- test.py
+                      #'              You can assign entry_point='src/train.py'.
+                      #' @param source_dir (str): Path (absolute, relative or an S3 URI) to a directory
+                      #'              with any other training source code dependencies aside from the entry
+                      #'              point file (default: None). If ``source_dir`` is an S3 URI, it must
+                      #'              point to a tar.gz file. Structure within this directory are preserved
+                      #'              when training on Amazon SageMaker. If 'git_config' is provided,
+                      #'              'source_dir' should be a relative location to a directory in the Git
+                      #'              repo.
+                      #'              .. admonition:: Example
+                      #'              With the following GitHub repo directory structure:
+                      #'              >>> |----- README.md
+                      #'              >>> |----- src
+                      #'              >>>         |----- train.py
+                      #'              >>>         |----- test.py
+                      #'              and you need 'train.py' as entry point and 'test.py' as
+                      #'              training source code as well, you can assign
+                      #'              entry_point='train.py', source_dir='src'.
+                      #' @param hyperparameters (dict): Hyperparameters that will be used for
+                      #'              training (default: None). The hyperparameters are made
+                      #'              accessible as a dict[str, str] to the training code on
+                      #'              SageMaker. For convenience, this accepts other types for keys
+                      #'              and values, but ``str()`` will be called to convert them before
+                      #'              training.
+                      #' @param enable_cloudwatch_metrics (bool): [DEPRECATED] Now there are
+                      #'              cloudwatch metrics emitted by all SageMaker training jobs. This
+                      #'              will be ignored for now and removed in a further release.
+                      #' @param container_log_level (str): Log level to use within the container
+                      #'              (default: "INFO")
+                      #' @param code_location (str): The S3 prefix URI where custom code will be
+                      #'              uploaded (default: None) - don't include a trailing slash since
+                      #'              a string prepended with a "/" is appended to ``code_location``. The code
+                      #'              file uploaded to S3 is 'code_location/job-name/source/sourcedir.tar.gz'.
+                      #'              If not specified, the default ``code location`` is s3://output_bucket/job-name/.
+                      #' @param image_uri (str): An alternate image name to use instead of the
+                      #'              official Sagemaker image for the framework. This is useful to
+                      #'              run one of the Sagemaker supported frameworks with an image
+                      #'              containing custom dependencies.
+                      #' @param dependencies (list[str]): A list of paths to directories (absolute
+                      #'              or relative) with any additional libraries that will be exported
+                      #'              to the container (default: []). The library folders will be
+                      #'              copied to SageMaker in the same folder where the entrypoint is
+                      #'              copied. If 'git_config' is provided, 'dependencies' should be a
+                      #'              list of relative locations to directories with any additional
+                      #'              libraries needed in the Git repo.
+                      #'              .. admonition:: Example
+                      #'              The following call
+                      #'              >>> Estimator(entry_point='train.py',
+                      #'              ...           dependencies=['my/libs/common', 'virtual-env'])
+                      #'              results in the following inside the container:
+                      #'              >>> $ ls
+                      #'              >>> opt/ml/code
+                      #'              >>>     |------ train.py
+                      #'              >>>     |------ common
+                      #'              >>>     |------ virtual-env
+                      #'              This is not supported with "local code" in Local Mode.
+                      #' @param enable_network_isolation (bool): Specifies whether container will
+                      #'              run in network isolation mode. Network isolation mode restricts
+                      #'              the container access to outside networks (such as the internet).
+                      #'              The container does not make any inbound or outbound network
+                      #'              calls. If True, a channel named "code" will be created for any
+                      #'              user entry script for training. The user entry script, files in
+                      #'              source_dir (if specified), and dependencies will be uploaded in
+                      #'              a tar to S3. Also known as internet-free mode (default: `False`).
+                      #' @param git_config (dict[str, str]): Git configurations used for cloning
+                      #'              files, including ``repo``, ``branch``, ``commit``,
+                      #'              ``2FA_enabled``, ``username``, ``password`` and ``token``. The
+                      #'              ``repo`` field is required. All other fields are optional.
+                      #'              ``repo`` specifies the Git repository where your training script
+                      #'              is stored. If you don't provide ``branch``, the default value
+                      #'              'master' is used. If you don't provide ``commit``, the latest
+                      #'              commit in the specified branch is used. .. admonition:: Example
+                      #'              The following config:
+                      #'              >>> git_config = {'repo': 'https://github.com/aws/sagemaker-python-sdk.git',
+                      #'              >>>               'branch': 'test-branch-git-config',
+                      #'              >>>               'commit': '329bfcf884482002c05ff7f44f62599ebc9f445a'}
+                      #'              results in cloning the repo specified in 'repo', then
+                      #'              checkout the 'master' branch, and checkout the specified
+                      #'              commit.
+                      #'              ``2FA_enabled``, ``username``, ``password`` and ``token`` are
+                      #'              used for authentication. For GitHub (or other Git) accounts, set
+                      #'              ``2FA_enabled`` to 'True' if two-factor authentication is
+                      #'              enabled for the account, otherwise set it to 'False'. If you do
+                      #'              not provide a value for ``2FA_enabled``, a default value of
+                      #'              'False' is used. CodeCommit does not support two-factor
+                      #'              authentication, so do not provide "2FA_enabled" with CodeCommit
+                      #'              repositories.
+                      #'              For GitHub and other Git repos, when SSH URLs are provided, it
+                      #'              doesn't matter whether 2FA is enabled or disabled; you should
+                      #'              either have no passphrase for the SSH key pairs, or have the
+                      #'              ssh-agent configured so that you will not be prompted for SSH
+                      #'              passphrase when you do 'git clone' command with SSH URLs. When
+                      #'              HTTPS URLs are provided: if 2FA is disabled, then either token
+                      #'              or username+password will be used for authentication if provided
+                      #'              (token prioritized); if 2FA is enabled, only token will be used
+                      #'              for authentication if provided. If required authentication info
+                      #'              is not provided, python SDK will try to use local credentials
+                      #'              storage to authenticate. If that fails either, an error message
+                      #'              will be thrown.
+                      #'              For CodeCommit repos, 2FA is not supported, so '2FA_enabled'
+                      #'              should not be provided. There is no token in CodeCommit, so
+                      #'              'token' should not be provided too. When 'repo' is an SSH URL,
+                      #'              the requirements are the same as GitHub-like repos. When 'repo'
+                      #'              is an HTTPS URL, username+password will be used for
+                      #'              authentication if they are provided; otherwise, python SDK will
+                      #'              try to use either CodeCommit credential helper or local
+                      #'              credential storage for authentication.
+                      #' @param checkpoint_s3_uri (str): The S3 URI in which to persist checkpoints
+                      #'              that the algorithm persists (if any) during training. (default:
+                      #'              ``None``).
+                      #' @param checkpoint_local_path (str): The local path that the algorithm
+                      #'              writes its checkpoints to. SageMaker will persist all files
+                      #'              under this path to `checkpoint_s3_uri` continually during
+                      #'              training. On job startup the reverse happens - data from the
+                      #'              s3 location is downloaded to this path before the algorithm is
+                      #'              started. If the path is unset then SageMaker assumes the
+                      #'              checkpoints will be provided under `/opt/ml/checkpoints/`.
+                      #'              (default: ``None``).
+                      #' @param enable_sagemaker_metrics (bool): enable SageMaker Metrics Time
+                      #'              Series. For more information see:
+                      #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_AlgorithmSpecification.html#SageMaker-Type-AlgorithmSpecification-EnableSageMakerMetricsTimeSeries
+                      #'              (default: ``None``).
+                      #' @param ... : Additional kwargs passed to the ``EstimatorBase``
+                      #'              constructor.
+                      #'              .. tip::
+                      #'              You can find additional parameters for initializing this class at
+                      #'              :class:`~sagemaker.estimator.EstimatorBase`.
+                      initialize = function(entry_point,
+                                            source_dir=NULL,
+                                            hyperparameters=NULL,
+                                            container_log_level=c("INFO", "WARN", "ERROR", "FATAL", "CRITICAL"),
+                                            code_location=NULL,
+                                            image_uri=NULL,
+                                            dependencies=NULL,
+                                            enable_network_isolation=FALSE,
+                                            git_config=NULL,
+                                            checkpoint_s3_uri=NULL,
+                                            checkpoint_local_path=NULL,
+                                            enable_sagemaker_metrics=NULL,
+                                            ...){
+                        super$intialize(enable_network_isolation=enable_network_isolation, ...)
+                        if (startsWith(entry_point,"s3://")){
+                          stop(sprintf("Invalid entry point script: %s. Must be a path to a local file.",
+                              entry_point))}
+
+                        self$entry_point = entry_point
+                        self$git_config = git_config
+                        self$source_dir = source_dir
+                        self$dependencies = dependencies %||% list()
+
+                        self$enable_cloudwatch_metrics = FALSE
+
+                        # Align logging level with python logging
+                        container_log_level = match.arg(toupper(container_log_level))
+                        container_log_level = switch(container_log_level,
+                                                     "INFO" = 20,
+                                                     "WARN" = 30,
+                                                     "ERROR" = 40,
+                                                     "FATAL" = 50,
+                                                     "CRITICAL" = 50)
+                        self$container_log_level = container_log_level
+                        self$code_location = code_location
+                        self$image_name = image_uri
+
+                        self$uploaded_code = NULL
+
+                        self$.hyperparameters = hyperparameters %||% {}
+                        self$checkpoint_s3_uri = checkpoint_s3_uri
+                        self$checkpoint_local_path = checkpoint_local_path
+                        self$enable_sagemaker_metrics = enable_sagemaker_metrics
+
+                        attr(self, "__framework_name__") = NULL
+                      },
+
+                      #' @description Set hyperparameters needed for training. This method will also
+                      #'              validate ``source_dir``.
+                      #' @param job_name (str): Name of the training job to be created. If not
+                      #'              specified, one is generated, using the base name given to the
+                      #'              constructor if applicable.
+                      .prepare_for_training = function(job_name=NULL){
+
+                        super$.prepare_for_training(job_name = job_name)
+
+                        if (!islistempty(self$git_config)){
+                          updated_paths = git_clone_repo(
+                            self$git_config, self$entry_point, self$source_dir, self$dependencies)
+                          self$entry_point = updated_paths$entry_point
+                          self$source_dir = updated_paths$source_dir
+                          self$dependencies = updated_paths$dependencies
+                        }
+
+                        # validate source dir will raise a ValueError if there is something wrong with the
+                        # source directory. We are intentionally not handling it because this is a critical error.
+                        if (!is.null(self$source_dir) && !startWith(tolower(self$source_dir),"s3://"))
+                          validate_source_dir(self$entry_point, self$source_dir)
+
+                        # if we are in local mode with local_code=True. We want the container to just
+                        # mount the source dir instead of uploading to S3.
+                        local_code = get_config_value("local.local_code", self$sagemaker_session$config)
+                        if (self$sagemaker_session$local_mode && local_code){
+                          # if there is no source dir, use the directory containing the entry point.
+                          if (is.null(self$source_dir))
+                            self$source_dir = dirname(self$entry_point)
+                          self.entry_point = basename(self$entry_point)
+
+                          code_dir = paste0("file://", self$source_dir)
+                          script = self$entry_point
+                        } else if (self$enable_network_isolation() && !is.null(self$entry_point)){
+                          self$uploaded_code = self$.stage_user_code_in_s3()
+                          code_dir = self$CONTAINER_CODE_CHANNEL_SOURCEDIR_PATH
+                          script = self$uploaded_code$script_name
+                          self$code_uri = self$uploaded_code$s3_prefix
+                        } else{
+                          self$uploaded_code = private$.stage_user_code_in_s3()
+                          code_dir = self$uploaded_code$s3_prefix
+                          script = self$uploaded_code$script_name
+                        }
+
+                        # Modify hyperparameters in-place to point to the right code directory and script URIs
+                        self$.hyperparameters[[DIR_PARAM_NAME]] = code_dir
+                        self$.hyperparameters[[SCRIPT_PARAM_NAME]] = script
+                        self$.hyperparameters[[CLOUDWATCH_METRICS_PARAM_NAME]] = self$enable_cloudwatch_metrics
+                        self$.hyperparameters[[CONTAINER_LOG_LEVEL_PARAM_NAME]] = self$container_log_level
+                        self$.hyperparameters[[JOB_NAME_PARAM_NAME]] = self$.current_job_name
+                        self$.hyperparameters[[SAGEMAKER_REGION_PARAM_NAME]] = self$sagemaker_session$paws_region_name
+
+                        private$.validate_and_set_debugger_configs()
+                      },
+
+                      #' @description Return the hyperparameters as a dictionary to use for training.
+                      #'              The :meth:`~sagemaker.estimator.EstimatorBase.fit` method, which
+                      #'              trains the model, calls this method to find the hyperparameters.
+                      #' @return dict[str, str]: The hyperparameters.
+                      hyperparameters = function(){
+                        return(self$.hyperparameters)
+                      },
+
+                      #' @description Return the Docker image to use for training.
+                      #'              The :meth:`~sagemaker.estimator.EstimatorBase.fit` method, which does
+                      #'              the model training, calls this method to find the image to use for model
+                      #'              training.
+                      #' @return str: The URI of the Docker image.
+                      train_image = function(){
+                        if (self$image_name)
+                          return (self$image_name)
+                        return (create_image_uri(
+                          self$sagemaker_session$boto_region_name,
+                          attributes(self)$`__framework_name__`,
+                          self$train_instance_type,
+                          self$framework_version,  # pylint: disable=no-member
+                          py_version=self$py_version)
+                        )
+                      },
+
+                      #' @description Attach to an existing training job.
+                      #'              Create an Estimator bound to an existing training job, each subclass
+                      #'              is responsible to implement
+                      #'              ``_prepare_init_params_from_job_description()`` as this method delegates
+                      #'              the actual conversion of a training job description to the arguments
+                      #'              that the class constructor expects. After attaching, if the training job
+                      #'              has a Complete status, it can be ``deploy()`` ed to create a SageMaker
+                      #'              Endpoint and return a ``Predictor``.
+                      #'              If the training job is in progress, attach will block and display log
+                      #'              messages from the training job, until the training job completes.
+                      #'              Examples:
+                      #'              >>> my_estimator.fit(wait=False)
+                      #'              >>> training_job_name = my_estimator.latest_training_job.name
+                      #'              Later on:
+                      #'              >>> attached_estimator = Estimator.attach(training_job_name)
+                      #'              >>> attached_estimator.deploy()
+                      #' @param training_job_name (str): The name of the training job to attach to.
+                      #' @param sagemaker_session (sagemaker.session.Session): Session object which
+                      #'              manages interactions with Amazon SageMaker APIs and any other
+                      #'              AWS services needed. If not specified, the estimator creates one
+                      #'              using the default AWS configuration chain.
+                      #' @param model_channel_name (str): Name of the channel where pre-trained
+                      #'              model data will be downloaded (default: 'model'). If no channel
+                      #'              with the same name exists in the training job, this option will
+                      #'              be ignored.
+                      #' @return Instance of the calling ``Estimator`` Class with the attached
+                      #'              training job.
+                      attach = function(training_job_name,
+                                        sagemaker_session=NULL,
+                                        model_channel_name="model"){
+                        estimator = super$attach(
+                          training_job_name, sagemaker_session, model_channel_name)
+
+                        UploadedCode$s3_prefix=estimator$source_dir
+                        UploadedCode$script_name= estimator$entry_point
+
+                        estimator$uploaded_code = UploadedCode
+                        return(estimator)
+                      },
+
+                      #' @description Return a ``Transformer`` that uses a SageMaker Model based on the
+                      #'              training job. It reuses the SageMaker Session and base job name used by
+                      #'              the Estimator.
+                      #' @param instance_count (int): Number of EC2 instances to use.
+                      #' @param instance_type (str): Type of EC2 instance to use, for example,
+                      #'              ml.c4.xlarge'.
+                      #' @param strategy (str): The strategy used to decide how to batch records in
+                      #'              a single request (default: None). Valid values: 'MultiRecord'
+                      #'              and 'SingleRecord'.
+                      #' @param assemble_with (str): How the output is assembled (default: None).
+                      #'              Valid values: 'Line' or 'None'.
+                      #' @param output_path (str): S3 location for saving the transform result. If
+                      #'              not specified, results are stored to a default bucket.
+                      #' @param output_kms_key (str): Optional. KMS key ID for encrypting the
+                      #'              transform output (default: None).
+                      #' @param accept (str): The accept header passed by the client to
+                      #'              the inference endpoint. If it is supported by the endpoint,
+                      #'              it will be the format of the batch transform output.
+                      #' @param env (dict): Environment variables to be set for use during the
+                      #'              transform job (default: None).
+                      #' @param max_concurrent_transforms (int): The maximum number of HTTP requests
+                      #'              to be made to each individual transform container at one time.
+                      #' @param max_payload (int): Maximum size of the payload in a single HTTP
+                      #'              request to the container in MB.
+                      #' @param tags (list[dict]): List of tags for labeling a transform job. If
+                      #'              none specified, then the tags used for the training job are used
+                      #'              for the transform job.
+                      #' @param role (str): The ``ExecutionRoleArn`` IAM Role ARN for the ``Model``,
+                      #'              which is also used during transform jobs. If not specified, the
+                      #'              role from the Estimator will be used.
+                      #' @param model_server_workers (int): Optional. The number of worker processes
+                      #'              used by the inference server. If None, server will use one
+                      #'              worker per vCPU.
+                      #' @param volume_kms_key (str): Optional. KMS key ID for encrypting the volume
+                      #'              attached to the ML compute instance (default: None).
+                      #' @param entry_point (str): Path (absolute or relative) to the local Python source file which
+                      #'              should be executed as the entry point to training. If ``source_dir`` is specified,
+                      #'              then ``entry_point`` must point to a file located at the root of ``source_dir``.
+                      #'              If not specified, the training entry point is used.
+                      #' @param vpc_config_override (dict[str, list[str]]): Optional override for
+                      #'              the VpcConfig set on the model.
+                      #'              Default: use subnets and security groups from this Estimator.
+                      #'              * 'Subnets' (list[str]): List of subnet ids.
+                      #'              * 'SecurityGroupIds' (list[str]): List of security group ids.
+                      #' @param enable_network_isolation (bool): Specifies whether container will
+                      #'              run in network isolation mode. Network isolation mode restricts
+                      #'              the container access to outside networks (such as the internet).
+                      #'              The container does not make any inbound or outbound network
+                      #'              calls. If True, a channel named "code" will be created for any
+                      #'              user entry script for inference. Also known as Internet-free mode.
+                      #'              If not specified, this setting is taken from the estimator's
+                      #'              current configuration.
+                      #' @param model_name (str): Name to use for creating an Amazon SageMaker
+                      #'              model. If not specified, the name of the training job is used.
+                      #' @return sagemaker.transformer.Transformer: a ``Transformer`` object that can be used to start a
+                      #'              SageMaker Batch Transform job.
+                      transformer = function(instance_count,
+                                             instance_type,
+                                             strategy=NULL,
+                                             assemble_with=NULL,
+                                             output_path=NULL,
+                                             output_kms_key=NULL,
+                                             accept=NULL,
+                                             env=NULL,
+                                             max_concurrent_transforms=NULL,
+                                             max_payload=NULL,
+                                             tags=NULL,
+                                             role=NULL,
+                                             model_server_workers=NULL,
+                                             volume_kms_key=NULL,
+                                             entry_point=NULL,
+                                             vpc_config_override=VPC_CONFIG_DEFAULT,
+                                             enable_network_isolation=NULL,
+                                             model_name=NULL){
+                        role = role %||% self$role
+                        tags = tags %||% self$tags
+
+                        if (!is.null(self$latest_training_job)){
+                          if (is.null(enable_network_isolation))
+                            enable_network_isolation = self$enable_network_isolation()
+
+                          model = self$create_model(
+                            role=role,
+                            model_server_workers=model_server_workers,
+                            entry_point=entry_point,
+                            vpc_config_override=vpc_config_override,
+                            model_kms_key=self$output_kms_key,
+                            enable_network_isolation=enable_network_isolation,
+                            name=model_name)
+                          model$.create_sagemaker_model(instance_type, tags=tags)
+
+                          model_name = model.name
+                          transform_env = model$env
+                          if (!islistempty(env))
+                            transform_env = c(transform_env, env)
+                        } else {
+                          log_warn(paste0(
+                            "No finished training job found associated with this estimator. Please make sure ",
+                            "this estimator is only used for building workflow config"))
+                          model_name = model_name %||% self$.current_job_name
+                          transform_env = env %||% list()
+                        }
+
+                        return(Transformer$new(
+                          model_name,
+                          instance_count,
+                          instance_type,
+                          strategy=strategy,
+                          assemble_with=assemble_with,
+                          output_path=output_path,
+                          output_kms_key=output_kms_key,
+                          accept=accept,
+                          max_concurrent_transforms=max_concurrent_transforms,
+                          max_payload=max_payload,
+                          env=transform_env,
+                          tags=tags,
+                          base_transform_job_name=self$base_job_name,
+                          volume_kms_key=volume_kms_key,
+                          sagemaker_session=self$sagemaker_session)
+                        )
+                      }
+
+                    ),
+                    private = list(
+                      # Upload the user training script to s3 and return the location.
+                      # Returns: s3 uri
+                      .stage_user_code_in_s3 = function(){
+                        local_mode = startsWith(self$output_path, "file://")
+
+                        if (is.null(self$code_location) && local_mode){
+                          parsed_s3 = list()
+                          parsed_s3$bucket = self$sagemaker_session$default_bucket()
+                          parsed_s3$key = sprintf("%s/%s",self$.current_job_name, "source")
+                          kms_key = NULL
+                        } else if(is.null(self$code_location)){
+                          parsed_s3 = split_s3_uri(self$output_path)
+                          code_s3_prefix = sprintf("%s/%s",self$.current_job_name, "source")
+                          kms_key = self$output_kms_key
+                        } else if (local_mode) {
+                          parsed_s3 = split_s3_uri(self.code_location)
+                          code_s3_prefix = paste(Filter(Negate(is.null), c(key_prefix, self$.current_job_name, "source")), collapse = "/")
+                          kms_key = NULL
+                        } else {
+                          parsed_s3 = split_s3_uri(self.code_location)
+                          code_s3_prefix = paste(Filter(Negate(is.null), c(key_prefix, self$.current_job_name, "source")), collapse = "/")
+
+                          parsed_s3 = split_s3_uri(self.output_path)
+                          kms_key = if (parsed_s3$bucket == output_bucket) self$output_kms_key else NULL
+                        }
+                        return (tar_and_upload_dir(
+                          sagemaker_session=self$sagemaker_session,
+                          bucket=parsed_s3$bucket,
+                          s3_key_prefix=parsed_s3$key,
+                          script=self$entry_point,
+                          directory=self$source_dir,
+                          dependencies=self$dependencies,
+                          kms_key=kms_key)
+                          )
+                        },
+
+                      # Set defaults for debugging
+                      .validate_and_set_debugger_configs = function(){
+                        if (is.null(self$debugger_hook_config)
+                            && .region_supports_debugger(self$sagemaker_session$paws_region_name))
+                          self.debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)
+                        else if(!self$debugger_hook_config)
+                          self$debugger_hook_config = NULL
+                        },
+
+                      # Get the appropriate value to pass as source_dir to model constructor
+                      # on deploying
+                      # Returns:
+                      #   str: Either a local or an S3 path pointing to the source_dir to be
+                      # used for code by the model to be deployed
+                      .model_source_dir = function(){
+                        return (if(self$sagemaker_session$local_mode) self$source_dir
+                                else self$uploaded_code$s3_prefix)
+                        },
+
+                      # Convert the job description to init params that can be handled by the
+                      # class constructor
+                      # Args:
+                      #   job_details: the returned job details from a describe_training_job
+                      # API call.
+                      # model_channel_name (str): Name of the channel where pre-trained
+                      # model data will be downloaded
+                      # Returns:
+                      #   dictionary: The transformed init_params
+                      .prepare_init_params_from_job_description = function(job_details,
+                                                                           model_channel_name=NULL){
+                        init_params = super$.prepare_init_params_from_job_description(
+                          job_details, model_channel_name)
+
+                        init_params$entry_point = init_params$hyperparameters[[SCRIPT_PARAM_NAME]]
+
+                        init_params$source_dir = init_params$hyperparameters[[DIR_PARAM_NAME]]
+                        init_params$enable_cloudwatch_metrics = init_params$hyperparameters[[CLOUDWATCH_METRICS_PARAM_NAME]]
+                        init_params$container_log_level = init_params$hyperparameters[[CONTAINER_LOG_LEVEL_PARAM_NAME]]
+
+                        hyperparameters = list()
+                        for (i in seq_along(init_params$hyperparameters)) {
+                          k = names(init_params$hyperparameters)[i]
+                          v = init_params$hyperparameters[[i]]
+                          # Tuning jobs add this special hyperparameter which is not JSON serialized
+                          if (k == "_tuning_objective_metric"){
+                            if (startsWith(v, '"') && endswith(v, '"'))
+                              v = gsub('"', '', v)
+                            hyperparameters[[k]] = v
+                          } else {
+                            hyperparameters[[k]] = v}
+                        }
+
+                        init_params$hyperparameters = hyperparameters
+
                         return(init_params)
                       }
                     ),
