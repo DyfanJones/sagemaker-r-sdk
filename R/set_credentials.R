@@ -7,10 +7,7 @@
 #'
 #' @seealso [paws_cred]
 #'
-#' @import paws
-#' @import jsonlite
 #' @import R6
-#' @import logger
 #' @import utils
 #' @export
 PawsCredentials = R6Class("PawsCredentials",
