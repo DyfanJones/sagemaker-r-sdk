@@ -1,8 +1,8 @@
 Package: R6sagemaker
-Type: R SDK for `AWS Sagemaker`
-Title: What the Package Does (Title Case)
+Type: Package
+Title: R SDK for `AWS Sagemaker`
 Version: 0.1.0
-Author: Who wrote it
+Author: Dyfan Jones
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
@@ -10,33 +10,43 @@ Import: R6,
         paws,
         jsonlite,
         logger,
-        httr
+        urltools,
+        data.table,
+        uuid
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
 Collate: 
-    'fw_registry.R'
-    'xgboost_estimator.R'
-    'utils.R'
-    'amazon_estimator.R'
     'analytics.R'
-    'data_capture_config.R'
-    'debugger.R'
     'vpc_utils.R'
+    'utils.R'
     'set_credentials.R'
     'logs.R'
     'session.R'
+    'git_utils.R'
     'transformer.R'
     'fw_utils.R'
     'model.R'
+    'predictor.R'
     'estimator.R'
+    'parameter.R'
+    'algorithm.R'
+    'fw_registery.R'
+    'xgboost_estimator.R'
+    'amazon_estimator.R'
+    'data_capture_config.R'
+    'debugger.R'
+    'hyperparameter.R'
     'input.R'
     'job.R'
-    'model_monitoring.R'
-    'pkg_variables.R'
-    'predictor.R'
-    'r6sagemaker.R'
     's3.R'
+    'model_monitoring.R'
+    'monitoring_files.R'
+    'network.R'
+    'pkg_variables.R'
+    'processing.R'
+    'r6sagemaker.R'
+    'tuner.R'
     'xgboost_default.R'
     'zzz.R'
