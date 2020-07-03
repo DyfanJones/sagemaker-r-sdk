@@ -1,3 +1,5 @@
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/utils.py
+
 `%||%` <- function(x, y) if (is.null(x)) return(y) else return(x)
 
 get_aws_env <- function(x) {
@@ -172,6 +174,8 @@ retry_api_call <- function(expr, retry = 5){
   resp
 }
 
+
+
 # get prefix of ECR image URI
 # Args:
 #   account (str): AWS account number
@@ -186,3 +190,180 @@ get_ecr_image_uri_prefix <- function(account,
 
 islistempty = function(obj) {(is.null(obj) || length(obj) == 0)}
 
+# Create a tar file containing all the source_files
+# Args:
+#   source_files: (List[str]): List of file paths that will be contained in the tar file
+# target:
+#   Returns:
+#   (str): path to created tar file
+create_tar_file = function(source_files, target=NULL){
+  if (!is.null(target)) filename = target else filename = tempfile(fileext = ".tar.gz")
+
+  tar_subdir(filename, source_files)
+  return(filename)
+}
+
+# Unpack model tarball and creates a new model tarball with the provided
+# code script.
+# This function does the following: - uncompresses model tarball from S3 or
+# local system into a temp folder - replaces the inference code from the model
+# with the new code provided - compresses the new model tarball and saves it
+# in S3 or local file system
+# Args:
+#   inference_script (str): path or basename of the inference script that
+# will be packed into the model
+# source_directory (str): path including all the files that will be packed
+# into the model
+# dependencies (list[str]): A list of paths to directories (absolute or
+#                                                           relative) with any additional libraries that will be exported to the
+# container (default: []). The library folders will be copied to
+# SageMaker in the same folder where the entrypoint is copied.
+# Example
+# The following call >>> Estimator(entry_point='train.py',
+#                                  dependencies=['my/libs/common', 'virtual-env']) results in the
+# following inside the container:
+#   >>> $ ls
+# >>> opt/ml/code
+# >>>     |------ train.py
+# >>>     |------ common
+# >>>     |------ virtual-env
+# model_uri (str): S3 or file system location of the original model tar
+# repacked_model_uri (str): path or file system location where the new
+# model will be saved
+# sagemaker_session (sagemaker.session.Session): a sagemaker session to
+# interact with S3.
+# kms_key (str): KMS key ARN for encrypting the repacked model file
+# Returns:
+#   str: path to the new packed model
+repack_model <- function(inference_script,
+                         source_directory,
+                         dependencies,
+                         model_uri,
+                         repacked_model_uri,
+                         sagemaker_session,
+                         kms_key=None){
+  dependencies = dependencies %||% list()
+
+  tmp = tempdir()
+
+  # extract model from tar.gz
+  model_dir = .extract_model(model_uri, sagemaker_session, tmp)
+
+  # append file to model directory
+  .create_or_update_code_dir(
+    model_dir, inference_script, source_directory, dependencies, sagemaker_session, tmps)
+
+  # repackage model_dir
+  tmp_model_path = file.path(tmp, "temp-model.tar.gz")
+  tar_subdir(tmp_model_path, model_dir)
+
+  # remove temp directory/tar.gz
+  on.exit(unlink(c(tmp_model_path, model_dir), recursive = T))
+
+  # save model
+  .save_model(repacked_model_uri, tmp_model_path, sagemaker_session, kms_key=kms_key)
+}
+
+is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", directory))}
+
+.create_or_update_code_dir = function(model_dir,
+                                      inference_script,
+                                      source_directory,
+                                      dependencies,
+                                      sagemaker_session,
+                                      tmp) {
+  code_dir = file.path(model_dir, "code")
+  if (!is.null(source_directory) &&
+      startsWith(tolower(source_directory), "s3://")) {
+    local_code_path = file.path(tmp, "local_code.tar.gz")
+    s3_parts = split_s3_uri(source_directory)
+    s3 = paws::s3(config = sagemaker_session$paws_credentials$credentials)
+    obj = s3$get_object(Bucket = s3_parts$bucket, Key = s3_parts$key)
+    write_bin(obj$Body, local_code_path)
+    untar(local_code_path, exdir = code_dir)
+    on.exit(unlink(local_code_path, recursive = T))
+  } else if (!is.null(source_directory)) {
+    if (file.exists(code_dir)) {
+      unlink(code_dir, recursive = TRUE)}
+    file.copy(source_directory, code_dir, recursive = TRUE)
+  } else {
+    if (!file.exists(code_dir)) {
+      file.copy(inference_script, code_dir, recursive = TRUE)
+      if (!file.exists(file.path(code_dir, inference_script)))
+        FALSE
+    }
+  }
+
+  for (dependency in dependencies) {
+    lib_dir = file.path(code_dir, "lib")
+    if (is.dir(dependency)) {
+      file.copy(dependency, file.path(lib_dir, basename(dependency)), recursive = T)
+    } else {
+      if (!is.dir(lib_dir)) {
+        dir.create(lib_dir, recursive = TRUE)}
+      file.copy(dependency, lib_dir, recursive = T)}
+  }
+}
+
+.extract_model <- function(model_uri, sagemaker_session, tmp){
+  tmp_model_dir = file.path(tmp, "model")
+  dir.create(tmp_model_dir, showWarnings = F)
+  if(startsWith(tolower(model_uri), "s3://")){
+    local_model_path = file.path(tmp, "tar_file")
+    s3_parts = split_s3_uri(model_uri)
+    s3 = paws::s3(config = sagemaker_session$paws_credentials$credentials)
+    obj = s3$get_object(Bucket = s3_parts$bucket, Key = s3_parts$key)
+    write_bin(obj$Body, local_model_path)
+    on.exit(unlink(local_model_path))
+  } else{
+    local_model_path = gsub("file://", "", model_uri)}
+  untar(local_model_path, exdir = tmp_model_dir)
+  return(tmp_model_dir)
+}
+
+.save_model <-
+  function(repacked_model_uri,
+           tmp_model_path,
+           sagemaker_session,
+           kms_key) {
+    if (startsWith(tolower(repacked_model_uri), "s3://")) {
+      s3_parts = split_s3_uri(repacked_model_uri)
+      s3_parts$key = gsub(basename(s3_parts$key), basename(repacked_model_uri), s3_parts$key)
+      s3 = paws::s3(config = sagemaker_session$paws_credentials$credentials)
+      obj = readBin(tmp_model_path, "raw", n = file.size(tmp_model_path))
+      if (!is.null(kms_key)) {
+        s3$put_object(Body = obj,
+                      Bucket =  s3_parts$bucket,
+                      Key =  s3_parts$bucket)
+      } else {
+        s3$put_object(
+          Body = obj,
+          Bucket =  s3_parts$bucket,
+          Key =  s3_parts$bucket,
+          ServerSideEncryption = "aws:kms",
+          SSEKMSKeyId = kms_key)}
+    } else {
+      file.copy(tmp_model_path,
+                gsub("file://", "", repacked_model_uri.replace), recursive = T)}
+  }
+
+# tar function to use system tar
+tar_subdir <- function(tarfile, srdir, compress = "gzip", ...){
+  current_dir = getwd()
+  setwd(srdir)
+  on.exit(setwd(current_dir))
+  tar(tarfile= tarfile, files=".", compression=compress, tar = "tar" , ...)
+}
+
+print_list <- function(l){
+  output <- vapply(seq_along(l), function(i){paste(names(l[i]), l[[i]], sep = ": ")}, FUN.VALUE = character(1))
+  paste(output, collapse = ", ")
+}
+
+IsSubR6Class <- function(subclass, cls) {
+  if(is.null(subclass)) return(NULL)
+  if (!is.R6Class(subclass))
+    stop("subclass is not a R6ClassGenerator.", call. = F)
+  parent <- subclass$get_inherit()
+  cls %in% c(subclass$classname, IsSubR6Class(parent))
+}
