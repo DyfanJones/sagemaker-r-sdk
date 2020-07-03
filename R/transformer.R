@@ -3,6 +3,8 @@
 #' @include session.R
 #' @include utils.R
 
+#' @import R6
+
 #' @title A class for handling creating and interacting with Amazon SageMaker
 #'        transform jobs
 #' @export
