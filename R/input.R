@@ -1,5 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/inputs.py
 
+#' @import R6
+
 #' @title Create a definition for input data used by an SageMaker training job.
 #' @export
 s3_input = R6Class("s3_input",
