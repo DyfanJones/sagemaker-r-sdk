@@ -32,7 +32,7 @@ Collate:
     'estimator.R'
     'parameter.R'
     'algorithm.R'
-    'fw_registery.R'
+    'fw_registry.R'
     'xgboost_estimator.R'
     'amazon_estimator.R'
     'data_capture_config.R'
