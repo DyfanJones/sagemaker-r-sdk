@@ -6,6 +6,15 @@
 \alias{R6sagemaker-package}
 \title{r6 sagemaker: this is just a placeholder}
 \description{
-More about what it does (maybe more than one line)
+Interface to Amazon Web Services SageMaker <https://aws.amazon.com/sagemaker/>
     Use four spaces when indenting paragraphs within the Description.
+}
+\author{
+\strong{Maintainer}: Dyfan Jones \email{dyfan.r.jones@gmail.com}
+
+Other contributors:
+\itemize{
+  \item Amazon.com, Inc. [copyright holder]
+}
+
 }

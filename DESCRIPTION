@@ -2,9 +2,9 @@ Package: R6sagemaker
 Type: Package
 Title: R SDK for `AWS Sagemaker`
 Version: 0.1.0
-Author: Dyfan Jones
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("aut", "cre")),
+             person("Amazon.com, Inc.", role = "cph"))
+Description: Interface to Amazon Web Services SageMaker <https://aws.amazon.com/sagemaker/>
     Use four spaces when indenting paragraphs within the Description.
 Import: R6,
         paws,
@@ -13,7 +13,7 @@ Import: R6,
         urltools,
         data.table,
         uuid
-License: What license is it under?
+License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
