@@ -1,4 +1,5 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/session.py
+#' @import R6
 
 #' @export
 DataCaptureConfig = R6Class("DataCaptureConfig",
