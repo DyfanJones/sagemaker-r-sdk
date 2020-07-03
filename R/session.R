@@ -18,7 +18,6 @@
 #' that accesses an S3 bucket location and one is not specified, the ``Session`` creates a default
 #' bucket based on a naming convention which includes the current AWS account ID.
 #'
-#'
 #' @import paws
 #' @import jsonlite
 #' @import R6
@@ -41,8 +40,11 @@ Session = R6Class("Session",
                                           bucket = NULL) {
                       self$paws_credentials <- .paws_cred(paws_credentials)
                       self$bucket <- bucket
+                      self$config <- NULL
                       # get sagemaker object from paws
                       self$sagemaker = paws::sagemaker(config = self$paws_credentials$credentials)
+
+                      self$local_mode = FALSE
                     },
 
                     #' @description Upload local file or directory to S3.If a single file is specified for upload, the resulting S3 object key is
@@ -84,6 +86,31 @@ Session = R6Class("Session",
                       for (i in 1:length(local_path)){
                         obj <- readBin(local_path[i], "raw", n = file.size(local_path[i]))
                         s3$put_object(Body = obj, Bucket = bucket, Key = s3_key[i], ...)}
+                    },
+
+                    #' @description Upload a string as a file body.
+                    #' @param body (str): String representing the body of the file.
+                    #' @param bucket (str): Name of the S3 Bucket to upload to (default: None). If not specified, the
+                    #'              default bucket of the ``Session`` is used (if default bucket does not exist, the
+                    #'              ``Session`` creates it).
+                    #' @param key (str): S3 object key. This is the s3 path to the file.
+                    #' @param kms_key (str): The KMS key to use for encrypting the file.
+                    #' @return str: The S3 URI of the uploaded file.
+                    #'              The URI format is: ``s3://{bucket name}/{key}``.
+                    upload_string_as_file_body = function(body,
+                                                          bucket,
+                                                          key,
+                                                          kms_key=NULL){
+                      # Get s3 object from paws
+                      s3 <- paws::s3(config = self$paws_credentials$credentials)
+
+                      if (!is.null(kms_key))
+                        s3$put_object(Bucket = bucket, Body=charToRaw(body), SSEKMSKeyId=kms_key, ServerSideEncryption="aws:kms")
+                      else
+                        s3$put_object(Bucket = bucket, Body=charToRaw(body))
+
+                      s3_uri = sprintf("s3://%s/%s",bucket, key)
+                      return (s3_uri)
                     },
 
                     #' @description Download file or directory from S3.
@@ -134,6 +161,22 @@ Session = R6Class("Session",
                         write_bin(obj$Body, destination_path[i])
                       }
                       return(invisible(NULL))
+                    },
+
+                    #' @description Read a single file from S3.
+                    #' @param bucket (str): Name of the S3 Bucket to download from.
+                    #' @param key_prefix (str): S3 object key name prefix.
+                    #' @return str: The body of the s3 file as a string.
+                    read_s3_file = function(bucket,
+                                            key_prefix){
+
+                      # Get s3 object from paws
+                      s3 = paws::s3(config = self$paws_credentials$credentials)
+
+                      # Explicitly passing a None kms_key to boto3 throws a validation error.
+                      s3_object = s3$get_object(Bucket=bucket, Key=key_prefix)
+
+                      return(rawToChar(s3_object$Body))
                     },
 
                     #' @description Lists the S3 files given an S3 bucket and key.
@@ -394,7 +437,7 @@ Session = R6Class("Session",
                       ExperimentConfig = experiment_config
 
                       log_info("Creating processing-job with name %s", job_name)
-                      log_debug("process request: %s", process_request)
+                      # log_debug("process request: %s", process_request)
 
                       self$sagemaker$create_processing_job(ProcessingInputs = ProcessingInputs,
                                                ProcessingOutputConfig = ProcessingOutputConfig,
@@ -924,6 +967,7 @@ Session = R6Class("Session",
                         Sys.sleep(poll)
 
                         if(state == LogState$JOB_COMPLETE) {
+                          writeLines("\n")
                           state = LogState$COMPLETE
                         } else if(Sys.time() - last_describe_job_call >= 30){
                           description = self.sagemaker_client.describe_auto_ml_job(AutoMLJobName=job_name)
@@ -936,7 +980,7 @@ Session = R6Class("Session",
                       }
 
                       if (wait) {
-                        self$.check_job_status(job_name, description, "AutoMLJobStatus")}
+                        private$.check_job_status(job_name, description, "AutoMLJobStatus")}
                     },
 
                     #' @description Create an Amazon SageMaker Neo compilation job.
@@ -1264,21 +1308,21 @@ Session = R6Class("Session",
                       log_info("Creating model with name: %s", name)
                       log_debug("CreateModel request: %s", primary_container %||% container_defs)
 
-                      tryCatch(self$sagemaker$create_model(ModelName = name,
-                                                           PrimaryContainer = primary_container,
-                                                           Containers = container_defs,
-                                                           ExecutionRoleArn = role,
-                                                           Tags = tags,
-                                                           VpcConfig = vpc_config,
-                                                           EnableNetworkIsolation = enable_network_isolation),
-                               error = function(e) {
+                      tryCatch({self$sagemaker$create_model(ModelName = name,
+                                                            PrimaryContainer = primary_container,
+                                                            Containers = container_defs,
+                                                            ExecutionRoleArn = role,
+                                                            Tags = tags,
+                                                            VpcConfig = vpc_config,
+                                                            EnableNetworkIsolation = enable_network_isolation)},
+                               error=function(e){
                                  error_code = attributes(e)$error_response$`__type`
-
                                  if (error_code == "ValidationException"
-                                   && grepl("Cannot create already existing model", e$message)) {
+                                   && grepl("Cannot create already existing model", e$message)){
                                    log_warn("Using already existing model: %s", name)
                                    } else {stop(e$message, call. = F)}
-                               })
+                                 }
+                               )
                       return(name)
                     },
 
@@ -1317,7 +1361,7 @@ Session = R6Class("Session",
                       name = name %||% training_job_name
                       role = role %||% training_job$RoleArn
                       primary_container = list(ContainerHostname = primary_container_image %||% training_job$AlgorithmSpecification$TrainingImage,
-                                               ModelDataUrl=model_data_url %||% training_job["ModelArtifacts"]["S3ModelArtifacts"],
+                                               ModelDataUrl=model_data_url %||% training_job$ModelArtifacts$S3ModelArtifacts,
                                                Environment = env %||% list())
 
                       vpc_config = private$.vpc_config_from_training_job(training_job, vpc_config_override)
@@ -1597,7 +1641,7 @@ Session = R6Class("Session",
                     wait_for_compilation_job = function(job,
                                                         poll=5){
                       desc = private$.wait_until(private$.compilation_job_status(job), poll)
-                      self$.check_job_status(job, desc, "CompilationJobStatus")
+                      private$.check_job_status(job, desc, "CompilationJobStatus")
                       return(desc)
                     },
 
@@ -1912,6 +1956,7 @@ Session = R6Class("Session",
                         Sys.sleep(poll)
 
                         if(state == LogState$JOB_COMPLETE) {
+                          writeLines("\n")
                           state = LogState$COMPLETE
                         } else if(Sys.time() - last_describe_job_call >= 30){
                           description = self$sagemaker$describe_training_job(TrainingJobName=job_name)
@@ -1927,9 +1972,10 @@ Session = R6Class("Session",
                           if (status %in% c("Completed", "Failed", "Stopped")) state = LogState$JOB_COMPLETE
 
                           debug_rule_statuses = description$DebugRuleEvaluationStatuses
-                          if(!isemptylist(debug_rule_statuses)
+                          if(!islistempty(debug_rule_statuses)
                              && .debug_rule_statuses_changed(debug_rule_statuses, last_debug_rule_statuses)
                              && (log_type %in% c("All", "Rules"))){
+                            writeLines("\n")
                             writeLines("********* Debugger Rule Status *********")
                             writeLines("*")
                             for (status in debug_rule_statuses){
@@ -1947,16 +1993,16 @@ Session = R6Class("Session",
                       }
 
                       if (wait) {
-                        self$.check_job_status(job_name, description, "TrainingJobStatus")
+                        private$.check_job_status(job_name, description, "TrainingJobStatus")
 
                         spot_training = description$EnableManagedSpotTraining
 
                         training_time = description$TrainingTimeInSeconds
                         billable_time = description$BillableTimeInSeconds
                         if (!is.null(training_time) || legnth(training_time) == 0)
-                          writeLines(sprintf("Training seconds: %s", training_time * instance_count))
+                          writeLines(sprintf("Training seconds: %s", training_time * init_log$instance_count))
                         if (!is.null(billable_time) || legnth(billable_time) == 0)
-                          writeLines(sprintf("Billable seconds: %s", billable_time * instance_count))
+                          writeLines(sprintf("Billable seconds: %s", billable_time * init_log$instance_count))
                         if (!is.null(spot_training) || legnth(spot_training) == 0){
                           saving = (1 - as.numeric(billable_time) / training_time) * 100
                           writeLines(sprintf("Managed Spot Training savings: %s", saving))}
@@ -1996,6 +2042,7 @@ Session = R6Class("Session",
                         Sys.sleep(poll)
 
                         if(state == LogState$JOB_COMPLETE) {
+                          writeLines("\n")
                           state = LogState$COMPLETE
                         } else if(Sys.time() - last_describe_job_call >= 30){
                           description = self$sagemaker$describe_training_job(TrainingJobName=job_name)
@@ -2008,7 +2055,7 @@ Session = R6Class("Session",
                       }
 
                       if (wait) {
-                        self$.check_job_status(job_name, description, "ProcessingJobStatus")}
+                        private$.check_job_status(job_name, description, "ProcessingJobStatus")}
                     },
 
                     #' @description Display the logs for a given transform job, optionally tailing them until the
@@ -2044,6 +2091,7 @@ Session = R6Class("Session",
                         Sys.sleep(poll)
 
                         if(state == LogState$JOB_COMPLETE) {
+                          writeLines("\n")
                           state = LogState$COMPLETE
                         } else if(Sys.time() - last_describe_job_call >= 30){
                           description = self$sagemaker$describe_training_job(TrainingJobName=job_name)
@@ -2056,7 +2104,7 @@ Session = R6Class("Session",
                       }
 
                       if (wait) {
-                        self$.check_job_status(job_name, description, "TransformJobStatus")}
+                        private$.check_job_status(job_name, description, "TransformJobStatus")}
                     },
 
                     #' @description
@@ -2230,6 +2278,8 @@ Session = R6Class("Session",
                       flush(stdout())
 
                       if (status %in% in_progress_statuses) return(NULL)
+
+                      writeLines("\n")
                       return(desc)
 
                     },
@@ -2245,6 +2295,7 @@ Session = R6Class("Session",
 
                       if (status %in% in_progress_statuses) return(NULL)
 
+                      writeLines("\n")
                       return(desc)
                     },
 
@@ -2268,19 +2319,21 @@ Session = R6Class("Session",
                       status = desc$TrainingJobStatus
 
                       if(secondary_training_status_changed(desc, last_desc)){
+                        writeLines("\n")
                         writeLines(secondary_training_status_message(desc, last_desc), sep = "")
-                        flush(stdout())
                       } else {
                         writeLines(".", sep = "")
-                        flush(stdout())
                       }
 
+                      flush(stdout())
                       # update last job description
                       private$.last_job_desc = desc
 
                       if(status %in% in_progress_statuses){
                         return(list(job_desc = desc, status = FALSE))
                       }
+
+                      writeLines("\n")
                       return(list(job_desc = desc, status = TRUE))
                     },
 
@@ -2348,6 +2401,7 @@ Session = R6Class("Session",
 
                       if (status %in% in_progress_statuses) return(NULL)
 
+                      writeLines("\n")
                       return(desc)
                     },
 
@@ -2372,6 +2426,7 @@ Session = R6Class("Session",
 
                       if (status %in% in_progress_statuses) return(NULL)
 
+                      writeLines("\n")
                       return(desc)
                     },
 
@@ -2428,8 +2483,8 @@ container_def = function(image,
   if(is.null(env)) env = list()
   c_def = list("Image" = image, "Environment"= env)
 
-  c_def["ModelDataUrl"] = model_data_url
-  c_def["Mode"] = container_mode
+  c_def$ModelDataUrl = model_data_url
+  c_def$Mode = container_mode
   return(list(c_def))
 }
 
@@ -2508,7 +2563,7 @@ get_execution_role <- function(sagemaker_session = NULL){
 # Checks the rule evaluation statuses for SageMaker Debugger rules.
 .debug_rule_statuses_changed <- function(current_statuses,
                                          last_statuses){
-  if (isemptylist(last_statuses)) return(TRUE)
+  if (islistempty(last_statuses)) return(TRUE)
 
   if (current_statuses$RuleConfigurationName == last_statuses$RuleConfigurationName
     && (current_statuses$RuleEvaluationStatus != last_statuses$RuleEvaluationStatus))
@@ -2575,6 +2630,8 @@ get_execution_role <- function(sagemaker_session = NULL){
     events = multi_stream_iter(cloudwatchlogs, log_group, stream_names, positions)
     for (e in seq_along(events)){
       logs = lapply(events[[e]], function(l) l$message)
+      # break if nothing exists in list
+      if(islistempty(logs)) break
       writeLines(sagemaker_colour_wrapper(logs))
       count = length(events[[e]])
       if(events[[e]][[count]]$timestamp == sm_env$positions[[e]]$timestamp){
