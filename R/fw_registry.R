@@ -1,4 +1,5 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/6a8bb6df1a0c34990a52fbfe4bbc6ec840d1bdcd/src/sagemaker/fw_registry.py
+
 fw_registry <- function(region_name){
   tryCatch(account_id <- image_registry_map[[region_name]],
            error = function(e) stop("The specific image or region does not exist", call. = F))
