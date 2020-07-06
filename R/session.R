@@ -5,6 +5,11 @@
 #' @include set_credentials.R
 #' @include vpc_utils.R
 
+#' @import paws
+#' @import jsonlite
+#' @import R6
+#' @import logger
+#' @import utils
 
 #' @title Sagemaker Session Class
 #'
@@ -18,11 +23,6 @@
 #' that accesses an S3 bucket location and one is not specified, the ``Session`` creates a default
 #' bucket based on a naming convention which includes the current AWS account ID.
 #'
-#' @import paws
-#' @import jsonlite
-#' @import R6
-#' @import logger
-#' @import utils
 #' @export
 Session = R6Class("Session",
                   public = list(
@@ -1963,7 +1963,7 @@ Session = R6Class("Session",
                           last_describe_job_call = Sys.time()
 
                           if(secondary_training_status_changed(description, last_description)){
-                            writeLines(secondary_training_status_message(description, last_description))
+                            writeLines(secondary_training_status_message(description, last_description), sep = "")
                             last_description = description
                           }
 
