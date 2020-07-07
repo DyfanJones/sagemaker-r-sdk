@@ -47,7 +47,6 @@ AnalyticsMetricsBase = R6Class("AnalyticsMetricsBase",
                                  #'              service.
                                  clear_cache = function(){
                                    self$.dataframe = NULL
-                                   return(self$.dataframe)
                                  },
 
                                  #' @description
@@ -237,7 +236,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
                                inherit = AnalyticsMetricsBase,
                                public = list(
                                  #' @field CLOUDWATCH_NAMESPACE
-                                 #' class metadata
+                                 #' Cloud watch namespace to return Training Job analytics
                                  CLOUDWATCH_NAMESPACE = "/aws/sagemaker/TrainingJobs",
 
                                  #' @description Initialize a ``TrainingJobAnalytics`` instance.
@@ -273,7 +272,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
                                    super$initialize()
                                    self$clear_cache()
 
-                                   attr(self, "__repr__") = sprintf("<sagemaker.TrainingJobAnalytics for %s>", self$name)
+                                   attr(self, "__repr__") = sprintf("<TrainingJobAnalytics for %s>", self$name)
                                  },
 
                                  #' @description Clear the object of all local caches of API methods, so that the next
@@ -360,3 +359,182 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
 )
 
 
+#' @title ExperimentAnalytics class
+#' @description Fetch trial component data and make them accessible for analytics.
+#' @export
+ExperimentAnalytics = R6Class("ExperimentAnalytics",
+                              inherit = AnalyticsMetricsBase,
+                              public = list(
+
+                                #' @field MAX_TRIAL_COMPONENTS
+                                #' class metadata
+                                MAX_TRIAL_COMPONENTS = 10000,
+
+                                #' @description Initialize a ``ExperimentAnalytics`` instance.
+                                #' @param experiment_name (str, optional): Name of the experiment if you want to constrain the
+                                #'              search to only trial components belonging to an experiment.
+                                #' @param search_expression (dict, optional): The search query to find the set of trial components
+                                #'              to use to populate the data frame.
+                                #' @param sort_by (str, optional): The name of the resource property used to sort
+                                #'              the set of trial components.
+                                #' @param sort_order (str optional): How trial components are ordered, valid values are Ascending
+                                #'              and Descending. The default is Descending.
+                                #' @param metric_names (list, optional): string names of all the metrics to be shown in the
+                                #'              data frame. If not specified, all metrics will be shown of all trials.
+                                #' @param parameter_names (list, optional): string names of the parameters to be shown in the
+                                #'              data frame. If not specified, all parameters will be shown of all trials.
+                                #' @param sagemaker_session (sagemaker.session.Session): Session object which manages interactions
+                                #'              with Amazon SageMaker APIs and any other AWS services needed. If not specified,
+                                #'              one is created using the default AWS configuration chain.
+                                initialize = function(experiment_name=NULL,
+                                                      search_expression=NULL,
+                                                      sort_by=NULL,
+                                                      sort_order=NULL,
+                                                      metric_names=NULL,
+                                                      parameter_names=NULL,
+                                                      sagemaker_session=NULL){
+                                  self$sagemaker_session = sagemaker_session %||% Session$new()
+
+                                  if (!is.null(experiment_name) && !is.null(search_expression))
+                                    stop("Either experiment_name or search_expression must be supplied.", call. = F)
+
+                                  self$.experiment_name = experiment_name
+                                  self$.search_expression = search_expression
+                                  self$.sort_by = sort_by
+                                  self$.sort_order = sort_order
+                                  self$.metric_names = metric_names
+                                  self$.parameter_names = parameter_names
+                                  self$.trial_components = NULL
+                                  super$initialize()
+                                  self$clear_cache()
+                                  attr(self, "__repr__") = sprintf("<ExperimentAnalytics for %s>", self$name)
+                                },
+
+                                #' @description Clear the object of all local caches of API methods.
+                                clear_cache = function() {
+                                  super$clear_cache()
+                                  self$.trial_components = NULL
+                                }
+                              ),
+                              private = list(
+                                # Reshape trial component data to pandas columns
+                                # Args:
+                                #   trial_component: dict representing a trial component
+                                # Returns:
+                                #   dict: Key-Value pair representing the data in the pandas dataframe
+                                .reshape = function(trial_component){
+                                  output = data.table(TrialComponentName = trial_component$TrialComponentName,
+                                                      DisplayName = trial_component$DisplayName,
+                                                      SourceArn = trial_component$Source$SourceArn)
+
+                                  # ----- bring .reshape_parameters into .reshape function -----
+
+                                  for(name in sort(names(trial_component$Parameters))){
+                                    if (!is.null(self$.parameter_names) && !(name %in% self$.parameter_names))
+                                      next
+                                    output[[name]] = (if(!islistempty(trial_component$Parameters[[name]]$NumberValue))
+                                                          trial_component$Parameters[[name]]$NumberValue
+                                                      else trial_component$Parameters[[name]]$StringValue)
+                                  }
+
+                                  # ----- bring .reshape_metrics into .reshape function -----
+                                  statistic_types = c("Min", "Max", "Avg", "StdDev", "Last", "Count")
+
+                                  for(metric_summary in trial_component$Metrics){
+                                    metric_name = trial_component$Metrics$MetricName
+                                    if (!is.null(self$.metric_name) && !(metric_name %in% self$.metric_names))
+                                      next
+
+                                    for(stat_type in statistic_types){
+                                      stat_value = metric_summary[[stat_type]]
+                                      if (!islistempty(stat_value))
+                                        output[[sprintf("%s - %s", metric_name, stat_type)]] = stat_value}
+                                  }
+
+                                  return(output)
+                                },
+
+
+                                # Return a pandas dataframe with all the trial_components,
+                                # along with their parameters and metrics.
+                                .fetch_dataframe = function(){
+                                  df = rbindlist(lapply(private$.get_trial_components(), private$.reshape), fill = T)
+                                  return(df)
+
+                                },
+
+                                # Get all trial components matching the given search query expression.
+                                # Args:
+                                #   force_refresh (bool): Set to True to fetch the latest data from SageMaker API.
+                                # Returns:
+                                #   list: List of dicts representing the trial components
+                                .get_trial_components = function(force_refresh=FALSE){
+                                  if (force_refresh)
+                                    self$clear_cache()
+                                  if (!islistempty(self$.trial_components))
+                                    return(self$.trial_components)
+
+                                  if (islistempty(self$.search_expression))
+                                    self$.search_expression = list()
+
+                                  if (!is.null(self$.experiment_name)){
+                                    if (islistempty(self$.search_expression$Filters))
+                                      self$.search_expression$Filters = list()
+
+                                    self$.search_expression$Filters = c(
+                                      self$.search_expression$Filters,
+                                      list("Name"= "Parents.ExperimentName",
+                                           "Operator"= "Equals",
+                                           "Value"= self$.experiment_name))
+                                    }
+
+                                    return(self$.search(self$.search_expression, self$.sort_by, self$.sort_order))
+                                },
+
+                                # Perform a search query using SageMaker Search and return the matching trial components
+                                # Args:
+                                #   search_expression: Search expression to filter trial components.
+                                # sort_by: The name of the resource property used to sort the trial components.
+                                # sort_order: How trial components are ordered, valid values are Ascending
+                                # and Descending. The default is Descending.
+                                # Returns:
+                                #   list: List of dict representing trial components.
+                                .search = function(search_expression,
+                                                   sort_by,
+                                                   sort_order){
+                                  trial_components = list()
+
+                                  search_args = list(
+                                    "Resource"= "ExperimentTrialComponent",
+                                    "SearchExpression"= search_expression)
+
+                                  search_args$SortBy = sort_by
+                                  search_args$SortOrder = sort_order
+
+                                  while(length(trial_components) < self$MAX_TRIAL_COMPONENTS){
+                                    search_response = self$sagemaker_session$sagemaker$search(
+                                      Resource = search_args$Resource,
+                                      SearchExpression = search_args$SearchExpression,
+                                      SortBy = search_args$SortBy,
+                                      SortOrder = search_args$SortOrder,
+                                      NextToken = search_args$NextToken)
+                                    components = lapply(search_response$Results, function(result) result$TrialComponent)
+                                    trial_components = c(trial_components, components)
+                                    if (!islistempty(search_response$NextToken) && !islistempty(components))
+                                      search_args$NextToken = search_response$NextToken
+                                    else
+                                      break
+                                  }
+
+                                  return(trial_components)
+                                }
+                              ),
+                              active = list(
+                                #' @field name
+                                #' Name of the Experiment being analyzed
+                                name = function(){
+                                  return(self$.experiment_name)
+                                  }
+                                ),
+                              lock_objects = F
+)
