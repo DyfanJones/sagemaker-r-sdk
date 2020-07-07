@@ -338,7 +338,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
 
                                  # Helper method to discover the metrics defined for a training job.
                                  .metric_names_for_training_job = function(){
-                                   raining_description = self$sagemaker_session$sagemaker$describe_training_job(
+                                   training_description = self$sagemaker_session$sagemaker$describe_training_job(
                                      TrainingJobName=self$.training_job_name)
 
                                    metric_definitions = training_description$AlgorithmSpecification$MetricDefinitions
