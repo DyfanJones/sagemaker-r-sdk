@@ -20,7 +20,7 @@ AnalyticsMetricsBase = R6Class("AnalyticsMetricsBase",
 
                                  #' @description Initialize a ``AnalyticsMetricsBase`` instance.
                                  initialize = function(){
-                                   sefl$.dataframe = NULL
+                                   self$.dataframe = NULL
                                  },
 
                                  #' @description ersists the analytics dataframe to a file.
@@ -324,7 +324,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
                                      log_warn("Warning: No metrics called %s found", metric_name)
                                      return(NULL)}
                                    # Process data: normalize to starting time, and sort.
-                                   base_time = min(raw_cwm_data$Timestamp)
+                                   base_time = min(sapply(raw_cwm_data, function(x) x$Timestamp))
 
                                    all_xy= rbindlist(lapply(raw_cwm_data, function(pt)
                                      data.table(timestamp = as.numeric(pt$Timestamp - base_time),
@@ -332,7 +332,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
                                                 value = pt$Average)),
                                      fill = T)
 
-                                   setorder(all_xy, Timestamp)
+                                   setorder(all_xy, timestamp)
                                    return(all_xy)
                                  },
 
