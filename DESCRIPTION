@@ -16,14 +16,14 @@ Import: R6,
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Collate: 
-    'analytics.R'
-    'vpc_utils.R'
     'utils.R'
+    'vpc_utils.R'
     'set_credentials.R'
     'logs.R'
     'session.R'
+    'analytics.R'
     'git_utils.R'
     'transformer.R'
     'fw_utils.R'
