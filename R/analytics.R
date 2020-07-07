@@ -236,7 +236,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
                                inherit = AnalyticsMetricsBase,
                                public = list(
                                  #' @field CLOUDWATCH_NAMESPACE
-                                 #' Cloud watch namespace to return Training Job analytics
+                                 #' CloudWatch namespace to return Training Job Analytics data
                                  CLOUDWATCH_NAMESPACE = "/aws/sagemaker/TrainingJobs",
 
                                  #' @description Initialize a ``TrainingJobAnalytics`` instance.
