@@ -12,7 +12,7 @@ fw_default_framework_uri <- function(framework, region_name, image_tag){
   return(sprintf("%s/%s:%s",account_name, repository_name, image_tag))
 }
 
-image_registry_map = list("us-west-1" ="746614075791",
+image_registry_map <- list("us-west-1" ="746614075791",
                           "us-west-2" = "246618743249",
                           "us-east-1" = "683313688378",
                           "us-east-2" = "257758044811",

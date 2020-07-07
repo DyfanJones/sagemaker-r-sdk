@@ -17,7 +17,7 @@
 #           * vpc_config must have key `Subnets` and the value must be a non-empty list
 #           * vpc_config must have key `SecurityGroupIds` and the value must be a non-empty list
 #   """
-vpc_sannitize = function(vpc_config = NULL){
+vpc_sannitize <- function(vpc_config = NULL){
   if (is.null(vpc_config)) return(vpc_config)
   if (!inherits(vpc_config, "list")) stop("vpc_config is not a `list()`: ", vpc_config, call. = F)
 
@@ -52,7 +52,7 @@ vpc_sannitize = function(vpc_config = NULL){
 # Raises:
 #   * ValueError if sanitize enabled and vpc_config is invalid
 #   * KeyError if sanitize disabled and vpc_config is missing key(s)
-vpc_from_list = function(vpc_config,
+vpc_from_list <- function(vpc_config,
                          do_sanitize=FALSE){
   if (do_sanitize)
     vpc_config = vpc_sannitize(vpc_config)
@@ -73,7 +73,7 @@ vpc_from_list = function(vpc_config,
 # Returns:
 #   A VpcConfig dict containing keys 'Subnets' and 'SecurityGroupIds' If
 # either or both parameters are None, returns None
-vpc_to_list = function(subnets,
+vpc_to_list <- function(subnets,
                        security_group_ids){
   if (islistempty(subnets) || islistempty(security_group_ids))
     return(NULL)

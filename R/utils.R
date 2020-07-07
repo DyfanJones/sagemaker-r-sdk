@@ -15,14 +15,12 @@ pkg_method <- function(fun, pkg) {
   return(fun_name)
 }
 
-get_region = pkg_method("get_region", "paws.common")
-get_profile_name = pkg_method("get_profile_name", "paws.common")
+get_region <- pkg_method("get_region", "paws.common")
+get_profile_name <- pkg_method("get_profile_name", "paws.common")
 
 .paws_cred <- function(paws_credentials) if(!inherits(paws_credentials, "PawsCredentials"))  return(paws_cred()) else return(paws_credentials)
 
 split_str <- function(str, split = ",") unlist(strsplit(str, split = split))
-
-
 
 name_from_image <- function(image){
   return(name_from_base(base_name_from_image(image)))
@@ -266,7 +264,7 @@ repack_model <- function(inference_script,
 
 is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", directory))}
 
-.create_or_update_code_dir = function(model_dir,
+.create_or_update_code_dir <- function(model_dir,
                                       inference_script,
                                       source_directory,
                                       dependencies,

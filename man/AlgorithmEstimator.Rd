@@ -31,6 +31,7 @@ A generic Estimator to train using any algorithm object (with an
 \item \href{#method-create_model}{\code{AlgorithmEstimator$create_model()}}
 \item \href{#method-transformer}{\code{AlgorithmEstimator$transformer()}}
 \item \href{#method-fit}{\code{AlgorithmEstimator$fit()}}
+\item \href{#method-print}{\code{AlgorithmEstimator$print()}}
 \item \href{#method-clone}{\code{AlgorithmEstimator$clone()}}
 }
 }
@@ -46,7 +47,6 @@ A generic Estimator to train using any algorithm object (with an
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="print">}\href{../../R6sagemaker/html/EstimatorBase.html#method-print}{\code{R6sagemaker::EstimatorBase$print()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="train_image">}\href{../../R6sagemaker/html/EstimatorBase.html#method-train_image}{\code{R6sagemaker::EstimatorBase$train_image()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transform">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transform}{\code{R6sagemaker::EstimatorBase$transform()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
@@ -437,6 +437,23 @@ a default job name, based on the training image name and current timestamp.}
 \item{\code{experiment_config}}{(dict[str, str]): Experiment management configuration.
 Dictionary contains three optional keys,
 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{AlgorithmEstimator$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

@@ -28,6 +28,7 @@ Fetch trial component data and make them accessible for analytics.
 \itemize{
 \item \href{#method-new}{\code{ExperimentAnalytics$new()}}
 \item \href{#method-clear_cache}{\code{ExperimentAnalytics$clear_cache()}}
+\item \href{#method-print}{\code{ExperimentAnalytics$print()}}
 \item \href{#method-clone}{\code{ExperimentAnalytics$clone()}}
 }
 }
@@ -36,7 +37,6 @@ Fetch trial component data and make them accessible for analytics.
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="dataframe">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-dataframe}{\code{R6sagemaker::AnalyticsMetricsBase$dataframe()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="export_csv">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-export_csv}{\code{R6sagemaker::AnalyticsMetricsBase$export_csv()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="print">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-print}{\code{R6sagemaker::AnalyticsMetricsBase$print()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -94,6 +94,23 @@ Clear the object of all local caches of API methods.
 \if{html}{\out{<div class="r">}}\preformatted{ExperimentAnalytics$clear_cache()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ExperimentAnalytics$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

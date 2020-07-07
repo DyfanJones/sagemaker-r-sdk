@@ -92,7 +92,7 @@ git_clone_repo <- function(git_config,
 }
 
 
-.valid_git_config = function(git_config){
+.valid_git_config <- function(git_config){
   if (!("repo" %in% names(git_config))){
     stop("Please provide a repo for git_config.", call. = F)}
   for (key in names(git_config)){
@@ -111,7 +111,7 @@ git_clone_repo <- function(git_config,
 #   git_config ((dict[str, str]): Git configurations used for cloning files,
 #               including ``repo``, ``branch`` and ``commit``.
 #               dest_dir (str): The local directory to clone the Git repo into.
-.generate_and_run_clone_command = function(git_config,
+.generate_and_run_clone_command <- function(git_config,
                                            dest_dir){
   if (startsWith(git_config$repo, "https://git-codecommit")
       || startsWith(git_config$repo, "ssh://git-codecommit")){
@@ -126,7 +126,7 @@ git_clone_repo <- function(git_config,
 #   git_config ((dict[str, str]): Git configurations used for cloning files,
 #               including ``repo``, ``branch`` and ``commit``.
 #               dest_dir (str): The local directory to clone the Git repo into.
-.generate_and_run_clone_command = function(git_config,
+.generate_and_run_clone_command <- function(git_config,
                                            dest_dir){
   if (startsWith(git_config$repo,"https://git-codecommit")
       ||startsWith(git_config$repo,"ssh://git-codecommit"))
@@ -141,7 +141,7 @@ git_clone_repo <- function(git_config,
 #   git_config ((dict[str, str]): Git configurations used for cloning files,
 #               including ``repo``, ``branch`` and ``commit``.
 #               dest_dir (str): The local directory to clone the Git repo into.
-.clone_command_for_github_like = function(git_config,
+.clone_command_for_github_like <- function(git_config,
                                           dest_dir){
   is_https = startsWith(git_config$repo,"https://")
   is_ssh = startsWith(git_config$repo,"git@")
@@ -155,13 +155,13 @@ git_clone_repo <- function(git_config,
     .clone_command_for_github_like_https_2fa_disabled(git_config, dest_dir)
 }
 
-.clone_command_for_ssh = function(git_config, dest_dir){
+.clone_command_for_ssh <- function(git_config, dest_dir){
   if ("username" %in% names(git_config) || "password" %in% names(git_config) || "token" %in% names(git_config))
     warning("SSH cloning, authentication information in git config will be ignored.")
   .run_clone_command(git_config$repo, dest_dir)
 }
 
-.clone_command_for_github_like_https_2fa_disabled = function(git_config, dest_dir){
+.clone_command_for_github_like_https_2fa_disabled <- function(git_config, dest_dir){
   updated_url = git_config$repo
   if ("token" %in% names(git_config)){
     if ("username" %in% names(git_config) || "password" %in% names(git_config))
@@ -175,7 +175,7 @@ git_clone_repo <- function(git_config,
   .run_clone_command(updated_url, dest_dir)
 }
 
-.clone_command_for_github_like_https_2fa_enabled = function(git_config, dest_dir){
+.clone_command_for_github_like_https_2fa_enabled <- function(git_config, dest_dir){
   updated_url = git_config$repo
   if ("token" %in% names(git_config)){
     if ("username" %in% names(git_config) || "password" %in% names(git_config))
@@ -193,7 +193,7 @@ git_clone_repo <- function(git_config,
 #               Raises:
 #                 ValueError: If git_config['repo'] is in the wrong format.
 #               CalledProcessError: If failed to clone git repo.
-.clone_command_for_codecommit = function(git_config, dest_dir){
+.clone_command_for_codecommit <- function(git_config, dest_dir){
   is_https = startsWith(git_config$repo,"https://git-codecommit")
   is_ssh = startsWith(git_config$repo,"ssh://git-codecommit")
   if (!is_https && !is_ssh)
@@ -241,7 +241,7 @@ git_clone_repo <- function(git_config,
 # token (str): Token to be inserted.
 # Returns:
 #   str: the component needed fot the git clone command.
-.insert_token_to_repo_url = function(url, token){
+.insert_token_to_repo_url <- function(url, token){
   index = nchar("https://")
   if (gregexpr(pattern ='welcome',txt)[[1]][1] == index)
     return(url)
@@ -257,7 +257,7 @@ git_clone_repo <- function(git_config,
 # password (str): Password to be inserted.
 # Returns:
 #   str: the component needed for the git clone command.
-.insert_username_and_password_to_repo_url = function(url, username, password){
+.insert_username_and_password_to_repo_url <- function(url, username, password){
   password = URLencode(password, reserved = T)
   index = nchar("https://")
   pt1 = substring(url, 1, index)
@@ -270,7 +270,7 @@ git_clone_repo <- function(git_config,
 #   git_config (dict[str, str]): Git configurations used for cloning files,
 # including ``repo``, ``branch`` and ``commit``.
 # dest_dir (str): the directory where the repo is cloned
-.checkout_branch_and_commit = function(git_config, dest_dir){
+.checkout_branch_and_commit <- function(git_config, dest_dir){
   # Current working directory
   cur <- getwd()
   # On exit, come back

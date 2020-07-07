@@ -2,36 +2,36 @@
 
 #' @include utils.R
 
-VALID_PY_VERSIONS = c("py2", "py3", "py37")
-VALID_EIA_FRAMEWORKS = c(
+VALID_PY_VERSIONS <- c("py2", "py3", "py37")
+VALID_EIA_FRAMEWORKS <- c(
   "tensorflow",
   "tensorflow-serving",
   "mxnet",
   "mxnet-serving",
   "pytorch-serving")
 
-PY2_RESTRICTED_EIA_FRAMEWORKS = c("pytorch-serving")
-PY37_SUPPORTED_FRAMEWORKS = c("tensorflow-scriptmode")
-VALID_ACCOUNTS_BY_REGION = list(
+PY2_RESTRICTED_EIA_FRAMEWORKS <- c("pytorch-serving")
+PY37_SUPPORTED_FRAMEWORKS <- c("tensorflow-scriptmode")
+VALID_ACCOUNTS_BY_REGION <- list(
   "us-gov-west-1"= "246785580436",
   "us-iso-east-1"= "744548109606",
   "cn-north-1"= "422961961927",
   "cn-northwest-1"= "423003514399")
 
-ASIMOV_VALID_ACCOUNTS_BY_REGION = list(
+ASIMOV_VALID_ACCOUNTS_BY_REGION <- list(
   "us-gov-west-1"= "442386744353",
   "us-iso-east-1"= "886529160074",
   "cn-north-1"= "727897471807",
   "cn-northwest-1"= "727897471807")
 
-OPT_IN_ACCOUNTS_BY_REGION = list("ap-east-1"= "057415533634", "me-south-1"= "724002660598")
-ASIMOV_OPT_IN_ACCOUNTS_BY_REGION = list("ap-east-1"= "871362719292", "me-south-1"= "217643126080")
-DEFAULT_ACCOUNT = "520713654638"
-ASIMOV_PROD_ACCOUNT = "763104351884"
-ASIMOV_DEFAULT_ACCOUNT = ASIMOV_PROD_ACCOUNT
-SINGLE_GPU_INSTANCE_TYPES = c("ml.p2.xlarge", "ml.p3.2xlarge")
+OPT_IN_ACCOUNTS_BY_REGION <- list("ap-east-1"= "057415533634", "me-south-1"= "724002660598")
+ASIMOV_OPT_IN_ACCOUNTS_BY_REGION <- list("ap-east-1"= "871362719292", "me-south-1"= "217643126080")
+DEFAULT_ACCOUNT <- "520713654638"
+ASIMOV_PROD_ACCOUNT <- "763104351884"
+ASIMOV_DEFAULT_ACCOUNT <- ASIMOV_PROD_ACCOUNT
+SINGLE_GPU_INSTANCE_TYPES <- c("ml.p2.xlarge", "ml.p3.2xlarge")
 
-MERGED_FRAMEWORKS_REPO_MAP = list(
+MERGED_FRAMEWORKS_REPO_MAP <- list(
   "tensorflow-scriptmode"= "tensorflow-training",
   "tensorflow-serving"= "tensorflow-inference",
   "tensorflow-serving-eia"= "tensorflow-inference-eia",
@@ -42,7 +42,7 @@ MERGED_FRAMEWORKS_REPO_MAP = list(
   "pytorch-serving"= "pytorch-inference",
   "pytorch-serving-eia"= "pytorch-inference-eia")
 
-MERGED_FRAMEWORKS_LOWEST_VERSIONS = list(
+MERGED_FRAMEWORKS_LOWEST_VERSIONS <- list(
   "tensorflow-scriptmode"= list("py3"= "1.13.1", "py2" = "1.14.0", "py37" = "1.15.2"),
   "tensorflow-serving"= "1.13.0",
   "tensorflow-serving-eia"= "1.14.0",
@@ -53,13 +53,13 @@ MERGED_FRAMEWORKS_LOWEST_VERSIONS = list(
   "pytorch-serving"= "1.2.0",
   "pytorch-serving-eia"= "1.3.1")
 
-INFERENTIA_VERSION_RANGES = list(
+INFERENTIA_VERSION_RANGES <- list(
   "neo-mxnet"= list("1.5.1", "1.5.1"),
   "neo-tensorflow"= list("1.15.0", "1.15.0"))
 
-INFERENTIA_SUPPORTED_REGIONS = c("us-east-1", "us-west-2")
+INFERENTIA_SUPPORTED_REGIONS <- c("us-east-1", "us-west-2")
 
-DEBUGGER_UNSUPPORTED_REGIONS = c("us-gov-west-1", "us-iso-east-1")
+DEBUGGER_UNSUPPORTED_REGIONS <- c("us-gov-west-1", "us-iso-east-1")
 
 # Return the ECR URI of an image.
 #   Args:
@@ -168,7 +168,7 @@ create_image_uri <- function(region,
 }
 
 
-.accelerator_type_valid_for_framework = function(framework,
+.accelerator_type_valid_for_framework <- function(framework,
                                                  py_version,
                                                  accelerator_type=NULL,
                                                  optimized_families=NULL){
@@ -312,7 +312,7 @@ UploadedCode = list("s3_prefix" = NULL, "script_name" = NULL)
 # Returns:
 #   sagemaker.fw_utils.UserCode: An object with the S3 bucket and key (S3 prefix) and
 # script name.
-tar_and_upload_dir = function(sagemaker_session,
+tar_and_upload_dir <- function(sagemaker_session,
                               bucket,
                               s3_key_prefix,
                               script,
@@ -355,7 +355,7 @@ tar_and_upload_dir = function(sagemaker_session,
   return(UploadedCode)
 }
 
-.list_files_to_compress = function(script, directory){
+.list_files_to_compress <- function(script, directory){
   if(is.null(directory))
     return(list(script))
 
@@ -401,6 +401,6 @@ validate_source_dir <- function(script, directory){
 #   region_name (str): Name of the region to check against.
 # Returns:
 #   bool: Whether or not the region supports Amazon SageMaker Debugger.
-.region_supports_debugger = function(region_name){
+.region_supports_debugger <- function(region_name){
   return (!(tolower(region_name) %in% DEBUGGER_UNSUPPORTED_REGIONS))
 }

@@ -20,7 +20,7 @@ layout_sagemaker <- structure(function(level, msg, namespace = NA_character_,
   sprintf('[%s:%s] %s', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), attr(level,'level'), msg, level)
 }, generator = quote(layout_simple()))
 
-sagemaker_log_colour = function (msg, level) {
+sagemaker_log_colour <- function (msg, level) {
   color <- switch(attr(level, "level"),
                   FATAL =  sprintf("\033[38;5;%sm%s\033[39m", 196, msg),
                   ERROR = sprintf("\033[38;5;%sm%s\033[39m", 124, msg),
@@ -67,7 +67,7 @@ multi_stream_iter <- function(cloudwatchlogs, log_group, streams, positions= NUL
 }
 
 
-log_stream = function(cloudwatchlogs,
+log_stream <- function(cloudwatchlogs,
                       log_group,
                       stream_name,
                       start_time=0,
