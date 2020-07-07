@@ -13,7 +13,7 @@ Fetch training curve data from CloudWatch Metrics for a specific training
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{CLOUDWATCH_NAMESPACE}}{class metadata}
+\item{\code{CLOUDWATCH_NAMESPACE}}{Cloud watch namespace to return Training Job analytics}
 }
 \if{html}{\out{</div>}}
 }
