@@ -12,10 +12,12 @@ library(data.table)
 library(fastDummies)
 library(pROC)
 #########################################################################
-# temporary solution to assume role
+# Set up session
 #########################################################################
+# Note: only require role when not working on sagemaker notebook
 Cred = PawsCredentials$new()
 
+# current method is temporary when issue: https://github.com/paws-r/paws/issues/253 is resolve this method will be streamlined
 role = paws::sts(Cred$credentials)$assume_role(RoleArn = Sys.getenv("rathena_arn"),
                                                RoleSession = sprintf("sagemaker-%s", as.integer(Sys.time())))
 
@@ -24,6 +26,10 @@ Cred = PawsCredentials$new(aws_access_key_id = role$Credentials$AccessKeyId,
                            aws_session_token = role$Credentials$SessionToken)
 
 session = Session$new(paws_credentials = Cred)
+
+# When working on sagemaker notebook
+session = Session$new()
+
 #########################################################################
 # set AWS parameters
 #########################################################################
