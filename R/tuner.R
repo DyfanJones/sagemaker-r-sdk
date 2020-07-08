@@ -1371,9 +1371,12 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
         "tags"= self$tags,
         "warm_start_config"= warm_start_config_req)
 
-      if (!is.null(self$estimator))
+      if (!is.null(self$estimator)){
         tuner_args$training_config = private$.prepare_training_config(
-          inputs, self$estimator, self$static_hyperparameters, self$metric_definitions)
+          inputs= inputs,
+          estimator = self$estimator,
+          static_hyperparameters = self$static_hyperparameters,
+          metric_definitions = self$metric_definitions)}
 
       if (!islistempty(self$estimator_list))
         tuner_args$training_config_list=lapply(
@@ -1403,7 +1406,8 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
                                         objective_type=NULL,
                                         objective_metric_name=NULL,
                                         parameter_ranges=NULL){
-      training_config = private$.load_config(inputs, estimator)
+
+      training_config = .Job$new()$load_config(inputs, estimator)
 
       training_config$input_mode = estimator$input_mode
       training_config$metric_definitions = metric_definitions
@@ -1416,7 +1420,6 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
           training_config$input_mode = inputs$config$InputMode}
       }
 
-      # TODO: create AlgorithmEstimator class
       if (inherits(estimator, "AlgorithmEstimator"))
         training_config$algorithm_arn = estimator$algorithm_arn
       else
@@ -1443,6 +1446,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       if (!is.null(parameter_ranges))
         training_config$parameter_ranges = parameter_ranges
 
+      ##
       return(training_config)
       },
 
@@ -1465,9 +1469,9 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     #'        for the ``HyperparameterTuner``.
     sagemaker_session = function(){
       estimator = self$estimator
-      if (is.null(estimator)){}
-        first_estimator_name = sorted(names(self$estimator_list))[1]
-        estimator = self$estimator_dict[[first_estimator_name]]
+      if (is.null(estimator)){
+        first_estimator_name = sort(names(self$estimator_list))[1]
+        estimator = self$estimator_list[[first_estimator_name]]}
       return(estimator$sagemaker_session)
     }
   ),

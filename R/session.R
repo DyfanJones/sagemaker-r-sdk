@@ -312,13 +312,13 @@ Session = R6Class("Session",
                      debugger_hook_config=NULL,
                      tensorboard_output_config=NULL,
                      enable_sagemaker_metrics=NULL){
-
-      AlgorithmSpecification = list(TrainingInputMode = input_mode)
-      OutputDataConfig = output_config
-      TrainingJobName = job_name
-      StoppingCondition = stop_condition
-      ResourceConfig = resource_config
-      RoleArn = role
+      train_request = list(
+        AlgorithmSpecification = list(TrainingInputMode = input_mode),
+        OutputDataConfig = output_config,
+        TrainingJobName = job_name,
+        StoppingCondition = stop_condition,
+        ResourceConfig = resource_config,
+        RoleArn = role)
 
       if(!is.null(image) && !is.null(algorithm_arn)) {
         stop("image and algorithm_arn are mutually exclusive.",
@@ -327,57 +327,57 @@ Session = R6Class("Session",
       if(is.null(image) && is.null(algorithm_arn)){
         stop("either image or algorithm_arn is required. None was provided.", call. = F)}
 
-      InputDataConfig = input_config
+      train_request$InputDataConfig = input_config
 
-      AlgorithmSpecification["TrainingImage"] = image
-      AlgorithmSpecification["AlgorithmName"] = algorithm_arn
-      AlgorithmSpecification["MetricDefinitions"] = metric_definitions
-      AlgorithmSpecification["EnableSageMakerMetricsTimeSeries"] = enable_sagemaker_metrics
+      train_request$AlgorithmSpecification$TrainingImage = image
+      train_request$AlgorithmSpecification$AlgorithmName = algorithm_arn
+      train_request$AlgorithmSpecification$MetricDefinitions = metric_definitions
+      train_request$AlgorithmSpecification$EnableSageMakerMetricsTimeSeries = enable_sagemaker_metrics
 
-      HyperParameters = hyperparameters
-      Tags = tags
-      VpcConfig = vpc_config
-      ExperimentConfig = experiment_config
-      EnableNetworkIsolation = enable_network_isolation
+      train_request$HyperParameters = hyperparameters
+      train_request$Tags = tags
+      train_request$VpcConfig = vpc_config
+      train_request$ExperimentConfig = experiment_config
+      train_request$EnableNetworkIsolation = enable_network_isolation
 
-      EnableInterContainerTrafficEncryption = encrypt_inter_container_traffic
-      EnableManagedSpotTraining = train_use_spot_instances
+      train_request$EnableInterContainerTrafficEncryption = encrypt_inter_container_traffic
+      train_request$EnableManagedSpotTraining = train_use_spot_instances
 
-      CheckpointConfig = NULL
+      train_request$CheckpointConfig = NULL
 
       if (!is.null(checkpoint_s3_uri) || !is.null(checkpoint_local_path)) {
         checkpoint_config = list()
         checkpoint_config["S3Uri"] = checkpoint_s3_uri
         checkpoint_config["LocalPath"] = checkpoint_local_path
-        CheckpointConfig = list(checkpoint_config)
+        train_request$CheckpointConfig = list(checkpoint_config)
       }
 
-      DebugRuleConfigurations = debugger_rule_configs
-      DebugHookConfig = debugger_hook_config
+      train_request$DebugRuleConfigurations = debugger_rule_configs
+      train_request$DebugHookConfig = debugger_hook_config
 
-      TensorBoardOutputConfig = tensorboard_output_config
+      train_request$TensorBoardOutputConfig = tensorboard_output_config
 
       log_info("Creating training-job with name: %s", job_name)
-      # log_debug("train request: %s", train_request)
+      log_debug("train request: %s", toJSON(train_request, pretty = T))
 
-      self$sagemaker$create_training_job(TrainingJobName = TrainingJobName,
-                             HyperParameters = HyperParameters,
-                             AlgorithmSpecification = AlgorithmSpecification,
-                             RoleArn = RoleArn,
-                             InputDataConfig = InputDataConfig,
-                             OutputDataConfig = OutputDataConfig,
-                             ResourceConfig = ResourceConfig,
-                             VpcConfig = VpcConfig,
-                             StoppingCondition = StoppingCondition,
-                             Tags = Tags,
-                             EnableNetworkIsolation = EnableNetworkIsolation,
-                             EnableInterContainerTrafficEncryption = EnableInterContainerTrafficEncryption,
-                             EnableManagedSpotTraining = EnableManagedSpotTraining,
-                             CheckpointConfig = CheckpointConfig,
-                             DebugHookConfig = DebugHookConfig,
-                             DebugRuleConfigurations = DebugRuleConfigurations,
-                             TensorBoardOutputConfig = TensorBoardOutputConfig,
-                             ExperimentConfig = ExperimentConfig)
+      self$sagemaker$create_training_job(TrainingJobName = train_request$TrainingJobName,
+                             HyperParameters = train_request$HyperParameters,
+                             AlgorithmSpecification = train_request$AlgorithmSpecification,
+                             RoleArn = train_request$RoleArn,
+                             InputDataConfig = train_request$InputDataConfig,
+                             OutputDataConfig = train_request$OutputDataConfig,
+                             ResourceConfig = train_request$ResourceConfig,
+                             VpcConfig = train_request$VpcConfig,
+                             StoppingCondition = train_request$StoppingCondition,
+                             Tags = train_request$Tags,
+                             EnableNetworkIsolation = train_request$EnableNetworkIsolation,
+                             EnableInterContainerTrafficEncryption = train_request$EnableInterContainerTrafficEncryption,
+                             EnableManagedSpotTraining = train_request$EnableManagedSpotTraining,
+                             CheckpointConfig = train_request$CheckpointConfig,
+                             DebugHookConfig = train_request$DebugHookConfig,
+                             DebugRuleConfigurations = train_request$DebugRuleConfigurations,
+                             TensorBoardOutputConfig = train_request$TensorBoardOutputConfig,
+                             ExperimentConfig = train_request$ExperimentConfig)
     },
 
     #' @description Create an Amazon SageMaker processing job.
@@ -421,35 +421,36 @@ Session = R6Class("Session",
                        experiment_config=NULL){
 
 
-      ProcessingJobName = job_name
-      ProcessingResources = resources
-      AppSpecification = app_specification
-      RoleArn = role_arn
+      process_request = list(
+        ProcessingJobName = job_name,
+        ProcessingResources = resources,
+        AppSpecification = app_specification,
+        RoleArn = role_arn)
 
-      ProcessingInputs = inputs
+      process_request$ProcessingInputs = inputs
 
-      if(!is.null(output_config$Outputs)) ProcessingOutputConfig = output_config
+      if(!is.null(output_config$Outputs)) process_request$ProcessingOutputConfig = output_config
 
-      Environment = environment
-      NetworkConfig = network_config
-      StoppingCondition = stopping_condition
-      Tags = tags
-      ExperimentConfig = experiment_config
+      process_request$Environment = environment
+      process_request$NetworkConfig = network_config
+      process_request$StoppingCondition = stopping_condition
+      process_request$Tags = tags
+      process_request$ExperimentConfig = experiment_config
 
       log_info("Creating processing-job with name %s", job_name)
-      # log_debug("process request: %s", process_request)
+      log_debug("process request: %s", toJSON(process_request, pretty))
 
-      self$sagemaker$create_processing_job(ProcessingInputs = ProcessingInputs,
-                               ProcessingOutputConfig = ProcessingOutputConfig,
-                               ProcessingJobName = ProcessingJobName,
-                               ProcessingResources = ProcessingResources,
-                               StoppingCondition = StoppingCondition,
-                               AppSpecification  = AppSpecification,
-                               Environment = Environment,
-                               NetworkConfig = NetworkConfig,
-                               RoleArn = RoleArn,
-                               Tags = Tags,
-                               ExperimentConfig = ExperimentConfig)
+      self$sagemaker$create_processing_job(ProcessingInputs = process_request$ProcessingInputs,
+                               ProcessingOutputConfig = process_request$ProcessingOutputConfig,
+                               ProcessingJobName = process_request$ProcessingJobName,
+                               ProcessingResources = process_request$ProcessingResources,
+                               StoppingCondition = process_request$StoppingCondition,
+                               AppSpecification  = process_request$AppSpecification,
+                               Environment = process_request$Environment,
+                               NetworkConfig = process_request$NetworkConfig,
+                               RoleArn = process_request$RoleArn,
+                               Tags = process_request$Tags,
+                               ExperimentConfig = process_request$ExperimentConfig)
     },
 
     #' @description Create an Amazon SageMaker monitoring schedule.
@@ -510,52 +511,52 @@ Session = R6Class("Session",
 
       instance_type = match.arg(instance_type)
 
-
-      MonitoringScheduleName = monitoring_schedule_name
-      MonitoringScheduleConfig = list(MonitoringJobDefinition =
+      monitoring_schedule_request = list(
+        MonitoringScheduleName = monitoring_schedule_name,
+        MonitoringScheduleConfig = list(MonitoringJobDefinition =
                                         list(MonitoringInputs = monitoring_inputs,
                                              RoleArn = role_arn,
-                                             MonitoringAppSpecification = list(ImageUri = image_uri)))
+                                             MonitoringAppSpecification = list(ImageUri = image_uri))))
 
       MonitoringResources = list(ClusterConfig = list(
         InstanceCount = instance_count,
         InstanceType = instance_type,
         VolumeSizeInGB = volume_size_in_gb))
 
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]]["MonitoringResources"] = list(MonitoringResources)
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources = list(MonitoringResources)
 
-      if(!is.null(schedule_expression)) MonitoringScheduleConfig[["ScheduleConfig"]] = list(ScheduleExpression = schedule_expression)
+      if(!is.null(schedule_expression)) monitoring_schedule_request$MonitoringScheduleConfig$ScheduleConfig = list(ScheduleExpression = schedule_expression)
 
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]]["MonitoringOutputConfig"] = monitoring_output_config
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringOutputConfig = monitoring_output_config
 
       BaselineConfig = NULL
       if (!is.null(statistics_s3_uri) || !is.null(constraints_s3_uri)){
         BaselineConfig = list()
-        if(!is.null(statistics_s3_uri)) BaselineConfig[["StatisticsResource"]] = list(S3Uri = statistics_s3_uri)
-        if(!is.null(constraints_s3_uri)) BaselineConfig[["ConstraintsResource"]] = list(S3Uri = constraints_s3_uri)
+        if(!is.null(statistics_s3_uri)) BaselineConfig$StatisticsResource = list(S3Uri = statistics_s3_uri)
+        if(!is.null(constraints_s3_uri)) BaselineConfig$ConstraintsResource = list(S3Uri = constraints_s3_uri)
       }
 
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["BaselineConfig"]] = BaselineConfig
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["MonitoringAppSpecification"]]["RecordPreprocessorSourceUri"] = record_preprocessor_source_uri
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["MonitoringAppSpecification"]]["PostAnalyticsProcessorSourceUri"] = post_analytics_processor_source_uri
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["MonitoringAppSpecification"]][["ContainerEntrypoint"]] = entrypoint
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["MonitoringAppSpecification"]][["ContainerArguments"]] = arguments
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["MonitoringResources"]][["ClusterConfig"]]["VolumeKmsKeyId"] = volume_kms_key
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$BaselineConfig = BaselineConfig
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$RecordPreprocessorSourceUri = record_preprocessor_source_uri
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$PostAnalyticsProcessorSourceUri = post_analytics_processor_source_uri
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerEntrypoint = entrypoint
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerArguments = arguments
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeKmsKeyId = volume_kms_key
 
-      if(!is.null(max_runtime_in_seconds)) MonitoringScheduleConfig[["MonitoringScheduleConfig"]][[
-                                                                      "MonitoringJobDefinition"]][["StoppingCondition"]] = list(MaxRuntimeInSeconds = max_runtime_in_seconds)
+      if(!is.null(max_runtime_in_seconds))
+        monitoring_schedule_request$MonitoringScheduleConfig$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition = list(MaxRuntimeInSeconds = max_runtime_in_seconds)
 
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["Environment"]] = environment
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]][["NetworkConfig"]] = network_config
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$Environment = environment
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig = network_config
 
-      Tags = tags
+      monitoring_schedule_request$Tags = tags
 
       log_info("Creating monitoring schedule name %s", monitoring_schedule_name)
-      # log_debug("monitoring_schedule_request= %s", monitoring_schedule_request)
+      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T))
 
-      self$sagemaker$create_monitoring_schedule(MonitoringScheduleName = MonitoringScheduleName,
-                                    MonitoringScheduleConfig = MonitoringScheduleConfig,
-                                    Tags= Tags)
+      self$sagemaker$create_monitoring_schedule(MonitoringScheduleName = monitoring_schedule_request$MonitoringScheduleName,
+                                    MonitoringScheduleConfig = monitoring_schedule_request$MonitoringScheduleConfig,
+                                    Tags= monitoring_schedule_request$Tags)
     },
 
     #' @description Update an Amazon SageMaker monitoring schedule.
@@ -629,22 +630,24 @@ Session = R6Class("Session",
       request_image_uri = image_uri %||% existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ImageUri
       request_role_arn = role_arn %||% existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$RoleArn
 
-      MonitoringScheduleName = monitoring_schedule_name
-      MonitoringScheduleConfig = list(MonitoringJobDefinition = list(
-        MonitoringInputs = request_monitoring_inputs,
-        MonitoringResources = list(
-          ClusterConfig = list(
-            InstanceCount = request_instance_count,
-            InstanceType = request_instance_type,
-            VolumeSizeInGB = request_volume_size_in_gb)),
-        MonitoringAppSpecification = list(ImageUri = request_image_uri),
-        RoleArn = request_role_arn))
+      monitoring_schedule_request = list(
+        MonitoringScheduleName = monitoring_schedule_name,
+        MonitoringScheduleConfig = list(MonitoringJobDefinition = list(
+          MonitoringInputs = request_monitoring_inputs,
+          MonitoringResources = list(
+            ClusterConfig = list(
+              InstanceCount = request_instance_count,
+              InstanceType = request_instance_type,
+              VolumeSizeInGB = request_volume_size_in_gb)),
+          MonitoringAppSpecification = list(ImageUri = request_image_uri),
+          RoleArn = request_role_arn)))
 
-      if(!is.null(existing_schedule_config)) MonitoringScheduleConfig[["ScheduleConfig"]][["ScheduleExpression"]] = list(ScheduleExpression = request_schedule_expression)
+      if(!is.null(existing_schedule_config))
+        monitoring_schedule_request$MonitoringScheduleConfig$ScheduleConfig$ScheduleExpression = list(ScheduleExpression = request_schedule_expression)
 
       existing_monitoring_output_config = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringOutputConfig
 
-      MonitoringScheduleConfig[["MonitoringJobDefinition"]]["MonitoringOutputConfig"] = monitoring_output_config %||% existing_monitoring_output_config
+      monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringOutputConfig = monitoring_output_config %||% existing_monitoring_output_config
 
       existing_statistics_s3_uri = NULL
       existing_constraints_s3_uri = NULL
@@ -663,63 +666,55 @@ Session = R6Class("Session",
             || !is.null(constraints_s3_uri)
             || !is.null(existing_statistics_s3_uri)
             || !is.null(existing_constraints_s3_uri)){
-          MonitoringScheduleConfig[["MonitoringJobDefinition"]][["BaselineConfig"]] = list()}
+          monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$BaselineConfig = list()}
 
         if (!is.null(statistics_s3_uri) || !is.null(existing_statistics_s3_uri)){
-          MonitoringScheduleConfig[["MonitoringJobDefinition"]][["BaselineConfig"]][["StatisticsResource"]]= list(S3Uri= statistics_s3_uri %||% existing_statistics_s3_uri)}
+          monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$BaselineConfig$StatisticsResource = list(S3Uri= statistics_s3_uri %||% existing_statistics_s3_uri)}
 
         if (!is.null(constraints_s3_uri) || !is.null(existing_constraints_s3_uri)){
-          MonitoringScheduleConfig[["MonitoringJobDefinition"]][["BaselineConfig"]][["ConstraintsResource"]]= list(S3Uri= constraints_s3_uri %||% existing_constraints_s3_uri)}
+          monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$BaselineConfig$ConstraintsResource = list(S3Uri= constraints_s3_uri %||% existing_constraints_s3_uri)}
 
         existing_record_preprocessor_source_uri = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$RecordPreprocessorSourceUri
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][[
-          "MonitoringAppSpecification"]]["RecordPreprocessorSourceUri"] = record_preprocessor_source_uri %||% existing_record_preprocessor_source_uri
+        monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$RecordPreprocessorSourceUri = record_preprocessor_source_uri %||% existing_record_preprocessor_source_uri
 
         existing_post_analytics_processor_source_uri = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$PostAnalyticsProcessorSourceUri
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][[
-          "MonitoringAppSpecification"]]["PostAnalyticsProcessorSourceUri"] = post_analytics_processor_source_uri %||% existing_post_analytics_processor_source_uri
+        monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$PostAnalyticsProcessorSourceUri = post_analytics_processor_source_uri %||% existing_post_analytics_processor_source_uri
 
         existing_entrypoint = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerEntrypoint
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][[
-          "MonitoringAppSpecification"]]["ContainerEntrypoint"] = entrypoint %||% existing_entrypoint
+        monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerEntrypoint = entrypoint %||% existing_entrypoint
 
         existing_arguments = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerArguments
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][[
-          "MonitoringAppSpecification"]]["ContainerArguments"] = arguments %||% existing_arguments
+        monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerArguments = arguments %||% existing_arguments
 
         existing_volume_kms_key = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeKmsKeyId
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][[
-          "MonitoringResources"]][["ClusterConfig"]]["VolumeKmsKeyId"] = volume_kms_key %||% existing_volume_kms_key
+        monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeKmsKeyId = volume_kms_key %||% existing_volume_kms_key
 
         existing_max_runtime_in_seconds = NULL
         if (!is.null(existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition)){
           existing_max_runtime_in_seconds = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition$MaxRuntimeInSeconds}
 
         if (!is.null(max_runtime_in_seconds) || !is.null(existing_max_runtime_in_seconds)){
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][[
-            "StoppingCondition"]] = list(MaxRuntimeInSeconds= max_runtime_in_seconds %||% existing_max_runtime_in_seconds)}
+          monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition = list(MaxRuntimeInSeconds= max_runtime_in_seconds %||% existing_max_runtime_in_seconds)}
 
-        existing_environment = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$Environment
+          existing_environment = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$Environment
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][
-            "Environment"] = environment %||% existing_environment
+          monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$Environment = environment %||% existing_environment
 
-        existing_network_config = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig
+          existing_network_config = existing_desc$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig
 
-        MonitoringScheduleConfig[["MonitoringJobDefinition"]][
-            "NetworkConfig"] = network_config %||% existing_network_config
+          monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig = network_config %||% existing_network_config
       }
 
       log_info("Updating monitoring schedule with name: %s", monitoring_schedule_name)
-      log_debug("monitoring_schedule_request= %s", MonitoringScheduleConfig)
+      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T))
 
-      self$sagemaker$update_monitoring_schedule(MonitoringScheduleName,
-                                                MonitoringScheduleConfig)
+      self$sagemaker$update_monitoring_schedule(monitoring_schedule_request$MonitoringScheduleName,
+                                                monitoring_schedule_request$MonitoringScheduleConfig)
     },
 
     #' @description Starts a monitoring schedule.
@@ -1116,8 +1111,8 @@ Session = R6Class("Session",
 
       strategy = match.arg(strategy)
 
-      HyperParameterTuningJobName = job_name
-      HyperParameterTuningJobConfig = private$.map_tuning_config(
+      tune_request$HyperParameterTuningJobName = job_name
+      tune_request$HyperParameterTuningJobConfig = private$.map_tuning_config(
         strategy=strategy,
         max_jobs=max_jobs,
         max_parallel_jobs=max_parallel_jobs,
@@ -1125,7 +1120,7 @@ Session = R6Class("Session",
         objective_metric_name=objective_metric_name,
         parameter_ranges=parameter_ranges,
         early_stopping_type=early_stopping_type)
-      TrainingJobDefinition = private$.map_training_config(
+      tune_request$TrainingJobDefinition = private$.map_training_config(
           static_hyperparameters=static_hyperparameters,
           role=role,
           input_mode=input_mode,
@@ -1144,13 +1139,16 @@ Session = R6Class("Session",
           checkpoint_local_path=checkpoint_local_path
         )
 
+      tune_request$WarmStartConfig = warm_start_config
+      tune_request$Tags = tags
+
       log_info("Creating hyperparameter tuning job with name: %s", job_name)
-      # log_debug("tune request: %s", tune_request)
-      self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = HyperParameterTuningJobName,
-                                                       HyperParameterTuningJobConfig = HyperParameterTuningJobConfig,
-                                                       TrainingJobDefinition = TrainingJobDefinition,
-                                                       WarmStartConfig = warm_start_config,
-                                                       Tags = tags)
+      log_debug("tune request: %s", toJSON(tune_request, pretty = T))
+      self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = tune_request$HyperParameterTuningJobName,
+                                                       HyperParameterTuningJobConfig = tune_request$HyperParameterTuningJobConfig,
+                                                       TrainingJobDefinition = tune_request$TrainingJobDefinition,
+                                                       WarmStartConfig = tune_request$WarmStartConfig,
+                                                       Tags = tune_request$Tags)
       },
 
     #' @description Create an Amazon SageMaker hyperparameter tuning job. This method supports creating
@@ -1168,33 +1166,37 @@ Session = R6Class("Session",
     #' @param tags (list[dict]): List of tags for labeling the tuning job. For more, see
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
     create_tuning_job = function(job_name,
-                               tuning_config,
-                               training_config=NULL,
-                               training_config_list=NULL,
-                               warm_start_config=NULL,
-                               tags=NULL){
+                                 tuning_config,
+                                 training_config=NULL,
+                                 training_config_list=NULL,
+                                 warm_start_config=NULL,
+                                 tags=NULL){
       if (is.null(training_config) && is.null(training_config_list)){
         stop("Either training_config or training_config_list should be provided.", call. = F)}
       if (!is.null(training_config) && !is.null(training_config_list)){
         stop("Only one of training_config and training_config_list should be provided.", call. = F)}
 
-      HyperParameterTuningJobConfig =  do.call(private$.map_tuning_config, tuning_config)
+      tune_request = list(HyperParameterTuningJobName = job_name,
+                          HyperParameterTuningJobConfig = do.call(private$.map_tuning_config, tuning_config))
 
       if(!is.null(training_config))
-        TrainingJobDefinition = do.call(private$.map_training_config, training_config)
+        tune_request$TrainingJobDefinition = do.call(private$.map_training_config, training_config)
 
       if (!is.null(training_config_list))
-        TrainingJobDefinitions= lapply(training_config_list, function(training_cfg) do.call(private$.map_training_config, training_cfg))
+        tune_request$TrainingJobDefinitions= lapply(training_config_list, function(training_cfg) do.call(private$.map_training_config, training_cfg))
+
+      tune_request$Tags = tags
+      tune_request$WarmStartConfig = warm_start_config
 
       log_info("Creating hyperparameter tuning job with name: %s", job_name)
+      log_debug("tune request: %s", toJSON(tune_request, pretty = T))
 
-      self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = job_name,
-                                                       HyperParameterTuningJobConfig = HyperParameterTuningJobConfig,
-                                                       TrainingJobDefinition = TrainingJobDefinition,
-                                                       TrainingJobDefinitions = TrainingJobDefinitions,
-                                                       WarmStartConfig = warm_start_config,
-                                                       Tags = tags)
-
+      self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = tune_request$HyperParameterTuningJobName,
+                                                       HyperParameterTuningJobConfig = tune_request$HyperParameterTuningJobConfig,
+                                                       TrainingJobDefinition = tune_request$TrainingJobDefinition,
+                                                       TrainingJobDefinitions = tune_request$TrainingJobDefinitions,
+                                                       WarmStartConfig = tune_request$WarmStartConfig,
+                                                       Tags = tune_request$Tags)
     },
 
     #' @description Stop the Amazon SageMaker hyperparameter tuning job with the specified name.
@@ -1247,7 +1249,7 @@ Session = R6Class("Session",
                           env, input_config, output_config, resource_config, data_processing,
                           tags, experiment_config)
       log_info("Creating transform job with name: %s", job_name)
-      log_debug("Transform request: %s", request_list)
+      log_debug("Transform request: %s", toJSON(request_list, pretty = T))
       self$sagemaker$create_transform_job(TransformJobName = job_name,
                                           ModelName = model_name,
                                           MaxConcurrentTransforms = max_concurrent_transforms,
@@ -1303,18 +1305,41 @@ Session = R6Class("Session",
                             primary_container = NULL,
                             tags = NULL){
 
+      if(!is.null(container_defs) && !is.null(primary_container))
+        stop("Both container_defs and primary_container can not be passed as input", call.= F)
+
+      create_model_request = list(ModelName= name,
+                                  ExecutionRoleArn = role)
+
+      if (!is.null(primary_container)){
+
+        msg = paste0("primary_container is going to be deprecated in a future release. Please use ",
+                     "container_defs instead.")
+        warning(msg)
+        container_defs = primary_container
+      }
+
       role = self$expand_role(role)
 
-      log_info("Creating model with name: %s", name)
-      log_debug("CreateModel request: %s", primary_container %||% container_defs)
+      if(inherits(container_def, "list"))
+        create_model_request$Containers = container_def
+      else
+        create_model_request$PrimaryContainer = container_def
 
-      tryCatch({self$sagemaker$create_model(ModelName = name,
-                                            PrimaryContainer = primary_container,
-                                            Containers = container_defs,
-                                            ExecutionRoleArn = role,
-                                            Tags = tags,
-                                            VpcConfig = vpc_config,
-                                            EnableNetworkIsolation = enable_network_isolation)},
+      create_model_request$Tags = tags
+      create_model_request$VpcConfig = vpc_config
+      create_model_request$EnableNetworkIsolation = enable_network_isolation
+
+      log_info("Creating model with name: %s", name)
+      log_debug("CreateModel request: %s", toJSON(create_model_request, pretty = T))
+
+      tryCatch({self$sagemaker$create_model(ModelName = create_model_request$ModelName,
+                                            PrimaryContainer = create_model_request$PrimaryContainer,
+                                            Containers = create_model_request$Containers,
+                                            ExecutionRoleArn = create_model_request$ExecutionRoleArn,
+                                            Tags = create_model_request$Tags,
+                                            VpcConfig = create_model_request$VpcConfig,
+                                            EnableNetworkIsolation = create_model_request$EnableNetworkIsolation)},
                error=function(e){
                  error_code = attributes(e)$error_response$`__type`
                  if (error_code == "ValidationException"
@@ -2463,6 +2488,12 @@ Session = R6Class("Session",
   lock_objects = F
 )
 
+
+
+
+
+
+
 #' @title Create a definition for executing a container as part of a SageMaker model.
 #' @param image (str): Docker image to run for this container.
 #' @param model_data_url (str): S3 URI of data required by this container,
@@ -2477,9 +2508,9 @@ Session = R6Class("Session",
 #'              passed via `PrimaryContainers` field.
 #' @export
 container_def <- function(image,
-                         model_data_url=NULL,
-                         env=NULL,
-                         container_mode=NULL){
+                          model_data_url=NULL,
+                          env=NULL,
+                          container_mode=NULL){
   if(is.null(env)) env = list()
   c_def = list("Image" = image, "Environment"= env)
 
@@ -2524,7 +2555,6 @@ production_variant <- function(model_name,
   return(production_variant_configuration)
 
 }
-
 
 .deployment_entity_exists <- function(describe_fn){
   tryCatch(eval.parent(substitute(expr)),
