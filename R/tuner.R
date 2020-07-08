@@ -290,7 +290,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       self$.current_job_name = NULL
       self$latest_tuning_job = NULL
       self$warm_start_config = warm_start_config
-      self$early_stopping_type = early_stopping_type
+      self$early_stopping_type = match.arg(early_stopping_type)
     },
 
     #' @description Start a hyperparameter tuning job.
@@ -1068,7 +1068,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
               tuning_range = parameter$as_json_range(parameter_name)
             else
               tuning_range = parameter$as_tuning_range(parameter_name)
-            hp_ranges = c(hp_ranges, tuning_range)}
+            hp_ranges = c(hp_ranges, list(tuning_range))}
         processed_parameter_ranges[[paste0(range_type, "ParameterRanges")]] = hp_ranges
         }
       }
@@ -1416,7 +1416,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
         if ("InputMode" %in% names(inputs$config)){
           log_debug(
             "Selecting s3_input's input_mode (%s) for TrainingInputMode.",
-            toJSON(inputs$config$InputMode, pretty = T))
+            toJSON(inputs$config$InputMode, pretty = T, auto_unbox = T))
           training_config$input_mode = inputs$config$InputMode}
       }
 
