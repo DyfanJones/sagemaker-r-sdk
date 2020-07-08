@@ -51,7 +51,7 @@ bucket based on a naming convention which includes the current AWS account ID.
 \item \href{#method-logs_for_auto_ml}{\code{Session$logs_for_auto_ml()}}
 \item \href{#method-compile_model}{\code{Session$compile_model()}}
 \item \href{#method-tune}{\code{Session$tune()}}
-\item \href{#method-create_tune_job}{\code{Session$create_tune_job()}}
+\item \href{#method-create_tuning_job}{\code{Session$create_tuning_job()}}
 \item \href{#method-stop_tuning_job}{\code{Session$stop_tuning_job()}}
 \item \href{#method-transform}{\code{Session$transform()}}
 \item \href{#method-create_model}{\code{Session$create_model()}}
@@ -1248,14 +1248,14 @@ checkpoints will be provided under `/opt/ml/checkpoints/`.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-create_tune_job"></a>}}
-\if{latex}{\out{\hypertarget{method-create_tune_job}{}}}
-\subsection{Method \code{create_tune_job()}}{
+\if{html}{\out{<a id="method-create_tuning_job"></a>}}
+\if{latex}{\out{\hypertarget{method-create_tuning_job}{}}}
+\subsection{Method \code{create_tuning_job()}}{
 Create an Amazon SageMaker hyperparameter tuning job. This method supports creating
              tuning jobs with single or multiple training algorithms (estimators), while the ``tune()``
              method above only supports creating tuning jobs with single training algorithm.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$create_tune_job(
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_tuning_job(
   job_name,
   tuning_config,
   training_config = NULL,
