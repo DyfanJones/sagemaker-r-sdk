@@ -890,7 +890,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
                                    job_name,
                                    include_cls_metadata,
                                    ...){
-      private$.prepare_estimator_for_tuning(self.estimator, inputs, job_name, ...)
+      private$.prepare_estimator_for_tuning(self$estimator, inputs, job_name, ...)
       private$.prepare_for_tuning(job_name=job_name, include_cls_metadata=include_cls_metadata)
       self$latest_tuning_job = private$start_new(inputs)
     },
@@ -1057,7 +1057,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       processed_parameter_ranges = list()
       for (range_type in ParameterRange$public_fields$.all_types){
         hp_ranges = list()
-        for (i in parameter_ranges){
+        for (i in seq_along(parameter_ranges)){
           parameter_name = names(parameter_ranges)[[i]]
           parameter = parameter_ranges[[i]]
           if (!islistempty(parameter) && parameter$.name == range_type){
@@ -1373,7 +1373,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
 
       if (!is.null(self$estimator))
         tuner_args$training_config = private$.prepare_training_config(
-          inputs, self$estimator, self$static_hyperparameters, self$.metric_definitions)
+          inputs, self$estimator, self$static_hyperparameters, self$metric_definitions)
 
       if (!islistempty(self$estimator_list))
         tuner_args$training_config_list=lapply(
