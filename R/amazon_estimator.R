@@ -145,7 +145,7 @@ registry <- function(region_name,
 #' @param repo_version (str): Version fo repo to call
 #' @export
 get_image_uri <- function(region_name, repo_name, repo_version = "1.0-1"){
-  stopifnot(as.character(region_name), as.character(repo_name), as.character(repo_version))
+  stopifnot(is.character(region_name), is.character(repo_name), is.character(repo_version))
   log_warn(
     "'get_image_uri' method will be deprecated in favor of 'ImageURIProvider' class to align with SageMaker Python SDK v2."
   )
