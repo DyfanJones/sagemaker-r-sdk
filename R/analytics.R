@@ -177,7 +177,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
      output = list()
      next_args = list()
 
-     next_args = list(HyperParameterTuningJobName='xgboost-200706-1050', MaxResults=100)
+     next_args = list(HyperParameterTuningJobName=self$name, MaxResults=100)
      for (count in 1:100){
        raw_result = self$sagemaker_session$sagemaker$list_training_jobs_for_hyper_parameter_tuning_job(
          HyperParameterTuningJobName = next_args$HyperParameterTuningJobName,
@@ -207,7 +207,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
  private = list(
     .fetch_dataframe = function(){
      # Run that helper over all the summaries.
-     df = rbindlist(lapply(training_summary, function(training_summary){
+     df = rbindlist(lapply(self$training_job_summaries(), function(training_summary){
        end_time = training_summary$TrainingEndTime
        start_time = training_summary$TrainingStartTime
        diff_time = if(length(start_time) == 0 || length(start_time) == 0) NULL else as.numeric(end_time - start_time)
