@@ -38,7 +38,7 @@ Session = R6Class("Session",
     #'              "sagemaker-{region}-{aws-account-id}". Example: "sagemaker-my-custom-bucket".
     initialize = function(paws_credentials = NULL,
                           bucket = NULL) {
-      self$paws_credentials <- .paws_cred(paws_credentials)
+      self$paws_credentials <- if(inherits(paws_credentials, "PawsCredentials")) paws_credentials else PawsCredentials$new()
       self$bucket <- bucket
       self$config <- NULL
       # get sagemaker object from paws
