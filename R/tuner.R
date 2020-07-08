@@ -1446,7 +1446,6 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       if (!is.null(parameter_ranges))
         training_config$parameter_ranges = parameter_ranges
 
-      ##
       return(training_config)
       },
 
