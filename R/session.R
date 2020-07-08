@@ -1167,7 +1167,7 @@ Session = R6Class("Session",
     #'              other required configurations.
     #' @param tags (list[dict]): List of tags for labeling the tuning job. For more, see
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
-    create_tune_job = function(job_name,
+    create_tuning_job = function(job_name,
                                tuning_config,
                                training_config=NULL,
                                training_config_list=NULL,
@@ -2111,7 +2111,7 @@ Session = R6Class("Session",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<sagemaker$Session>")
+      cat("<Session>")
       invisible(self)
     }
   ),
