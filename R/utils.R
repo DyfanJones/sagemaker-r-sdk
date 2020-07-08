@@ -353,11 +353,6 @@ tar_subdir <- function(tarfile, srdir, compress = "gzip", ...){
   tar(tarfile= tarfile, files=".", compression=compress, tar = "tar" , ...)
 }
 
-print_list <- function(l){
-  output <- vapply(seq_along(l), function(i){paste(names(l[i]), l[[i]], sep = ": ")}, FUN.VALUE = character(1))
-  paste(output, collapse = ", ")
-}
-
 IsSubR6Class <- function(subclass, cls) {
   if(is.null(subclass)) return(NULL)
   if (!is.R6Class(subclass))

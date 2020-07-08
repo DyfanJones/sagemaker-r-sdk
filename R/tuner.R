@@ -1416,7 +1416,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
         if ("InputMode" %in% names(inputs$config)){
           log_debug(
             "Selecting s3_input's input_mode (%s) for TrainingInputMode.",
-            print_list(inputs$config$InputMode))
+            toJSON(inputs$config$InputMode, pretty = T))
           training_config$input_mode = inputs$config$InputMode}
       }
 
