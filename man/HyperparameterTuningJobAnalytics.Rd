@@ -14,6 +14,40 @@ Fetch results about a hyperparameter tuning job and make them accessible
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
 \item{\code{name}}{Name of the HyperparameterTuningJob being analyzed}
+
+\item{\code{tuning_ranges}}{A dictionary describing the ranges of all tuned hyperparameters. The
+keys are the names of the hyperparameter, and the values are the ranges.
+The output can take one of two forms:
+* If the 'TrainingJobDefinition' field is present in the job description, the output
+is a dictionary constructed from 'ParameterRanges' in
+'HyperParameterTuningJobConfig' of the job description. The keys are the
+parameter names, while the values are the parameter ranges.
+Example:
+>>> {
+>>>     "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
+>>>     "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
+>>>     "iterations": {"MaxValue": "100", "MinValue": "50", "Name": "iterations"},
+>>>     "num_layers": {"MaxValue": "30", "MinValue": "5", "Name": "num_layers"},
+>>> }
+* If the 'TrainingJobDefinitions' field (list) is present in the job description,
+the output is a dictionary with keys as the 'DefinitionName' values from
+all items in 'TrainingJobDefinitions', and each value would be a dictionary
+constructed from 'HyperParameterRanges' in each item in 'TrainingJobDefinitions'
+in the same format as above
+Example:
+>>> {
+>>>     "estimator_1": {
+>>>         "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
+>>>         "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
+>>>     },
+>>>     "estimator_2": {
+>>>         "framework": {"Values": ["TF", "MXNet"], "Name": "framework"},
+>>>         "gamma": {"MaxValue": "1.0", "MinValue": "0.2", "Name": "gamma"}
+>>>     }
+>>> }
+For more details about the 'TrainingJobDefinition' and 'TrainingJobDefinitions' fields
+in job description, see
+https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#SageMaker.Client.create_hyper_parameter_tuning_job}
 }
 \if{html}{\out{</div>}}
 }
@@ -21,11 +55,10 @@ Fetch results about a hyperparameter tuning job and make them accessible
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{HyperparameterTuningJobAnalytics$new()}}
-\item \href{#method-clear_cache}{\code{HyperparameterTuningJobAnalytics$clear_cache()}}
-\item \href{#method-tuning_ranges}{\code{HyperparameterTuningJobAnalytics$tuning_ranges()}}
 \item \href{#method-description}{\code{HyperparameterTuningJobAnalytics$description()}}
 \item \href{#method-training_job_summaries}{\code{HyperparameterTuningJobAnalytics$training_job_summaries()}}
 \item \href{#method-print}{\code{HyperparameterTuningJobAnalytics$print()}}
+\item \href{#method-clear_cache}{\code{HyperparameterTuningJobAnalytics$clear_cache()}}
 \item \href{#method-clone}{\code{HyperparameterTuningJobAnalytics$clone()}}
 }
 }
@@ -62,58 +95,6 @@ default AWS configuration chain.}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clear_cache"></a>}}
-\if{latex}{\out{\hypertarget{method-clear_cache}{}}}
-\subsection{Method \code{clear_cache()}}{
-Clear the object of all local caches of API methods.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuningJobAnalytics$clear_cache()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tuning_ranges"></a>}}
-\if{latex}{\out{\hypertarget{method-tuning_ranges}{}}}
-\subsection{Method \code{tuning_ranges()}}{
-A dictionary describing the ranges of all tuned hyperparameters. The
-             keys are the names of the hyperparameter, and the values are the ranges.
-             The output can take one of two forms:
-             * If the 'TrainingJobDefinition' field is present in the job description, the output
-             is a dictionary constructed from 'ParameterRanges' in
-             'HyperParameterTuningJobConfig' of the job description. The keys are the
-             parameter names, while the values are the parameter ranges.
-             Example:
-             >>> {
-             >>>     "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
-             >>>     "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
-             >>>     "iterations": {"MaxValue": "100", "MinValue": "50", "Name": "iterations"},
-             >>>     "num_layers": {"MaxValue": "30", "MinValue": "5", "Name": "num_layers"},
-             >>> }
-             * If the 'TrainingJobDefinitions' field (list) is present in the job description,
-             the output is a dictionary with keys as the 'DefinitionName' values from
-             all items in 'TrainingJobDefinitions', and each value would be a dictionary
-             constructed from 'HyperParameterRanges' in each item in 'TrainingJobDefinitions'
-             in the same format as above
-             Example:
-             >>> {
-             >>>     "estimator_1": {
-             >>>         "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
-             >>>         "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
-             >>>     },
-             >>>     "estimator_2": {
-             >>>         "framework": {"Values": ["TF", "MXNet"], "Name": "framework"},
-             >>>         "gamma": {"MaxValue": "1.0", "MinValue": "0.2", "Name": "gamma"}
-             >>>     }
-             >>> }
-             For more details about the 'TrainingJobDefinition' and 'TrainingJobDefinitions' fields
-             in job description, see
-             https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#SageMaker.Client.create_hyper_parameter_tuning_job
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuningJobAnalytics$tuning_ranges()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-description"></a>}}
@@ -177,6 +158,16 @@ Printer.
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clear_cache"></a>}}
+\if{latex}{\out{\hypertarget{method-clear_cache}{}}}
+\subsection{Method \code{clear_cache()}}{
+Clear the object of all local caches of API methods.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuningJobAnalytics$clear_cache()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

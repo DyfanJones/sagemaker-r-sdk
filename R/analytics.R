@@ -93,61 +93,6 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
 
     },
 
-    #' @description Clear the object of all local caches of API methods.
-    clear_cache = function(){
-     super$clear_cache()
-     self$.tuning_job_describe_result = NULL
-     self$.training_job_summaries = NULL
-    },
-
-    #' @description A dictionary describing the ranges of all tuned hyperparameters. The
-    #'              keys are the names of the hyperparameter, and the values are the ranges.
-    #'              The output can take one of two forms:
-    #'              * If the 'TrainingJobDefinition' field is present in the job description, the output
-    #'              is a dictionary constructed from 'ParameterRanges' in
-    #'              'HyperParameterTuningJobConfig' of the job description. The keys are the
-    #'              parameter names, while the values are the parameter ranges.
-    #'              Example:
-    #'              >>> {
-    #'              >>>     "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
-    #'              >>>     "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
-    #'              >>>     "iterations": {"MaxValue": "100", "MinValue": "50", "Name": "iterations"},
-    #'              >>>     "num_layers": {"MaxValue": "30", "MinValue": "5", "Name": "num_layers"},
-    #'              >>> }
-    #'              * If the 'TrainingJobDefinitions' field (list) is present in the job description,
-    #'              the output is a dictionary with keys as the 'DefinitionName' values from
-    #'              all items in 'TrainingJobDefinitions', and each value would be a dictionary
-    #'              constructed from 'HyperParameterRanges' in each item in 'TrainingJobDefinitions'
-    #'              in the same format as above
-    #'              Example:
-    #'              >>> {
-    #'              >>>     "estimator_1": {
-    #'              >>>         "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
-    #'              >>>         "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
-    #'              >>>     },
-    #'              >>>     "estimator_2": {
-    #'              >>>         "framework": {"Values": ["TF", "MXNet"], "Name": "framework"},
-    #'              >>>         "gamma": {"MaxValue": "1.0", "MinValue": "0.2", "Name": "gamma"}
-    #'              >>>     }
-    #'              >>> }
-    #'              For more details about the 'TrainingJobDefinition' and 'TrainingJobDefinitions' fields
-    #'              in job description, see
-    #'              https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#SageMaker.Client.create_hyper_parameter_tuning_job
-    tuning_ranges = function(){
-     description = self$description()
-
-     if(!islistempty(description$TrainingJobDefinition))
-       return(private$.prepare_parameter_ranges(
-         description$HyperParameterTuningJobConfig$ParameterRanges))
-
-     output = lapply(description$TrainingJobDefinitions,
-                     function(training_job_definition)
-                       private$.prepare_parameter_ranges(
-                         training_job_definition$HyperParameterRanges))
-     names(output) = sapply(description$TrainingJobDefinitions, function(x) x$DefinitionName)
-     return (output)
-    },
-
     #' @description Call ``DescribeHyperParameterTuningJob`` for the hyperparameter
     #'              tuning job.
     #' @param force_refresh (bool): Set to True to fetch the latest data from
@@ -160,7 +105,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
      if(!islistempty(self$.tuning_job_describe_result))
        self$.tuning_job_describe_result = self$sagemaker_session$sagemaker$describe_hyper_parameter_tuning_job(
          HyperParameterTuningJobName=self$name)
-     return (self._tuning_job_describe_result)
+     return (self$.tuning_job_describe_result)
     },
 
     #' @description A (paginated) list of everything from
@@ -202,6 +147,13 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
     print = function(...){
       cat("<HyperparameterTuningJobAnalytics>")
       invisible(self)
+    },
+
+    #' @description Clear the object of all local caches of API methods.
+    clear_cache = function(){
+      super$clear_cache()
+      self$.tuning_job_describe_result = NULL
+      self$.training_job_summaries = NULL
     }
  ),
  private = list(
@@ -232,7 +184,57 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
     #' Name of the HyperparameterTuningJob being analyzed
     name = function(){
      return(self$.tuning_job_name)
+    },
+
+    #' @field tuning_ranges
+    #' A dictionary describing the ranges of all tuned hyperparameters. The
+    #'              keys are the names of the hyperparameter, and the values are the ranges.
+    #'              The output can take one of two forms:
+    #'              * If the 'TrainingJobDefinition' field is present in the job description, the output
+    #'              is a dictionary constructed from 'ParameterRanges' in
+    #'              'HyperParameterTuningJobConfig' of the job description. The keys are the
+    #'              parameter names, while the values are the parameter ranges.
+    #'              Example:
+    #'              >>> {
+    #'              >>>     "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
+    #'              >>>     "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
+    #'              >>>     "iterations": {"MaxValue": "100", "MinValue": "50", "Name": "iterations"},
+    #'              >>>     "num_layers": {"MaxValue": "30", "MinValue": "5", "Name": "num_layers"},
+    #'              >>> }
+    #'              * If the 'TrainingJobDefinitions' field (list) is present in the job description,
+    #'              the output is a dictionary with keys as the 'DefinitionName' values from
+    #'              all items in 'TrainingJobDefinitions', and each value would be a dictionary
+    #'              constructed from 'HyperParameterRanges' in each item in 'TrainingJobDefinitions'
+    #'              in the same format as above
+    #'              Example:
+    #'              >>> {
+    #'              >>>     "estimator_1": {
+    #'              >>>         "eta": {"MaxValue": "1", "MinValue": "0", "Name": "eta"},
+    #'              >>>         "gamma": {"MaxValue": "10", "MinValue": "0", "Name": "gamma"},
+    #'              >>>     },
+    #'              >>>     "estimator_2": {
+    #'              >>>         "framework": {"Values": ["TF", "MXNet"], "Name": "framework"},
+    #'              >>>         "gamma": {"MaxValue": "1.0", "MinValue": "0.2", "Name": "gamma"}
+    #'              >>>     }
+    #'              >>> }
+    #'              For more details about the 'TrainingJobDefinition' and 'TrainingJobDefinitions' fields
+    #'              in job description, see
+    #'              https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#SageMaker.Client.create_hyper_parameter_tuning_job
+    tuning_ranges = function(){
+      description = self$description()
+
+      if(!islistempty(description$TrainingJobDefinition))
+        return(private$.prepare_parameter_ranges(
+          description$HyperParameterTuningJobConfig$ParameterRanges))
+
+      output = lapply(description$TrainingJobDefinitions,
+                      function(training_job_definition)
+                        private$.prepare_parameter_ranges(
+                          training_job_definition$HyperParameterRanges))
+      names(output) = sapply(description$TrainingJobDefinitions, function(x) x$DefinitionName)
+      return (output)
     }
+
  ),
  lock_objects = F
 )
