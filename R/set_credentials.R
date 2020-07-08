@@ -52,12 +52,12 @@ PawsCredentials = R6Class("PawsCredentials",
                           aws_session_token = NULL,
                           region_name = NULL,
                           profile_name = NULL){
-      self$aws_access_key_id <- aws_access_key_id %||% get_aws_env("AWS_ACCESS_KEY_ID")
-      self$aws_secret_access_key <- aws_secret_access_key %||% get_aws_env("AWS_SECRET_ACCESS_KEY")
-      self$aws_session_token <- aws_session_token %||% get_aws_env("AWS_SESSION_TOKEN")
-      self$region_name <- region_name %||% get_region(profile_name)
-      self$profile_name <- if(!(is.null(self$aws_access_key_id) || is.null(self$aws_secret_access_key) || is.null(self$aws_session_token))) NULL else get_profile_name(profile_name)
-      self$credentials <- private$cred_set(self$aws_access_key_id, self$aws_secret_access_key, self$aws_session_token, self$profile_name, self$region_name)
+      self$aws_access_key_id = aws_access_key_id %||% get_aws_env("AWS_ACCESS_KEY_ID")
+      self$aws_secret_access_key = aws_secret_access_key %||% get_aws_env("AWS_SECRET_ACCESS_KEY")
+      self$aws_session_token = aws_session_token %||% get_aws_env("AWS_SESSION_TOKEN")
+      self$region_name = region_name %||% get_region(profile_name)
+      self$profile_name = if(!(is.null(self$aws_access_key_id) || is.null(self$aws_secret_access_key) || is.null(self$aws_session_token))) NULL else get_profile_name(profile_name)
+      self$credentials = private$cred_set(self$aws_access_key_id, self$aws_secret_access_key, self$aws_session_token, self$profile_name, self$region_name)
     },
 
     #' @description
