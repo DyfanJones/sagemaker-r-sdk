@@ -358,7 +358,7 @@ Session = R6Class("Session",
       train_request$TensorBoardOutputConfig = tensorboard_output_config
 
       log_info("Creating training-job with name: %s", job_name)
-      log_debug("train request: %s", toJSON(train_request, pretty = T))
+      log_debug("train request: %s", toJSON(train_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_training_job(TrainingJobName = train_request$TrainingJobName,
                              HyperParameters = train_request$HyperParameters,
@@ -438,7 +438,7 @@ Session = R6Class("Session",
       process_request$ExperimentConfig = experiment_config
 
       log_info("Creating processing-job with name %s", job_name)
-      log_debug("process request: %s", toJSON(process_request, pretty))
+      log_debug("process request: %s", toJSON(process_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_processing_job(ProcessingInputs = process_request$ProcessingInputs,
                                ProcessingOutputConfig = process_request$ProcessingOutputConfig,
@@ -552,7 +552,7 @@ Session = R6Class("Session",
       monitoring_schedule_request$Tags = tags
 
       log_info("Creating monitoring schedule name %s", monitoring_schedule_name)
-      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T))
+      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_monitoring_schedule(MonitoringScheduleName = monitoring_schedule_request$MonitoringScheduleName,
                                     MonitoringScheduleConfig = monitoring_schedule_request$MonitoringScheduleConfig,
@@ -711,7 +711,7 @@ Session = R6Class("Session",
       }
 
       log_info("Updating monitoring schedule with name: %s", monitoring_schedule_name)
-      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T))
+      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$update_monitoring_schedule(monitoring_schedule_request$MonitoringScheduleName,
                                                 monitoring_schedule_request$MonitoringScheduleConfig)
@@ -1143,7 +1143,7 @@ Session = R6Class("Session",
       tune_request$Tags = tags
 
       log_info("Creating hyperparameter tuning job with name: %s", job_name)
-      log_debug("tune request: %s", toJSON(tune_request, pretty = T))
+      log_debug("tune request: %s", toJSON(tune_request, pretty = T, auto_unbox = T))
       self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = tune_request$HyperParameterTuningJobName,
                                                        HyperParameterTuningJobConfig = tune_request$HyperParameterTuningJobConfig,
                                                        TrainingJobDefinition = tune_request$TrainingJobDefinition,
@@ -1189,7 +1189,7 @@ Session = R6Class("Session",
       tune_request$WarmStartConfig = warm_start_config
 
       log_info("Creating hyperparameter tuning job with name: %s", job_name)
-      log_debug("tune request: %s", toJSON(tune_request, pretty = T))
+      log_debug("tune request: %s", toJSON(tune_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = tune_request$HyperParameterTuningJobName,
                                                        HyperParameterTuningJobConfig = tune_request$HyperParameterTuningJobConfig,
@@ -1249,7 +1249,7 @@ Session = R6Class("Session",
                           env, input_config, output_config, resource_config, data_processing,
                           tags, experiment_config)
       log_info("Creating transform job with name: %s", job_name)
-      log_debug("Transform request: %s", toJSON(request_list, pretty = T))
+      log_debug("Transform request: %s", toJSON(request_list, pretty = T, auto_unbox = T))
       self$sagemaker$create_transform_job(TransformJobName = job_name,
                                           ModelName = model_name,
                                           MaxConcurrentTransforms = max_concurrent_transforms,
@@ -1331,7 +1331,7 @@ Session = R6Class("Session",
       create_model_request$EnableNetworkIsolation = enable_network_isolation
 
       log_info("Creating model with name: %s", name)
-      log_debug("CreateModel request: %s", toJSON(create_model_request, pretty = T))
+      log_debug("CreateModel request: %s", toJSON(create_model_request, pretty = T, auto_unbox = T))
 
       tryCatch({self$sagemaker$create_model(ModelName = create_model_request$ModelName,
                                             PrimaryContainer = create_model_request$PrimaryContainer,
@@ -2173,17 +2173,18 @@ Session = R6Class("Session",
                              MaxParallelTrainingJobs = max_parallel_jobs),
                            TrainingJobEarlyStoppingType =  early_stopping_type)
 
-
+      # ----- bring .map_tuning_objective into function ------
       tuning_objective = NULL
 
       if (!is.null(objective_type) || !is.null(objective_metric_name)) {
         tuning_objective = list()
-        tuning_objective["Type"] = objective_type
-        tuning_objective["MetricName"] = objective_metric_name}
+        tuning_objective$Type = objective_type
+        tuning_objective$MetricName = objective_metric_name}
+      # ------------------------------------------------------
 
-      tuning_config[["HyperParameterTuningJobObjective"]] = tuning_objective
+      tuning_config$HyperParameterTuningJobObjective = tuning_objective
 
-      tuning_config[["ParameterRanges"]] = parameter_ranges
+      tuning_config$ParameterRanges = parameter_ranges
 
       return(tuning_config)
     },
@@ -2253,12 +2254,12 @@ Session = R6Class("Session",
 
       if (!is.null(objective_type) || !is.null(objective_metric_name)) {
         tuning_objective = list()
-        tuning_objective["Type"] = objective_type
-        tuning_objective["MetricName"] = objective_metric_name}
+        tuning_objective$Type = objective_type
+        tuning_objective$MetricName = objective_metric_name}
 
-      training_job_definition[["TuningObjective"]] = tuning_objective
+      training_job_definition$TuningObjective = tuning_objective
 
-      training_job_definition[["HyperParameterRanges"]] = parameter_ranges
+      training_job_definition$HyperParameterRanges = parameter_ranges
 
       return(training_job_definition)
     },
@@ -2487,12 +2488,6 @@ Session = R6Class("Session",
   ),
   lock_objects = F
 )
-
-
-
-
-
-
 
 #' @title Create a definition for executing a container as part of a SageMaker model.
 #' @param image (str): Docker image to run for this container.
