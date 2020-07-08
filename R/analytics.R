@@ -82,7 +82,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
     #'              AWS services needed. If not specified, one is created using the
     #'              default AWS configuration chain.
     initialize = function(hyperparameter_tuning_job_name,
-                         sagemaker_session=NULL){
+                          sagemaker_session=NULL){
      self$sagemaker_session = sagemaker_session %||% Session$new()
      self$.tuning_job_name = hyperparameter_tuning_job_name
      self$.tuning_job_describe_result = NULL
@@ -102,7 +102,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
     description = function(force_refresh=FALSE){
      if (force_refresh)
        self$clear_cache()
-     if(!islistempty(self$.tuning_job_describe_result))
+     if(islistempty(self$.tuning_job_describe_result))
        self$.tuning_job_describe_result = self$sagemaker_session$sagemaker$describe_hyper_parameter_tuning_job(
          HyperParameterTuningJobName=self$name)
      return (self$.tuning_job_describe_result)
@@ -177,6 +177,17 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
          output[[k]] = v}
        output}), fill = TRUE)
      return(df)
+    },
+
+    # Convert parameter ranges a dictionary using the parameter range names as the keys
+    .prepare_parameter_ranges = function(parameter_ranges){
+      out = list()
+      for (i in seq_along(parameter_ranges)){
+        ranges = parameter_ranges[[i]]
+        for(param in ranges)
+          out[[param$Name]] = param
+      }
+      return(out)
     }
  ),
  active = list(
