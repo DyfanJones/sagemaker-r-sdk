@@ -35,19 +35,19 @@ sagemaker_log_colour <- function (msg, level) {
 
 # format logs
 sagemaker_colour_wrapper <- function(logs){
-  ifelse(grepl("^\\[.*FATAL\\].*|^FATAL:.*",logs),
+  ifelse(grepl("^\\[.*FATAL.*\\].*|^FATAL:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 196, logs),
-  ifelse(grepl("^\\[.*ERROR\\].*|^ERROR:.*",logs),
+  ifelse(grepl("^\\[.*ERROR.*\\].*|^ERROR:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 124, logs),
-  ifelse(grepl("^\\[.*WARNING\\].*|^.*WARNING:.*",logs),
+  ifelse(grepl("^\\[.*WARNING.*\\].*|^.*WARNING:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 214, logs),
-  ifelse(grepl("^\\[.*SUCCESS\\].*|^SUCCESS:.*",logs),
+  ifelse(grepl("^\\[.*SUCCESS.*\\].*|^SUCCESS:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 34, logs),
-  ifelse(grepl("^\\[.*INFO\\].*|^INFO:.*",logs),
+  ifelse(grepl("^\\[.*INFO.*\\].*|^INFO:.*",logs),
          sprintf("\x1b[%sm%s\x1b[0m", 34, logs),
-  ifelse(grepl("^\\[.*DEBUG\\].*|^DEBUG:.*",logs),
+  ifelse(grepl("^\\[.*DEBUG.*\\].*|^DEBUG:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 31, logs),
-  ifelse(grepl("^\\[.*TRACE\\].*|^TRACE:.*",logs),
+  ifelse(grepl("^\\[.*TRACE.*\\].*|^TRACE:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 25, logs),
          sprintf("\033[38;5;246m%s\033[39m", logs))))))))
 }
