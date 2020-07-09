@@ -1994,6 +1994,7 @@ Session = R6Class("Session",
           last_describe_job_call = Sys.time()
 
           if(secondary_training_status_changed(description, last_description)){
+            writeLines("")
             writeLines(secondary_training_status_message(description, last_description), sep = "")
             last_description = description
           }
@@ -2351,7 +2352,7 @@ Session = R6Class("Session",
       status = desc$TrainingJobStatus
 
       if(secondary_training_status_changed(desc, last_desc)){
-        writeLines("\n")
+        writeLines("")
         writeLines(secondary_training_status_message(desc, last_desc), sep = "")
       } else {
         writeLines(".", sep = "")
