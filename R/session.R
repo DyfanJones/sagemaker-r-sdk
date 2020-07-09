@@ -1328,9 +1328,9 @@ Session = R6Class("Session",
       role = self$expand_role(role)
 
       if(inherits(container_def, "list"))
-        create_model_request$Containers = container_def
+        create_model_request$Containers = container_defs
       else
-        create_model_request$PrimaryContainer = container_def
+        create_model_request$PrimaryContainer = container_defs
 
       create_model_request$Tags = tags
       create_model_request$VpcConfig = vpc_config
