@@ -123,23 +123,21 @@ Session = R6Class("Session",
     #'              https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-example-download-file.html
     #' @return
     #' NULL invisibly
-    download_data = function(path="", bucket, key_prefix = NULL, ...){
+    download_data = function(path="", bucket, key_prefix = "", ...){
 
       # Get s3 object from paws
       s3 = paws::s3(config = self$paws_credentials$credentials)
 
       next_token = NULL
-      keys = character()
+      keys = list()
       # Loop through the contents of the bucket, 1,000 objects at a time. Gathering all keys into
       # a "keys" list.
       while(!identical(next_token, character(0))){
         response = s3$list_objects_v2(Bucket = bucket, Prefix = key_prefix, ContinuationToken = next_token)
+        # For each object, save its key or directory.
         keys = c(keys, sapply(response$Contents, function(x) x$Key))
         next_token = response$ContinuationToken
       }
-
-      # convert key_prefix if NULL
-      if (is.null(key_prefix)) key_prefix = ""
 
       tail_s3_uri_path = basename(keys)
       # list of directories to be created
@@ -150,11 +148,16 @@ Session = R6Class("Session",
       list_dir = gsub("^/", "", output[files])
 
       if (path =="") path = getwd()
-      destination_path = sapply(1:length(list_dir), function(i)if(list_dir[i] == "") file.path(path, tail_s3_uri_path[files][i])
-                                else file.path(path, list_dir[i], tail_s3_uri_path[files][i]))
+      destination_path = sapply(1:length(list_dir),
+                                function(i) {
+                                  if (list_dir[i] == "")
+                                    file.path(path, tail_s3_uri_path[files][i])
+                                  else
+                                    file.path(path, list_dir[i], tail_s3_uri_path[files][i])
+                                })
 
       # create directory
-      sapply(list_dir, dir.create, showWarnings = F)
+      sapply(dirname(destination_path), dir.create, showWarnings = F, recursive = T)
 
       for (i in 1:length(keys[files])){
         obj = s3$get_object(Bucket = bucket, Key = keys[i], ...)
