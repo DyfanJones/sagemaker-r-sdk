@@ -61,27 +61,30 @@ get_config_value <- function(key_path, config = NULL){
 
 # Write large raw connections in chunks
 write_bin <- function(
-  value,
+  obj,
   filename,
   chunk_size = 2L ^ 20L) {
 
   # if readr is avialable then use readr::write_file else loop writeBin
   if (requireNamespace("readr", quietly = TRUE)) {
     write_file <- pkg_method("write_file", "readr")
-    write_file(value, filename)
+    # to avoid readr trying to unzip files and causing errors
+    pos <- regexpr("\\.([[:alnum:]]+)$", x)
+    l = if(pos > -1L) list(file = substring(x, 1, pos-1L), ext = substring(x, pos + 1L)) else list(file = x)
+    write_file(obj, l$file)
+    file.rename(l$file, paste(l, collapse = "."))
     return(invisible(TRUE))}
 
-  total_size <- length(value)
+  total_size <- length(obj)
   split_vec <- seq(1, total_size, chunk_size)
 
   con <- file(filename, "a+b")
   on.exit(close(con))
 
-  if (length(split_vec) == 1) writeBin(value,con)
-  else sapply(split_vec, function(x){writeBin(value[x:min(total_size,(x+chunk_size-1))],con)})
+  if (length(split_vec) == 1) writeBin(obj,con)
+  else sapply(split_vec, function(x){writeBin(obj[x:min(total_size,(x+chunk_size-1))],con)})
   invisible(TRUE)
 }
-
 
 # Returns true if training job's secondary status message has changed.
 #     Args:
