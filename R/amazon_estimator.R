@@ -181,7 +181,7 @@ get_image_uri <- function(region_name, repo_name, repo_version = "1.0-1"){
   }
 
   repo = sprintf("%s:%s", repo_name, repo_version)
-  return (sprintf("%s/%s",registry(region_name), repo))
+  return (sprintf("%s/%s",registry(region_name, repo_name), repo))
 }
 
 .is_latest_xgboost_version <- function(repo_version){
