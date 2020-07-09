@@ -538,8 +538,8 @@ json_deserializer <- JsonDeserializer$new()
 #' @param ... arguments passed to ``RealTimePredictor$predict``
 #' @export
 predict.RealTimePredictor <- function(object, newdata, serializer = csv_serializer, deserializer = csv_deserializer, ...){
-  stopifnot(inherits(serializer,"Serializer"),
-            inherits(deserializer,"Deserializer"))
+  stopifnot(is.null(serializer) || inherits(serializer,"Serializer"),
+            is.null(deserializer) || inherits(deserializer,"Deserializer"))
 
   obj = object$clone()
   obj$serializer = serializer
