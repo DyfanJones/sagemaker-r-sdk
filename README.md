@@ -9,3 +9,19 @@ The idea is to rebuild [AWS Sagemaker Python SDK](https://github.com/aws/sagemak
 # API overview
 
 This package aims to mimic python's AWS Sagemaker SDK api, but using `R6` and `paws`
+
+
+# Learn from examples:
+
+## Amazon Algorithms:
+
+`R6sagemaker` is designed to minic python's sagemaker sdk. Therefore all examples for python's sagemaker should be able to accessible. 
+
+### Examples:
+
+* [Targeted Direct Marketing](https://github.com/DyfanJones/sagemaker-r-sdk/tree/master/examples/introduction_to_applying_machine_learning/xgboost_direct_marketing) predicts potential customers that are most likely to convert based on customer and aggregate level metrics, using Amazon SageMaker's implementation of XGBoost.
+* [XGBoost Tuning](https://github.com/DyfanJones/sagemaker-r-sdk/tree/master/examples/introduction_to_applying_machine_learning/xgboost_direct_marketing) shows how to use SageMaker hyperparameter tuning to improve your model fits for the [Targeted Direct Marketing](https://github.com/DyfanJones/sagemaker-r-sdk/tree/master/examples/introduction_to_applying_machine_learning/xgboost_direct_marketing) task.
+
+
+
+**Note: If a feature hasn't yet been implemented please feel free to raise a pull request or a ticket**
