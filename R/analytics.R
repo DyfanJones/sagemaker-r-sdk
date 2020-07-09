@@ -168,7 +168,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
                            TrainingJobStatus = training_summary$TrainingJobStatus,
                            FinalObjectiveValue = training_summary$FinalHyperParameterTuningJobObjectiveMetric$Value,
                            TrainingStartTime = if(length(start_time) == 0) NULL else start_time,
-                           TrainingEndTime = if(length(start_time) == 0) NULL else start_time,
+                           TrainingEndTime = if(length(end_time) == 0) NULL else end_time,
                            TrainingElapsedTimeSeconds = diff_time,
                            TrainingJobDefinitionName = def_name)
        for (i in seq_along(training_summary$TunedHyperParameters)){
