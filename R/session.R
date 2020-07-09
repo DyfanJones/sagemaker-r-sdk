@@ -129,7 +129,7 @@ Session = R6Class("Session",
       s3 = paws::s3(config = self$paws_credentials$credentials)
 
       next_token = NULL
-      keys = list()
+      keys = character()
       # Loop through the contents of the bucket, 1,000 objects at a time. Gathering all keys into
       # a "keys" list.
       while(!identical(next_token, character(0))){
