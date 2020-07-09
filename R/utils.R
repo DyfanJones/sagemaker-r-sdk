@@ -69,8 +69,8 @@ write_bin <- function(
   if (requireNamespace("readr", quietly = TRUE)) {
     write_file <- pkg_method("write_file", "readr")
     # to avoid readr trying to unzip files and causing errors
-    pos <- regexpr("\\.([[:alnum:]]+)$", x)
-    l = if(pos > -1L) list(file = substring(x, 1, pos-1L), ext = substring(x, pos + 1L)) else list(file = x)
+    pos <- regexpr("\\.([[:alnum:]]+)$", filename)
+    l = if(pos > -1L) list(file = substring(filename, 1, pos-1L), ext = substring(filename, pos + 1L)) else list(file = filename)
     write_file(obj, l$file)
     file.rename(l$file, paste(l, collapse = "."))
     return(invisible(TRUE))}
