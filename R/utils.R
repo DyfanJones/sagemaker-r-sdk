@@ -142,7 +142,7 @@ secondary_training_status_message <- function(job_description = NULL, prev_descr
 
   status_strs = sprintf("%s %s - %s", job_description$LastModifiedTime, transitions_to_print$Status, transitions_to_print$StatusMessage)
 
-  return(status_strs)
+  return(paste(status_strs, collapse = "\n"))
 }
 
 
