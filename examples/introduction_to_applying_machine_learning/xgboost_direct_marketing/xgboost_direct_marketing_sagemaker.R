@@ -11,6 +11,17 @@ library(R6sagemaker)
 library(data.table)
 library(fastDummies)
 library(pROC)
+
+#########################################################################
+# NOTE:
+#
+# R6sagemaker by default sets logging level to INFO.
+# If you wish to change the level for the logging level please use the
+# logger package, for example:
+#
+# >>> logger::log_threshold(logger::DEBUG)
+#########################################################################
+
 #########################################################################
 # Set up session
 #########################################################################
