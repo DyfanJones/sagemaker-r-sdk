@@ -724,7 +724,8 @@ Session = R6Class("Session",
     #' @param monitoring_schedule_name (str): The name of the Amazon SageMaker Monitoring
     #'              Schedule to start.
     start_monitoring_schedule = function(monitoring_schedule_name){
-      message(sprintf("Starting Monitoring Schedule with name: %s",monitoring_schedule_name))
+      writeLines("")
+      writeLines(sprintf("Starting Monitoring Schedule with name: %s",monitoring_schedule_name))
 
       self$sagemaker$start_monitoring_schedule(MonitoringScheduleName=monitoring_schedule_name)
     },
@@ -733,7 +734,8 @@ Session = R6Class("Session",
     #' @param monitoring_schedule_name (str): The name of the Amazon SageMaker Monitoring
     #'              Schedule to stop.
     stop_monitoring_schedule = function(monitoring_schedule_name){
-      message(sprintf("Stopping Monitoring Schedule with name: %s",monitoring_schedule_name))
+      writeLines("")
+      writeLines(sprintf("Stopping Monitoring Schedule with name: %s",monitoring_schedule_name))
       self$sagemaker$stop_monitoring_schedule(MonitoringScheduleName=monitoring_schedule_name)
     },
 
@@ -741,7 +743,8 @@ Session = R6Class("Session",
     #' @param monitoring_schedule_name (str): The name of the Amazon SageMaker Monitoring
     #'              Schedule to delete.
     delete_monitoring_schedule = function(monitoring_schedule_name){
-      message(sprintf("Deleting Monitoring Schedule with name: %s",monitoring_schedule_name))
+      writeLines("")
+      writeLines(sprintf("Deleting Monitoring Schedule with name: %s",monitoring_schedule_name))
       self$sagemaker$delete_monitoring_schedule(MonitoringScheduleName=monitoring_schedule_name)
     },
 
@@ -965,7 +968,7 @@ Session = R6Class("Session",
         Sys.sleep(poll)
 
         if(state == LogState$JOB_COMPLETE) {
-          writeLines("\n")
+          writeLines("")
           state = LogState$COMPLETE
         } else if(Sys.time() - last_describe_job_call >= 30){
           description = self.sagemaker_client.describe_auto_ml_job(AutoMLJobName=job_name)
