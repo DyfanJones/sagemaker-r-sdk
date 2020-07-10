@@ -5,8 +5,9 @@
 
 #' @import R6
 
-#' @title A class for handling creating and interacting with Amazon SageMaker
-#'        transform jobs
+#' @title Transformer class
+#' @description A class for handling creating and interacting with Amazon SageMaker
+#'              transform jobs
 #' @export
 Transformer = R6Class("Transformer",
   public = list(

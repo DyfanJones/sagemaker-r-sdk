@@ -2,14 +2,10 @@
 % Please edit documentation in R/transformer.R
 \name{Transformer}
 \alias{Transformer}
-\title{A class for handling creating and interacting with Amazon SageMaker
-       transform jobs}
+\title{Transformer class}
 \description{
 A class for handling creating and interacting with Amazon SageMaker
-       transform jobs
-
-A class for handling creating and interacting with Amazon SageMaker
-       transform jobs
+             transform jobs
 }
 \section{Methods}{
 \subsection{Public methods}{
