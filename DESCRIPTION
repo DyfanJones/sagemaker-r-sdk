@@ -44,6 +44,7 @@ Collate:
     'model_monitoring.R'
     'monitoring_files.R'
     'network.R'
+    'pipeline.R'
     'pkg_variables.R'
     'processing.R'
     'r6sagemaker.R'

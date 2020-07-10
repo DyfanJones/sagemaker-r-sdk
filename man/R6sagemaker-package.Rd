@@ -6,8 +6,8 @@
 \alias{R6sagemaker-package}
 \title{r6 sagemaker: this is just a placeholder}
 \description{
-Interface to Amazon Web Services SageMaker <https://aws.amazon.com/sagemaker/>
-    Use four spaces when indenting paragraphs within the Description.
+A library for training and deploying machine learning models on 
+    Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`
 }
 \author{
 \strong{Maintainer}: Dyfan Jones \email{dyfan.r.jones@gmail.com}
