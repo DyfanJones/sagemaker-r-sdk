@@ -95,12 +95,33 @@ vecs = bt_endpoint$predict(toJSON(payload))
 # Or call the predict s3 method
 vecs = predict(bt_endpoint, toJSON(payload), NULL, json_deserializer)
 
+#########################################################################
+# Evaluation
+#########################################################################
+# get model_data
+parsed_s3 = urltools::url_parse(bt_model$model_data)
+sess$download_data("data/model", bucket = parsed_s3$domain, key_prefix = parsed_s3$path)
+untar("data/model/model.tar.gz",exdir = "data/model")
 
+fromJSON("data/model/eval.json")
 
+# Going to use Rtsne to implement Van der Maaten’s Barnes-Hut implementation of t-Distributed Stochastic Neighbor: https://github.com/jkrijthe/Rtsne
+# install.packages("Rtsne")
+library(data.table) # read in data
+library(Rtsne)
 
+# data.table can handle unusual look text files (makes life easier)
+dt = fread("data/model/vectors.txt")
 
+set.seed(42) # Sets seed for reproducibility
+word_vecs = normalize_input(as.matrix(dt[,-1])) # normalize data
+tsne =  Rtsne(word_vecs[1:400,], perplexity = 40, dim = 2, pca = TRUE, max_iter = 10000) # fit tsne
 
-
-
-
+library(ggplot2)
+ggplot(data.table(tsne$Y),aes(V1, V2, label = dt[1:400][[1]], colour = unique(dt[1:400][[1]]))) +
+  geom_point() + # plot scatter plot
+  geom_text(hjust=0, vjust=0, size = 2.5, check_overlap = T) + # format label text
+  theme_bw() + # use a theme you want (optional)
+  theme(legend.position="none") + # remove colour label legend
+  labs(x = "", y = "") # remove temporary x and y axis labels (optional)
 
