@@ -125,3 +125,7 @@ ggplot(data.table(tsne$Y),aes(V1, V2, label = dt[1:400][[1]], colour = unique(dt
   theme(legend.position="none") + # remove colour label legend
   labs(x = "", y = "") # remove temporary x and y axis labels (optional)
 
+#########################################################################
+# Stop / Close the Endpoint (Optional)
+#########################################################################
+sess$delete_endpoint(bt_endpoint$endpoint)
