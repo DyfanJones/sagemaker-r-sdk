@@ -43,6 +43,7 @@ Collate:
     's3.R'
     'model_monitoring.R'
     'monitoring_files.R'
+    'multidatamodel.R'
     'network.R'
     'pipeline.R'
     'pkg_variables.R'
