@@ -4,8 +4,8 @@ Title: R SDK for `AWS Sagemaker`
 Version: 0.1.0
 Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("aut", "cre")),
              person("Amazon.com, Inc.", role = "cph"))
-Description: Interface to Amazon Web Services SageMaker <https://aws.amazon.com/sagemaker/>
-    Use four spaces when indenting paragraphs within the Description.
+Description: A library for training and deploying machine learning models on 
+    Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`
 Import: R6,
         paws,
         jsonlite,
