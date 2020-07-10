@@ -184,7 +184,7 @@ str: The S3 URI of the uploaded file.
 \subsection{Method \code{download_data()}}{
 Download file or directory from S3.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$download_data(path = "", bucket, key_prefix = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$download_data(path = "", bucket, key_prefix = "", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
