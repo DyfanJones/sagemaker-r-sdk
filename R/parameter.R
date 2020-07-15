@@ -121,7 +121,7 @@ CategoricalParameter = R6Class("CategoricalParameter",
    #' @param values (list or object): The possible values for the hyperparameter.
    #'              This input will be converted into a list of strings.
    initialize = function(values){
-     if (inherits(values, list))
+     if (inherits(values, "list"))
        self$values = lapply(values, as.character)
      else
        self$values = as.list(as.character(values))
