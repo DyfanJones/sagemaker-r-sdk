@@ -173,7 +173,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
                            TrainingJobDefinitionName = def_name)
        for (i in seq_along(training_summary$TunedHyperParameters)){
          k = names(training_summary$TunedHyperParameters)[i]
-         v = as.numeric(training_summary$TunedHyperParameters[[i]])
+         v = type.convert(training_summary$TunedHyperParameters[[i]])
          output[[k]] = v}
        output}), fill = TRUE)
      return(df)
