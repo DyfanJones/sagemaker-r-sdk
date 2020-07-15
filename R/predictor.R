@@ -429,11 +429,14 @@ CsvDeserializer = R6Class("CsvDeserializer",
     #' @description  Takes raw data stream and deserializes it.
     #' @param stream raw data to be deserialize
     deserialize = function(stream) {
-      TempFile = tempfile()
-      write_bin(stream, TempFile)
-      dt = fread(TempFile)
-      unlink(TempFile)
-      return(melt(dt, measure = 1:ncol(dt), value.name ="prediction")[,-"variable"])
+      if(inherits(stream, "raw")){
+        TempFile = tempfile()
+        write_bin(stream, TempFile)
+        dt = fread(TempFile)
+        unlink(TempFile)
+        return(melt(dt, measure = 1:ncol(dt), value.name ="prediction")[,-"variable"])
+        }
+      fread(stream, col.names = "prediction")
       },
 
     #' @description
