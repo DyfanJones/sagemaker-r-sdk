@@ -238,7 +238,7 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
 
   if(is.null(repo_version)) repo_version = image_meta[order(-imagePushedAt)][1,imageTags]
 
-  file.path(repos$repositoryUri, repo_version)
+  paste(repos$repositoryUri, repo_version, sep = ":")
 }
 
 .is_latest_xgboost_version <- function(repo_version){
