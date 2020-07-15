@@ -69,6 +69,11 @@ train <- function(){
   save(model, factor_levels, file=file.path(model_path, 'model.RData'))
 
   write('success', file=file.path(output_path, 'success'))
+
+  # Generate outputs
+  print(summary(model))
+  print(paste('gcv:', model$gcv))
+  print(paste('mse:', mean(model$residuals**2)))
 }
 
 # Setup scoring function
