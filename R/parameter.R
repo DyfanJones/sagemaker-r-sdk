@@ -112,9 +112,9 @@ CategoricalParameter = R6Class("CategoricalParameter",
    #' Helps to categorise Class
    .name = "Categorical",
 
-   #' @field value
+   #' @field values
    #' The possible values for the hyperparameter
-   value = NULL,
+   values = NULL,
 
    # Kept initialize in for individual class for roxygen2 documentation
    #' @description Initialize a ``CategoricalParameter``.

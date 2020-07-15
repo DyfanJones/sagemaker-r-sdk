@@ -15,7 +15,7 @@ A class for representing hyperparameters that have a discrete list of
 \describe{
 \item{\code{.name}}{Helps to categorise Class}
 
-\item{\code{value}}{The possible values for the hyperparameter}
+\item{\code{values}}{The possible values for the hyperparameter}
 }
 \if{html}{\out{</div>}}
 }
