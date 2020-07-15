@@ -30,6 +30,16 @@ train <- function(){
   # Read in hyperparameters
   training_params = read_json(param_path)
 
+  # convert any TRUE or FALSE read in as string
+  for(i in seq_along(training_params)){
+    if(training_params[[i]] %in% c("TRUE", "FALSE"))
+      training_params[[i]] = as.logical(training_params[[i]])
+    }
+
+  # stop if target variable not set correctly
+  if(is.null(training_params$target))
+    stop("Target variable not set")
+
   target = training_params$target
   training_params$target = NULL
 
@@ -40,7 +50,7 @@ train <- function(){
   cols = names(training_data)[names(training_data)!= target]
 
   # Convert to model matrix
-  training_X =model.matrix(~., training_data[, .SD, .SDcols = cols])
+  training_X =model.matrix(~., data = training_data[, .SD, .SDcols = cols])
 
   character_var = names(training_data)[sapply(training_data, is.character)]
 
