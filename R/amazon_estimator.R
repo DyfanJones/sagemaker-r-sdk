@@ -194,8 +194,8 @@ get_image_uri <- function(region_name, repo_name, repo_version = "1.0-1"){
 #'              using the default AWS configuration chain.
 #' @export
 get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session = NULL){
-  stopifnot(as.character(repo_name),
-            as.character(repo_version) || is.null(repo_version),
+  stopifnot(is.character(repo_name),
+            is.character(repo_version) || is.null(repo_version),
             is.null(sagemaker_session) || inherits(sagemaker_session, "session"))
 
   session = sagemaker_session %||% Session$new()
@@ -222,7 +222,6 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
 
   nextToken = NULL
   image_meta = list()
-
   # get all tags from repository
   while(!identical(nextToken, character(0))){
     image_chunk = ecr$describe_images(repos[, registryId], repos[, repositoryName])
