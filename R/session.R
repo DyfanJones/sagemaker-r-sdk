@@ -86,6 +86,10 @@ Session = R6Class("Session",
       for (i in 1:length(local_path)){
         obj <- readBin(local_path[i], "raw", n = file.size(local_path[i]))
         s3$put_object(Body = obj, Bucket = bucket, Key = s3_key[i], ...)}
+
+      s3_uri = sprintf("s3://%s/%s", bucket, key_prefix)
+
+      return(s3_uri)
     },
 
     #' @description Upload a string as a file body.
