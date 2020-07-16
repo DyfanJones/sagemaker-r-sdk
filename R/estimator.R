@@ -908,23 +908,23 @@ EstimatorBase = R6Class("EstimatorBase",
     if ("EnableNetworkIsolation" %in% names(job_details))
       init_params[["enable_network_isolation"]] = job_details$EnableNetworkIsolation
 
-    has_hps = "HyperParameters" %in% names(job_details)
+    has_hps = !islistempty(job_details$HyperParameters)
     init_params[["hyperparameters"]] = if (has_hps) job_details$HyperParameters else list()
 
-    if ("AlgorithmName" %in% names(job_details$AlgorithmSpecification)) {
+    if (!islistempty(job_details$AlgorithmSpecification$AlgorithmName)) {
       init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
     }
 
-    if ("TrainingImage" %in% names(job_details$AlgorithmSpecification)) {
+    if (!islistempty(job_details$AlgorithmSpecification$TrainingImage)) {
       init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
     } else {
       stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
         "AlgorithmName is expected. NULL was found.", call. = F)}
 
-    if ("MetricDefinitons" %in% names(job_details$AlgorithmSpecification))
+    if (!islistempty(job_details$AlgorithmSpecification$MetricDefinitons))
       init_params[["metric_definitions"]] = job_details$AlgorithmSpecification$MetricsDefinition
 
-    if ("EnableInterContainerTrafficEncryption" %in% names(job_details))
+    if (!islistempty(job_details$EnableInterContainerTrafficEncryption))
       init_params[["encrypt_inter_container_traffic"]] = job_details$EnableInterContainerTrafficEncryption
 
     vpc_list = vpc_from_list(job_details$VpcConfig)
