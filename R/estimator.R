@@ -449,21 +449,22 @@ EstimatorBase = R6Class("EstimatorBase",
       # clone current class
       estimator = self$clone()
 
+      estimator$initialize(role = init_params$role,
+                           train_instance_count = init_params$train_instance_count,
+                           train_instance_type = init_params$train_instance_type,
+                           train_volume_size = init_params$train_volume_size,
+                           train_max_run = init_params$train_max_run,
+                           input_mode = init_params$input_mode,
+                           output_path = init_params$output_path,
+                           output_kms_key = init_params$output_kms_key,
+                           subnets = init_params$subnets,
+                           security_group_ids = init_params$security_group_ids,
+                           model_uri = init_params$model_uri,
+                           model_channel_name = init_params$model_channel_name,
+                           metric_definitions = init_paramsmetric_definitions,
+                           encrypt_inter_container_traffic = init_params$encrypt_inter_container_traffic)
+
       # update estimator class variables
-      estimator$role = init_params$role
-      estimator$train_instance_count = init_params$train_instance_count
-      estimator$train_instance_type = init_params$train_instance_type
-      estimator$train_volume_size = init_params$train_volume_size
-      estimator$train_max_run = init_params$train_max_run
-      estimator$input_mode = init_params$input_mode
-      estimator$output_path = init_params$output_path
-      estimator$output_kms_key = init_params$output_kms_key
-      estimator$subnets = init_params$subnets
-      estimator$security_group_ids = init_params$security_group_ids
-      estimator$model_uri = init_params$model_uri
-      estimator$model_channel_name = init_params$model_channel_name
-      estimator$metric_definitions = init_paramsmetric_definitions
-      estimator$encrypt_inter_container_traffic = init_params$encrypt_inter_container_traffic
       estimator$latest_transform_job = init_params$base_job_name
       estimator$.current_job_name = estimator$latest_training_job
 
@@ -913,7 +914,7 @@ EstimatorBase = R6Class("EstimatorBase",
     init_params[["train_instance_count"]] = job_details$ResourceConfig$InstanceCount
     init_params[["train_instance_type"]] = job_details$ResourceConfig$InstanceType
     init_params[["train_volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
-    init_params[["train_max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds$
+    init_params[["train_max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
     init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
     init_params[["base_job_name"]] = job_details$TrainingJobName
     init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
