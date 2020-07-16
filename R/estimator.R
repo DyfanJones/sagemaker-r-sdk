@@ -448,21 +448,7 @@ EstimatorBase = R6Class("EstimatorBase",
 
       # clone current class
       estimator = self$clone()
-
-      estimator$initialize(role = init_params$role,
-                           train_instance_count = init_params$train_instance_count,
-                           train_instance_type = init_params$train_instance_type,
-                           train_volume_size = init_params$train_volume_size,
-                           train_max_run = init_params$train_max_run,
-                           input_mode = init_params$input_mode,
-                           output_path = init_params$output_path,
-                           output_kms_key = init_params$output_kms_key,
-                           subnets = init_params$subnets,
-                           security_group_ids = init_params$security_group_ids,
-                           model_uri = init_params$model_uri,
-                           model_channel_name = init_params$model_channel_name,
-                           metric_definitions = init_paramsmetric_definitions,
-                           encrypt_inter_container_traffic = init_params$encrypt_inter_container_traffic)
+      do.call(estimator$initialize, init_params)
 
       # update estimator class variables
       estimator$latest_transform_job = init_params$base_job_name
@@ -927,7 +913,9 @@ EstimatorBase = R6Class("EstimatorBase",
 
     if ("AlgorithmName" %in% names(job_details$AlgorithmSpecification)) {
       init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
-    } else if ("TrainingImage" %in% names(job_details$AlgorithmSpecification)) {
+    }
+
+    if ("TrainingImage" %in% names(job_details$AlgorithmSpecification)) {
       init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
     } else {
       stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
@@ -1292,7 +1280,7 @@ Estimator = R6Class("Estimator",
       init_params = super$.prepare_init_params_from_job_description(
         job_details, model_channel_name)
 
-      init_params$image_name = init_params$image
+      init_params$image_uri = init_params$image
       init_params$image = NULL
       return(init_params)
     }
