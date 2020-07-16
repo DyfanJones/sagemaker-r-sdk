@@ -1287,12 +1287,12 @@ Estimator = R6Class("Estimator",
     # model data will be downloaded
     # Returns:
     #   dictionary: The transformed init_params
-    .prepare_init_params_from_job_description = function(){
+    .prepare_init_params_from_job_description = function(job_details, model_channel_name=NULL){
       init_params = super$.prepare_init_params_from_job_description(
         job_details, model_channel_name)
 
       init_params$image_name = init_params$image
-      init_params$image <- NULL
+      init_params$image = NULL
       return(init_params)
     }
   ),
