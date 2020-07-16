@@ -338,9 +338,9 @@ EstimatorBase = R6Class("EstimatorBase",
       if(inherits(logs, "logical")) logs = ifelse(logs, "All", "NULL")
 
       if(logs != "NULL"){
-          self$sagemaker_session$logs_for_job(self$latest_training_job, wait=TRUE, log_type=logs)
+          self$sagemaker_session$logs_for_job(job_name = self$latest_training_job, wait=TRUE, log_type=logs)
       } else {
-          self$sagemaker_session$wait_for_job(self$latest_training_job)}
+          self$sagemaker_session$wait_for_job(job = self$latest_training_job)}
     },
 
     #' @description Compile a Neo model using the input model.
@@ -451,7 +451,7 @@ EstimatorBase = R6Class("EstimatorBase",
       do.call(estimator$initialize, init_params)
 
       # update estimator class variables
-      estimator$latest_transform_job = init_params$base_job_name
+      estimator$latest_training_job = init_params$base_job_name
       estimator$.current_job_name = estimator$latest_training_job
 
       estimator$wait()
