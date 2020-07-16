@@ -9,7 +9,7 @@ load(file.path(model_path, 'model.RData'))
 app = Application$new()
 app$add_get("/ping",
             FUN = function(req, res) {
-              res$set_body("Welcome to R6sagemaker demo example 1")})
+              res$set_body("")})
 
 app$add_post("/model",
              FUN= function(req, res){

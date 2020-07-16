@@ -78,7 +78,7 @@ train <- function(){
 
 # Setup scoring function
 serve <- function() {
-  source("server.R")
+  source(file.path(prefix, "server.R"))
   backend = BackendRserve$new()
   backend$start(app, 8080)}
 
