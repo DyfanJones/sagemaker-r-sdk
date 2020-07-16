@@ -122,9 +122,9 @@ CategoricalParameter = R6Class("CategoricalParameter",
    #'              This input will be converted into a list of strings.
    initialize = function(values){
      if (inherits(values, "list"))
-       self$values = lapply(values, as.character)
+       self$values = values
      else
-       self$values = as.list(as.character(values))
+       self$values = as.list(values)
    },
 
    #' @description Represent the parameter range as a dicionary suitable for a request
