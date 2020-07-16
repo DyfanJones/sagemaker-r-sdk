@@ -946,7 +946,7 @@ EstimatorBase = R6Class("EstimatorBase",
     if (!islistempty(vpc_list$SecurityGroupIds)){
       init_params[["security_group_ids"]] = vpc_list$SecurityGroupIds}
 
-    if ("InputDataConfig" %in% names(job_details) && model_channel_name){
+    if ("InputDataConfig" %in% names(job_details) && !is.null(model_channel_name)){
       for(channel in job_details$InputDataConfig){
        if (channel$ChannelName == model_channel_name){
           init_params[["model_channel_name"]] = model_channel_name
