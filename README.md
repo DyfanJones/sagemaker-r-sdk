@@ -23,6 +23,9 @@ This package aims to mimic python's AWS Sagemaker SDK api, but using `R6` and `p
 * [XGBoost Tuning](https://github.com/DyfanJones/sagemaker-r-sdk/blob/master/examples/hyparameter_tuning/xgboost_direct_maketing) shows how to use SageMaker hyperparameter tuning to improve your model fits for the [Targeted Direct Marketing](https://github.com/DyfanJones/sagemaker-r-sdk/tree/master/examples/introduction_to_applying_machine_learning/xgboost_direct_marketing) task.
 * [BlazingText Word2Vec](https://github.com/DyfanJones/sagemaker-r-sdk/tree/master/examples/introduction_to_amazon_algorithms/blazingtext_word2vec_text8) generates Word2Vec embeddings from a cleaned text dump of Wikipedia articles using SageMaker's fast and scalable BlazingText implementation.
 
+### R Model Examples:
+
+* [R Multivariate Adaptive Regression Splines](https://github.com/DyfanJones/sagemaker-r-sdk/tree/master/examples/hyparameter_tuning/r_bring_your_own/mars-restrserve) example over iris data.frame
 
 
 **Note: If a feature hasn't yet been implemented please feel free to raise a pull request or a ticket**
