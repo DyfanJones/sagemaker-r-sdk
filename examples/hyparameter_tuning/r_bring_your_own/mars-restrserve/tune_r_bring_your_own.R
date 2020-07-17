@@ -117,7 +117,7 @@ cols = names(test)[names(test)!= "Sepal.Length"]
 
 # Create csv serializer that uses content_type "text/plain" when calling RestRserve endpoint
 library(R6)
-RestRserveCsv = R6Class("RestrserveCsv",
+RestRserveCsv = R6Class("RestRserveCsv",
   inherit = CsvSerializer,
   public = list(
     initialize = function(){
@@ -127,10 +127,10 @@ RestRserveCsv = R6Class("RestrserveCsv",
 )
 
 # Get predictions from R model endpoint using standard S3 predict method
-pred = predict(mars_pred, test[,..cols], RestrserveCsv$new())
+pred = predict(mars_pred, test[,..cols], RestRserveCsv$new())
 
 # Alternatively you can call the predict method in mars_pred class
-mars_pred$serializer = RestrserveCsv$new()
+mars_pred$serializer = RestRserveCsv$new()
 mars_pred$deserializer = csv_deserializer
 pred = mars_pred$predict(test[,..cols])
 
