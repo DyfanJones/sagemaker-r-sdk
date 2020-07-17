@@ -2,7 +2,6 @@
 library(RestRserve)
 library(data.table)
 
-# prefix = '/opt/ml'
 model_path = file.path(prefix, "model")
 load(file.path(model_path, 'model.RData'))
 
