@@ -16,4 +16,6 @@ RUN R -e "install.packages('Rserve', repos = 'http://www.rforge.net/')" && \
 COPY mars.R /opt/ml/mars.R
 COPY server.R /opt/ml/server.R
 
+EXPOSE 8080
+
 ENTRYPOINT ["/usr/bin/Rscript", "/opt/ml/mars.R", "--no-save"]
