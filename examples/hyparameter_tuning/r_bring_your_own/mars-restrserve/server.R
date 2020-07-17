@@ -9,18 +9,13 @@ load(file.path(model_path, 'model.RData'))
 app = Application$new()
 app$add_get("/ping",
             FUN = function(req, res) {
-              res$set_body("")})
+              res$set_body("R6sagemaker mars restrserve example")})
 
-app$add_post("/model",
+app$add_post("/invocations",
              FUN= function(req, res){
-
                data = fread(req$body)
 
-               # # Convert input to model matrix
-               scoring_X <- model.matrix(~., data, xlev=factor_levels)
-
-               # res$content_type = "application/json"
-               result = predict(model, scoring_X, row.names=FALSE)
+               result = predict(model, data, row.names=FALSE)
                res$set_body(result)
              }
 )

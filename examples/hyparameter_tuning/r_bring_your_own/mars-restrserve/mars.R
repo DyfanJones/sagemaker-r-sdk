@@ -34,7 +34,7 @@ train <- function(){
   for(i in seq_along(training_params)){
     if(training_params[[i]] %in% c("TRUE", "FALSE"))
       training_params[[i]] = as.logical(training_params[[i]])
-    }
+  }
 
   # stop if target variable not set correctly
   if(is.null(training_params$target))
@@ -49,24 +49,12 @@ train <- function(){
 
   cols = names(training_data)[names(training_data)!= target]
 
-  # Convert to model matrix
-  training_X =model.matrix(~., data = training_data[, .SD, .SDcols = cols])
-
-  character_var = names(training_data)[sapply(training_data, is.character)]
-
-  # convert characters to factors
-  for(x in character_var) set(training_data, j = x, value = as.factor(training_data[[x]]))
-
-  # Save factor levels for scoring
-  factor_levels <- lapply(training_data[, .SD, .SDcols = character_var],
-                          function(x) {levels(x)})
-
-  mod_param =  append(training_params, list(x = training_X, y=training_data[,.SD, .SDcols = target][[1]]))
+  mod_param =  append(training_params, list(x = training_data[, ..cols], y=training_data[,..target][[1]]))
 
   # This method give alot of flexibility for model build and is not constrained by specific hyperparameters
   model = do.call(mars, mod_param)
 
-  save(model, factor_levels, file=file.path(model_path, 'model.RData'))
+  save(model, file=file.path(model_path, 'model.RData'))
 
   write('success', file=file.path(output_path, 'success'))
 
