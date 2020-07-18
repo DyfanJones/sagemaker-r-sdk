@@ -365,11 +365,12 @@ JsonSerializer = R6Class("JsonSerializer",
     #' @description Take data of various data formats and serialize them into CSV.
     #' @param data (object): Data to be serialized.
     serialize = function(data) {
-      TempFile = tempfile()
-      write_json(df, TempFile, dataframe = "columns", auto_unbox = T)
-      obj = readBin(TempFile, "raw", n = file.size(TempFile))
-      unlink(TempFile)
-      return(obj)
+
+      con = rawConnection(raw(0), "r+")
+      on.exit(close(con))
+      write_json(data, con, dataframe = "columns", auto_unbox = T)
+
+      return(rawConnectionValue(con))
     },
 
     #' @description
@@ -507,11 +508,10 @@ JsonDeserializer = R6Class("JsonDeserializer",
    #' @description  Takes raw data stream and deserializes it.
    #' @param stream raw data to be deserialize
    deserialize = function(stream) {
-     TempFile = tempfile()
-     write_bin(stream, TempFile)
-     df = read_json(TempFile)
-     unlink(TempFile)
-     return(df)
+     con = rawConnection(stream)
+     on.exit(close(con))
+     data = as.data.table(parse_json(con))
+     return(data)
    },
 
    #' @description
