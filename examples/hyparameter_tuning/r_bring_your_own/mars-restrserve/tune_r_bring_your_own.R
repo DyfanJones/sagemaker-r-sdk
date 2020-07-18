@@ -115,22 +115,11 @@ mars_pred = tuner$deploy(initial_instance_count = 1, instance_type = 'ml.t2.medi
 #########################################################################
 cols = names(test)[names(test)!= "Sepal.Length"]
 
-# Create csv serializer that uses content_type "text/plain" when calling RestRserve endpoint
-library(R6)
-RestRserveCsv = R6Class("RestRserveCsv",
-  inherit = CsvSerializer,
-  public = list(
-    initialize = function(){
-      self$content_type = "text/plain"
-    }
-  )
-)
-
 # Get predictions from R model endpoint using standard S3 predict method
-pred = predict(mars_pred, test[,..cols], RestRserveCsv$new())
+pred = predict(mars_pred, test[,..cols])
 
 # Alternatively you can call the predict method in mars_pred class
-mars_pred$serializer = RestRserveCsv$new()
+mars_pred$serializer = csv_serializer
 mars_pred$deserializer = csv_deserializer
 pred = mars_pred$predict(test[,..cols])
 
