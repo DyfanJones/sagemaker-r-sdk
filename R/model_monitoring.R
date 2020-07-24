@@ -548,20 +548,21 @@ ModelMonitor = R6Class("ModelMonitor",
      schedule_desc = sagemaker_session$describe_monitoring_schedule(
        monitoring_schedule_name=monitor_schedule_name)
 
-     role = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$RoleArn
-     image_uri = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ImageUri
-     instance_count = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$InstanceCount
-     instance_type = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$InstanceType
-     entrypoint = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerEntrypoint
-     volume_size_in_gb = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeSizeInGB
-     volume_kms_key = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeKmsKeyId
-     output_kms_key = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringOutputConfig$KmsKeyId
+     initial_param = list()
 
-     max_runtime_in_seconds = NULL
+     initial_param$role = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$RoleArn
+     initial_param$image_uri = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ImageUri
+     initial_param$instance_count = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$InstanceCount
+     initial_param$instance_type = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$InstanceType
+     initial_param$entrypoint = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringAppSpecification$ContainerEntrypoint
+     initial_param$volume_size_in_gb = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeSizeInGB
+     initial_param$volume_kms_key = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringResources$ClusterConfig$VolumeKmsKeyId
+     initial_param$output_kms_key = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$MonitoringOutputConfig$KmsKeyId
+
      if (!islistempty(schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition)){
-       max_runtime_in_seconds = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition$MaxRuntimeInSeconds}
+        initial_param$max_runtime_in_seconds = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$StoppingCondition$MaxRuntimeInSeconds}
 
-     env = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$Environment
+     initial_param$env = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$Environment
      network_config_list = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig
      vpc_config = schedule_desc$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig$VpcConfig
 
@@ -571,31 +572,20 @@ ModelMonitor = R6Class("ModelMonitor",
        security_group_ids = vpc_config$SecurityGroupIds
        subnets = vpc_config$Subnets}
 
-     # TODO: create NetworkConfig class
      if (!islistempty(network_config_list)){
-       network_config = NetworkConfig$new(
+        initial_param$network_config = NetworkConfig$new(
          enable_network_isolation=network_config_list$EnableNetworkIsolation,
          security_group_ids=security_group_ids,
          subnets=subnets)}
 
-     tags = sagemaker_session$list_tags(resource_arn=schedule_desc$MonitoringScheduleArn)
+     initial_param$tags = sagemaker_session$list_tags(resource_arn=schedule_desc$MonitoringScheduleArn)
 
-     attached_monitor = sefl$clone()
+     attached_monitor = self$clone()
+
+     # initialize new class
+     do.call(attached_monitor$initialize, initial_param)
 
      # modify clone class with new inputs
-     attached_monitor$role = role
-     attached_monitor$image_uri = image_uri
-     attached_monitor$instance_count = instance_count
-     attached_monitor$instance_type = instance_type
-     attached_monitor$entrypoint = entrypoint
-     attached_monitor$volume_size_in_gb = volume_size_in_gb
-     attached_monitor$volume_kms_key = volume_kms_key
-     attached_monitor$output_kms_key = output_kms_key
-     attached_monitor$max_runtime_in_seconds = max_runtime_in_seconds
-     attached_monitor$sagemaker_session = sagemaker_session
-     attached_monitor$env = env
-     attached_monitor$tags = tags
-     attached_monitor$network_config = network_config
      attached_monitor$monitoring_schedule_name = monitor_schedule_name
 
      return (attached_monitor)
