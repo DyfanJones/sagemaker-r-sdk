@@ -1,5 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger.py
 
+# TODO: Build other python class in debugger
+
 #' @import R6
 #' @import utils
 DebuggerHookConfig <- R6Class("DebuggerHookConfig",

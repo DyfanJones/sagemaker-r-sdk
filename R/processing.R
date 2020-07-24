@@ -618,7 +618,6 @@ ProcessingJob = R6Class("ProcessingJob",
 
       process_request_args$environment = processor$env
 
-      # TODO: create NetworkConfig Class
       if (!islistempty(processor$network_config))
         process_request_args$network_config = processor$network_config$to_request_list()
 

@@ -615,7 +615,6 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     #'              tuning job of this tuner. Analytics olbject gives you access to tuning
     #'              results summarized into a pandas dataframe.
     analytics = function(){
-      # TODO: create HyperparameterTuningJobAnalytics Class
       return(HyperparameterTuningJobAnalytics$new(self$latest_tuning_job.name, self$sagemaker_session))
     },
 

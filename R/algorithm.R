@@ -145,7 +145,6 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
          do.call(self$set_hyperparameters, hyperparameters)
      },
 
-     # TODO: create docstring
      #' @description Placeholder docstring
      validate_train_spec = function(){
        train_spec = self$algorithm_spec[["TrainingSpecification"]]
