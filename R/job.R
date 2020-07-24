@@ -242,5 +242,12 @@
         return(list("MaxRuntimeInSeconds"= max_run))
       }
     ),
+  active = list(
+    #' @field name
+    #' Returns job name
+    name = function(){
+      return(self$job_name)
+    }
+  ),
   lock_objects = F
 )
