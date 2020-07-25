@@ -31,7 +31,7 @@ Hyperparameter = R6Class("Hyperparameter",
     #'                    value is invalid for this hyperparameter.
     #' @param validation_message (str): A usage guide to display on validation
     #'                    failure.
-    #' @param data_type
+    #' @param data_type : function to convert data types
     initialize = function(name,
                           validate= function(x) TRUE,
                           validation_message="",
@@ -63,18 +63,19 @@ Hyperparameter = R6Class("Hyperparameter",
 
     #' @description Return all non-None ``hyperparameter`` values on ``obj`` as a
     #'              ``dict[str,str].``
-    serialize = function(){
+    #' @param obj : R object to be serialized
+    serialize_all = function(obj){
 
-      if (!("_hyperparameters" %in% names(obj)))
+      if (!(".hyperparameters" %in% names(obj)))
         return(list())
 
-      return(Filter(Negate(is.null), obj[["_hyperparameters"]]))
+      return(Filter(Negate(is.null), obj[[".hyperparameters"]]))
     }
   ),
   private = list(
     ..get.. = function(obj,
                        objtype){
-      if (!("_hyperparameters" %in% names(obj)) || !(self$name %in% obj[["_hyperparameters"]]))
+      if (!(".hyperparameters" %in% names(obj)) || !(self$name %in% obj[[".hyperparameters"]]))
         stop("Attribute Error", call. = F)
       return(obj[["_hyperparameters"]][[self$name]])
     },
@@ -84,9 +85,9 @@ Hyperparameter = R6Class("Hyperparameter",
                        value = NULL){
       value = if(is.null(value)) NULL else self$data_type(value)
       self$validate(value)
-      if (!("_hyperparameters" %in% names(obj)))
-        obj[["_hyperparameters"]] = list()
-      obj[["_hyperparameters"]][[self$name]] = value
+      if (!(".hyperparameters" %in% names(obj)))
+        obj[[".hyperparameters"]] = list()
+      obj[[".hyperparameters"]][[self$name]] = value
     },
 
     ..delete.. = function(obj){
