@@ -2,6 +2,7 @@
 
 S3method(predict,RealTimePredictor)
 export(AlgorithmEstimator)
+export(AmazonAlgorithmEstimatorBase)
 export(AnalyticsMetricsBase)
 export(BaseliningJob)
 export(CategoricalParameter)
