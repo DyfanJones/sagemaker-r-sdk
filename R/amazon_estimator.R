@@ -4,7 +4,366 @@
 #' @include utils.R
 #' @include xgboost_estimator.R
 #' @include fw_registry.R
+#' @include s3.R
+#' @include amazon_hyperparameter.R
+#' @include amazon_validation.R
 
+#' @import R6
+#' @importFrom urltools url_parse
+#' @import paws
+
+#' @title AmazonAlgorithmEstimatorBase Class
+#' @description Base class for Amazon first-party Estimator implementations. This class
+#'              isn't intended to be instantiated directly.
+#' @export
+AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
+  inherit = EstimatorBase,
+  public = list(
+    #' @field feature_dim
+    #' Hyperparameter class for feature_dim
+    feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer),
+
+    #' @field mini_batch_size
+    #' Hyperparameter class for mini_batch_size
+    mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer),
+
+    #' @field repo_name
+    #' The repo name for the account
+    repo_name = NULL,
+
+    #' @field repo_version
+    #' Version fo repo to call
+    repo_version = NULL,
+
+    #' @description Initialize an AmazonAlgorithmEstimatorBase.
+    #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
+    #'              SageMaker training jobs and APIs that create Amazon SageMaker
+    #'              endpoints use this role to access training data and model
+    #'              artifacts. After the endpoint is created, the inference code
+    #'              might use the IAM role, if it needs to access an AWS resource.
+    #' @param train_instance_count (int): Number of Amazon EC2 instances to use
+    #'              for training.
+    #' @param train_instance_type (str): Type of EC2 instance to use for training,
+    #'              for example, 'ml.c4.xlarge'.
+    #' @param data_location (str or None): The s3 prefix to upload RecordSet
+    #'              objects to, expressed as an S3 url. For example
+    #'              "s3://example-bucket/some-key-prefix/". Objects will be saved in
+    #'              a unique sub-directory of the specified location. If None, a
+    #'              default data location will be used.
+    #' @param enable_network_isolation (bool): Specifies whether container will
+    #'              run in network isolation mode. Network isolation mode restricts
+    #'              the container access to outside networks (such as the internet).
+    #'              Also known as internet-free mode (default: ``False``).
+    #' @param ... : Additional parameters passed to
+    #'             :class:`~sagemaker.estimator.EstimatorBase`.
+    initialize = function(role,
+                          train_instance_count,
+                          train_instance_type,
+                          data_location=NULL,
+                          enable_network_isolation=FALSE,
+                          ...){
+      super$initialize(role,
+                       train_instance_count,
+                       train_instance_type,
+                       enable_network_isolation=enable_network_isolation,
+                       ...)
+
+
+      data_location = data_location %||% sprintf("s3://%s/sagemaker-record-sets/", self$sagemaker_session$default_bucket())
+
+      self$.data_location = data_location
+    },
+
+    #' @description Return algorithm image URI for the given AWS region, repository name, and
+    #'              repository version
+    train_image = function(){
+      return(get_image_uri(
+        self$sagemaker_session$paws_region_name, self$repo_name, self$repo_version)
+      )
+    },
+
+    #' @description Return all non-None ``hyperparameter`` values on ``obj`` as a
+    #'              ``dict[str,str].``
+    hyperparameters = function(){
+      return(Hyperparameter$public_methods$serialize_all(self))
+    },
+
+    #' @description Calls _prepare_for_training. Used when setting up a workflow.
+    #' @param records (:class:`~RecordSet`): The records to train this ``Estimator`` on.
+    #' @param mini_batch_size (int or None): The size of each mini-batch to use when
+    #'              training. If ``None``, a default value will be used.
+    #' @param job_name (str): Name of the training job to be created. If not
+    #'              specified, one is generated, using the base name given to the
+    #'              constructor if applicable.
+    prepare_workflow_for_training = function(records=NULL,
+                                             mini_batch_size=NULL,
+                                             job_name=NULL){
+      private$.prepare_for_training(
+        records=records, mini_batch_size=mini_batch_size, job_name=job_name
+      )
+    },
+
+    #' @description Fit this Estimator on serialized Record objects, stored in S3.
+    #'              ``records`` should be an instance of :class:`~RecordSet`. This
+    #'              defines a collection of S3 data files to train this ``Estimator`` on.
+    #'              Training data is expected to be encoded as dense or sparse vectors in
+    #'              the "values" feature on each Record. If the data is labeled, the label
+    #'              is expected to be encoded as a list of scalas in the "values" feature of
+    #'              the Record label.
+    #'              More information on the Amazon Record format is available at:
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html
+    #'              See :meth:`~AmazonAlgorithmEstimatorBase.record_set` to construct a
+    #'              ``RecordSet`` object from :class:`~numpy.ndarray` arrays.
+    #' @param records (:class:`~RecordSet`): The records to train this ``Estimator`` on
+    #' @param mini_batch_size (int or None): The size of each mini-batch to use
+    #'              when training. If ``None``, a default value will be used.
+    #' @param wait (bool): Whether the call should wait until the job completes
+    #'              (default: True).
+    #' @param logs (bool): Whether to show the logs produced by the job. Only
+    #'              meaningful when wait is True (default: True).
+    #' @param job_name (str): Training job name. If not specified, the estimator
+    #'              generates a default job name, based on the training image name
+    #'              and current timestamp.
+    #' @param experiment_config (dict[str, str]): Experiment management configuration.
+    #'              Dictionary contains three optional keys, 'ExperimentName',
+    #'              'TrialName', and 'TrialComponentName'
+    #'              (default: ``None``).
+    fit = function(records,
+                   mini_batch_size=NULL,
+                   wait=TRUE,
+                   logs=TRUE,
+                   job_name=NULL,
+                   experiment_config=NULL){
+      private$.prepare_for_training(records, job_name=job_name, mini_batch_size=mini_batch_size)
+
+      self$latest_training_job = gsub(".*/","", private$.start_new(records, experiment_config)$TrainingJobArn)
+      if (wait)
+        self$wait(logs=logs)
+    },
+
+    #' @description Build a :class:`~RecordSet` from a numpy :class:`~ndarray` matrix and
+    #'              label vector.
+    #'              For the 2D ``ndarray`` ``train``, each row is converted to a
+    #'              :class:`~Record` object. The vector is stored in the "values" entry of
+    #'              the ``features`` property of each Record. If ``labels`` is not None,
+    #'              each corresponding label is assigned to the "values" entry of the
+    #'              ``labels`` property of each Record.
+    #'              The collection of ``Record`` objects are protobuf serialized and
+    #'              uploaded to new S3 locations. A manifest file is generated containing
+    #'              the list of objects created and also stored in S3.
+    #'              The number of S3 objects created is controlled by the
+    #'              ``train_instance_count`` property on this Estimator. One S3 object is
+    #'              created per training instance.
+    #' @param train (numpy.ndarray): A 2D numpy array of training data.
+    #' @param labels (numpy.ndarray): A 1D numpy array of labels. Its length must
+    #'              be equal to the number of rows in ``train``.
+    #' @param channel (str): The SageMaker TrainingJob channel this RecordSet
+    #'              should be assigned to.
+    #' @param encrypt (bool): Specifies whether the objects uploaded to S3 are
+    #'              encrypted on the server side using AES-256 (default: ``False``).
+    #' @return RecordSet: A RecordSet referencing the encoded, uploading training
+    #'              and label data.
+    record_set = function(train,
+                          labels=NULL,
+                          channel="train",
+                          encrypt=FALSE){
+      s3 = paws::s3(config = self$sagemaker_session$paws_credentials$credentials)
+
+      parsed_s3_url = url_parse(self$data_location)
+      bucket = parsed_s3_url$domain
+      key_prefix = parsed_s3_url$path
+      key_prefix = paste0(key_prefix, sprintf("%s-%s/", class(self)[1], sagemaker_timestamp()))
+      key_prefix = trimws(key_prefix, "left", "/")
+      log_debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
+      # TODO: upload_numpy_to_s3_shards function
+      manifest_s3_file = upload_numpy_to_s3_shards(
+        self$train_instance_count, s3, bucket, key_prefix, train, labels, encrypt
+      )
+
+      log_debug("Created manifest file %s", manifest_s3_file)
+
+      # TODO: RecordSet class
+      return(RecordSet$new(
+        manifest_s3_file,
+        num_records=train.shape[0],
+        feature_dim=train.shape[1],
+        channel=channel)
+      )
+    },
+
+    #' @description Wait for an Amazon SageMaker job to complete.
+    #' @param logs ([str]): A list of strings specifying which logs to print. Acceptable
+    #'              strings are "All", "NULL", "Training", or "Rules". To maintain backwards
+    #'              compatibility, boolean values are also accepted and converted to strings.
+    wait = function(logs = "All"){
+      if(inherits(logs, "logical")) logs = ifelse(logs, "All", "NULL")
+
+      if(logs != "NULL"){
+        self$sagemaker_session$logs_for_job(job_name = self$latest_training_job, wait=TRUE, log_type=logs)
+      } else {
+        self$sagemaker_session$wait_for_job(job = self$latest_training_job)}
+    }
+  ),
+  private = list(
+    # Convert the job description to init params that can be handled by the
+    # class constructor
+    # Args:
+    #   job_details: the returned job details from a describe_training_job
+    # API call.
+    # model_channel_name (str): Name of the channel where pre-trained
+    # model data will be downloaded.
+    # Returns:
+    #   dictionary: The transformed init_params
+    .prepare_init_params_from_job_description = function(job_details,
+                                                         model_channel_name=NULL){
+      init_params = super$.prepare_init_params_from_job_description(
+        job_details, model_channel_name)
+
+      # The hyperparam names may not be the same as the class attribute that holds them,
+      # for instance: local_lloyd_init_method is called local_init_method. We need to map these
+      # and pass the correct name to the constructor.
+      cls_list = as.list(self)
+      for (i in seq_along(cls_list)){
+        value = names(cls_list)[i]
+        attribute = cls_list[[i]]
+        if (inherits(value, "Hyperparameter")){
+          if (names(value) %in% names(init_params$hyperparameters))
+            init_params[[attribute]] = init_params$hyperparameters[[names(value)]]
+        }
+      }
+
+      init_params["hyperparameters"] = NULL
+      init_params["image"] = NULL
+      return(init_params)
+    },
+
+    # Set hyperparameters needed for training.
+    # Args:
+    #     records (:class:`~RecordSet`): The records to train this ``Estimator`` on.
+    #     mini_batch_size (int or None): The size of each mini-batch to use when
+    #         training. If ``None``, a default value will be used.
+    #     job_name (str): Name of the training job to be created. If not
+    #         specified, one is generated, using the base name given to the
+    #         constructor if applicable.
+    .prepare_for_training = function(records,
+                                     mini_batch_size=NULL,
+                                     job_name=NULL){
+      super$.prepare_for_training(job_name=job_name)
+
+      feature_dim = NULL
+
+      if (inherits(records, "list")){
+        for (record in records){
+          if (record$channel == "train"){
+            feature_dim = record$feature_dim
+            break}
+        }
+        if (islistempty(feature_dim))
+          stop("Must provide train channel.", call. = F)
+      } else {
+        feature_dim = records$feature_dim
+      }
+
+      self$feature_dim = feature_dim
+      self$mini_batch_size = mini_batch_size
+    },
+
+    # ------------------------ incorporate _TrainingJob.start_new calls -------------------
+
+    # Create a new Amazon SageMaker training job from the estimator.
+    # Args:
+    #   estimator (sagemaker.estimator.EstimatorBase): Estimator object
+    # created by the user.
+    # inputs (str): Parameters used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.
+    # experiment_config (dict[str, str]): Experiment management configuration used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.  Dictionary contains
+    # three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+    # Returns:
+    #   sagemaker.estimator._TrainingJob: Constructed object that captures
+    # all information about the started training job.
+    .start_new = function(inputs,
+                          experiment_config = NULL){
+      local_mode = self$sagemaker_session$local_mode
+      model_uri = self$model_uri
+
+      # Allow file:// input only in local mode
+      if (private$.is_local_channel(inputs) || private$.is_local_channel(model_uri)){
+        if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
+      }
+
+      config = .Job$new()$load_config(inputs, self)
+
+      if (!islistempty(self$hyperparameters())){
+        hyperparameters = self$hyperparameters()}
+
+
+      train_args = config
+      train_args[["input_mode"]] = self$input_mode
+      train_args[["job_name"]] = self$.current_job_name
+      train_args[["hyperparameters"]] = hyperparameters
+      train_args[["tags"]] = self$tags
+      train_args[["metric_definitions"]] = self$metric_definitions
+      train_args[["experiment_config"]] = experiment_config
+
+      if (inherits(inputs, "s3_input")){
+        if ("InputMode" %in% inputs$config){
+          log_debug("Selecting s3_input's input_mode (%s) for TrainingInputMode.",
+                    inputs$config$InputMode)
+          train_args[["input_mode"]] = inputs$config$InputMod}
+      }
+
+
+      if (self$enable_network_isolation()){
+        train_args[["enable_network_isolation"]] = TRUE}
+
+      if (self$encrypt_inter_container_traffic){
+        train_args[["encrypt_inter_container_traffic"]] = TRUE}
+
+      if (inherits(self, "Algorithmself")){
+        train_args[["algorithm_arn"]] = self$algorithm_arn
+      } else {
+        train_args[["image"]] = self$train_image()}
+
+
+      if (!islistempty(self$debugger_rule_configs))
+        train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
+
+      if (!islistempty(self$debugger_hook_config)){
+        self$debugger_hook_config[["collection_configs"]] = self$collection_configs
+        train_args[["debugger_hook_config"]] = self$debugger_hook_config$to_request_list()}
+
+      if (!islistempty(self$tensorboard_output_config))
+        train_args[["tensorboard_output_config"]] = self$tensorboard_output_config$to_request_list()
+
+      train_args = c(train_args, private$.add_spot_checkpoint_args(local_mode, train_args))
+
+
+      if (!islistempty(self$enable_sagemaker_metrics))
+        train_args[["enable_sagemaker_metrics"]] = self$enable_sagemaker_metrics
+      do.call(self$sagemaker_session$train, train_args)
+    }
+
+  ),
+  active = list(
+    #' @field data_location
+    #' The s3 prefix to upload RecordSet objects to, expressed as an S3 url
+    data_location = function(data_location){
+      if(missing(data_location))
+        return(self$.data_location)
+
+
+      if(!startsWith(data_location, "s3://"))
+        stop(sprintf('Expecting an S3 URL beginning with "s3://". Got "%s"',data_location), call. = F)
+
+      if (!grepl("/$", data_location))
+        data_location = paste0(data_location, "/")
+
+      self$.data_location = data_location
+    }
+  ),
+  lock_object = F
+)
 
 
 # Return docker registry for the given AWS region
@@ -259,4 +618,3 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
   # Returns a list of version equivalents for XGBoost
   lapply(XGBOOST_VERSION_EQUIVALENTS, function(suffix) c(paste0(version, suffix), version))
 }
-
