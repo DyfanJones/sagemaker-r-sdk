@@ -89,8 +89,6 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
      self$.training_job_summaries = NULL
      super$initialize()
      self$clear_cache()
-     attr(self, "__repr__") = sprintf("<HyperparameterTuningJobAnalytics for %s>", self$name)
-
     },
 
     #' @description Call ``DescribeHyperParameterTuningJob`` for the hyperparameter
@@ -145,7 +143,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<HyperparameterTuningJobAnalytics>")
+      cat(sprintf("<HyperparameterTuningJobAnalytics for %s>\n", self$name))
       invisible(self)
     },
 
@@ -294,8 +292,6 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
 
      super$initialize()
      self$clear_cache()
-
-     attr(self, "__repr__") = sprintf("<TrainingJobAnalytics for %s>", self$name)
    },
 
    #' @description Clear the object of all local caches of API methods, so that the next
@@ -311,7 +307,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<TrainingJobAnalytics>")
+     cat(sprintf("<TrainingJobAnalytics for %s>\n", self$name))
      invisible(self)
    }
  ),
@@ -438,7 +434,6 @@ ExperimentAnalytics = R6Class("ExperimentAnalytics",
       self$.trial_components = NULL
       super$initialize()
       self$clear_cache()
-      attr(self, "__repr__") = sprintf("<ExperimentAnalytics for %s>", self$name)
     },
 
     #' @description Clear the object of all local caches of API methods.
@@ -451,7 +446,7 @@ ExperimentAnalytics = R6Class("ExperimentAnalytics",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<ExperimentAnalytics>")
+      cat(sprintf("<ExperimentAnalytics for %s>\n", self$name))
       invisible(self)
     }
   ),
