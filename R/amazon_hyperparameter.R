@@ -73,14 +73,16 @@ Hyperparameter = R6Class("Hyperparameter",
     }
   ),
   private = list(
+    # Placeholder: until get R6 equivalent
     ..get.. = function(obj,
                        objtype){
       if (!(".hyperparameters" %in% names(obj)) || !(self$name %in% obj[[".hyperparameters"]]))
         stop("Attribute Error", call. = F)
-      return(obj[["_hyperparameters"]][[self$name]])
+      return(obj[[".hyperparameters"]][[self$name]])
     },
 
     # Validate the supplied value and set this hyperparameter to value
+    # Placeholder: until get R6 equivalent
     ..set.. = function(obj,
                        value = NULL){
       value = if(is.null(value)) NULL else self$data_type(value)
@@ -90,8 +92,9 @@ Hyperparameter = R6Class("Hyperparameter",
       obj[[".hyperparameters"]][[self$name]] = value
     },
 
+    # Placeholder: until get R6 equivalent
     ..delete.. = function(obj){
-      obj[["_hyperparameters"]][[self$name]] <- NULL
+      obj[[".hyperparameters"]][[self$name]] <- NULL
     }
   )
 )
