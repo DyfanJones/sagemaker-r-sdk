@@ -11,6 +11,7 @@
 #' @import R6
 #' @importFrom urltools url_parse
 #' @import paws
+#' @import jsonlite
 
 #' @title AmazonAlgorithmEstimatorBase Class
 #' @description Base class for Amazon first-party Estimator implementations. This class
@@ -182,11 +183,10 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
 
       log_debug("Created manifest file %s", manifest_s3_file)
 
-      # TODO: RecordSet class
       return(RecordSet$new(
         manifest_s3_file,
-        num_records=train.shape[0],
-        feature_dim=train.shape[1],
+        num_records=dim(train)[1],
+        feature_dim=dim(train)[2],
         channel=channel)
       )
     },
@@ -360,6 +360,62 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
         data_location = paste0(data_location, "/")
 
       self$.data_location = data_location
+    }
+  ),
+  lock_object = F
+)
+
+#' @title RecordSet Class
+RecordSet = R6Class("RecordSet",
+  public = list(
+    #' @description A collection of Amazon :class:~`Record` objects serialized and stored
+    #'              in S3.
+    #' @param s3_data (str): The S3 location of the training data
+    #' @param num_records (int): The number of records in the set.
+    #' @param feature_dim (int): The dimensionality of "values" arrays in the
+    #'              Record features, and label (if each Record is labeled).
+    #' @param s3_data_type (str): Valid values: 'S3Prefix', 'ManifestFile'. If
+    #'              'S3Prefix', ``s3_data`` defines a prefix of s3 objects to train
+    #'              on. All objects with s3 keys beginning with ``s3_data`` will be
+    #'              used to train. If 'ManifestFile', then ``s3_data`` defines a
+    #'              single s3 manifest file, listing each s3 object to train on.
+    #' @param channel (str): The SageMaker Training Job channel this RecordSet
+    #'              should be bound to
+    initialize = function(){
+      self$s3_data = s3_data
+      self$feature_dim = feature_dim
+      self$num_records = num_records
+      self$s3_data_type = s3_data_type
+      self$channel = channel
+    },
+
+    #' @description Return a dictionary to represent the training data in a channel for
+    #'              use with ``fit()``
+    data_channel = function(){
+      output = list(self$records_s3_input())
+      names(output) = self$channel
+      return(output)
+    },
+
+    #' @description Return a s3_input to represent the training data
+    recods_s3_input = function(){
+      return(s3_input$new(self$s3_data, distribution="ShardedByS3Key", s3_data_type=self$s3_data_type))
+    },
+
+    #' @description Return an unambiguous representation of this RecordSet
+    print = function(){
+      class_list = private$.str_list(RecordSet)
+      return(cat(paste("class <'RecordSet'>,", class_list), "\n"))
+    }
+  ),
+  private = list(
+    .str_list = function(cls_gen){
+      output = c(names(cls_gen$public_fields),
+                 names(cls_gen$public_methods),
+                 names(cls_gen$private_fields),
+                 names(cls_gen$private_methods))
+      output = as.list(self)[setdiff(ls(self), output)]
+      return(toJSON(output, auto_unbox = T))
     }
   ),
   lock_object = F
