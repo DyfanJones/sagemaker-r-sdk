@@ -687,7 +687,7 @@ EstimatorBase = R6Class("EstimatorBase",
         # honor supplied base_job_name or generate it
         if (!is.null(self$base_job_name)){
           base_name = self$base_job_name
-        } else if (inherits(self$base_job_name, "AlgorithmEstimator")){ # need to work on this alittle more :)
+        } else if (inherits(self, "AlgorithmEstimator")){ # need to work on this alittle more :)
           base_name = split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))]
         } else {
           base_name = base_name_from_image(self$train_image())}
@@ -1496,7 +1496,7 @@ FrameWork = R6Class("FrameWork",
 
       self$uploaded_code = NULL
 
-      self$.hyperparameters = hyperparameters %||% {}
+      self$.hyperparameters = hyperparameters %||% list()
       self$checkpoint_s3_uri = checkpoint_s3_uri
       self$checkpoint_local_path = checkpoint_local_path
       self$enable_sagemaker_metrics = enable_sagemaker_metrics
