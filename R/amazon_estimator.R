@@ -20,14 +20,6 @@
 AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
   inherit = EstimatorBase,
   public = list(
-    #' @field feature_dim
-    #' Hyperparameter class for feature_dim
-    feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer),
-
-    #' @field mini_batch_size
-    #' Hyperparameter class for mini_batch_size
-    mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer),
-
     #' @field repo_name
     #' The repo name for the account
     repo_name = NULL,
@@ -204,7 +196,49 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
         self$sagemaker_session$wait_for_job(job = self$latest_training_job)}
     }
   ),
+  active = list(
+    #' @field data_location
+    #' The s3 prefix to upload RecordSet objects to, expressed as an S3 url
+    data_location = function(data_location){
+      if(missing(data_location))
+        return(self$.data_location)
+
+
+      if(!startsWith(data_location, "s3://"))
+        stop(sprintf('Expecting an S3 URL beginning with "s3://". Got "%s"',data_location), call. = F)
+
+      if (!grepl("/$", data_location))
+        data_location = paste0(data_location, "/")
+
+      self$.data_location = data_location
+    }
+
+    # --------- User Active binding to mimic Python's Descriptor Class
+
+    #' @field feature_dim
+    #' Hyperparameter class for feature_dim
+    feature_dim = function(value){
+      if(missing(value))
+        return(private$.feature_dim$descriptor)
+      private$.feature_dim$descriptor = value
+    },
+
+    #' @field mini_batch_size
+    #' Hyperparameter class for mini_batch_size
+    mini_batch_size = function(value){
+      if(missing(value))
+        return(private$.mini_batch_size$descriptor)
+      private$.mini_batch_size$descriptor = value
+    }
+  ),
   private = list(
+    # set up descpritor class as private field
+    .feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer),
+
+    # set up descpritor class as private field
+    .mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer),
+
+
     # Convert the job description to init params that can be handled by the
     # class constructor
     # Args:
@@ -344,23 +378,6 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       do.call(self$sagemaker_session$train, train_args)
     }
 
-  ),
-  active = list(
-    #' @field data_location
-    #' The s3 prefix to upload RecordSet objects to, expressed as an S3 url
-    data_location = function(data_location){
-      if(missing(data_location))
-        return(self$.data_location)
-
-
-      if(!startsWith(data_location, "s3://"))
-        stop(sprintf('Expecting an S3 URL beginning with "s3://". Got "%s"',data_location), call. = F)
-
-      if (!grepl("/$", data_location))
-        data_location = paste0(data_location, "/")
-
-      self$.data_location = data_location
-    }
   ),
   lock_object = F
 )

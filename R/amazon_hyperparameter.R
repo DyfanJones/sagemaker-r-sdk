@@ -74,7 +74,7 @@ Hyperparameter = R6Class("Hyperparameter",
   ),
   private = list(
     # Placeholder: until get R6 equivalent
-    ..get.. = function(obj,
+    .get = function(obj,
                        objtype){
       if (!(".hyperparameters" %in% names(obj)) || !(self$name %in% obj[[".hyperparameters"]]))
         stop("Attribute Error", call. = F)
@@ -83,7 +83,7 @@ Hyperparameter = R6Class("Hyperparameter",
 
     # Validate the supplied value and set this hyperparameter to value
     # Placeholder: until get R6 equivalent
-    ..set.. = function(obj,
+    .set = function(obj,
                        value = NULL){
       value = if(is.null(value)) NULL else self$data_type(value)
       self$validate(value)
@@ -93,8 +93,24 @@ Hyperparameter = R6Class("Hyperparameter",
     },
 
     # Placeholder: until get R6 equivalent
-    ..delete.. = function(obj){
+    .delete = function(obj){
       obj[[".hyperparameters"]][[self$name]] <- NULL
+    }
+  ),
+  active = list(
+    # Use active binding to mimic Python Descriptor class
+
+    descriptor = function(value){
+      # get method
+      if(missing(value))
+        return(private$.get())
+
+      # delete method
+      if(is.null(value))
+        return(private$.delete(value))
+
+      # set method
+      return(private$.set(value))
     }
   )
 )
