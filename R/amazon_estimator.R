@@ -258,8 +258,8 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       # and pass the correct name to the constructor.
       cls_list = as.list(self)
       for (i in seq_along(cls_list)){
-        value = names(cls_list)[i]
-        attribute = cls_list[[i]]
+        attribute = names(cls_list)[i]
+        value = cls_list[[i]]
         if (inherits(value, "Hyperparameter")){
           if (names(value) %in% names(init_params$hyperparameters))
             init_params[[attribute]] = init_params$hyperparameters[[names(value)]]
@@ -383,6 +383,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
 )
 
 #' @title RecordSet Class
+#' @export
 RecordSet = R6Class("RecordSet",
   public = list(
     #' @description A collection of Amazon :class:~`Record` objects serialized and stored
@@ -436,6 +437,79 @@ RecordSet = R6Class("RecordSet",
     }
   ),
   lock_object = F
+)
+
+#' @description Amazon SageMaker channel configuration for a file system data source
+#'              for Amazon algorithms.
+#' @export
+FileSystemRecordSet = R6Class("FileSystemRecordSet",
+  public = list(
+
+    #' @field feature_dim
+    #' The dimensionality of "values" arrays in the Record features
+    feature_dim = NULL,
+
+    #' @field num_records
+    #' The number of records in the set
+    num_records = NULL,
+
+    #' @field channel
+    #' The SageMaker Training Job channel this RecordSet should be bound to
+    channel = NULL,
+
+    #' @description Initialize a ``FileSystemRecordSet`` object.
+    #' @param file_system_id (str): An Amazon file system ID starting with 'fs-'.
+    #' @param file_system_type (str): The type of file system used for the input.
+    #'              Valid values: 'EFS', 'FSxLustre'.
+    #' @param directory_path (str): Absolute or normalized path to the root directory (mount point) in
+    #'              the file system. Reference:
+    #'              https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html and
+    #'              https://docs.aws.amazon.com/efs/latest/ug/wt1-test.html
+    #' @param num_records (int): The number of records in the set.
+    #' @param feature_dim (int): The dimensionality of "values" arrays in the Record features,
+    #'              and label (if each Record is labeled).
+    #' @param file_system_access_mode (str): Permissions for read and write.
+    #'              Valid values: 'ro' or 'rw'. Defaults to 'ro'.
+    #' @param channel (str): The SageMaker Training Job channel this RecordSet should be bound to
+    initialize = function(file_system_id,
+                          file_system_type,
+                          directory_path,
+                          num_records,
+                          feature_dim,
+                          file_system_access_mode="ro",
+                          channel="train"){
+      self$file_system_input = FileSystemInput$new(
+        file_system_id, file_system_type, directory_path, file_system_access_mode
+      )
+      self$feature_dim = feature_dim
+      self$num_records = num_records
+      self$channel = channel
+    },
+
+    #' @description Return an unambiguous representation of this RecordSet
+    #' @description Return an unambiguous representation of this RecordSet
+    print = function(){
+      class_list = private$.str_list(RecordSet)
+      return(cat(paste("class <'FileSystemRecordSet'>,", class_list), "\n"))
+    },
+
+    #' @description Return a dictionary to represent the training data in a channel for use with ``fit()``
+    data_channel = function(){
+      output = list(self$file_system_input)
+      names(output) = self$channel
+      return(output)
+    }
+  ),
+  private = list(
+    .str_list = function(cls_gen){
+      output = c(names(cls_gen$public_fields),
+                 names(cls_gen$public_methods),
+                 names(cls_gen$private_fields),
+                 names(cls_gen$private_methods))
+      output = as.list(self)[setdiff(ls(self), output)]
+      return(toJSON(output, auto_unbox = T))
+      }
+    )
 )
 
 
