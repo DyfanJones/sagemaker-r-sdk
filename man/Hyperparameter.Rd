@@ -20,6 +20,13 @@ An algorithm hyperparameter with optional validation. Implemented as a
 }
 \if{html}{\out{</div>}}
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{descriptor}}{active binding that mimic's python descriptor class}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -38,7 +45,8 @@ An algorithm hyperparameter with optional validation. Implemented as a
   name,
   validate = function(x) TRUE,
   validation_message = "",
-  data_type = as.character
+  data_type = as.character,
+  obj
 )}\if{html}{\out{</div>}}
 }
 
@@ -56,6 +64,8 @@ value is invalid for this hyperparameter.}
 failure.}
 
 \item{\code{data_type}}{: function to convert data types}
+
+\item{\code{obj}}{(R6Class): R6Class for descriptor class to modify}
 }
 \if{html}{\out{</div>}}
 }

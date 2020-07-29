@@ -32,10 +32,12 @@ Hyperparameter = R6Class("Hyperparameter",
     #' @param validation_message (str): A usage guide to display on validation
     #'                    failure.
     #' @param data_type : function to convert data types
+    #' @param obj (R6Class): R6Class for descriptor class to modify
     initialize = function(name,
                           validate= function(x) TRUE,
                           validation_message="",
-                          data_type=as.character){
+                          data_type=as.character,
+                          obj){
       stopifnot(is.character(validation_message),
                 is.function(data_type))
 
@@ -43,6 +45,7 @@ Hyperparameter = R6Class("Hyperparameter",
       self$validation_message = validation_message
       self$name = name
       self$data_type = data_type
+      self$obj = obj
     },
 
     #' @description Validate value
@@ -74,32 +77,32 @@ Hyperparameter = R6Class("Hyperparameter",
   ),
   private = list(
     # Placeholder: until get R6 equivalent
-    .get = function(obj,
-                       objtype){
-      if (!(".hyperparameters" %in% names(obj)) || !(self$name %in% obj[[".hyperparameters"]]))
+    .get = function(){
+      if (!(".hyperparameters" %in% names(self$obj)) || !(self$name %in% self$obj[[".hyperparameters"]]))
         stop("Attribute Error", call. = F)
-      return(obj[[".hyperparameters"]][[self$name]])
+      return(self$obj[[".hyperparameters"]][[self$name]])
     },
 
     # Validate the supplied value and set this hyperparameter to value
     # Placeholder: until get R6 equivalent
-    .set = function(obj,
-                       value = NULL){
+    .set = function(value = NULL){
       value = if(is.null(value)) NULL else self$data_type(value)
       self$validate(value)
-      if (!(".hyperparameters" %in% names(obj)))
-        obj[[".hyperparameters"]] = list()
-      obj[[".hyperparameters"]][[self$name]] = value
+      if (!(".hyperparameters" %in% names(self$obj)))
+        self$obj[[".hyperparameters"]] = list()
+      self$obj[[".hyperparameters"]][[self$name]] = value
     },
 
     # Placeholder: until get R6 equivalent
-    .delete = function(obj){
-      obj[[".hyperparameters"]][[self$name]] <- NULL
+    .delete = function(){
+      self$obj[[".hyperparameters"]][[self$name]] <- NULL
     }
   ),
   active = list(
     # Use active binding to mimic Python Descriptor class
 
+    #' @field descriptor
+    #' active binding that mimic's python descriptor class
     descriptor = function(value){
       # get method
       if(missing(value))
