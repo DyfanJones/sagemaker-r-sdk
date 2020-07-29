@@ -28,6 +28,14 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #' Version fo repo to call
     repo_version = NULL,
 
+    #' @field .feature_dim
+    #' descriptor class
+    .feature_dim = NULL,
+
+    #' @field .mini_batch_size
+    #' descriptor class
+    .mini_batch_size = NULL,
+
     #' @description Initialize an AmazonAlgorithmEstimatorBase.
     #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
     #'              SageMaker training jobs and APIs that create Amazon SageMaker
@@ -61,10 +69,12 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                        enable_network_isolation=enable_network_isolation,
                        ...)
 
-
       data_location = data_location %||% sprintf("s3://%s/sagemaker-record-sets/", self$sagemaker_session$default_bucket())
 
       self$.data_location = data_location
+
+      self$.feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer, obj = self)
+      self$.mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer, obj = self)
     },
 
     #' @description Return algorithm image URI for the given AWS region, repository name, and
@@ -211,7 +221,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
         data_location = paste0(data_location, "/")
 
       self$.data_location = data_location
-    }
+    },
 
     # --------- User Active binding to mimic Python's Descriptor Class
 
@@ -219,8 +229,8 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #' Hyperparameter class for feature_dim
     feature_dim = function(value){
       if(missing(value))
-        return(private$.feature_dim$descriptor)
-      private$.feature_dim$descriptor = value
+        return(self$.feature_dim$descriptor)
+      self$.feature_dim$descriptor = value
     },
 
     #' @field mini_batch_size
@@ -232,13 +242,6 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     }
   ),
   private = list(
-    # set up descpritor class as private field
-    .feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer),
-
-    # set up descpritor class as private field
-    .mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer),
-
-
     # Convert the job description to init params that can be handled by the
     # class constructor
     # Args:
@@ -439,6 +442,7 @@ RecordSet = R6Class("RecordSet",
   lock_object = F
 )
 
+#' @title FileSystemRecordSet Class
 #' @description Amazon SageMaker channel configuration for a file system data source
 #'              for Amazon algorithms.
 #' @export

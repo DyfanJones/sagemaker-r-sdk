@@ -13,13 +13,13 @@ Base class for Amazon first-party Estimator implementations. This class
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{feature_dim}}{Hyperparameter class for feature_dim}
-
-\item{\code{mini_batch_size}}{Hyperparameter class for mini_batch_size}
-
 \item{\code{repo_name}}{The repo name for the account}
 
 \item{\code{repo_version}}{Version fo repo to call}
+
+\item{\code{.feature_dim}}{descriptor class}
+
+\item{\code{.mini_batch_size}}{descriptor class}
 }
 \if{html}{\out{</div>}}
 }
@@ -27,6 +27,10 @@ Base class for Amazon first-party Estimator implementations. This class
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
 \item{\code{data_location}}{The s3 prefix to upload RecordSet objects to, expressed as an S3 url}
+
+\item{\code{feature_dim}}{Hyperparameter class for feature_dim}
+
+\item{\code{mini_batch_size}}{Hyperparameter class for mini_batch_size}
 }
 \if{html}{\out{</div>}}
 }
