@@ -8,6 +8,7 @@ Description: A library for training and deploying machine learning models on
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`
 Import: R6,
         paws,
+        RProtoBuf,
         jsonlite,
         logger,
         urltools,
