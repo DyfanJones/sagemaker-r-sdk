@@ -1,5 +1,6 @@
 
 #' @import R6
+#' @import RProtobuf
 
 matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
   public = list(
