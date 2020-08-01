@@ -190,17 +190,3 @@ for (amount in 0:3){
          stop(sprintf("Unsupported dtype %s on array",dtype), call. = FALSE)
   )
 }
-
-.build_shards = function(num_shards, array){
-  if (num_shards < 1)
-    stop("num_shards must be >= 1")
-  # ensure matrix gets split into same number of shards
-  shard_size = ceiling(dim(array)[1] / num_shards)
-  if (shard_size == 0)
-    stop("Array length is less than num shards")
-
-  max_row = dim(array)[2]
-
-  split_vec <- seq(1, max_row, shard_size)
-  lapply(split_vec,function(i)array[i:min(max_row,(i+shard_size-1)),])
-}
