@@ -1,6 +1,6 @@
 
 #' @import R6
-#' @import RProtobuf
+#' @importFrom RProtobuf serialize_pd
 
 matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
   public = list(
@@ -177,7 +177,7 @@ for (amount in 0:3){
   writeBin(.kmagic, f)
   writeBin(len, f)
   pad = 1 + bitwShiftL(bitwShiftR((len + 3), 2), 2) - len # added +1 to map to R indexing
-  serialize_pb(record, f)
+  RProtobuf::serialize_pb(record, f)
   writeBin(padding[[pad]], f)
 }
 
