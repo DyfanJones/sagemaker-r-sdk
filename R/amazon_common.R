@@ -3,22 +3,31 @@
 #' @import R6
 #' @importFrom RProtoBuf serialize_pb
 
+#' @include amazon_record_pd2.R
+
 matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
   public = list(
+    # content_type
+    # Method in how data is going to be seperated
+    content_type = NULL,
     initialize = function(content_type="application/x-recordio-protobuf"){
       self$content_type = content_type
     },
 
     serialize = function(array){
+      if(is.vector(array))
+        array = as.array(array)
+
       if(length(dim(array)) == 1)
-        # reshape array
+        array = matrix(array, 1, dim(array)[1])
 
       obj = raw(0)
       buf = rawConnection(obj, open = "wb")
-      write_matrix_to_dense_tensor(buf, array)
-      close(buf)
+      on.exit(close(buf))
 
-      return(obj)
+      write_matrix_to_dense_tensor(buf, array)
+
+      return(rawConnectionValue(buf))
     }
   )
 )
@@ -92,10 +101,12 @@ write_matrix_to_dense_tensor <- function(file, array, labels = NULL){
     resolved_label_type = .resolve_type(labels[1])
   }
   resolved_type = .resolve_type(array[1])
+  record = Record()
   # Write each vector in array into a Record in the file object
   for(index in 1:nrow(array)){
-    vector = array[i,]
-    record = Record$clone()
+    vector = array[index,]
+    record$clear()
+    record$update(features = .RECORD_FEATURESENTRY(), label = .RECORD_LABELENTRY())
     .write_feature_tensor(resolved_type, record, vector)
     if (!is.null(labels))
       .write_label_tensor(resolved_label_type, record, labels[index])
@@ -129,7 +140,7 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
 
 
   for (row_idx in 1:nrow(array)){
-    record = Record$clone()
+    record = Record()
     row = array[row_idx,]
 
     # Write values
@@ -146,7 +157,7 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
     .write_shape(resolved_type, record, n_cols)
 
     # TODO: create .write_recordio function
-    # TODO: replace record serializeToString with RProtobuf method
+    # TODO: replace record serializeToString with RProtoBuf method
     .write_recordio(file, record.SerializeToString())
   }
 }
@@ -174,11 +185,11 @@ for (amount in 0:3){
 .kmagic = 0xCED7230A
 
 .write_recordio = function(f, data){
-  len = length(record$serialize(NULL))
+  len = length(data$serialize(NULL))
   writeBin(.kmagic, f)
   writeBin(len, f)
   pad = 1 + bitwShiftL(bitwShiftR((len + 3), 2), 2) - len # added +1 to map to R indexing
-  RProtobuf::serialize_pb(record, f)
+  serialize_pb(data, f)
   writeBin(padding[[pad]], f)
 }
 
