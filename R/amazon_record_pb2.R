@@ -2,15 +2,17 @@
 
 #' @include zzz.R
 
+.recordProto <- function() system.file("proto", "record.proto", package= "R6sagemaker")
+
 # create descriptors
-.FLOAT32TENSOR <- RProtoBuf::P("aialgs.data.Float32Tensor", file = record.proto)
-.FLOAT64TENSOR <- RProtoBuf::P("aialgs.data.Float64Tensor", file = record.proto)
-.INT32TENSOR <- RProtoBuf::P("aialgs.data.Int32Tensor", file = record.proto)
-.BYTES <- RProtoBuf::P("aialgs.data.Bytes", file =record.proto)
-.VALUE <- RProtoBuf::P("aialgs.data.Value", file =record.proto)
-.RECORD_FEATURESENTRY <- RProtoBuf::P("aialgs.data.Record.FeaturesEntry", file = record.proto)
-.RECORD_LABELENTRY <- RProtoBuf::P("aialgs.data.Record.LabelEntry", file = record.proto)
-.RECORD <- RProtoBuf::P("aialgs.data.Record", file = record.proto)
+.FLOAT32TENSOR <- RProtoBuf::P("aialgs.data.Float32Tensor", file = .recordProto())
+.FLOAT64TENSOR <- RProtoBuf::P("aialgs.data.Float64Tensor", file = .recordProto())
+.INT32TENSOR <- RProtoBuf::P("aialgs.data.Int32Tensor", file = .recordProto())
+.BYTES <- RProtoBuf::P("aialgs.data.Bytes", file =.recordProto())
+.VALUE <- RProtoBuf::P("aialgs.data.Value", file =.recordProto())
+.RECORD_FEATURESENTRY <- RProtoBuf::P("aialgs.data.Record.FeaturesEntry", file = .recordProto())
+.RECORD_LABELENTRY <- RProtoBuf::P("aialgs.data.Record.LabelEntry", file = .recordProto())
+.RECORD <- RProtoBuf::P("aialgs.data.Record", file = .recordProto())
 
 # Create message
 Float32Tensor <- .FLOAT32TENSOR$new()
