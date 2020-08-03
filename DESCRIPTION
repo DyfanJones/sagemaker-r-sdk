@@ -8,12 +8,12 @@ Description: A library for training and deploying machine learning models on
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`
 Import: R6,
         paws,
-        RProtoBuf,
         jsonlite,
         logger,
         urltools,
         data.table,
-        uuid
+        uuid,
+        RProtobuf
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
@@ -40,6 +40,7 @@ Collate:
     'fw_registry.R'
     'xgboost_estimator.R'
     'amazon_estimator.R'
+    'zzz.R'
     'amazon_record_pb2.R'
     'data_capture_config.R'
     'debugger.R'
@@ -55,4 +56,3 @@ Collate:
     'r6sagemaker.R'
     'tuner.R'
     'xgboost_default.R'
-    'zzz.R'
