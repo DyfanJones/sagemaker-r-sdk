@@ -517,6 +517,45 @@ FileSystemRecordSet = R6Class("FileSystemRecordSet",
 )
 
 
+# Upload the training ``array`` and ``labels`` arrays to ``num_shards`` S3
+# objects, stored in "s3:// ``bucket`` / ``key_prefix`` /". Optionally
+# ``encrypt`` the S3 objects using AES-256.
+upload_matrix_to_s3_shards = function(num_shards,
+                                      s3,
+                                      bucket,
+                                      key_prefix,
+                                      array,
+                                      labels=NULL,
+                                      encrypt=FALSE){
+  shards = .build_shards(num_shards, array)
+
+  if (!is.null(labels))
+    label_shards = .build_shards(num_shards, labels)
+  uploaded_files = list()
+  if (!grepl("/$", key_prefix))
+    key_prefix = paste0(key_prefix, "/")
+  extra_put_kwargs = if(encrypt) list("ServerSideEncryption"= "AES256") else list()
+
+}
+
+
+# needs to be compatible with vectors
+.build_shards = function(num_shards,
+                         array){
+  if (num_shards < 1)
+    stop("num_shards must be >= 1")
+  # ensure matrix gets split into same number of shards
+  shard_size = ceiling(dim(array)[1] / num_shards)
+  if (shard_size == 0)
+    stop("Array length is less than num shards")
+
+  max_row = dim(array)[2]
+
+  split_vec <- seq(1, max_row, shard_size)
+  lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
+}
+
+
 # Return docker registry for the given AWS region
 # Note: Not all the algorithms listed below have an Amazon Estimator
 # implemented. For full list of pre-implemented Estimators, look at:
