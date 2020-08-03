@@ -5,7 +5,7 @@
 
 #' @import R6
 #' @import paws
-#' @import urltools
+#' @importFrom urltools url_parse
 
 MULTI_MODEL_CONTAINER_MODE <- "MultiModel"
 
