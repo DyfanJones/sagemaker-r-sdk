@@ -1,7 +1,5 @@
 #' @importFrom RProtoBuf P
 
-#' @include zzz.R
-
 .recordProto <- function() system.file("proto", "record.proto", package= "R6sagemaker")
 
 # create descriptors
