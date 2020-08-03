@@ -1,3 +1,4 @@
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/dc444d7f147533d78322f667200ed54f2dd55e61/src/sagemaker/amazon/common.py
 
 #' @import R6
 #' @importFrom RProtoBuf serialize_pb
