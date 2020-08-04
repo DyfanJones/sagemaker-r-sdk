@@ -1,14 +1,14 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/dc444d7f147533d78322f667200ed54f2dd55e61/src/sagemaker/amazon/common.py
 
 #' @import R6
-#' @importFrom RProtoBuf serialize_pb
+#' @importFrom RProtoBuf read
 
-#' @include amazon_record_pd2.R
+#' @include amazon_record_pb2.R
 
 matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
   public = list(
     # content_type
-    # Method in how data is going to be seperated
+    # Method in how data sent to api
     content_type = NULL,
     initialize = function(content_type="application/x-recordio-protobuf"){
       self$content_type = content_type
@@ -34,6 +34,9 @@ matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
 
 record_deserializer = R6Class("record_deserializer",
   public = list(
+    # accept
+    # Method in how data returned from api
+    accept = NULL,
     initialize = function(accept="application/x-recordio-protobuf"){
       self$accept = accept
     },
@@ -41,8 +44,7 @@ record_deserializer = R6Class("record_deserializer",
     deserializer = function(stream,
                             content_type){
 
-      # TODO: create read_records function
-      tryCatch(read_records(stream),
+      tryCatch(read_records_io(stream),
                finally = function(f) close(stream))
     }
   )
@@ -86,7 +88,7 @@ record_deserializer = R6Class("record_deserializer",
 
 write_matrix_to_dense_tensor <- function(file, array, labels = NULL){
   # Validate shape of array and labels, resolve array and label types
-  if (!length(dim(mat)) ==2)
+  if (!length(dim(array)) ==2)
     stop("Array must be a Matrix", call. = F)
 
   if(!is.null(labels)){
@@ -111,7 +113,7 @@ write_matrix_to_dense_tensor <- function(file, array, labels = NULL){
     if (!is.null(labels))
       .write_label_tensor(resolved_label_type, record, labels[index])
 
-    .write_recordio(file, record)
+    .write_recordio(file, record$serialize(NULL))
   }
 }
 
@@ -156,22 +158,41 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
     # Write shape
     .write_shape(resolved_type, record, n_cols)
 
-    # TODO: create .write_recordio function
-    # TODO: replace record serializeToString with RProtoBuf method
-    .write_recordio(file, record.SerializeToString())
+    .write_recordio(file, record$serialize(NULL))
   }
 }
 
 # Eagerly read a collection of amazon Record protobuf objects from file
-read_records = function(file){
-  records = list
-  # TODO: read_recordio
-  for (record_data in read_recordio(file)){
-    record = Record()
-    record.ParseFromString(record_data)
-    records.append(record)
+read_records_io = function(file){
+
+  # create raw connection
+  f = rawConnection(obj,  "rb")
+  on.exit(close(f))
+
+  records = list()
+  i = 1
+
+  while(TRUE){
+    read_kmagic = readBin(f, "numeric", n = 1)
+    (check = read_kmagic == .kmagic)
+
+    # break loop
+    if(!check || length(check) == 0)
+      return(records)
+
+    len_record = readBin(f, "int", n = 1)
+
+    data = readBin(f, "raw", n = len_record)
+
+    pad = bitwShiftL(bitwShiftR((len_record + 3), 2), 2) - len_record
+
+    record = read(aialgs.data.Record, data)
+    records[[i]] = record
+    i = i +1
+
+    if(pad > 0)
+      readBin(f, "raw", pad)
   }
-  return(records)
 }
 
 # MXNet requires recordio records have length in bytes that's a multiple of 4
@@ -185,11 +206,11 @@ for (amount in 0:3){
 .kmagic = 0xCED7230A
 
 .write_recordio = function(f, data){
-  len = length(data$serialize(NULL))
+  len = length(data)
   writeBin(.kmagic, f)
   writeBin(len, f)
   pad = 1 + bitwShiftL(bitwShiftR((len + 3), 2), 2) - len # added +1 to map to R indexing
-  serialize_pb(data, f)
+  writeBin(data, f)
   writeBin(padding[[pad]], f)
 }
 
