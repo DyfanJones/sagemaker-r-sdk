@@ -19,6 +19,8 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Collate: 
+    'deserializers.R'
+    'serializers.R'
     'utils.R'
     'vpc_utils.R'
     'set_credentials.R'

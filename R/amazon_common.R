@@ -1,25 +1,33 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/dc444d7f147533d78322f667200ed54f2dd55e61/src/sagemaker/amazon/common.py
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/common.py
 
 #' @import R6
 #' @importFrom RProtoBuf read
 
 #' @include amazon_record_pb2.R
+#' @include serializers.R
+#' @include deserializers.R
 
-matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
+#' @title RecordSerializer Class
+#' @description Serialize a matrices and array for an inference request.
+#' @export
+RecordSerializer = R6Class("RecordSerializer",
+  inherit = BaseSerializer,
   public = list(
-    # content_type
-    # Method in how data sent to api
-    content_type = NULL,
-    initialize = function(content_type="application/x-recordio-protobuf"){
-      self$content_type = content_type
+
+    #' @description intialize RecordSerializer class
+    initialize = function(){
+      self$CONTENT_TYPE = "application/x-recordio-protobuf"
     },
 
-    serialize = function(array){
-      if(is.vector(array))
-        array = as.array(array)
+    #' @description Serialize a NumPy array into a buffer containing RecordIO records.
+    #' @param data (numpy.ndarray): The data to serialize.
+    #' @return raw: A buffer containing the data serialized as records.
+    serialize = function(data){
+      if(is.vector(data))
+        data = as.array(data)
 
-      if(length(dim(array)) == 1)
-        array = matrix(array, 1, dim(array)[1])
+      if(length(dim(data)) == 1)
+        data = matrix(array, 1, dim(data)[1])
 
       obj = raw(0)
       buf = rawConnection(obj, open = "wb")
@@ -32,18 +40,24 @@ matrix_to_record_serializer = R6Class("matrix_to_record_serializer",
   )
 )
 
-record_deserializer = R6Class("record_deserializer",
+
+#' @title RecordDeserializer Class
+#' @description Deserialize RecordIO Protobuf data from an inference endpoint.
+#' @export
+RecordDeserializer = R6Class("RecordDeserializer",
+  inherit = BaseDeserializer,
   public = list(
-    # accept
-    # Method in how data returned from api
-    accept = NULL,
-    initialize = function(accept="application/x-recordio-protobuf"){
-      self$accept = accept
+
+    #' @description intialize RecordDeserializer class
+    initialize = function(){
+      self$ACCEPT = "application/x-recordio-protobuf"
     },
 
-    deserializer = function(stream,
-                            content_type){
-
+    #' @description Deserialize RecordIO Protobuf data from an inference endpoint.
+    #' @param data (object): The protobuf message to deserialize.
+    #' @param content_type (str): The MIME type of the data.
+    #' @return list: A list of records.
+    deserializer = function(data, content_type){
       tryCatch(read_records_io(stream),
                finally = function(f) close(stream))
     }
