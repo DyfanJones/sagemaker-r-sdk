@@ -14,6 +14,7 @@ Import: R6,
         data.table,
         uuid,
         RProtobuf
+Suggest: testthat
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true

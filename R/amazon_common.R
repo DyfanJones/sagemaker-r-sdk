@@ -27,13 +27,13 @@ RecordSerializer = R6Class("RecordSerializer",
         data = as.array(data)
 
       if(length(dim(data)) == 1)
-        data = matrix(array, 1, dim(data)[1])
+        data = matrix(data, 1, dim(data)[1])
 
       obj = raw(0)
       buf = rawConnection(obj, open = "wb")
       on.exit(close(buf))
 
-      write_matrix_to_dense_tensor(buf, array)
+      write_matrix_to_dense_tensor(buf, data)
 
       return(rawConnectionValue(buf))
     }
@@ -57,8 +57,8 @@ RecordDeserializer = R6Class("RecordDeserializer",
     #' @param content_type (str): The MIME type of the data.
     #' @return list: A list of records.
     deserializer = function(data, content_type){
-      tryCatch(read_records_io(stream),
-               finally = function(f) close(stream))
+      tryCatch(read_records_io(data),
+               finally = function(f) close(data))
     }
   )
 )
@@ -174,7 +174,7 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
 read_records_io = function(file){
 
   # create raw connection
-  f = rawConnection(obj,  "rb")
+  f = rawConnection(file,  "rb")
   on.exit(close(f))
 
   records = list()
