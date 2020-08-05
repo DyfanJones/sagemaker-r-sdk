@@ -7,13 +7,12 @@
 #' @include session.R
 #' @include vpc_utils.R
 #' @include analytics.R
+#' @include serializers.R
+#' @include deserializers.R
 
 #' @import paws
-#' @import jsonlite
 #' @import R6
 #' @import utils
-#' @import uuid
-#' @import data.table
 
 #' @title RealTimePredictor Class
 #' @description Make prediction requests to an Amazon SageMaker endpoint.
@@ -88,8 +87,8 @@ RealTimePredictor = R6Class("RealTimePredictor",
 
       self$endpoint = endpoint
       self$sagemaker_session = sagemaker_session %||% Session$new()
-      self$serializer = if(inherits(serializer, "Serializer") || is.null(serializer)) serializer else stop("Please use a R6 Serializer Class.", call. = F)
-      self$deserializer = if(inherits(deserializer, "Deserializer") || is.null(deserializer)) deserializer else stop("Please use a R6 Deserializer Class.", call. = F)
+      self$serializer = if(inherits(serializer, "BaseSerializer") || is.null(serializer)) serializer else stop("Please use a R6 Serializer Class.", call. = F)
+      self$deserializer = if(inherits(deserializer, "BaseDeserializer") || is.null(deserializer)) deserializer else stop("Please use a R6 Deserializer Class.", call. = F)
       self$content_type = content_type %||% serializer$content_type
       self$accept = accept %||% deserializer$accept
       self$.endpoint_config_name = private$.get_endpoint_config_name()
@@ -289,245 +288,6 @@ RealTimePredictor = R6Class("RealTimePredictor",
   )
 )
 
-#' @title Default Serializer Class
-#' @description  All serializer are children of this class. If a custom
-#'               serializer is desired, inherit this class.
-#' @export
-Serializer = R6Class("Serializer",
-  public = list(
-   #' @field content_type
-   #' Method in how data is going to be seperated
-   content_type = NULL,
-
-   #' @description  Take data of various data formats and serialize them
-   #' @param data (object): Data to be serialized.
-   initialize = function(){},
-
-   #' @description Take data of various data formats and serialize them into CSV.
-   #' @param data (object): Data to be serialized
-   serialize = function(data) {stop("I'm an abstract interface method", call. = F)},
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<Serializer>")
-     invisible(self)
-   }
-  )
-)
-
-#' @title CsvSerializer Class
-#' @description Make Raw data using text/csv format
-#' @export
-CsvSerializer = R6Class("CsvSerializer",
-  inherit = Serializer,
-  public = list(
-    #' @description Initialize Serializer Class
-    initialize = function(){
-      self$content_type = "text/csv"
-    },
-    #' @description Take data of various data formats and serialize them into CSV.
-    #' @param data (object): Data to be serialized. Any list of same length vectors; e.g. data.frame and data.table.
-    #'               If matrix, it gets internally coerced to data.table preserving col names but not row names
-    serialize = function(data) {
-      TempFile = tempfile()
-      fwrite(data, TempFile, col.names = FALSE)
-      obj = readBin(TempFile, "raw", n = file.size(TempFile))
-      unlink(TempFile)
-      return(obj)
-      },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<CsvSerializer>")
-      invisible(self)
-    }
-  )
-)
-
-#' @title S3 method to call CsvSerializer class
-#' @export
-csv_serializer <- CsvSerializer$new()
-
-#' @title JsonSerializer Class
-#' @description Make Raw data using json format
-#' @export
-JsonSerializer = R6Class("JsonSerializer",
-  inherit = Serializer,
-  public = list(
-    #' @description Initialize Csv Serializer
-    initialize = function(){
-      self$content_type = "application/json"
-    },
-    #' @description Take data of various data formats and serialize them into CSV.
-    #' @param data (object): Data to be serialized.
-    serialize = function(data) {
-
-      con = rawConnection(raw(0), "r+")
-      on.exit(close(con))
-      write_json(data, con, dataframe = "columns", auto_unbox = T)
-
-      return(rawConnectionValue(con))
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<JsonSerializer>")
-      invisible(self)
-    }
-  )
-)
-
-#' @title S3 method to call JsonSerializer class
-#' @export
-json_serializer <- JsonSerializer$new()
-
-
-#' @title Default Deserializer Class
-#' @description  All deserializer are children of this class. If a custom
-#'               deserializer is desired, inherit this class.
-#' @export
-Deserializer = R6Class("Deserializer",
-  public = list(
-
-   #' @field accept
-   #' format accepted by deserializer
-   accept = NULL,
-
-   #' @description Initialize Serializer Class
-   initialize = function(){},
-
-   #' @description  Takes raw data stream and deserializes it.
-   #' @param stream raw data to be deserialize
-   deserialize = function(stream) {stop("I'm an abstract interface method", call. = F)},
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<Deserializer>")
-     invisible(self)
-   }
-  )
-)
-
-#' @title CsvDeserializer Class
-#' @description  Use csv format to deserialize raw data stream
-#' @export
-CsvDeserializer = R6Class("CsvDeserializer",
-  inherit = Deserializer,
-  public = list(
-    #' @description Initialize CsvSerializer Class
-    initialize = function(){
-      self$accept = "text/csv"
-      },
-
-    #' @description  Takes raw data stream and deserializes it.
-    #' @param stream raw data to be deserialize
-    deserialize = function(stream) {
-      if(inherits(stream, "raw")){
-        TempFile = tempfile()
-        write_bin(stream, TempFile)
-        dt = fread(TempFile)
-        unlink(TempFile)
-        return(melt(dt, measure = 1:ncol(dt), value.name ="prediction")[,-"variable"])
-        }
-      fread(stream, col.names = "prediction")
-      },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<CsvDeserializer>")
-      invisible(self)
-      }
-    )
-)
-
-#' @title S3 method to call CsvDeserializer class
-#' @export
-csv_deserializer <- CsvDeserializer$new()
-
-#' @title StringDeserializer Class
-#' @description  Deserialize raw data stream into a character string
-#' @export
-StringDeserializer = R6Class("StringDeserializer",
-  inherit = Deserializer,
-  public = list(
-
-   #' @field encoding
-   #' string encoding to be used
-   encoding = NULL,
-   #' @description Initialize StringDeserializer Class
-   initialize = function(){
-     self$accept = "text"
-   },
-
-   #' @description  Takes raw data stream and deserializes it.
-   #' @param stream raw data to be deserialize
-   deserialize = function(stream) {
-     obj = rawToChar(stream)
-     return(obj)
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<StringDeserializer>")
-     invisible(self)
-   }
-  )
-)
-
-#' @title S3 method to call StringDeserializer class
-#' @export
-string_deserializer <- StringDeserializer$new()
-
-#' @title JsonDeserializer Class
-#' @description  Use json format to deserialize raw data stream
-#' @export
-JsonDeserializer = R6Class("JsonDeserializer",
-  inherit = Deserializer,
-  public = list(
-
-   #' @field encoding
-   #' string encoding to be used
-   encoding = NULL,
-   #' @description Initialize StringDeserializer Class
-   initialize = function(){
-     self$accept = "application/json"
-   },
-
-   #' @description  Takes raw data stream and deserializes it.
-   #' @param stream raw data to be deserialize
-   deserialize = function(stream) {
-     con = rawConnection(stream)
-     on.exit(close(con))
-     data = as.data.table(parse_json(con))
-     return(data)
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<JsonDeserializer>")
-     invisible(self)
-   }
-   )
-)
-
-#' @title S3 method to call StringDeserializer class
-#' @export
-json_deserializer <- JsonDeserializer$new()
-
 
 #' @title S3 method that wraps RealTimePredictor Class
 #' @description Predicted values returned from endpoint
@@ -541,8 +301,8 @@ json_deserializer <- JsonDeserializer$new()
 #' @param ... arguments passed to ``RealTimePredictor$predict``
 #' @export
 predict.RealTimePredictor <- function(object, newdata, serializer = csv_serializer, deserializer = csv_deserializer, ...){
-  stopifnot(is.null(serializer) || inherits(serializer,"Serializer"),
-            is.null(deserializer) || inherits(deserializer,"Deserializer"))
+  stopifnot(is.null(serializer) || inherits(serializer,"BaseSerializer"),
+            is.null(deserializer) || inherits(deserializer,"BaseDeserializer"))
 
   obj = object$clone()
   obj$serializer = serializer
