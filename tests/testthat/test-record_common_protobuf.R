@@ -37,5 +37,5 @@ test_that("test character vector",{
 
   serialize_proto = RecordSerializer$new()
 
-  testthat::expect_error(serialize_proto$serialize(Vector))
+  expect_error(serialize_proto$serialize(Vector))
 })
