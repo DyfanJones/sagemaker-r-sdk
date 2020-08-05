@@ -9,6 +9,7 @@ test_that("test matrix",{
   serialize_proto = RecordSerializer$new()
   obj = serialize_proto$serialize(mat)
 
+  # deserialize matrix using protobuf
   deserialize_proto = RecordDeserializer$new()
   proto_mat = deserialize_proto$deserializer(obj, serialize_proto$CONTENT_TYPE)
 
@@ -20,13 +21,21 @@ test_that("test matrix",{
 test_that("test integer vector",{
   num = 1:9
 
-  # serialize matrix
+  # serialize vector
   serialize_proto = RecordSerializer$new()
   obj = serialize_proto$serialize(num)
 
+  # deserialize matrix using protobuf
   deserialize_proto = RecordDeserializer$new()
   proto_num = deserialize_proto$deserializer(obj, serialize_proto$CONTENT_TYPE)
 
   expect_equal(num, proto_num[[1]]$features[[1]]$value$int32_tensor$values)
 })
 
+test_that("test character vector",{
+  Vector = LETTERS
+
+  serialize_proto = RecordSerializer$new()
+
+  testthat::expect_error(serialize_proto$serialize(Vector))
+})
