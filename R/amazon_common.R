@@ -228,6 +228,6 @@ for (amount in 0:3){
          integer64 = "Int32",
          numeric =   "Float64",
          double = "Float64",
-         stop(sprintf("Unsupported dtype %s on array",dtype), call. = FALSE)
+         stop(sprintf("Unsupported class %s on array",dtype), call. = FALSE)
   )
 }
