@@ -40,7 +40,6 @@ RecordSerializer = R6Class("RecordSerializer",
   )
 )
 
-
 #' @title RecordDeserializer Class
 #' @description Deserialize RecordIO Protobuf data from an inference endpoint.
 #' @export
@@ -139,10 +138,9 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
   if (!length(dim(array)) == 2)
     stop("Array must be a Matrix", call.=F)
   if (!is.null(labels)){
-    # TODO: need to double check this method works in R
-    if (length(dim(labels)) != 1)
+    if (!is.vector(labels))
       stop("Labels must be a Vector", call. = F)
-    if (!(dim(labels)[1] %in% dim(array)))
+    if (!(length(labels) %in% dim(array)))
       stop(sprintf("Label shape (%s) not compatible with array shape (%s)",
                    paste(dim(labels), collapse = ", "),
                    paste(dim(array), collapse = ", ")),
@@ -150,10 +148,6 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
     resolved_label_type = .resolve_type(labels[1])
   }
   resolved_type = .resolve_type(labels[1])
-
-  # csr_array = array.tocsr()
-  array_dim = dim(array)
-
 
   for (row_idx in 1:nrow(array)){
     record = Record()
