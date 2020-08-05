@@ -74,23 +74,17 @@ RealTimePredictor = R6Class("RealTimePredictor",
     #'              may provide a ``content_type`` attribute that defines the
     #'              endpoint response's "Accept" content type. If not specified, a
     #'              sequence of bytes is expected for the data. (default: ``csv_deserializer``)
-    #' @param content_type (str): The invocation's "ContentType", overriding any
-    #'              ``content_type`` from the serializer (default: NULL).
-    #' @param accept (str): The invocation's "Accept", overriding any accept from
-    #'              the deserializer (default: NULL).
     initialize = function(endpoint,
                           sagemaker_session=NULL,
                           serializer=csv_serializer,
-                          deserializer=csv_deserializer,
-                          content_type= NULL,
-                          accept=NULL){
+                          deserializer=csv_deserializer){
 
       self$endpoint = endpoint
       self$sagemaker_session = sagemaker_session %||% Session$new()
       self$serializer = if(inherits(serializer, "BaseSerializer") || is.null(serializer)) serializer else stop("Please use a R6 Serializer Class.", call. = F)
       self$deserializer = if(inherits(deserializer, "BaseDeserializer") || is.null(deserializer)) deserializer else stop("Please use a R6 Deserializer Class.", call. = F)
-      self$content_type = content_type %||% serializer$content_type
-      self$accept = accept %||% deserializer$accept
+      self$content_type = serializer$CONTENT_TYPE
+      self$accept = deserializer$ACCEPT
       self$.endpoint_config_name = private$.get_endpoint_config_name()
       self$.model_names = private$.get_model_names()
     },
@@ -237,9 +231,10 @@ RealTimePredictor = R6Class("RealTimePredictor",
   private = list(
     .handle_response = function(response){
       response_body = response$Body
+      content_type = response$ContentType %||% "application/octet-stream"
       if (!is.null(self$deserializer)){
         # It's the deserializer's responsibility to close the stream
-        return(self$deserializer$deserialize(response_body))}
+        return(self$deserializer$deserialize(response_body, content_type))}
       return(response_body)
     },
 
@@ -249,10 +244,11 @@ RealTimePredictor = R6Class("RealTimePredictor",
         args$EndpointName = self$endpoint}
 
       if (!("ContentType" %in% names(args))){
-        args$ContentType = self$content_type %||% self$serializer$content_type}
+        args$ContentType = self$content_type %||% self$serializer$CONTENT_TYPE}
 
       if (!("Accept" %in% names(args))){
-        args$Accept = self$accept %||% self$deserializer$accept}
+        args$Accept = paste(self$accept %||% self$deserializer$ACCEPT, collapse = ",")
+        }
 
       if (!is.null(target_model)){
         args$TargetModel = target_model}

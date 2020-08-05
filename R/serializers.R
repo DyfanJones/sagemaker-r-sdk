@@ -8,11 +8,11 @@
 #' @description  All serializer are children of this class. If a custom
 #'               serializer is desired, inherit this class.
 #' @export
-BaseSerializer = R6Class("Serializer",
+BaseSerializer = R6Class("BaseSerializer",
   public = list(
-   #' @field content_type
+   #' @field CONTENT_TYPE
    #' Method in how data is going to be seperated
-   content_type = NULL,
+   CONTENT_TYPE = NULL,
 
    #' @description  Take data of various data formats and serialize them
    #' @param data (object): Data to be serialized.
@@ -26,7 +26,7 @@ BaseSerializer = R6Class("Serializer",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<Serializer>")
+     cat("<BaseSerializer>")
      invisible(self)
    }
   )
@@ -36,11 +36,11 @@ BaseSerializer = R6Class("Serializer",
 #' @description Make Raw data using text/csv format
 #' @export
 CsvSerializer = R6Class("CsvSerializer",
-  inherit = Serializer,
+  inherit = BaseSerializer,
   public = list(
-    #' @description Initialize Serializer Class
+    #' @description Initialize BaseSerializer Class
     initialize = function(){
-      self$content_type = "text/csv"
+      self$CONTENT_TYPE = "text/csv"
     },
     #' @description Take data of various data formats and serialize them into CSV.
     #' @param data (object): Data to be serialized. Any list of same length vectors; e.g. data.frame and data.table.
@@ -57,7 +57,7 @@ CsvSerializer = R6Class("CsvSerializer",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<CsvSerializer>")
+      cat("<CsvBaseSerializer>")
       invisible(self)
     }
   )
@@ -71,11 +71,11 @@ csv_serializer <- CsvSerializer$new()
 #' @description Make Raw data using json format
 #' @export
 JsonSerializer = R6Class("JsonSerializer",
-  inherit = Serializer,
+  inherit = BaseSerializer,
   public = list(
-   #' @description Initialize Csv Serializer
+   #' @description Initialize Csv BaseSerializer
    initialize = function(){
-     self$content_type = "application/json"
+     self$CONTENT_TYPE = "application/json"
    },
    #' @description Take data of various data formats and serialize them into CSV.
    #' @param data (object): Data to be serialized.
@@ -92,7 +92,7 @@ JsonSerializer = R6Class("JsonSerializer",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<JsonSerializer>")
+     cat("<JsonBaseSerializer>")
      invisible(self)
    }
   )
@@ -101,3 +101,11 @@ JsonSerializer = R6Class("JsonSerializer",
 #' @title S3 method to call JsonSerializer class
 #' @export
 json_serializer <- JsonSerializer$new()
+
+# TODO: Serializers:
+# - NumpySerializer (R equivalent Matrix?)
+# - IdentitySerializer
+# - JSONLinesSerializer
+# - SparseMatrixSerializer (issue write .npz format: possibly look into (https://github.com/scipy/scipy/blob/e777eb9e4a4cd9844629a3c37b3e94902328ad0b/scipy/sparse/_matrix_io.py) in combination with the use of RcppCNPy)
+# - LibSVMSerializer (consider using sparsio)
+

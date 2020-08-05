@@ -56,9 +56,7 @@ Initialize a ``RealTimePredictor``.
   endpoint,
   sagemaker_session = NULL,
   serializer = csv_serializer,
-  deserializer = csv_deserializer,
-  content_type = NULL,
-  accept = NULL
+  deserializer = csv_deserializer
 )}\if{html}{\out{</div>}}
 }
 
@@ -84,12 +82,6 @@ the response content type, and returns a sequence of bytes. It
 may provide a ``content_type`` attribute that defines the
 endpoint response's "Accept" content type. If not specified, a
 sequence of bytes is expected for the data. (default: ``csv_deserializer``)}
-
-\item{\code{content_type}}{(str): The invocation's "ContentType", overriding any
-``content_type`` from the serializer (default: NULL).}
-
-\item{\code{accept}}{(str): The invocation's "Accept", overriding any accept from
-the deserializer (default: NULL).}
 }
 \if{html}{\out{</div>}}
 }
