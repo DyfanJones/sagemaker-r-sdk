@@ -149,22 +149,26 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
   }
   resolved_type = .resolve_type(labels[1])
 
-  for (row_idx in 1:nrow(array)){
+  # convert sparse Matrix to Sparse Row matrix
+  csr_array = Matrix::as(array, "RsparseMatrix")
+  dim_array = dim(csr_array)
+
+  for (row_idx in seq_len(dim_array[1])){
     record = Record()
-    row = array[row_idx,]
+    row = csr_array[row_idx,, drop = F] # keep row in RsparseMatrix format
 
     # Write values
-    .write_feature_tensor(resolved_type, record, row.data)
+    .write_feature_tensor(resolved_type, record, row@x)
 
     # Write keys
-    .write_keys_tensor(resolved_type, record, row.indices.astype(np.uint64))
+    .write_keys_tensor(resolved_type, record, row@j)
 
     # Write labels
     if (!is.null(labels))
       .write_label_tensor(resolved_label_type, record, labels[row_idx])
 
     # Write shape
-    .write_shape(resolved_type, record, n_cols)
+    .write_shape(resolved_type, record, dim_array[2])
 
     .write_recordio(file, record$serialize(NULL))
   }
