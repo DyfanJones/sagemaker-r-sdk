@@ -570,18 +570,18 @@ upload_matrix_to_s3_shards = function(num_shards,
       file_name = sprintf("matrix_%s.pbr", shard_index_string)
       key = paste0(key_prefix, file_name)
       log_debug("Creating object %s in bucket %s", key, bucket)
+      # Upload shard to s3
       s3$put_object(Bucket = bucket, Key = key, Body = obj, ServerSideEncryption = extra_put_kwargs$extra_put_kwargs)
+      # update uploaded files
       uploaded_files = c(uploaded_files, file_name)
-      manifest_key = paste0(key_prefix,".amazon.manifest")
-
-      manifest_str = toJSON(c(list(list("prefix" = sprintf("s3://%s/%s", bucket, key_prefix))), uploaded_files),
-                            auto_unbox = T)
-
-      s3$put_object(Bucket = bucket, Key = manifest_key,
-                    Body = charToRaw(manifest_str),
-                    ServerSideEncryption = extra_put_kwargs$extra_put_kwargs)
-      return(sprintf("s3://%s/%s",bucket, manifest_key))
     }
+    manifest_key = paste0(key_prefix,".amazon.manifest")
+    manifest_str = toJSON(c(list(list("prefix" = sprintf("s3://%s/%s", bucket, key_prefix))), uploaded_files),
+                          auto_unbox = T)
+    s3$put_object(Bucket = bucket, Key = manifest_key,
+                  Body = charToRaw(manifest_str),
+                  ServerSideEncryption = extra_put_kwargs$extra_put_kwargs)
+    return(sprintf("s3://%s/%s",bucket, manifest_key))
   },
   error = function(e){
     tryCatch({for(file in uploaded_files) s3$delete_object(bucket, paste0(key_prefix, file))},
