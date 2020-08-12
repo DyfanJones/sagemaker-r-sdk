@@ -178,8 +178,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       key_prefix = paste0(key_prefix, sprintf("%s-%s/", class(self)[1], sagemaker_timestamp()))
       key_prefix = trimws(key_prefix, "left", "/")
       log_debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
-      # TODO: upload_numpy_to_s3_shards function
-      manifest_s3_file = upload_numpy_to_s3_shards(
+      manifest_s3_file = upload_matrix_to_s3_shards(
         self$train_instance_count, s3, bucket, key_prefix, train, labels, encrypt
       )
 
