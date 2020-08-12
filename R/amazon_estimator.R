@@ -1,6 +1,5 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/af7f75ae336f0481e52bb968e4cc6df91b1bac2c/src/sagemaker/amazon/amazon_estimator.py
 
-
 #' @include utils.R
 #' @include xgboost_estimator.R
 #' @include fw_registry.R
@@ -79,7 +78,8 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
 
     #' @description Return algorithm image URI for the given AWS region, repository name, and
     #'              repository version
-    train_image = function(){
+    train_image_uri = function(){
+      # TODO: replace get_image_uri for image_uris.retrieve
       return(get_image_uri(
         self$sagemaker_session$paws_region_name, self$repo_name, self$repo_version)
       )
@@ -516,6 +516,25 @@ FileSystemRecordSet = R6Class("FileSystemRecordSet",
     )
 )
 
+# needs to be compatible with vectors
+.build_shards = function(num_shards,
+                         array){
+  if (num_shards < 1)
+    stop("num_shards must be >= 1")
+
+  if(is.vector(array))
+    array = as.array(array)
+  # ensure matrix gets split into same number of shards
+  shard_size = ceiling(dim(array)[1] / num_shards)
+  if (shard_size == 0)
+    stop("Array length is less than num shards")
+
+  max_row = dim(array)[1]
+
+  split_vec <- seq(1, max_row, shard_size)
+  lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
+}
+
 
 # Upload the training ``array`` and ``labels`` arrays to ``num_shards`` S3
 # objects, stored in "s3:// ``bucket`` / ``key_prefix`` /". Optionally
@@ -536,23 +555,40 @@ upload_matrix_to_s3_shards = function(num_shards,
     key_prefix = paste0(key_prefix, "/")
   extra_put_kwargs = if(encrypt) list("ServerSideEncryption"= "AES256") else list()
 
-}
+  tryCatch({
+    for(shard_index in seq_along(shards)){
+      obj = raw(0)
+      buf = rawConnection(obj, open = "wb")
+      if (!is.null(labels))
+        write_matrix_to_dense_tensor(buf, shards[[shard_index]], label_shards[[shard_index]])
+      else
+        write_matrix_to_dense_tensor(buf, shards[[shard_index]])
 
+      obj = rawConnectionValue(buf)
+      close(buf)
 
-# needs to be compatible with vectors
-.build_shards = function(num_shards,
-                         array){
-  if (num_shards < 1)
-    stop("num_shards must be >= 1")
-  # ensure matrix gets split into same number of shards
-  shard_size = ceiling(dim(array)[1] / num_shards)
-  if (shard_size == 0)
-    stop("Array length is less than num shards")
+      shard_index_string = formatC(shard_index, width = nchar(nrow(shards[[shard_index]])), format = "d", flag = "0")
+      file_name = sprintf("matrix_%s.pbr", shard_index_string)
+      key = paste0(key_prefix, file_name)
+      log_debug("Creating object %s in bucket %s", key, bucket)
+      s3$put_object(Bucket = bucket, Key = key, Body = obj, ServerSideEncryption = extra_put_kwargs$extra_put_kwargs)
+      uploaded_files = c(uploaded_files, file_name)
+      manifest_key = paste0(key_prefix,".amazon.manifest")
 
-  max_row = dim(array)[2]
+      manifest_str = toJSON(c(list(list("prefix" = sprintf("s3://%s/%s", bucket, key_prefix))), uploaded_files),
+                            auto_unbox = T)
 
-  split_vec <- seq(1, max_row, shard_size)
-  lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
+      s3$put_object(Bucket = bucket, Key = manifest_key,
+                    Body = charToRaw(manifest_str),
+                    ServerSideEncryption = extra_put_kwargs$extra_put_kwargs)
+      return(sprintf("s3://%s/%s",bucket, manifest_key))
+    }
+  },
+  error = function(e){
+    tryCatch({for(file in uploaded_files) s3$delete_object(bucket, paste0(key_prefix, file))},
+             finally = function(f) stop(f, call. = F))
+    }
+  )
 }
 
 
@@ -808,3 +844,4 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
   # Returns a list of version equivalents for XGBoost
   lapply(XGBOOST_VERSION_EQUIVALENTS, function(suffix) c(paste0(version, suffix), version))
 }
+
