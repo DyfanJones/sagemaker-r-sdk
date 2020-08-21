@@ -186,6 +186,7 @@ retry_api_call <- function(expr, retry = 5){
 # Returns:
 #   (str): URI prefix of ECR image
 
+# TODO: deprecate helper function
 get_ecr_image_uri_prefix <- function(account,
                                      region){
   return (sprintf("%s.dkr.ecr.%s.amazonaws.com", account, region))

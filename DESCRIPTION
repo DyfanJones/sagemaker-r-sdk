@@ -46,6 +46,7 @@ Collate:
     'amazon_estimator.R'
     'data_capture_config.R'
     'debugger.R'
+    'image_uris.R'
     'input.R'
     'job.R'
     'model_monitoring.R'

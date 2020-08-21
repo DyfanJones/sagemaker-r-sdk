@@ -721,7 +721,7 @@ registry <- function(region_name,
   stop(sprintf("Algorithm (%s) is unsupported for region (%s).", algorithm, region_name), call. = F)
 }
 
-
+# TODO: get_image_uri function is deprecated in python sagemaker v2.please refer to retrieve function in image_uris.R
 #' Return algorithm image URI for the given AWS region, repository name, and
 #' repository version
 #' @param region_name (str): The region name for the account.
