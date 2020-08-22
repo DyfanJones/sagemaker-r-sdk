@@ -782,6 +782,7 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
             is.character(repo_version) || is.null(repo_version),
             is.null(sagemaker_session) || inherits(sagemaker_session, "session"))
 
+  log_warn("'get_ecr_image_uri' method will be deprecated in favor of 'ImageUris' class.")
   session = sagemaker_session %||% Session$new()
 
   ecr = paws::ecr(config = session$paws_credentials$credentials)
