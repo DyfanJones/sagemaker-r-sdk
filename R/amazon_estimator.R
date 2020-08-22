@@ -825,15 +825,3 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
 
   paste(repos$repositoryUri, repo_version, sep = ":")
 }
-
-.is_latest_xgboost_version <- function(repo_version){
-  # Compare xgboost image version with latest version
-  if(repo_version %in% XGBOOST_1P_VERSIONS) return(FALSE)
-  return(repo_version %in% unlist(.generate_version_equivalents(XGBOOST_LATEST_VERSION)))
-}
-
-.generate_version_equivalents <- function(version){
-  # Returns a list of version equivalents for XGBoost
-  lapply(XGBOOST_VERSION_EQUIVALENTS, function(suffix) c(paste0(version, suffix), version))
-}
-
