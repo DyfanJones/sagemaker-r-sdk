@@ -5,7 +5,8 @@
 #' @import jsonlite
 #' @import R6
 #' @import logger
-
+#' @import paws
+#' @import data.table
 
 #' @title ImageUris Class
 #' @description Class to create and format sagemaker docker images stored in ECR
@@ -27,7 +28,7 @@ ImageUris = R6Class("ImageUris",
 
     },
 
-    #' @description Retrieves the ECR URI for the Docker image matching the given arguments.
+    #' @description Retrieves the ECR URI for the Docker image matching the given arguments of inbuilt AWS Sagemaker models.
     #' @param framework (str): The name of the framework or algorithm.
     #' @param region (str): The AWS region.
     #' @param version (str): The framework or algorithm version. This is required if there is
@@ -43,7 +44,6 @@ ImageUris = R6Class("ImageUris",
     #'              Valid values: "training", "inference", "eia". If ``accelerator_type`` is set,
     #'              ``image_scope`` is ignored.
     #' @return str: the ECR URI for the corresponding SageMaker Docker image.
-
     retrieve = function(framework,
                         region=NULL,
                         version=NULL,
@@ -79,12 +79,109 @@ ImageUris = R6Class("ImageUris",
       repo = sprintf("%s:%s", repo, tag)
 
       return(sprintf(private$ECR_URI_TEMPLATE, registry, hostname, repo))
-    }
+    },
 
-    # TODO: migrate function get_ecr_image_uri into class
+    #' @description lists URIs of custom built models stored in ECR
+    #' @param force_refresh (bool): Set to True to fetch the latest data from
+    #'              SageMaker API.
+    #' @return (data.frame): containing all custom built models
+    list_ecr_uris = function(force_refresh = FALSE){
+      if (force_refresh)
+        private$clear_cache()
+      if (is.null(private$.list_ecr_uris)){
+
+        ecr = paws::ecr(config = self$sagemaker_session$paws_credentials$credentials)
+
+        nextToken = NULL
+        repos = list()
+        # get list of repositories in ecr
+        while (!identical(nextToken, character(0))){
+          repo_chunk = ecr$describe_repositories()
+          repo_dt = rbindlist(repo_chunk$repositories)
+          repos = list(repos, repo_dt)
+          nextToken = repo_chunk$nextToken
+        }
+        private$.list_ecr_uris = rbindlist(repos)
+      }
+      return(private$.list_ecr_uris)
+    },
+
+    #' @description Clear the object of all local caches of API methods, so that the next
+    #'              time any properties are accessed they will be refreshed from the
+    #'              service.
+    clear_cache = function() {
+      private$.list_ecr_uris = NULL
+    },
+
+    #' @description Gets tags of framework stored in ECR
+    #' @param repo_name (str): The name of the repository name stored in ECR.
+    #' @return (data.frame): listing all tagged version of repository names ordered by time stamp.
+    ecr_tags = function(repo_name){
+      stopifnot(is.character(repo_name))
+
+      # ensure list of custom ecr uris are retrieved
+      self$list_ecr_uris()
+
+      # check if repo_name exists in registered ecr repositories
+      if(nrow(private$.list_ecr_uris[repositoryName == repo_name]) == 0)
+        stop(sprintf("Custom repository %s doesn't exist in AWS ECR", repo_name))
+
+      # after repo_name check only use repo_name
+      repos = private$.list_ecr_uris[repositoryName == repo_name]
+
+      ecr = paws::ecr(config = self$sagemaker_session$paws_credentials$credentials)
+      nextToken = NULL
+      image_meta = list()
+      # get all tags from repository
+      while(!identical(nextToken, character(0))){
+        image_chunk = ecr$describe_images(repos[, registryId], repos[, repositoryName])
+        nextToken = image_chunk$nextToken
+        image_chunk = lapply(image_chunk$imageDetails, function(x)
+          data.table(imageTags = x$imageTags, imagePushedAt= x$imagePushedAt))
+        image_meta = c(image_meta, image_chunk)
+      }
+
+      image_meta = rbindlist(image_meta)
+      image_meta[["repositoryName"]] = repo_name
+
+      setcolorder(image_meta, "repositoryName")
+
+      return(image_meta[order(-imagePushedAt)])
+    },
+
+    #' @description Retrieves the ECR URI for the Docker image matching the given arguments for custome inbuilt models
+    #' @param repo_name (str): The name of the repository that stores framework or algorithm in ecr
+    #' @param tag (str): The framework or algorithm version. This is required if there is
+    #'              more than one supported version for the given framework or algorithm.
+    retrieve_ecr_uri = function(repo_name,
+                                tag = NULL){
+      stopifnot(is.character(repo_name),
+                is.character(tag) || is.null(tag))
+
+      # list all ecr uris
+      repos = self$list_ecr_uris()
+
+      # get all tags for custom framework
+      image_meta = self$ecr_tags(repo_name)
+
+      # check if repo tag matches given tag parameter
+      if(!is.null(tag) && nrow(image_meta[imageTags == tag]) == 0)
+        stop(sprintf("Repository version %s doesn't exist", tag))
+
+      if(is.null(tag)) {
+        # get latest tag if not provided
+        tag = image_meta[1, imageTags]
+        log_info("Defaulting to latest version of framework: %s.", repo_name)
+      }
+
+      paste(repos$repositoryUri, tag, sep = ":")
+    }
   ),
+
   private = list(
     ECR_URI_TEMPLATE = "%s.dkr.%s/%s",
+
+    .list_ecr_uris= NULL,
 
     # Loads the JSON config for the given framework and image scope.
     .config_for_framework_and_scope = function(framework,

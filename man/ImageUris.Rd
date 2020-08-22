@@ -18,6 +18,10 @@ Class to create and format sagemaker docker images stored in ECR
 \itemize{
 \item \href{#method-new}{\code{ImageUris$new()}}
 \item \href{#method-retrieve}{\code{ImageUris$retrieve()}}
+\item \href{#method-list_ecr_uris}{\code{ImageUris$list_ecr_uris()}}
+\item \href{#method-clear_cache}{\code{ImageUris$clear_cache()}}
+\item \href{#method-ecr_tags}{\code{ImageUris$ecr_tags()}}
+\item \href{#method-retrieve_ecr_uri}{\code{ImageUris$retrieve_ecr_uri()}}
 \item \href{#method-clone}{\code{ImageUris$clone()}}
 }
 }
@@ -45,11 +49,11 @@ using the default AWS configuration chain.}
 \if{html}{\out{<a id="method-retrieve"></a>}}
 \if{latex}{\out{\hypertarget{method-retrieve}{}}}
 \subsection{Method \code{retrieve()}}{
-Retrieves the ECR URI for the Docker image matching the given arguments.
+Retrieves the ECR URI for the Docker image matching the given arguments of inbuilt AWS Sagemaker models.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ImageUris$retrieve(
   framework,
-  region,
+  region = NULL,
   version = NULL,
   py_version = NULL,
   instance_type = NULL,
@@ -86,6 +90,79 @@ Valid values: "training", "inference", "eia". If ``accelerator_type`` is set,
 }
 \subsection{Returns}{
 str: the ECR URI for the corresponding SageMaker Docker image.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-list_ecr_uris"></a>}}
+\if{latex}{\out{\hypertarget{method-list_ecr_uris}{}}}
+\subsection{Method \code{list_ecr_uris()}}{
+lists URIs of custom built models stored in ECR
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ImageUris$list_ecr_uris(force_refresh = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{force_refresh}}{(bool): Set to True to fetch the latest data from
+SageMaker API.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(data.frame): containing all custom built models
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clear_cache"></a>}}
+\if{latex}{\out{\hypertarget{method-clear_cache}{}}}
+\subsection{Method \code{clear_cache()}}{
+Clear the object of all local caches of API methods, so that the next
+             time any properties are accessed they will be refreshed from the
+             service.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ImageUris$clear_cache()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ecr_tags"></a>}}
+\if{latex}{\out{\hypertarget{method-ecr_tags}{}}}
+\subsection{Method \code{ecr_tags()}}{
+Gets tags of framework stored in ECR
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ImageUris$ecr_tags(repo_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{repo_name}}{(str): The name of the repository name stored in ECR.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(data.frame): listing all tagged version of repository names ordered by time stamp.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-retrieve_ecr_uri"></a>}}
+\if{latex}{\out{\hypertarget{method-retrieve_ecr_uri}{}}}
+\subsection{Method \code{retrieve_ecr_uri()}}{
+Retrieves the ECR URI for the Docker image matching the given arguments for custome inbuilt models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ImageUris$retrieve_ecr_uri(repo_name, tag = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{repo_name}}{(str): The name of the repository that stores framework or algorithm in ecr}
+
+\item{\code{tag}}{(str): The framework or algorithm version. This is required if there is
+more than one supported version for the given framework or algorithm.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
