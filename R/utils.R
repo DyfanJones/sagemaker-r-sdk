@@ -177,21 +177,6 @@ retry_api_call <- function(expr, retry = 5){
   resp
 }
 
-
-
-# get prefix of ECR image URI
-# Args:
-#   account (str): AWS account number
-# region (str): AWS region name
-# Returns:
-#   (str): URI prefix of ECR image
-
-# TODO: deprecate helper function
-get_ecr_image_uri_prefix <- function(account,
-                                     region){
-  return (sprintf("%s.dkr.ecr.%s.amazonaws.com", account, region))
-}
-
 islistempty = function(obj) {(is.null(obj) || length(obj) == 0)}
 
 # Create a tar file containing all the source_files
