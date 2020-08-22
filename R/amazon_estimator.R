@@ -832,14 +832,6 @@ get_ecr_image_uri = function(repo_name, repo_version = NULL, sagemaker_session =
   return(repo_version %in% unlist(.generate_version_equivalents(XGBOOST_LATEST_VERSION)))
 }
 
-.warn_newer_xgboost_image <- function(){
-  log_warn(sprintf(paste0("There is a more up to date SageMaker XGBoost image. ",
-                   "To use the newer image, please set 'repo_version'=",
-                   "'%s'.\nFor example:",
-                   "\tget_image_uri(region, '%s', '%s')."),XGBOOST_LATEST_VERSION,
-                   XGBOOST_NAME, XGBOOST_LATEST_VERSION))
-}
-
 .generate_version_equivalents <- function(version){
   # Returns a list of version equivalents for XGBoost
   lapply(XGBOOST_VERSION_EQUIVALENTS, function(suffix) c(paste0(version, suffix), version))
