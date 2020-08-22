@@ -193,7 +193,7 @@ ImageUris = R6Class("ImageUris",
       if (!is.null(accelerator_type)){
         private$.validate_accelerator_type(accelerator_type)
 
-        if (!(image_scope %in% c("eia", "inference")))
+        if (!(is.null(image_scope) || image_scope %in% c("eia", "inference")))
           log_warn(
             "Elastic inference is for inference only. Ignoring image scope: %s.", image_scope
             )
@@ -372,5 +372,14 @@ ImageUris = R6Class("ImageUris",
 # Loads the JSON config for the given framework.
 config_for_framework = function(framework){
   fname= system.file("image_uri_config", sprintf("%s.json", framework), package= "R6sagemaker")
+
+  # check if framework json file exists first
+  if(!file.exists(fname))
+    stop(sprintf(paste(
+      "Unsupported framework: %s. You may need to upgrade your SDK version",
+      "(remotes::install_github('dyfanjones/R6sagemaker')) for newer frameworks."),
+      framework),
+    call. = F)
+
   return(read_json(fname))
 }
