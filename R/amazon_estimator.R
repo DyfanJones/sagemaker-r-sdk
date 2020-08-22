@@ -78,11 +78,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
 
     #' @description Return algorithm image URI for the given AWS region, repository name, and
     #'              repository version
-    train_image_uri = function(){
-      # TODO: replace get_image_uri for image_uris.retrieve
-      return(get_image_uri(
-        self$sagemaker_session$paws_region_name, self$repo_name, self$repo_version)
-      )
+    training_image_uri = function(){
+      image_uri = ImageUris$new(self$sagemaker_session)
+      return(image_uri$retrieve(self$repo_name, version = self$repo_version))
     },
 
     #' @description Return all non-None ``hyperparameter`` values on ``obj`` as a

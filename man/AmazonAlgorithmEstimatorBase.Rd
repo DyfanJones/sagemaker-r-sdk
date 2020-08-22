@@ -38,7 +38,7 @@ Base class for Amazon first-party Estimator implementations. This class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{AmazonAlgorithmEstimatorBase$new()}}
-\item \href{#method-train_image_uri}{\code{AmazonAlgorithmEstimatorBase$train_image_uri()}}
+\item \href{#method-training_image_uri}{\code{AmazonAlgorithmEstimatorBase$training_image_uri()}}
 \item \href{#method-hyperparameters}{\code{AmazonAlgorithmEstimatorBase$hyperparameters()}}
 \item \href{#method-prepare_workflow_for_training}{\code{AmazonAlgorithmEstimatorBase$prepare_workflow_for_training()}}
 \item \href{#method-fit}{\code{AmazonAlgorithmEstimatorBase$fit()}}
@@ -115,13 +115,13 @@ Also known as internet-free mode (default: ``False``).}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-train_image_uri"></a>}}
-\if{latex}{\out{\hypertarget{method-train_image_uri}{}}}
-\subsection{Method \code{train_image_uri()}}{
+\if{html}{\out{<a id="method-training_image_uri"></a>}}
+\if{latex}{\out{\hypertarget{method-training_image_uri}{}}}
+\subsection{Method \code{training_image_uri()}}{
 Return algorithm image URI for the given AWS region, repository name, and
              repository version
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AmazonAlgorithmEstimatorBase$train_image_uri()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AmazonAlgorithmEstimatorBase$training_image_uri()}\if{html}{\out{</div>}}
 }
 
 }
