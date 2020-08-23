@@ -566,9 +566,8 @@ MODEL_SERVER_WORKERS_PARAM_NAME <- "sagemaker_model_server_workers"
 SAGEMAKER_REGION_PARAM_NAME <- "sagemaker_region"
 SAGEMAKER_OUTPUT_LOCATION <- "sagemaker_s3_output"
 
-#' @title FrameworkModel Class
-#' @description A Model for working with an SageMaker ``Framework``.
-#'              This class hosts user-defined code in S3 and sets code location and
+#' @title A Model for working with an SageMaker ``Framework``.
+#' @description This class hosts user-defined code in S3 and sets code location and
 #'              configuration in model environment variables.
 #' @export
 FrameworkModel = R6Class("FrameWorkModel",
@@ -616,9 +615,6 @@ FrameworkModel = R6Class("FrameWorkModel",
    #'              when hosted in SageMaker (default: None).
    #' @param name (str): The model name. If None, a default model name will be
    #'              selected on each ``deploy``.
-   #' @param enable_cloudwatch_metrics (bool): Whether training and hosting
-   #'              containers will generate CloudWatch metrics under the
-   #'              AWS/SageMakerContainer namespace (default: False).
    #' @param container_log_level (str): Log level to use within the container
    #'              (default: "INFO").
    #' @param code_location (str): Name of the S3 bucket where custom code is
@@ -690,22 +686,21 @@ FrameworkModel = R6Class("FrameWorkModel",
    #'              credential storage for authentication.
    #' @param  ... : Keyword arguments passed to the ``Model`` initializer.
    initialize = function(model_data,
-                         image,
+                         image_uri,
                          role,
                          entry_point,
                          source_dir=NULL,
                          predictor_cls=NULL,
                          env=NULL,
                          name=NULL,
-                         enable_cloudwatch_metrics=FALSE,
                          container_log_level=c("INFO", "WARN", "ERROR", "FATAL", "CRITICAL"),
                          code_location=NULL,
                          sagemaker_session=NULL,
                          dependencies=NULL,
                          git_config=NULL,
                          ...){
-     super$initialize(model_data,
-                      image,
+     super$initialize(image_uri,
+                      model_data,
                       role,
                       predictor_cls=predictor_cls,
                       env=env,
@@ -716,8 +711,6 @@ FrameworkModel = R6Class("FrameWorkModel",
      self$source_dir = source_dir
      self$dependencies = dependencies %||% list()
      self$git_config = git_config
-     self$enable_cloudwatch_metrics = enable_cloudwatch_metrics
-
      # Align logging level with python logging
      container_log_level = match.arg(toupper(container_log_level))
      container_log_level = switch(container_log_level,
@@ -735,9 +728,10 @@ FrameworkModel = R6Class("FrameWorkModel",
        self$bucket = NULL
        self$key_prefix = NULL
      }
-
      if (!islistempty(self$git_config)){
-       updates = git_clone_repo(self$git_config, self$entry_point, self$source_dir, self$dependencies)
+       updates = git_clone_repo(
+         self$git_config, self$entry_point, self$source_dir, self$dependencies
+       )
        self$entry_point = updates$entry_point
        self$source_dir = updates$source_dir
        self$dependencies = updates$dependencies}
@@ -757,10 +751,12 @@ FrameworkModel = R6Class("FrameWorkModel",
    #'              CreateModel API.
    prepaper_container = function(instance_type=NULL,
                                  accelerator_type=NULL){
-     deploy_key_prefix = model_code_key_prefix(self.key_prefix, self.name, self.image)
+     deploy_key_prefix = model_code_key_prefix(
+       self$key_prefix, self$name, self$image_uri
+     )
      private$.upload_code(deploy_key_prefix)
      deploy_env = list(self$env)
-     deploy_env = c(deploy_env,private$.framework_env_vars())
+     deploy_env = c(deploy_env, private$.framework_env_vars())
      return (container_def(self$image_uri, self$model_data, deploy_env))
    },
 
@@ -802,7 +798,6 @@ FrameworkModel = R6Class("FrameWorkModel",
           kms_key=self$model_kms_key)
 
         self$repacked_model_data = repacked_model_data
-
         UploadedCode$UserCode$s3_prefix=self$repacked_model_data
         UploadedCode$UserCode$script_name=basename(self$entry_point)
 
@@ -918,15 +913,16 @@ ModelPackage = R6Class("ModelPackage",
      if (self$env != list())
        container_def$Environment = self$env
 
-     model_package_short_name = model_package_name.split("/")[-1]
-     enable_network_isolation = self$enable_network_isolation()
-     self$name = self$name %||% name_from_base(model_package_short_name)
+     model_package_short_name = split_str(model_package_name, "/")[length(split_str(model_package_name, "/"))]
+     private$.ensure_base_name_if_needed(model_package_short_name)
+     private$.set_model_name_if_needed()
+
      self$sagemaker_session$create_model(
        self$name,
        self$role,
        container_def,
        vpc_config=self$vpc_config,
-       enable_network_isolation=enable_network_isolation)
+       enable_network_isolation=self$enable_network_isolation())
    },
 
    #' @description Printer.
@@ -964,8 +960,13 @@ ModelPackage = R6Class("ModelPackage",
      self$sagemaker_session$create_model_package_from_algorithm(
        name, description, self$algorithm_arn, self$model_data)
      return(name)
-   }
+   },
 
+   # Set the base name if there is no model name provided.
+   .ensure_base_name_if_needed = function(base_name){
+     if (is.null(self$name))
+       self$.base_name = base_name
+   }
   ),
   lock_objects =  F
 )
