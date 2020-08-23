@@ -6,6 +6,7 @@
 #' @include session.R
 #' @include vpc_utils.R
 #' @include analytics.R
+#' @include image_uris.R
 
 #' @import paws
 #' @import jsonlite
@@ -1575,12 +1576,13 @@ FrameWork = R6Class("FrameWork",
     training_image_uri = function(){
       if (self$image_name)
         return (self$image_name)
-      return (create_image_uri(
-        self$sagemaker_session$boto_region_name,
+      return (ImageUris$new()$retrieve(
         attributes(self)$`__framework_name__`,
-        self$train_instance_type,
-        self$framework_version,  # pylint: disable=no-member
-        py_version=self$py_version)
+        self$sagemaker_session$paws_region_name,
+        instance_type=self$train_instance_type,
+        version=self$framework_version,
+        py_version=self$py_version,
+        image_scope="training")
       )
     },
 
