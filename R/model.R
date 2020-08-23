@@ -7,6 +7,7 @@
 #' @include fw_utils.R
 #' @include transformer.R
 #' @include git_utils.R
+#' @include image_uris.R
 
 
 #' @import paws
@@ -17,41 +18,16 @@
 
 NEO_ALLOWED_FRAMEWORKS <- list("mxnet", "tensorflow", "keras", "pytorch", "onnx", "xgboost", "tflite")
 
-NEO_IMAGE_ACCOUNT <- list(
-  "us-west-1"= "710691900526",
-  "us-west-2"= "301217895009",
-  "us-east-1"= "785573368785",
-  "us-east-2"= "007439368137",
-  "eu-west-1"= "802834080501",
-  "eu-west-2"= "205493899709",
-  "eu-west-3"= "254080097072",
-  "eu-central-1"= "746233611703",
-  "eu-north-1"= "601324751636",
-  "ap-northeast-1"= "941853720454",
-  "ap-northeast-2"= "151534178276",
-  "ap-east-1"= "110948597952",
-  "ap-southeast-1"= "324986816169",
-  "ap-southeast-2"= "355873309152",
-  "ap-south-1"= "763008648453",
-  "sa-east-1"= "756306329178",
-  "ca-central-1"= "464438896020",
-  "me-south-1"= "836785723513",
-  "cn-north-1"= "472730292857",
-  "cn-northwest-1"= "474822919863",
-  "us-gov-west-1"= "263933020539")
-
-INFERENTIA_INSTANCE_PREFIX <- "ml_inf"
-
 #' @title Model Class
-#' @description Initialize an SageMaker ``Model``.
+#' @description A SageMaker ``Model`` that can be deployed to an ``Endpoint``.
 #' @export
 Model = R6Class("Model",
   public = list(
 
     #' @description Creates a new instance of this [R6][R6::R6Class] class.
+    #' @param image_uri (str): A Docker image URI.
     #' @param model_data (str): The S3 location of a SageMaker model data
     #'              ``.tar.gz`` file.
-    #' @param image_uri (str): A Docker image URI.
     #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
     #'              SageMaker training jobs and APIs that create Amazon SageMaker
     #'              endpoints use this role to access training data and model
@@ -83,8 +59,8 @@ Model = R6Class("Model",
     #'              or from the model container.
     #' @param model_kms_key (str): KMS key ARN used to encrypt the repacked
     #'              model archive file if the model is repacked
-    initialize = function(model_data,
-                          image_uri,
+    initialize = function(image_uri,
+                          model_data=NULL,
                           role=NULL,
                           predictor_cls=NULL,
                           env=NULL,
@@ -95,14 +71,14 @@ Model = R6Class("Model",
                           model_kms_key=NULL){
 
       self$model_data = model_data
-      self$image = image_uri
+      self$image_uri = image_uri
       self$role = role
       self$predictor_cls = predictor_cls
       self$env = env %||% list()
       self$name = name
+      self$.base_name = NULL
       self$vpc_config = vpc_config
       self$sagemaker_session = sagemaker_session
-      self$.model_name = NULL
       self$endpoint_name = NULL
       self$.is_compiled_model = FALSE
       self$.enable_network_isolation = enable_network_isolation
@@ -121,7 +97,7 @@ Model = R6Class("Model",
     #' @return dict: A container definition object usable with the CreateModel API.
     prepare_container_def = function(instance_type,
                                      accelerator_type=NULL){
-      return (container_def(self$image, self$model_data, self$env))
+      return (container_def(self$image_uri, self$model_data, self$env))
     },
 
     #' @description Whether to enable network isolation when creating this Model
@@ -161,6 +137,21 @@ Model = R6Class("Model",
     #'              model. Allowed values: 'mxnet', 'tensorflow', 'keras', 'pytorch',
     #'              'onnx', 'xgboost'
     #' @param framework_version (str):
+    #' @param target_platform_os (str): Target Platform OS, for example: 'LINUX'.
+    #'              For allowed strings see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    #'              It can be used instead of target_instance_family.
+    #' @param target_platform_arch (str): Target Platform Architecture, for example: 'X86_64'.
+    #'              For allowed strings see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    #'              It can be used instead of target_instance_family.
+    #' @param target_platform_accelerator (str, optional): Target Platform Accelerator,
+    #'              for example: 'NVIDIA'. For allowed strings see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    #'              It can be used instead of target_instance_family.
+    #' @param compiler_options (dict, optional): Additional parameters for compiler.
+    #'              Compiler Options are TargetPlatform / target_instance_family specific. See
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html for details.
     #' @return sagemaker.model.Model: A SageMaker ``Model`` object. See
     #'              :func:`~sagemaker.model.Model` for full details.
     compile = function(target_instance_family,
@@ -171,53 +162,68 @@ Model = R6Class("Model",
                        job_name=NULL,
                        compile_max_run=5 * 60,
                        framework=NULL,
-                       framework_version=NULL){
+                       framework_version=NULL,
+                       target_platform_os=NULL,
+                       target_platform_arch=NULL,
+                       target_platform_accelerator=NULL,
+                       compiler_options=NULL){
+
+      framework = framework %||% private$.framework()
 
       if (is.null(framework))
         stop(sprintf("You must specify framework, allowed values %s",
                      paste0(NEO_ALLOWED_FRAMEWORKS, collapse = ", ")), call. = F)
-
       if (!(framework %in% NEO_ALLOWED_FRAMEWORKS))
         stop(sprintf("You must provide valid framework, allowed values %s",
           paste0(NEO_ALLOWED_FRAMEWORKS, collapse = ", ")), call. = F)
-
       if(is.null(job_name))
         stop("You must provide a compilation job name", call. = F)
+      if (is.null(self$model_data))
+        stop("You must provide an S3 path to the compressed model artifacts.", call. = F)
 
-      framework = toupper(framework)
+      framework_version = framework_version %||% private$.get_framework_version()
+
       private$.init_sagemaker_session_if_does_not_exist(target_instance_family)
       config = private$.compilation_job_config(
-                  target_instance_family,
-                  input_shape,
-                  output_path,
-                  role,
-                  compile_max_run,
-                  job_name,
-                  framework,
-                  tags)
-
+        target_instance_family,
+        input_shape,
+        output_path,
+        role,
+        compile_max_run,
+        job_name,
+        framework,
+        tags,
+        target_platform_os,
+        target_platform_arch,
+        target_platform_accelerator,
+        compiler_options
+      )
       do.call(self$sagemaker_session$compile_model, config)
       job_status = self$sagemaker_session$wait_for_compilation_job(job_name)
       self$model_data = job_status$ModelArtifacts$S3ModelArtifacts
-      if (startsWith(target_instance_family,"ml_")){
-        self$image = private$.neo_image(
-              self$sagemaker_session$paws_region_name,
-              target_instance_family,
-              framework,
-              framework_version)
-        self$.is_compiled_model = TRUE
-      } else if(startsWith(target_instance_family,INFERENTIA_INSTANCE_PREFIX)){
-        self$image = private$.inferentia_image(
-          self$sagemaker_session$paws_region_name,
-          target_instance_family,
-          framework,
-          framework_version)
-        self$.is_compiled_model = TRUE
-      } else{
-          log_warn("The instance type %s is not supported to deploy via SageMaker, please deploy the model manually.",
-                   target_instance_family)
-      }
 
+      if (!is.null(target_instance_family)){
+        if (startsWith(target_instance_family,"ml_")){
+          self.image_uri = private$.compilation_image_uri(
+            self$sagemaker_session$paws_region_name,
+            target_instance_family,
+            framework,
+            framework_version
+            )
+        self$.is_compiled_model = TRUE
+        } else {
+          log_warn(paste(
+            "The instance type %s is not supported for deployment via SageMaker.",
+            "Please deploy the model manually.", sep = "\n"),
+            target_instance_family
+          )
+        } else {
+          log_warn(paste(
+            "Devices described by Target Platform OS, Architecture and Accelerator are not",
+            "supported for deployment via SageMaker. Please deploy the model manually.", sep = "\n")
+          )
+        }
+      }
       return(self)
     },
 
@@ -235,6 +241,16 @@ Model = R6Class("Model",
     #'              in the ``Endpoint`` created from this ``Model``.
     #' @param instance_type (str): The EC2 instance type to deploy this Model to.
     #'              For example, 'ml.p2.xlarge', or 'local' for local mode.
+    #' @param serializer (:class:`~sagemaker.serializers.BaseSerializer`): A
+    #'              serializer object, used to encode data for an inference endpoint
+    #'              (default: None). If ``serializer`` is not None, then
+    #'              ``serializer`` will override the default serializer. The
+    #'              default serializer is set by the ``predictor_cls``.
+    #' @param deserializer (:class:`~sagemaker.deserializers.BaseDeserializer`): A
+    #'              deserializer object, used to decode data from an inference
+    #'              endpoint (default: None). If ``deserializer`` is not None, then
+    #'              ``deserializer`` will override the default deserializer. The
+    #'              default deserializer is set by the ``predictor_cls``.
     #' @param accelerator_type (str): Type of Elastic Inference accelerator to
     #'              deploy this model for model loading and inference, for example,
     #'              'ml.eia1.medium'. If not specified, no Elastic Inference
@@ -243,11 +259,6 @@ Model = R6Class("Model",
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html
     #' @param endpoint_name (str): The name of the endpoint to create (Default:
     #'              NULL). If not specified, a unique endpoint name will be created.
-    #' @param update_endpoint (bool): Flag to update the model in an existing
-    #'              Amazon SageMaker endpoint. If True, this will deploy a new
-    #'              EndpointConfig to an already existing endpoint and delete
-    #'              resources corresponding to the previous EndpointConfig. If
-    #'              False, a new endpoint will be created. Default: False
     #' @param tags (List[dict[str, str]]): The list of tags to attach to this
     #'              specific endpoint.
     #' @param kms_key (str): The ARN of the KMS key that is used to encrypt the
@@ -263,9 +274,10 @@ Model = R6Class("Model",
     #'              is not None. Otherwise, return None.
     deploy = function(initial_instance_count,
                       instance_type,
+                      serializer=NULL,
+                      deserializer=NULL,
                       accelerator_type=NULL,
                       endpoint_name=NULL,
-                      update_endpoint=FALSE,
                       tags=NULL,
                       kms_key=NULL,
                       wait=TRUE,
@@ -275,56 +287,50 @@ Model = R6Class("Model",
       if(is.null(self$role))
         stop("Role can not be null for deploying a model", call. = F)
 
-      if (startsWith(instance_type,"ml.inf") && !self.is_compiled_model)
+      if (startsWith(instance_type,"ml.inf") && !self$.is_compiled_model)
         log_warn("Your model is not compiled. Please compile your model before using Inferentia.")
 
       compiled_model_suffix = paste0(split_str(instance_type, "\\."), collapse = "-")
       if (self$.is_compiled_model){
-        name_prefix = self$name %||% name_from_image(self$image)
-        self$name = sprintf("%s%s",name_prefix, compiled_model_suffix)
+        private$.ensure_base_name_if_needed(self$image_uri)
+        if(!is.null(self$.base_name))
+          self$.base_name = paste(self$.base_name, compiled_model_suffix, sep = "-")
       }
 
       self$.create_sagemaker_model(instance_type, accelerator_type, tags)
-      production_variant = production_variant(self$name,
-                                              instance_type,
-                                              initial_instance_count,
-                                              accelerator_type=accelerator_type)
-
+      production_variant = production_variant(
+        self$name, instance_type, initial_instance_count, accelerator_type=accelerator_type
+      )
       if (!is.null(endpoint_name)) {
         self$endpoint_name = endpoint_name
       } else{
-        self$endpoint_name = self$name
+        base_endpoint_name = self$.base_name %||% base_from_name(self$name)
         if (self$.is_compiled_model && !endsWith(self$endpoint_name, compiled_model_suffix))
-          self$endpoint_name = c(self$endpoint_name, compiled_model_suffix)
+          base_endpoint_name = paste(self$endpoint_name, compiled_model_suffix, sep = "-")
+        self$endpoint_name = name_from_base(base_endpoint_name)
       }
 
       data_capture_config_list = NULL
       if (!is.null(data_capture_config))
         data_capture_config_list = data_capture_config$to_request_list
 
-      if (update_endpoint){
-        endpoint_config_name = self$sagemaker_session$create_endpoint_config(
-          name=self$name,
-          model_name=self$name,
-          initial_instance_count=initial_instance_count,
-          instance_type=instance_type,
-          accelerator_type=accelerator_type,
-          tags=tags,
-          kms_key=kms_key,
-          data_capture_config_list=data_capture_config_list)
-        self$sagemaker_session$update_endpoint(self$endpoint_name, endpoint_config_name, wait=wait)
-      } else{
-        self$sagemaker_session$endpoint_from_production_variants(
-          name=self$endpoint_name,
-          production_variants=list(production_variant),
-          tags=tags,
-          kms_key=kms_key,
-          wait=wait,
-          data_capture_config_list=data_capture_config_list)
-      }
+      self$sagemaker_session$endpoint_from_production_variants(
+        name=self$endpoint_name,
+        production_variants=list(production_variant),
+        tags=tags,
+        kms_key=kms_key,
+        wait=wait,
+        data_capture_config_list=data_capture_config_list
+      )
 
-      if (!is.null(self$predictor_cls))
-        return(self$predictor_cls(self$endpoint_name, self$sagemaker_session))
+      if (!is.null(self$predictor_cls)){
+        predictor = self$predictor_cls(self$endpoint_name, self$sagemaker_session)
+        if (!is.null(serializer))
+          predictor$serializer = serializer
+        if (!is.null(deserializer))
+          predictor$deserializer = deserializer
+        return(predictor)
+      }
       return(NULL)
     },
 
@@ -418,7 +424,10 @@ Model = R6Class("Model",
                                        accelerator_type=NULL,
                                        tags=NULL){
       container_def = self$prepare_container_def(instance_type, accelerator_type=accelerator_type)
-      self$name = self$name %||% name_from_image(container_def$Image)
+
+      private$.ensure_base_name_if_needed(container_def$Image)
+      private$.set_model_name_if_needed()
+
       enable_network_isolation = self$enable_network_isolation()
 
       private$.init_sagemaker_session_if_does_not_exist(instance_type)
@@ -440,10 +449,11 @@ Model = R6Class("Model",
     }
   ),
   private = list(
+
+    # Set ``self.sagemaker_session`` to be a ``LocalSession`` or
+    # ``Session`` if it is not already. The type of session object is
+    # determined by the instance type.
     .init_sagemaker_session_if_does_not_exist = function(instance_type){
-      # Set ``self.sagemaker_session`` to be a ``LocalSession`` or
-      # ``Session`` if it is not already. The type of session object is
-      # determined by the instance type.
       if (!is.null(self$sagemaker_session)) return(invisible(NULL))
       if (instance_type %in% c("local", "local_gpu")){
         # TODO: local sagemaker session
@@ -454,12 +464,25 @@ Model = R6Class("Model",
           self$sagemaker_session = Session$new()}
       },
 
-    .framework = function(obj){
-      return(attr(obj, "__framework_name__"))
+    # Create a base name from the image URI if there is no model name provided.
+    .ensure_base_name_if_needed = function(image_uri){
+      if (is.null(self$name))
+        self$.base_name = self$.base_name %||% base_name_from_image(image_uri)
+    },
+
+    # Generate a new model name if ``self._base_name`` is present.
+    .set_model_name_if_needed = function(){
+      if (!is.null(self._base_name))
+        self$name = name_from_base(self$.base_name)
+    },
+
+    .framework = function(){
+      return(attr(self, "__framework_name__"))
       },
 
+    # TODO: review this private method
     .get_framework_version = function(obj){
-      return(attr(obj, "framework_version"))
+      return(attr(self, "framework_version"))
       },
 
     .compilation_job_config = function(target_instance_type,
@@ -469,15 +492,37 @@ Model = R6Class("Model",
                                        compile_max_run,
                                        job_name,
                                        framework,
-                                       tag){
+                                       tag,
+                                       target_platform_os=NULL,
+                                       target_platform_arch=NULL,
+                                       target_platform_accelerator=NULL,
+                                       compiler_options=NULL){
       input_model_config = list(
         "S3Uri" = self$model_data,
         "DataInputConfig" = input_shape,
-        "Framework" = framework)
+        "Framework" = toupper(framework))
       role = self$sagemaker_session$expand_role(role)
       output_model_config = list(
-        "TargetDevice" = target_instance_type,
         "S3OutputLocation" = output_path)
+
+      if(!is.null(target_instance_type)){
+        output_model_config$TargetDevice = target_instance_type
+      } else {
+        if (is.null(target_platform_os) && is.null(target_platform_arch))
+          stop("target_instance_type or (target_platform_os and target_platform_arch) ",
+               "should be provided", call. = F)
+        target_platform = list(
+          "Os"= target_platform_os,
+          "Arch"= target_platform_arch
+        )
+        if (!is.null(target_platform_accelerator))
+          target_platform$Accelerator = target_platform_accelerator
+        output_model_config$TargetPlatform = target_platform
+      }
+
+      if (!is.null(compiler_options)){
+        output_model_config$CompilerOptions = compiler_options
+      }
 
       return(list(
         "input_model_config"= input_model_config,
@@ -488,41 +533,29 @@ Model = R6Class("Model",
         "job_name"= job_name))
     },
 
-    .neo_image = function(region,
-                          target_instance_type,
-                          framework,
-                          framework_version){
-      return(create_image_uri(
-                region,
-                sprintf("neo-%s", tolower(framework)),
-                gsub("_", "\\.", target_instance_type),
-                framework_version,
-                py_version="py3",
-                account=private$.neo_image_account(region)))
-      },
-
-    .inferentia_image = function(region,
-                                 target_instance_type,
-                                 framework, framework_version){
-      return(create_image_uri(
-                region,
-                sprintf("neo-%s", tolower(framework)),
-                gsub("_", "\\.", target_instance_type),
-                framework_version,
-                py_version="py3",
-                account=private$.neo_image_account(region)))
-      },
-
-    .neo_image_account = function(region){
-      if (!(region %in% names(NEO_IMAGE_ACCOUNT)))
-        stop(sprintf("Neo is not currently supported in %s, valid regions:\n%s",
-                     region, paste0(names(NEO_IMAGE_ACCOUNT), collapse = ", \n")), call. = F)
-      return(NEO_IMAGE_ACCOUNT[[region]])
+    # Retrieve the Neo or Inferentia image URI.
+    # Args:
+    #   region (str): The AWS region.
+    # target_instance_type (str): Identifies the device on which you want to run
+    # your model after compilation, for example: ml_c5. For valid values, see
+    # https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    # framework (str): The framework name.
+    # framework_version (str): The framework version.
+    .compilation_image_uri = function(region,
+                                      target_instance_type,
+                                      framework,
+                                      framework_version){
+        framework_prefix = if (startsWith(target_instance_type, "ml_inf")) "inferentia-" else "neo-"
+        return(ImageUris$new()$retrieve(
+          sprintf("%s%s", framework_prefix, framework),
+          region,
+          instance_type=target_instance_type,
+          version=framework_version)
+        )
       }
     ),
   lock_objects = F
 )
-
 
 SCRIPT_PARAM_NAME <- "sagemaker_program"
 DIR_PARAM_NAME <- "sagemaker_submit_directory"
@@ -728,7 +761,7 @@ FrameworkModel = R6Class("FrameWorkModel",
      private$.upload_code(deploy_key_prefix)
      deploy_env = list(self$env)
      deploy_env = c(deploy_env,private$.framework_env_vars())
-     return (container_def(self$image, self$model_data, deploy_env))
+     return (container_def(self$image_uri, self$model_data, deploy_env))
    },
 
    #' @description
