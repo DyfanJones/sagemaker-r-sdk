@@ -324,7 +324,7 @@ Model = R6Class("Model",
       )
 
       if (!is.null(self$predictor_cls)){
-        predictor = self$predictor_cls(self$endpoint_name, self$sagemaker_session)
+        predictor = self$predictor_cls$new(self$endpoint_name, self$sagemaker_session)
         if (!is.null(serializer))
           predictor$serializer = serializer
         if (!is.null(deserializer))
