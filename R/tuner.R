@@ -838,7 +838,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
         base_name = self$base_tuning_job_name
         if (is.null(base_name)){
           estimator = self$estimator %||%  self$estimator_list[sort(names(self$estimator_list))[1]]
-          base_name = base_name_from_image(estimator$train_image())}
+          base_name = base_name_from_image(estimator$training_image_uri())}
         self$.current_job_name = name_from_base(base_name, max_length=self$TUNING_JOB_NAME_MAX_LENGTH, short=TRUE)
       }
     },
@@ -1422,7 +1422,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       if (inherits(estimator, "AlgorithmEstimator"))
         training_config$algorithm_arn = estimator$algorithm_arn
       else
-        training_config$image = estimator$train_image()
+        training_config$image = estimator$training_image_uri()
 
       training_config$enable_network_isolation = estimator$enable_network_isolation()
       training_config$encrypt_inter_container_traffic = estimator$encrypt_inter_container_traffic

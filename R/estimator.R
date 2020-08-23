@@ -234,7 +234,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              the model training, calls this method to find the image to use for model
     #'              training.
     #' @return str: The URI of the Docker image.
-    train_image = function() {stop("I'm an abstract interface method", call. = F)},
+    training_image_uri = function() {stop("I'm an abstract interface method", call. = F)},
 
     #' @description Return the hyperparameters as a dictionary to use for training.
     #'              The :meth:`~sagemaker.estimator.EstimatorBase.fit` method, which
@@ -690,7 +690,7 @@ EstimatorBase = R6Class("EstimatorBase",
         } else if (inherits(self, "AlgorithmEstimator")){ # need to work on this alittle more :)
           base_name = split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))]
         } else {
-          base_name = base_name_from_image(self$train_image())}
+          base_name = base_name_from_image(self$training_image_uri())}
         self$.current_job_name = name_from_base(base_name)}
 
       # if output_path was specified we use it otherwise initialize here.
@@ -829,7 +829,7 @@ EstimatorBase = R6Class("EstimatorBase",
     if (inherits(self, "Algorithmself")){
       train_args[["algorithm_arn"]] = self$algorithm_arn
     } else {
-      train_args[["image"]] = self$train_image()}
+      train_args[["image"]] = self$training_image_uri()}
 
 
     if (!islistempty(self$debugger_rule_configs))
@@ -879,7 +879,7 @@ EstimatorBase = R6Class("EstimatorBase",
 
   # ---------------------------------------------------------------------------
   .compilation_job_name = function(){
-    base_name = self$base_job_name %||% base_name_from_image(self$train_image())
+    base_name = self$base_job_name %||% base_name_from_image(self$training_image_uri())
     return (name_from_base(paste0("compilation-", base_name)))
   },
 
@@ -1170,7 +1170,7 @@ Estimator = R6Class("Estimator",
     #' @description Returns the docker image to use for training.
     #'              The fit() method, that does the model training, calls this method to
     #'              find the image to use for model training.
-    train_image = function(){
+    training_image_uri = function(){
       return(self$image_name)
     },
 
@@ -1233,7 +1233,7 @@ Estimator = R6Class("Estimator",
                             vpc_config_override="VPC_CONFIG_DEFAULT",
                             ...){
       args = list(role = role %||% self$role,
-                  image_uri = image %||% self$train_image(),
+                  image_uri = image %||% self$training_image_uri(),
                   vpc_config = self$get_vpc_config(vpc_config_override),
                   sagemaker_session = self$sagemaker_session,
                   model_data = self$model_data,
@@ -1572,7 +1572,7 @@ FrameWork = R6Class("FrameWork",
     #'              the model training, calls this method to find the image to use for model
     #'              training.
     #' @return str: The URI of the Docker image.
-    train_image = function(){
+    training_image_uri = function(){
       if (self$image_name)
         return (self$image_name)
       return (create_image_uri(
