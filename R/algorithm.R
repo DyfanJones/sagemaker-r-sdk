@@ -192,8 +192,8 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
      #' @description Returns the docker image to use for training.
      #'              The fit() method, that does the model training, calls this method to
      #'              find the image to use for model training.
-     train_images = function(){
-       stop("train_image is never meant to be called on Algorithm Estimators", call. = F)
+     training_image_uri = function(){
+       stop("training_image_uri is never meant to be called on Algorithm Estimators", call. = F)
      },
 
      #' @description Return True if this Estimator will need network isolation to run.

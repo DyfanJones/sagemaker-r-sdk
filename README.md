@@ -1,5 +1,5 @@
 # Warning!!!
-This repo is in constantly under development and is not currently stable.
+This repo is in constantly under development and is not currently stable. R6sagemaker is currently aligning it's api with sagemaker v2, apologises for any code breaking this causes.
 
 # Brief overview
 

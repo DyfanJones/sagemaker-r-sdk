@@ -357,7 +357,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       if (inherits(self, "Algorithmself")){
         train_args[["algorithm_arn"]] = self$algorithm_arn
       } else {
-        train_args[["image"]] = self$train_image()}
+        train_args[["image"]] = self$training_image_uri()}
 
 
       if (!islistempty(self$debugger_rule_configs))
