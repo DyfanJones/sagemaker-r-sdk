@@ -12,9 +12,10 @@ Import: R6,
         logger,
         urltools,
         data.table,
-        uuid,
-        RProtoBuf
-Suggest: testthat
+        uuid
+Suggest: testthat,
+         RProtoBuf,
+         readr
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true

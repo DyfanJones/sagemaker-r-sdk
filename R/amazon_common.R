@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/common.py
 
 #' @import R6
-#' @importFrom RProtoBuf read
 
 #' @include amazon_record_pb2.R
 #' @include serializers.R
@@ -17,6 +16,7 @@ RecordSerializer = R6Class("RecordSerializer",
     #' @description intialize RecordSerializer class
     initialize = function(){
       self$CONTENT_TYPE = "application/x-recordio-protobuf"
+      initProtoBuf()
     },
 
     #' @description Serialize a NumPy array into a buffer containing RecordIO records.
@@ -50,6 +50,7 @@ RecordDeserializer = R6Class("RecordDeserializer",
     #' @description intialize RecordDeserializer class
     initialize = function(){
       self$ACCEPT = "application/x-recordio-protobuf"
+      initProtoBuf()
     },
 
     #' @description Deserialize RecordIO Protobuf data from an inference endpoint.
@@ -198,7 +199,7 @@ read_records_io = function(file){
 
     pad = bitwShiftL(bitwShiftR((len_record + 3), 2), 2) - len_record
 
-    record = read(aialgs.data.Record, data)
+    record = RProtoBuf::read(aialgs.data.Record, data)
     records[[i]] = record
     i = i +1
 
