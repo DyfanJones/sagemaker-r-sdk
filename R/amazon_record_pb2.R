@@ -1,4 +1,6 @@
 
+.recordProto <- function() system.file("proto", "record.proto", package= "R6sagemaker")
+
 # create descriptors
 .FLOAT32TENSOR <- function() RProtoBuf::P("aialgs.data.Float32Tensor", file = .recordProto())
 .FLOAT64TENSOR <- function() RProtoBuf::P("aialgs.data.Float64Tensor", file = .recordProto())
