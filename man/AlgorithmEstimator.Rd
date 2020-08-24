@@ -26,7 +26,7 @@ A generic Estimator to train using any algorithm object (with an
 \item \href{#method-validate_train_spec}{\code{AlgorithmEstimator$validate_train_spec()}}
 \item \href{#method-set_hyperparameter}{\code{AlgorithmEstimator$set_hyperparameter()}}
 \item \href{#method-hyperparameters}{\code{AlgorithmEstimator$hyperparameters()}}
-\item \href{#method-train_images}{\code{AlgorithmEstimator$train_images()}}
+\item \href{#method-training_image_uri}{\code{AlgorithmEstimator$training_image_uri()}}
 \item \href{#method-enable_network_isolation}{\code{AlgorithmEstimator$enable_network_isolation()}}
 \item \href{#method-create_model}{\code{AlgorithmEstimator$create_model()}}
 \item \href{#method-transformer}{\code{AlgorithmEstimator$transformer()}}
@@ -47,7 +47,6 @@ A generic Estimator to train using any algorithm object (with an
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="train_image">}\href{../../R6sagemaker/html/EstimatorBase.html#method-train_image}{\code{R6sagemaker::EstimatorBase$train_image()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transform">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transform}{\code{R6sagemaker::EstimatorBase$transform()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
 }
@@ -221,14 +220,14 @@ Returns the hyperparameters as a dictionary to use for training.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-train_images"></a>}}
-\if{latex}{\out{\hypertarget{method-train_images}{}}}
-\subsection{Method \code{train_images()}}{
+\if{html}{\out{<a id="method-training_image_uri"></a>}}
+\if{latex}{\out{\hypertarget{method-training_image_uri}{}}}
+\subsection{Method \code{training_image_uri()}}{
 Returns the docker image to use for training.
              The fit() method, that does the model training, calls this method to
              find the image to use for model training.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AlgorithmEstimator$train_images()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AlgorithmEstimator$training_image_uri()}\if{html}{\out{</div>}}
 }
 
 }

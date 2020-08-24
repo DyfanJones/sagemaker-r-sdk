@@ -351,3 +351,5 @@ IsSubR6Class <- function(subclass, cls) {
   parent <- subclass$get_inherit()
   cls %in% c(subclass$classname, IsSubR6Class(parent))
 }
+
+ECR_URI_PATTERN <- "^(\\d+)(\\.)dkr(\\.)ecr(\\.)(.+)(\\.)(.*)(/)(.*:.*)$"

@@ -46,7 +46,7 @@ Initialize a ``MultiDataModel``. In addition to these arguments, it supports all
   name,
   model_data_prefix,
   model = NULL,
-  image = NULL,
+  image_uri = NULL,
   role = NULL,
   sagemaker_session = NULL,
   ...
@@ -64,10 +64,10 @@ in a Multi-Model endpoint are located}
 \item{\code{model}}{(sagemaker.Model): The Model object that would define the
 SageMaker model attributes like vpc_config, predictors, etc.
 If this is present, the attributes from this model are used when
-deploying the ``MultiDataModel``.  Parameters 'image', 'role' and 'kwargs'
+deploying the ``MultiDataModel``.  Parameters 'image_uri', 'role' and 'kwargs'
 are not permitted when model parameter is set.}
 
-\item{\code{image}}{(str): A Docker image URI. It can be null if the 'model' parameter
+\item{\code{image_uri}}{(str): A Docker image_uri URI. It can be null if the 'model' parameter
 is passed to during ``MultiDataModel`` initialization (default: None)}
 
 \item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon
@@ -144,12 +144,13 @@ Deploy this ``Model`` to an ``Endpoint`` and optionally return a ``Predictor``.
 \if{html}{\out{<div class="r">}}\preformatted{MultiDataModel$deploy(
   initial_instance_count,
   instance_type,
+  serializer = NULL,
+  deserializer = NULL,
   accelerator_type = NULL,
   endpoint_name = NULL,
-  update_endpoint = FALSE,
   tags = NULL,
   kms_key = NULL,
-  wait = True,
+  wait = TRUE,
   data_capture_config = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -163,6 +164,18 @@ in the ``Endpoint`` created from this ``Model``.}
 \item{\code{instance_type}}{(str): The EC2 instance type to deploy this Model to.
 For example, 'ml.p2.xlarge', or 'local' for local mode.}
 
+\item{\code{serializer}}{(:class:`~sagemaker.serializers.BaseSerializer`): A
+serializer object, used to encode data for an inference endpoint
+(default: None). If ``serializer`` is not None, then
+``serializer`` will override the default serializer. The
+default serializer is set by the ``predictor_cls``.}
+
+\item{\code{deserializer}}{(:class:`~sagemaker.deserializers.BaseDeserializer`): A
+deserializer object, used to decode data from an inference
+endpoint (default: None). If ``deserializer`` is not None, then
+``deserializer`` will override the default deserializer. The
+default deserializer is set by the ``predictor_cls``.}
+
 \item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to
 deploy this model for model loading and inference, for example,
 'ml.eia1.medium'. If not specified, no Elastic Inference
@@ -172,12 +185,6 @@ https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html}
 
 \item{\code{endpoint_name}}{(str): The name of the endpoint to create (default:
 None). If not specified, a unique endpoint name will be created.}
-
-\item{\code{update_endpoint}}{(bool): Flag to update the model in an existing
-Amazon SageMaker endpoint. If True, this will deploy a new
-EndpointConfig to an already existing endpoint and delete
-resources corresponding to the previous EndpointConfig. If
-False, a new endpoint will be created. Default: False}
 
 \item{\code{tags}}{(List[dict[str, str]]): The list of tags to attach to this
 specific endpoint.}

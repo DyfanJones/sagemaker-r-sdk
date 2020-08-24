@@ -26,9 +26,9 @@ MultiDataModel = R6Class("MultiDataModel",
     #' @param model (sagemaker.Model): The Model object that would define the
     #'              SageMaker model attributes like vpc_config, predictors, etc.
     #'              If this is present, the attributes from this model are used when
-    #'              deploying the ``MultiDataModel``.  Parameters 'image', 'role' and 'kwargs'
+    #'              deploying the ``MultiDataModel``.  Parameters 'image_uri', 'role' and 'kwargs'
     #'              are not permitted when model parameter is set.
-    #' @param image (str): A Docker image URI. It can be null if the 'model' parameter
+    #' @param image_uri (str): A Docker image_uri URI. It can be null if the 'model' parameter
     #'              is passed to during ``MultiDataModel`` initialization (default: None)
     #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
     #'              SageMaker training jobs and APIs that create Amazon SageMaker
@@ -50,7 +50,7 @@ MultiDataModel = R6Class("MultiDataModel",
     initialize = function(name,
                           model_data_prefix,
                           model=NULL,
-                          image=NULL,
+                          image_uri=NULL,
                           role=NULL,
                           sagemaker_session=NULL,
                           ...){
@@ -59,8 +59,8 @@ MultiDataModel = R6Class("MultiDataModel",
         stop(sprintf('Expecting S3 model prefix beginning with "s3://". Received: "%s"',
             model_data_prefix), call. = F)
 
-      if (!is.null(model) && (!is.null(image) || !is.null(role) || !islistemptylist(...)))
-        stop("Parameters image, role or kwargs are not permitted when model parameter is passed.",
+      if (!is.null(model) && (!is.null(image_uri) || !is.null(role) || !islistemptylist(...)))
+        stop("Parameters image_uri, role or kwargs are not permitted when model parameter is passed.",
              call. = F)
 
       self$name = name
@@ -74,8 +74,8 @@ MultiDataModel = R6Class("MultiDataModel",
       # Set the ``Model`` parameters if the model parameter is not specified
       if (is.null(self.model))
         super$initialize(
+          image_uri,
           self$model_data_prefix,
-          image,
           role,
           name=self$name,
           sagemaker_session=self$sagemaker_session,
@@ -94,18 +94,18 @@ MultiDataModel = R6Class("MultiDataModel",
     #' @return dict[str, str]: A complete container definition object usable with the CreateModel API
     prepare_container_def = function(instance_type=NULL,
                                      accelerator_type=NULL){
-    # Copy the trained model's image and environment variables if they exist. Models trained
+    # Copy the trained model's image_uri and environment variables if they exist. Models trained
     # with FrameworkEstimator set framework specific environment variables which need to be
     # copied over
       if (!is.null(self$model)){
         container_definition = self$model$prepare_container_def(instance_type, accelerator_type)
-        image = container_definition$Image
+        image_uri = container_definition$Image
         environment = container_definition$Environment
       } else {
-        image = self$image
+        image_uri = self$image_uri
         environment = self$env
         return (container_def(
-          image,
+          image_uri,
           env=environment,
           model_data_url=self$model_data_prefix,
           container_mode=self$container_mode)
@@ -129,6 +129,16 @@ MultiDataModel = R6Class("MultiDataModel",
     #'              in the ``Endpoint`` created from this ``Model``.
     #' @param instance_type (str): The EC2 instance type to deploy this Model to.
     #'              For example, 'ml.p2.xlarge', or 'local' for local mode.
+    #' @param serializer (:class:`~sagemaker.serializers.BaseSerializer`): A
+    #'              serializer object, used to encode data for an inference endpoint
+    #'              (default: None). If ``serializer`` is not None, then
+    #'              ``serializer`` will override the default serializer. The
+    #'              default serializer is set by the ``predictor_cls``.
+    #' @param deserializer (:class:`~sagemaker.deserializers.BaseDeserializer`): A
+    #'              deserializer object, used to decode data from an inference
+    #'              endpoint (default: None). If ``deserializer`` is not None, then
+    #'              ``deserializer`` will override the default deserializer. The
+    #'              default deserializer is set by the ``predictor_cls``.
     #' @param accelerator_type (str): Type of Elastic Inference accelerator to
     #'              deploy this model for model loading and inference, for example,
     #'              'ml.eia1.medium'. If not specified, no Elastic Inference
@@ -137,11 +147,6 @@ MultiDataModel = R6Class("MultiDataModel",
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html
     #' @param endpoint_name (str): The name of the endpoint to create (default:
     #'              None). If not specified, a unique endpoint name will be created.
-    #' @param update_endpoint (bool): Flag to update the model in an existing
-    #'              Amazon SageMaker endpoint. If True, this will deploy a new
-    #'              EndpointConfig to an already existing endpoint and delete
-    #'              resources corresponding to the previous EndpointConfig. If
-    #'              False, a new endpoint will be created. Default: False
     #' @param tags (List[dict[str, str]]): The list of tags to attach to this
     #'              specific endpoint.
     #' @param kms_key (str): The ARN of the KMS key that is used to encrypt the
@@ -158,29 +163,31 @@ MultiDataModel = R6Class("MultiDataModel",
     #'              is not None. Otherwise, return None.
     deploy = function(initial_instance_count,
                       instance_type,
+                      serializer=NULL,
+                      deserializer=NULL,
                       accelerator_type=NULL,
                       endpoint_name=NULL,
-                      update_endpoint=FALSE,
                       tags=NULL,
                       kms_key=NULL,
-                      wait=True,
+                      wait=TRUE,
                       data_capture_config=NULL){
       # Set model specific parameters
       if (!is.null(self$model)){
         enable_network_isolation = self$model$enable_network_isolation()
         role = self$model$role
         vpc_config = self$model$vpc_config
-        predictor = self$model$predictor_cls
+        predictor_cls = self$model$predictor_cls
       } else {
-          enable_network_isolation = self$enable_network_isolation()
+        enable_network_isolation = self$enable_network_isolation()
         role = self$role
         vpc_config = self$vpc_config
-        predictor = self$predictor_cls
+        predictor_cls = self$predictor_cls
       }
 
       if (is.null(role))
         stop("Role can not be null for deploying a model", call. = F)
 
+      # TODO: create LocalSession
       if (instance_type == "local" && !inherits(self$sagemaker_session, "LocalSession"))
         self$sagemaker_session = LocalSession$new()
 
@@ -205,31 +212,22 @@ MultiDataModel = R6Class("MultiDataModel",
       if (!islistempty(data_capture_config))
         data_capture_config_dict = data_capture_config$to_request_list()
 
-      if (update_endpoint){
-        endpoint_config_name = self$sagemaker_session$create_endpoint_config(
-          name=self$name,
-          model_name=self$name,
-          initial_instance_count=initial_instance_count,
-          instance_type=instance_type,
-          accelerator_type=accelerator_type,
-          tags=tags,
-          kms_key=kms_key,
-          data_capture_config_dict=data_capture_config_dict)
+      self$sagemaker_session$endpoint_from_production_variants(
+        name=self$endpoint_name,
+        production_variants=list(production_variant),
+        tags=tags,
+        kms_key=kms_key,
+        wait=wait,
+        data_capture_config_list=data_capture_config_dict)
 
-        self$sagemaker_session$update_endpoint(
-          self$endpoint_name, endpoint_config_name, wait=wait)
-      } else{
-        self$sagemaker_session$endpoint_from_production_variants(
-          name=self$endpoint_name,
-          production_variants=list(production_variant),
-          tags=tags,
-          kms_key=kms_key,
-          wait=wait,
-          data_capture_config_list=data_capture_config_dict)
+      if (!is.null(predictor_cls)){
+        predictor = predictor_cls$new(self$endpoint_name, self$sagemaker_session)
+        if (!is.null(serializer))
+          predictor$serializer = serializer
+        if (!is.null(deserializer))
+          predictor$deserializer = deserializer
+          return(predictor)
       }
-
-      if (!is.null(predictor))
-        return(predictor$new(self$endpoint_name, self$sagemaker_session))
       return(NULL)
     },
 
@@ -271,12 +269,9 @@ MultiDataModel = R6Class("MultiDataModel",
           dst_s3_uri = file.path(dst_parts$key, model_data_path)
         else
           dst_s3_uri = file.path(dst_parts$key, basename(model_data_source))
-
-
         # Upload file to s3
         obj = readBin(model_data_source, "raw", n = file.size(model_data_source))
         s3$put_object(Body = obj, Bucket = dst_parts$bucket, Key = dst_s3_uri)
-
         # return upload_path
         return(file.path("s3:/", dst_parts$bucket, dst_s3_uri))
       }
@@ -294,7 +289,7 @@ MultiDataModel = R6Class("MultiDataModel",
       file_keys = self$sagemaker_session$list_s3_files(bucket=uri_parts$bucket, key_prefix=uri_parts$key)
       # Return the model paths relative to the model_data_prefix
       # Ex: "a/b/c.tar.gz" -> "b/c.tar.gz" where url_prefix = "a/"
-      return(gsub(url_prefix, "", list_s3_uri))
+      return(gsub(uri_parts$key, "", file_keys))
     }
   ),
   lock_objects = F
