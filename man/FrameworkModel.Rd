@@ -63,6 +63,8 @@ Initialize a ``FrameworkModel``.
 \item{\code{model_data}}{(str): The S3 location of a SageMaker model data
 ``.tar.gz`` file.}
 
+\item{\code{image_uri}}{(str): A Docker image URI.}
+
 \item{\code{role}}{(str): An IAM role name or ARN for SageMaker to access AWS
 resources on your behalf.}
 
@@ -181,8 +183,6 @@ try to use either CodeCommit credential helper or local
 credential storage for authentication.}
 
 \item{\code{...}}{: Keyword arguments passed to the ``Model`` initializer.}
-
-\item{\code{image}}{(str): A Docker image URI.}
 }
 \if{html}{\out{</div>}}
 }

@@ -577,7 +577,7 @@ FrameworkModel = R6Class("FrameWorkModel",
    #' @description Initialize a ``FrameworkModel``.
    #' @param model_data (str): The S3 location of a SageMaker model data
    #'              ``.tar.gz`` file.
-   #' @param image (str): A Docker image URI.
+   #' @param image_uri (str): A Docker image URI.
    #' @param role (str): An IAM role name or ARN for SageMaker to access AWS
    #'              resources on your behalf.
    #' @param entry_point (str): Path (absolute or relative) to the Python source
