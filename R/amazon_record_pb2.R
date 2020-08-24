@@ -23,7 +23,7 @@ Record <- function() .RECORD()$new()
 initProtoBuf <- function(){
   if(!exists("aialgs.data.Record")){
     if(requireNamespace('RProtoBuf', quietly=TRUE)){
-      if(!file.exist(.recordProto())) stop("ProtoBuf File failed to install.")
+      if(!file.exists(.recordProto())) stop("ProtoBuf File failed to install.")
       RProtoBuf::readProtoFiles(.recordProto(), package = "R6sagmaker")
     } else {
       stop('Please install RProtoBuf package and try again', call. = F)
