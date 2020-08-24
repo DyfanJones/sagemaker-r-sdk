@@ -4,7 +4,7 @@
 \alias{Model}
 \title{Model Class}
 \description{
-Initialize an SageMaker ``Model``.
+A SageMaker ``Model`` that can be deployed to an ``Endpoint``.
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -29,8 +29,8 @@ Initialize an SageMaker ``Model``.
 Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Model$new(
-  model_data,
   image_uri,
+  model_data = NULL,
   role = NULL,
   predictor_cls = NULL,
   env = NULL,
@@ -45,10 +45,10 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{image_uri}}{(str): A Docker image URI.}
+
 \item{\code{model_data}}{(str): The S3 location of a SageMaker model data
 ``.tar.gz`` file.}
-
-\item{\code{image_uri}}{(str): A Docker image URI.}
 
 \item{\code{role}}{(str): An AWS IAM role (either name or full ARN). The Amazon
 SageMaker training jobs and APIs that create Amazon SageMaker
@@ -169,7 +169,11 @@ Compile this ``Model`` with SageMaker Neo.
   job_name = NULL,
   compile_max_run = 5 * 60,
   framework = NULL,
-  framework_version = NULL
+  framework_version = NULL,
+  target_platform_os = NULL,
+  target_platform_arch = NULL,
+  target_platform_accelerator = NULL,
+  compiler_options = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -205,6 +209,25 @@ model. Allowed values: 'mxnet', 'tensorflow', 'keras', 'pytorch',
 'onnx', 'xgboost'}
 
 \item{\code{framework_version}}{(str):}
+
+\item{\code{target_platform_os}}{(str): Target Platform OS, for example: 'LINUX'.
+For allowed strings see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+It can be used instead of target_instance_family.}
+
+\item{\code{target_platform_arch}}{(str): Target Platform Architecture, for example: 'X86_64'.
+For allowed strings see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+It can be used instead of target_instance_family.}
+
+\item{\code{target_platform_accelerator}}{(str, optional): Target Platform Accelerator,
+for example: 'NVIDIA'. For allowed strings see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+It can be used instead of target_instance_family.}
+
+\item{\code{compiler_options}}{(dict, optional): Additional parameters for compiler.
+Compiler Options are TargetPlatform / target_instance_family specific. See
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html for details.}
 }
 \if{html}{\out{</div>}}
 }
@@ -231,9 +254,10 @@ Deploy this ``Model`` to an ``Endpoint`` and optionally return a
 \if{html}{\out{<div class="r">}}\preformatted{Model$deploy(
   initial_instance_count,
   instance_type,
+  serializer = NULL,
+  deserializer = NULL,
   accelerator_type = NULL,
   endpoint_name = NULL,
-  update_endpoint = FALSE,
   tags = NULL,
   kms_key = NULL,
   wait = TRUE,
@@ -250,6 +274,18 @@ in the ``Endpoint`` created from this ``Model``.}
 \item{\code{instance_type}}{(str): The EC2 instance type to deploy this Model to.
 For example, 'ml.p2.xlarge', or 'local' for local mode.}
 
+\item{\code{serializer}}{(:class:`~sagemaker.serializers.BaseSerializer`): A
+serializer object, used to encode data for an inference endpoint
+(default: None). If ``serializer`` is not None, then
+``serializer`` will override the default serializer. The
+default serializer is set by the ``predictor_cls``.}
+
+\item{\code{deserializer}}{(:class:`~sagemaker.deserializers.BaseDeserializer`): A
+deserializer object, used to decode data from an inference
+endpoint (default: None). If ``deserializer`` is not None, then
+``deserializer`` will override the default deserializer. The
+default deserializer is set by the ``predictor_cls``.}
+
 \item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to
 deploy this model for model loading and inference, for example,
 'ml.eia1.medium'. If not specified, no Elastic Inference
@@ -259,12 +295,6 @@ https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html}
 
 \item{\code{endpoint_name}}{(str): The name of the endpoint to create (Default:
 NULL). If not specified, a unique endpoint name will be created.}
-
-\item{\code{update_endpoint}}{(bool): Flag to update the model in an existing
-Amazon SageMaker endpoint. If True, this will deploy a new
-EndpointConfig to an already existing endpoint and delete
-resources corresponding to the previous EndpointConfig. If
-False, a new endpoint will be created. Default: False}
 
 \item{\code{tags}}{(List[dict[str, str]]): The list of tags to attach to this
 specific endpoint.}

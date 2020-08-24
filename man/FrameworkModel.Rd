@@ -2,10 +2,9 @@
 % Please edit documentation in R/model.R
 \name{FrameworkModel}
 \alias{FrameworkModel}
-\title{FrameworkModel Class}
+\title{A Model for working with an SageMaker ``Framework``.}
 \description{
-A Model for working with an SageMaker ``Framework``.
-             This class hosts user-defined code in S3 and sets code location and
+This class hosts user-defined code in S3 and sets code location and
              configuration in model environment variables.
 }
 \section{Super class}{
@@ -42,14 +41,13 @@ Initialize a ``FrameworkModel``.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$new(
   model_data,
-  image,
+  image_uri,
   role,
   entry_point,
   source_dir = NULL,
   predictor_cls = NULL,
   env = NULL,
   name = NULL,
-  enable_cloudwatch_metrics = FALSE,
   container_log_level = c("INFO", "WARN", "ERROR", "FATAL", "CRITICAL"),
   code_location = NULL,
   sagemaker_session = NULL,
@@ -64,8 +62,6 @@ Initialize a ``FrameworkModel``.
 \describe{
 \item{\code{model_data}}{(str): The S3 location of a SageMaker model data
 ``.tar.gz`` file.}
-
-\item{\code{image}}{(str): A Docker image URI.}
 
 \item{\code{role}}{(str): An IAM role name or ARN for SageMaker to access AWS
 resources on your behalf.}
@@ -109,10 +105,6 @@ when hosted in SageMaker (default: None).}
 
 \item{\code{name}}{(str): The model name. If None, a default model name will be
 selected on each ``deploy``.}
-
-\item{\code{enable_cloudwatch_metrics}}{(bool): Whether training and hosting
-containers will generate CloudWatch metrics under the
-AWS/SageMakerContainer namespace (default: False).}
 
 \item{\code{container_log_level}}{(str): Log level to use within the container
 (default: "INFO").}
@@ -189,6 +181,8 @@ try to use either CodeCommit credential helper or local
 credential storage for authentication.}
 
 \item{\code{...}}{: Keyword arguments passed to the ``Model`` initializer.}
+
+\item{\code{image}}{(str): A Docker image URI.}
 }
 \if{html}{\out{</div>}}
 }

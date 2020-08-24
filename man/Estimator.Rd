@@ -14,7 +14,7 @@ A generic Estimator to train using any supplied algorithm. This class is
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Estimator$new()}}
-\item \href{#method-train_image}{\code{Estimator$train_image()}}
+\item \href{#method-training_image_uri}{\code{Estimator$training_image_uri()}}
 \item \href{#method-set_hyperparameters}{\code{Estimator$set_hyperparameters()}}
 \item \href{#method-hyperparameters}{\code{Estimator$hyperparameters()}}
 \item \href{#method-create_model}{\code{Estimator$create_model()}}
@@ -234,14 +234,14 @@ https://docs.aws.amazon.com/sagemaker/latest/dg/API_AlgorithmSpecification.html#
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-train_image"></a>}}
-\if{latex}{\out{\hypertarget{method-train_image}{}}}
-\subsection{Method \code{train_image()}}{
+\if{html}{\out{<a id="method-training_image_uri"></a>}}
+\if{latex}{\out{\hypertarget{method-training_image_uri}{}}}
+\subsection{Method \code{training_image_uri()}}{
 Returns the docker image to use for training.
              The fit() method, that does the model training, calls this method to
              find the image to use for model training.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Estimator$train_image()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Estimator$training_image_uri()}\if{html}{\out{</div>}}
 }
 
 }
