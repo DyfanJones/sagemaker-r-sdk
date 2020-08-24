@@ -217,12 +217,12 @@ Model = R6Class("Model",
             "Please deploy the model manually.", sep = "\n"),
             target_instance_family
           )
-        } else {
+        }
+      } else {
           log_warn(paste(
             "Devices described by Target Platform OS, Architecture and Accelerator are not",
             "supported for deployment via SageMaker. Please deploy the model manually.", sep = "\n")
           )
-        }
       }
       return(self)
     },
