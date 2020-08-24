@@ -1,6 +1,4 @@
 
-.recordProto <- function() system.file("proto", "record.proto", package= "R6sagemaker")
-
 # create descriptors
 .FLOAT32TENSOR <- function() RProtoBuf::P("aialgs.data.Float32Tensor", file = .recordProto())
 .FLOAT64TENSOR <- function() RProtoBuf::P("aialgs.data.Float64Tensor", file = .recordProto())
@@ -23,8 +21,7 @@ Record <- function() .RECORD()$new()
 initProtoBuf <- function(){
   if(!exists("aialgs.data.Record")){
     if(requireNamespace('RProtoBuf', quietly=TRUE)){
-      if(!file.exists(.recordProto())) stop("ProtoBuf File failed to install.")
-      RProtoBuf::readProtoFiles(.recordProto(), package = "R6sagmaker")
+      RProtoBuf::readProtoFiles(dir = "proto", package = "R6sagmaker")
     } else {
       stop('Please install RProtoBuf package and try again', call. = F)
     }
