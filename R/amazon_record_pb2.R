@@ -1,4 +1,5 @@
 
+# Directory to aws sagemaker proto buf file
 .recordProto <- function() system.file("proto", package= "R6sagemaker")
 
 # create descriptors
