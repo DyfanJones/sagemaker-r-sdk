@@ -1,15 +1,15 @@
 
-.recordProto <- function() system.file("proto", "record.proto", package= "R6sagemaker")
+.recordProto <- function() system.file("proto", package= "R6sagemaker")
 
 # create descriptors
-.FLOAT32TENSOR <- function() RProtoBuf::P("aialgs.data.Float32Tensor", file = .recordProto())
-.FLOAT64TENSOR <- function() RProtoBuf::P("aialgs.data.Float64Tensor", file = .recordProto())
-.INT32TENSOR <- function() RProtoBuf::P("aialgs.data.Int32Tensor", file = .recordProto())
-.BYTES <- function() RProtoBuf::P("aialgs.data.Bytes", file =.recordProto())
-.VALUE <- function() RProtoBuf::P("aialgs.data.Value", file =.recordProto())
-.RECORD_FEATURESENTRY <- function() RProtoBuf::P("aialgs.data.Record.FeaturesEntry", file = .recordProto())$new()
-.RECORD_LABELENTRY <- function() RProtoBuf::P("aialgs.data.Record.LabelEntry", file = .recordProto())$new()
-.RECORD <- function() RProtoBuf::P("aialgs.data.Record", file = .recordProto())
+.FLOAT32TENSOR <- function() RProtoBuf::P("aialgs.data.Float32Tensor")
+.FLOAT64TENSOR <- function() RProtoBuf::P("aialgs.data.Float64Tensor")
+.INT32TENSOR <- function() RProtoBuf::P("aialgs.data.Int32Tensor")
+.BYTES <- function() RProtoBuf::P("aialgs.data.Bytes")
+.VALUE <- function() RProtoBuf::P("aialgs.data.Value")
+.RECORD_FEATURESENTRY <- function() RProtoBuf::P("aialgs.data.Record.FeaturesEntry")$new()
+.RECORD_LABELENTRY <- function() RProtoBuf::P("aialgs.data.Record.LabelEntry")$new()
+.RECORD <- function() RProtoBuf::P("aialgs.data.Record")
 
 # Create message
 Float32Tensor <- function() .FLOAT32TENSOR()$new()
@@ -23,7 +23,7 @@ Record <- function() .RECORD()$new()
 initProtoBuf <- function(){
   if(!exists("aialgs.data.Record")){
     if(requireNamespace('RProtoBuf', quietly=TRUE)){
-      RProtoBuf::readProtoFiles(dir = "proto", package = "R6sagmaker")
+      RProtoBuf::readProtoFiles2(protoPath=.recordProto())
     } else {
       stop('Please install RProtoBuf package and try again', call. = F)
     }
