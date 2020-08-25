@@ -38,7 +38,7 @@ intialize RecordSerializer class
 \if{html}{\out{<a id="method-serialize"></a>}}
 \if{latex}{\out{\hypertarget{method-serialize}{}}}
 \subsection{Method \code{serialize()}}{
-Serialize a NumPy array into a buffer containing RecordIO records.
+Serialize a matrix/array into a buffer containing RecordIO records.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RecordSerializer$serialize(data)}\if{html}{\out{</div>}}
 }
@@ -46,7 +46,7 @@ Serialize a NumPy array into a buffer containing RecordIO records.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data}}{(numpy.ndarray): The data to serialize.}
+\item{\code{data}}{(matrix): The data to serialize.}
 }
 \if{html}{\out{</div>}}
 }
