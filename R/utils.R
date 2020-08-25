@@ -1,5 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/utils.py
 
+#' @importFrom stats runif
+
 `%||%` <- function(x, y) if (is.null(x)) return(y) else return(x)
 
 get_aws_env <- function(x) {
@@ -230,7 +232,7 @@ repack_model <- function(inference_script,
                          model_uri,
                          repacked_model_uri,
                          sagemaker_session,
-                         kms_key=None){
+                         kms_key=NULL){
   dependencies = dependencies %||% list()
 
   tmp = tempdir()
@@ -240,7 +242,7 @@ repack_model <- function(inference_script,
 
   # append file to model directory
   .create_or_update_code_dir(
-    model_dir, inference_script, source_directory, dependencies, sagemaker_session, tmps)
+    model_dir, inference_script, source_directory, dependencies, sagemaker_session, tmp)
 
   # repackage model_dir
   tmp_model_path = file.path(tmp, "temp-model.tar.gz")
@@ -333,7 +335,7 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
           SSEKMSKeyId = kms_key)}
     } else {
       file.copy(tmp_model_path,
-                gsub("file://", "", repacked_model_uri.replace), recursive = T)}
+                gsub("file://", "", repacked_model_uri), recursive = T)}
   }
 
 # tar function to use system tar

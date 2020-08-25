@@ -243,7 +243,7 @@ git_clone_repo <- function(git_config,
 #   str: the component needed fot the git clone command.
 .insert_token_to_repo_url <- function(url, token){
   index = nchar("https://")
-  if (gregexpr(pattern ='welcome',txt)[[1]][1] == index)
+  if (gregexpr(pattern =token, url)[[1]][1] == index)
     return(url)
   return(gsub("https://", paste0("https://",token, "@"), url))
 }
@@ -261,7 +261,7 @@ git_clone_repo <- function(git_config,
   password = URLencode(password, reserved = T)
   index = nchar("https://")
   pt1 = substring(url, 1, index)
-  pt4 = substring(url, index, char(url))
+  pt4 = substring(url, index, nchar(url))
   return(paste0(pt1, username, ":", password, "@", pt4))
 }
 

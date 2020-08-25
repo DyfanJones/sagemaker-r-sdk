@@ -14,9 +14,6 @@ layout_sagemaker_colour <- structure(function(level, msg, namespace = NA_charact
 
 layout_sagemaker <- structure(function(level, msg, namespace = NA_character_,
                                        .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
-
-
-
   sprintf('[%s:%s] %s', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), attr(level,'level'), msg, level)
 }, generator = quote(layout_simple()))
 

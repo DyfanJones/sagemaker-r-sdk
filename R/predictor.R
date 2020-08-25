@@ -290,9 +290,9 @@ RealTimePredictor = R6Class("RealTimePredictor",
 #' @param object a sagemaker model
 #' @param newdata data for model to predict
 #' @param serializer method class to serializer data to sagemaker model. Requires to be
-#'              a class inherited from \link{Serializer}. (Default: \link{csv_serializer})
+#'              a class inherited from \link{BaseSerializer}. (Default: \link{csv_serializer})
 #' @param deserializer method class to deserializer return data streams from sagemaker model.
-#'              Requires to be a class inherited from \link{Deserializer}.
+#'              Requires to be a class inherited from \link{BaseDeserializer}.
 #'              (Default: \link{csv_deserializer})
 #' @param ... arguments passed to ``RealTimePredictor$predict``
 #' @export

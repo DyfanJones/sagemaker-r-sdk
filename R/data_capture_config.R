@@ -1,18 +1,66 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/session.py
 #' @import R6
 
+#' @title DataCaptureConfig Class
+#' @description Configuration object passed in when deploying models to Amazon SageMaker Endpoints.
+#'              This object specifies configuration related to endpoint data capture for use with
+#'              Amazon SageMaker Model Monitoring.
 #' @export
 DataCaptureConfig = R6Class("DataCaptureConfig",
   public = list(
+
+    #' @field enable_capture
+    #' Whether data capture should be enabled or not.
     enable_capture = TRUE,
+
+    #' @field sampling_percentage
+    #' The percentage of data to sample.
     sampling_percentage = NULL,
+
+    #' @field destination_s3_uri
+    #' Defaults to "s3://<default-session-bucket>/model-monitor/data-capture"
     destination_s3_uri = NULL,
+
+    #' @field kms_key_id
+    #' The kms key to use when writing to S3.
     kms_key_id = NULL,
+
+    #' @field capture_options
+    #' Denotes which data to capture between request and response.
     capture_options = NULL,
+
+    #' @field csv_content_types
+    #' Default=["text/csv"].
     csv_content_types=NULL,
+
+    #' @field json_content_types
+    #' Default=["application/json"].
     json_content_types=NULL,
+
+    #' @field sagemaker_session
+    #' A SageMaker Session object
     sagemaker_session=NULL,
+
+    #' @field API_MAPPING
+    #' Convert to API values or pass value directly through if unable to convert
     API_MAPPING = list("REQUEST"= "Input", "RESPONSE"= "Output"),
+
+    #' @description Initialize a DataCaptureConfig object for capturing data from Amazon SageMaker Endpoints.
+    #' @param enable_capture (bool): Required. Whether data capture should be enabled or not.
+    #' @param sampling_percentage (int): Optional. Default=20. The percentage of data to sample.
+    #'              Must be between 0 and 100.
+    #' @param destination_s3_uri (str): Optional. Defaults to "s3://<default-session-bucket>/
+    #'              model-monitor/data-capture".
+    #' @param kms_key_id (str): Optional. Default=None. The kms key to use when writing to S3.
+    #' @param capture_options ([str]): Optional. Must be a list containing any combination of the
+    #'              following values: "REQUEST", "RESPONSE". Default=["REQUEST", "RESPONSE"]. Denotes
+    #'              which data to capture between request and response.
+    #' @param csv_content_types ([str]): Optional. Default=["text/csv"].
+    #' @param json_content_types ([str]): Optional. Default=["application/json"].
+    #' @param sagemaker_session (sagemaker.session.Session): A SageMaker Session
+    #'              object, used for SageMaker interactions (default: None). If not
+    #'              specified, one is created using the default AWS configuration
+    #'              chain.
     initialize = function(enable_capture = TRUE,
                           sampling_percentage=20L,
                           destination_s3_uri=NULL,
@@ -42,6 +90,10 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
       self$csv_content_types = csv_content_types %||% "text/csv"
       self$json_content_types = json_content_types %||% "application/json"
       },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
     print = function(...){
       cat("<DataCaptureConfig>")
       invisible(self)
@@ -52,12 +104,15 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
     .DATA_CAPTURE_S3_PATH = "data-capture"
     ),
   active = list(
+
+    #' @field to_request_list
+    #' Generates a request named list using the parameters provided to the class.
     to_request_list = function(){
       request_list = list(
         "EnableCapture"= self$enable_capture,
         "InitialSamplingPercentage"= self$sampling_percentage,
         "DestinationS3Uri"= self$destination_s3_uri,
-        "CaptureOptions"= lapply(capture_options, function(x) list("CaptureMode"= API_MAPPING[[toupper(x)]])) #  Convert to API values or pass value directly through if unable to convert.
+        "CaptureOptions"= lapply(capture_options, function(x) list("CaptureMode"= self$API_MAPPING[[toupper(x)]])) #  Convert to API values or pass value directly through if unable to convert.
       )
 
       request_list["KmsKeyId"] = self$kms_key_id

@@ -1406,7 +1406,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
                                         objective_metric_name=NULL,
                                         parameter_ranges=NULL){
 
-      training_config = .Job$new()$load_config(inputs, estimator)
+      training_config = .Job$private_methods$.load_config(inputs, estimator)
 
       training_config$input_mode = estimator$input_mode
       training_config$metric_definitions = metric_definitions
