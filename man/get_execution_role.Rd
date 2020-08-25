@@ -7,7 +7,7 @@
 get_execution_role(sagemaker_session = NULL)
 }
 \arguments{
-\item{sagemaker_session(Session):}{Current sagemaker session}
+\item{sagemaker_session}{(Session): Current sagemaker session}
 }
 \value{
 (str): The role ARN

@@ -45,7 +45,6 @@ Other Processor:
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="load_config">}\href{../../R6sagemaker/html/.Job.html#method-load_config}{\code{R6sagemaker::.Job$load_config()}}\out{</span>}
 }
 \out{</details>}
 }

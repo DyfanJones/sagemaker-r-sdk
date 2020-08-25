@@ -99,8 +99,8 @@ PawsCredentials = R6Class("PawsCredentials",
 #' @param aws_access_key_id (str): AWS access key
 #' @param aws_secret_access_key (str): AWS secret access key
 #' @param aws_session_token (str): AWS token
-#' @param region (str): AWS region
-#' @param profile (str): AWS profile
+#' @param region_name (str): AWS region
+#' @param profile_name (str): AWS profile
 #'
 #' @export
 paws_cred <- function(aws_access_key_id = NULL,

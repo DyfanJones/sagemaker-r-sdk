@@ -326,7 +326,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
         if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
       }
 
-      config = .Job$new()$load_config(inputs, self)
+      config = .Job$private_methods$.load_config(inputs, self)
 
       if (!islistempty(self$hyperparameters())){
         hyperparameters = self$hyperparameters()}

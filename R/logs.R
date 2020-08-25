@@ -9,14 +9,11 @@ sagemaker_logging_format <- function(){
 
 layout_sagemaker_colour <- structure(function(level, msg, namespace = NA_character_,
                                               .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
-  sprintf('[%s:%s] %s', crayon::italic(format(Sys.time(), "%Y-%m-%d %H:%M:%S")), sagemaker_log_colour(attr(level,'level'), level), msg, level)
+  sprintf('[%s:%s] %s', paste0("\033[3m", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\033[23m"), sagemaker_log_colour(attr(level,'level'), level), msg, level)
 }, generator = quote(layout_simple()))
 
 layout_sagemaker <- structure(function(level, msg, namespace = NA_character_,
                                        .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
-
-
-
   sprintf('[%s:%s] %s', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), attr(level,'level'), msg, level)
 }, generator = quote(layout_simple()))
 

@@ -2574,7 +2574,7 @@ production_variant <- function(model_name,
 }
 
 #' @title Return the role ARN whose credentials are used to call the API.
-#' @param sagemaker_session(Session): Current sagemaker session
+#' @param sagemaker_session (Session): Current sagemaker session
 #' @return (str): The role ARN
 #' @export
 get_execution_role <- function(sagemaker_session = NULL){
