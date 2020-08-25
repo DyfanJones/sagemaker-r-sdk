@@ -8,7 +8,7 @@ This class hosts user-defined code in S3 and sets code location and
              configuration in model environment variables.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:Model]{R6sagemaker::Model}} -> \code{FrameWorkModel}
+\code{\link[R6sagemaker:Model]{R6sagemaker::Model}} -> \code{FrameworkModel}
 }
 \section{Methods}{
 \subsection{Public methods}{

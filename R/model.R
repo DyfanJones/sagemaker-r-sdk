@@ -570,7 +570,7 @@ SAGEMAKER_OUTPUT_LOCATION <- "sagemaker_s3_output"
 #' @description This class hosts user-defined code in S3 and sets code location and
 #'              configuration in model environment variables.
 #' @export
-FrameworkModel = R6Class("FrameWorkModel",
+FrameworkModel = R6Class("FrameworkModel",
   inherit = Model,
   public = list(
 
