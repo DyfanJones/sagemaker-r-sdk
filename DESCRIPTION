@@ -5,17 +5,22 @@ Version: 0.1.0
 Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("aut", "cre")),
              person("Amazon.com, Inc.", role = "cph"))
 Description: A library for training and deploying machine learning models on 
-    Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`
-Import: R6,
-        paws,
-        jsonlite,
-        logger,
-        urltools,
-        data.table,
-        uuid
-Suggest: testthat,
-         RProtoBuf,
-         readr
+    Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
+Imports: 
+    R6,
+    paws,
+    jsonlite,
+    logger,
+    urltools,
+    data.table,
+    uuid,
+    stats,
+    methods
+Suggests: 
+    testthat,
+    RProtoBuf,
+    readr,
+    Matrix
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
