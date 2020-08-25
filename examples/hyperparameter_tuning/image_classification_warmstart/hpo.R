@@ -22,19 +22,17 @@ library(fastDummies)
 #########################################################################
 
 #########################################################################
-# Setup 
+# Setup
 #########################################################################
 sess = Session$new()
 region = sess$paws_region_name
 role = get_execution_role(sess)
 bucket = sess$default_bucket()
-prefix = 'ic-fulltraining'
+prefix = 'sagemaker/DEMO-hpo-image-classification'
 
 # To do!!!!
 training_image = get_image_uri(sess.boto_region_name, 'image-classification', repo_version="1")
 print (training_image)
-
-smclient = boto3.Session().client('sagemaker')
 
 #########################################################################
 # Download data from AWS sample data 
@@ -49,8 +47,6 @@ sess$upload_data(path = "validation.rec", bucket = bucket, key_prefix = file.pat
 #########################################################################
 # Set up Hyperparameter Tuning
 #########################################################################
-# Container for image classification 
-container = get_image_uri(region, 'xgboost')
 
 # set up initial estimator
 imageclassification = Estimator$new(container,
