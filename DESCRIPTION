@@ -20,7 +20,8 @@ Suggests:
     testthat,
     RProtoBuf,
     readr,
-    Matrix
+    Matrix,
+    sparsio
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
@@ -49,6 +50,8 @@ Collate:
     'amazon_hyperparameter.R'
     's3.R'
     'fw_registry.R'
+    'xgboost_default.R'
+    'xgboost_model.R'
     'xgboost_estimator.R'
     'amazon_estimator.R'
     'data_capture_config.R'
@@ -64,5 +67,4 @@ Collate:
     'processing.R'
     'r6sagemaker.R'
     'tuner.R'
-    'xgboost_default.R'
     'zzz.R'
