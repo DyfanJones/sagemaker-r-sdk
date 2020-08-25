@@ -477,7 +477,7 @@ Model = R6Class("Model",
     },
 
     .framework = function(){
-      return(attr(self, "__framework_name__"))
+      return(attr(self, "_framework_name"))
       },
 
     # TODO: review this private method
