@@ -14,10 +14,10 @@
 #' @import R6
 #' @import utils
 
-#' @title RealTimePredictor Class
+#' @title Predictor Class
 #' @description Make prediction requests to an Amazon SageMaker endpoint.
 #' @export
-RealTimePredictor = R6Class("RealTimePredictor",
+Predictor = R6Class("Predictor",
   public = list(
 
     #' @field endpoint
@@ -52,7 +52,7 @@ RealTimePredictor = R6Class("RealTimePredictor",
     #'        Model names being used at endpoint
     .model_names = NULL,
 
-    #' @description Initialize a ``RealTimePredictor``.
+    #' @description Initialize a ``Predictor``.
     #'              Behavior for serialization of input data and deserialization of
     #'              result data can be configured through initializer arguments. If not
     #'              specified, a sequence of bytes is expected and the API sends it in the
@@ -92,7 +92,7 @@ RealTimePredictor = R6Class("RealTimePredictor",
     #' @description Return the inference from the specified endpoint.
     #' @param data (object): Input data for which you want the model to provide
     #'              inference. If a serializer was specified when creating the
-    #'              RealTimePredictor, the result of the serializer is sent as input
+    #'              Predictor, the result of the serializer is sent as input
     #'              data. Otherwise the data must be sequence of bytes, and the
     #'              predict method then sends the bytes in the request body as is.
     #' @param initial_args (list[str,str]): Optional. Default arguments for boto3
@@ -105,7 +105,7 @@ RealTimePredictor = R6Class("RealTimePredictor",
     #'              request on (Default: NULL). Note that the ProductionVariant identifies the model
     #'              you want to host and the resources you want to deploy for hosting it. Currently not implemented.
     #' @return object: Inference for the given input. If a deserializer was specified when creating
-    #'              the RealTimePredictor, the result of the deserializer is
+    #'              the Predictor, the result of the deserializer is
     #'              returned. Otherwise the response returns the sequence of bytes
     #'              as is.
     predict = function(data,
@@ -285,7 +285,7 @@ RealTimePredictor = R6Class("RealTimePredictor",
 )
 
 
-#' @title S3 method that wraps RealTimePredictor Class
+#' @title S3 method that wraps Predictor Class
 #' @description Predicted values returned from endpoint
 #' @param object a sagemaker model
 #' @param newdata data for model to predict
@@ -294,9 +294,9 @@ RealTimePredictor = R6Class("RealTimePredictor",
 #' @param deserializer method class to deserializer return data streams from sagemaker model.
 #'              Requires to be a class inherited from \link{BaseDeserializer}.
 #'              (Default: \link{csv_deserializer})
-#' @param ... arguments passed to ``RealTimePredictor$predict``
+#' @param ... arguments passed to ``Predictor$predict``
 #' @export
-predict.RealTimePredictor <- function(object, newdata, serializer = csv_serializer, deserializer = csv_deserializer, ...){
+predict.Predictor <- function(object, newdata, serializer = csv_serializer, deserializer = csv_deserializer, ...){
   stopifnot(is.null(serializer) || inherits(serializer,"BaseSerializer"),
             is.null(deserializer) || inherits(deserializer,"BaseDeserializer"))
 

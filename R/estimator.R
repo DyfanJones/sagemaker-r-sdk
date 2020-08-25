@@ -461,7 +461,7 @@ EstimatorBase = R6Class("EstimatorBase",
     },
 
     #' @description Deploy the trained model to an Amazon SageMaker endpoint and return a
-    #'              ``sagemaker.RealTimePredictor`` object.
+    #'              ``sagemaker.Predictor`` object.
     #'              More information:
     #'              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
     #' @param initial_instance_count (int): Minimum number of EC2 instances to
@@ -504,7 +504,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              Implementations may customize ``create_model()`` to accept
     #'              ``...`` to customize model creation during deploy.
     #'              For more, see the implementation docs.
-    #' @return sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()`` method,
+    #' @return sagemaker.predictor.Predictor: A predictor that provides a ``predict()`` method,
     #'              which can be used to send requests to the Amazon SageMaker
     #'              endpoint and obtain inferences.
     deploy = function(initial_instance_count,
@@ -1194,14 +1194,14 @@ Estimator = R6Class("Estimator",
 
     #' @description Create a model to deploy.
     #'              The serializer, deserializer, content_type, and accept arguments are only used to define a
-    #'              default RealTimePredictor. They are ignored if an explicit predictor class is passed in.
+    #'              default Predictor. They are ignored if an explicit predictor class is passed in.
     #'              Other arguments are passed through to the Model class.
     #' @param role (str): The ``ExecutionRoleArn`` IAM Role ARN for the ``Model``,
     #'              which is also used during transform jobs. If not specified, the
     #'              role from the Estimator will be used.
     #' @param image (str): An container image to use for deploying the model.
     #'              Defaults to the image used for training.
-    #' @param predictor_cls (RealTimePredictor): The predictor class to use when
+    #' @param predictor_cls (Predictor): The predictor class to use when
     #'              deploying the model.
     #' @param serializer (callable): Should accept a single argument, the input
     #'              data, and return a sequence of bytes. May provide a content_type
@@ -1243,7 +1243,7 @@ Estimator = R6Class("Estimator",
       if(is.null(args$predictor_cls)){
 
         predict_wrapper = function(endpoint, session){
-          return(RealTimePredictor$new(
+          return(Predictor$new(
             endpoint, session, serializer, deserializer, content_type, accept))
         }
 
@@ -1502,7 +1502,7 @@ FrameWork = R6Class("FrameWork",
       self$checkpoint_local_path = checkpoint_local_path
       self$enable_sagemaker_metrics = enable_sagemaker_metrics
 
-      attr(self, "__framework_name__") = NULL
+      attr(self, "_framework_name") = NULL
     },
 
     #' @description Set hyperparameters needed for training. This method will also
@@ -1577,7 +1577,7 @@ FrameWork = R6Class("FrameWork",
       if (self$image_name)
         return (self$image_name)
       return (ImageUris$new()$retrieve(
-        attributes(self)$`__framework_name__`,
+        attributes(self)$`_framework_name`,
         self$sagemaker_session$paws_region_name,
         instance_type=self$train_instance_type,
         version=self$framework_version,

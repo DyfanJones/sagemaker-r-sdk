@@ -207,7 +207,7 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
 
      #' @description Create a model to deploy.
      #'              The serializer, deserializer, content_type, and accept arguments are
-     #'              only used to define a default RealTimePredictor. They are ignored if an
+     #'              only used to define a default Predictor They are ignored if an
      #'              explicit predictor class is passed in. Other arguments are passed
      #'              through to the Model class.
      #' @param role (str): The ``ExecutionRoleArn`` IAM Role ARN for the ``Model``,

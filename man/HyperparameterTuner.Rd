@@ -342,7 +342,7 @@ sagemaker.tuner.HyperparameterTuner: A ``HyperparameterTuner``
 \if{latex}{\out{\hypertarget{method-deploy}{}}}
 \subsection{Method \code{deploy()}}{
 Deploy the best trained or user specified model to an Amazon
-             SageMaker endpoint and return a ``sagemaker.RealTimePredictor`` object.
+             SageMaker endpoint and return a ``sagemaker.Predictor`` object.
              For more information:
              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
 \subsection{Usage}{
@@ -400,7 +400,7 @@ what other arguments are needed.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()``
+sagemaker.predictor.Predictor: A predictor that provides a ``predict()``
              method, which can be used to send requests to the Amazon SageMaker endpoint
              and obtain inferences.
 }
@@ -440,7 +440,7 @@ Wait for latest hyperparameter tuning job to finish.
 \if{latex}{\out{\hypertarget{method-best_estimator}{}}}
 \subsection{Method \code{best_estimator()}}{
 Return the estimator that has best training job attached. The trained model can then
-             be deployed to an Amazon SageMaker endpoint and return a ``sagemaker.RealTimePredictor``
+             be deployed to an Amazon SageMaker endpoint and return a ``sagemaker.Predictor``
              object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuner$best_estimator(best_training_job = NULL)}\if{html}{\out{</div>}}

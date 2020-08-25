@@ -280,7 +280,7 @@ Returns the hyperparameters as a dictionary to use for training.
 \subsection{Method \code{create_model()}}{
 Create a model to deploy.
              The serializer, deserializer, content_type, and accept arguments are only used to define a
-             default RealTimePredictor. They are ignored if an explicit predictor class is passed in.
+             default Predictor. They are ignored if an explicit predictor class is passed in.
              Other arguments are passed through to the Model class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Estimator$create_model(
@@ -306,7 +306,7 @@ role from the Estimator will be used.}
 \item{\code{image}}{(str): An container image to use for deploying the model.
 Defaults to the image used for training.}
 
-\item{\code{predictor_cls}}{(RealTimePredictor): The predictor class to use when
+\item{\code{predictor_cls}}{(Predictor): The predictor class to use when
 deploying the model.}
 
 \item{\code{serializer}}{(callable): Should accept a single argument, the input

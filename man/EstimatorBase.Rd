@@ -509,7 +509,7 @@ Instance of the calling ``Estimator`` Class with the attached
 \if{latex}{\out{\hypertarget{method-deploy}{}}}
 \subsection{Method \code{deploy()}}{
 Deploy the trained model to an Amazon SageMaker endpoint and return a
-             ``sagemaker.RealTimePredictor`` object.
+             ``sagemaker.Predictor`` object.
              More information:
              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
 \subsection{Usage}{
@@ -587,7 +587,7 @@ For more, see the implementation docs.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()`` method,
+sagemaker.predictor.Predictor: A predictor that provides a ``predict()`` method,
              which can be used to send requests to the Amazon SageMaker
              endpoint and obtain inferences.
 }
