@@ -20,8 +20,8 @@ RecordSerializer = R6Class("RecordSerializer",
       initProtoBuf()
     },
 
-    #' @description Serialize a NumPy array into a buffer containing RecordIO records.
-    #' @param data (numpy.ndarray): The data to serialize.
+    #' @description Serialize a matrix/array into a buffer containing RecordIO records.
+    #' @param data (matrix): The data to serialize.
     #' @return raw: A buffer containing the data serialized as records.
     serialize = function(data){
       if(is.vector(data))
