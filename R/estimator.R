@@ -34,15 +34,15 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              might use the IAM role, if it needs to access an AWS resource.
     #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
-    #' @param train_instance_type (str): Type of EC2 instance to use for training,
+    #' @param instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
-    #' @param train_volume_size (int): Size in GB of the EBS volume to use for
+    #' @param volume_size (int): Size in GB of the EBS volume to use for
     #'              storing input data during training (default: 30). Must be large
     #'              enough to store training data if File Mode is used (which is the
     #'              default).
-    #' @param train_volume_kms_key (str): Optional. KMS key ID for encrypting EBS
+    #' @param volume_kms_key (str): Optional. KMS key ID for encrypting EBS
     #'              volume attached to the training instance (default: NULL).
-    #' @param train_max_run (int): Timeout in seconds for training (default: 24 *
+    #' @param max_run (int): Timeout in seconds for training (default: 24 *
     #'              60 * 60). After this amount of time Amazon SageMaker terminates
     #'              the job regardless of its current status.
     #' @param input_mode (str): The input mode that the algorithm supports
@@ -98,13 +98,13 @@ EstimatorBase = R6Class("EstimatorBase",
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic
     #'              between training containers is encrypted for the training job
     #'              (default: ``False``).
-    #' @param train_use_spot_instances (bool): Specifies whether to use SageMaker
+    #' @param use_spot_instances (bool): Specifies whether to use SageMaker
     #'              Managed Spot instances for training. If enabled then the
-    #'              `train_max_wait` arg should also be set.
+    #'              `max_wait` arg should also be set.
     #'              More information:
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/model-managed-spot-training.html
     #'              (default: ``False``).
-    #' @param train_max_wait (int): Timeout in seconds waiting for spot training
+    #' @param max_wait (int): Timeout in seconds waiting for spot training
     #'              instances (default: NULL). After this amount of time Amazon
     #'              SageMaker will stop waiting for Spot instances to become
     #'              available (default: ``NULL``).
@@ -146,10 +146,10 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              outbound network calls. Also known as Internet-free mode.
     initialize = function(role,
                           instance_count,
-                          train_instance_type,
-                          train_volume_size = 30,
-                          train_volume_kms_key = NULL,
-                          train_max_run = 24 * 60 * 60,
+                          instance_type,
+                          volume_size = 30,
+                          volume_kms_key = NULL,
+                          max_run = 24 * 60 * 60,
                           input_mode = "File",
                           output_path = NULL,
                           output_kms_key = NULL,
@@ -162,8 +162,8 @@ EstimatorBase = R6Class("EstimatorBase",
                           model_channel_name = "model",
                           metric_definitions = NULL,
                           encrypt_inter_container_traffic = FALSE,
-                          train_use_spot_instances =FALSE,
-                          train_max_wait = NULL,
+                          use_spot_instances =FALSE,
+                          max_wait = NULL,
                           checkpoint_s3_uri = NULL,
                           checkpoint_local_path = NULL,
                           rules = NULL,
@@ -173,10 +173,10 @@ EstimatorBase = R6Class("EstimatorBase",
                           enable_network_isolation = FALSE) {
       self$role = role
       self$instance_count = instance_count
-      self$train_instance_type = train_instance_type
-      self$train_volume_size = train_volume_size
-      self$train_volume_kms_key = train_volume_kms_key
-      self$train_max_run = train_max_run
+      self$instance_type = instance_type
+      self$volume_size = volume_size
+      self$volume_kms_key = volume_kms_key
+      self$max_run = max_run
       self$input_mode = input_mode
       self$tags = tags
       self$metric_definitions = metric_definitions
@@ -185,8 +185,8 @@ EstimatorBase = R6Class("EstimatorBase",
       self$code_uri = NULL
       self$code_channel_name = "code"
 
-      if (self$train_instance_type %in% c("local", "local_gpu")) {
-        if (self$train_instance_type == "local_gpu" && self$instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
+      if (self$instance_type %in% c("local", "local_gpu")) {
+        if (self$instance_type == "local_gpu" && self$instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
         stop("Currently don't support local sagemaker", call. = F)
         self$sagemaker_session = sagemaker_session #  LocalSession()
         if (!inherist(self$sagemaker_session, "Session")) stop("instance_type local or local_gpu is only supported with an instance of LocalSession", call. = FALSE)
@@ -214,8 +214,8 @@ EstimatorBase = R6Class("EstimatorBase",
       self$security_group_ids = security_group_ids
 
       self$encrypt_inter_container_traffic = encrypt_inter_container_traffic
-      self$train_use_spot_instances = train_use_spot_instances
-      self$train_max_wait = train_max_wait
+      self$use_spot_instances = use_spot_instances
+      self$max_wait = max_wait
       self$checkpoint_s3_uri = checkpoint_s3_uri
       self$checkpoint_local_path = checkpoint_local_path
 
@@ -854,10 +854,10 @@ EstimatorBase = R6Class("EstimatorBase",
   .add_spot_checkpoint_args = function(local_mode,
                                        train_args){
     train_args = list()
-    if (self$train_use_spot_instances){
+    if (self$use_spot_instances){
       if (local_mode){
         stop("Spot training is not supported in local mode.", call. = F)}
-      train_args[["train_use_spot_instances"]] = TRUE
+      train_args[["use_spot_instances"]] = TRUE
     }
 
     if (!islistempty(self$checkpoint_s3_uri)){
@@ -899,9 +899,9 @@ EstimatorBase = R6Class("EstimatorBase",
 
     init_params[["role"]] = job_details$RoleArn
     init_params[["instance_count"]] = job_details$ResourceConfig$InstanceCount
-    init_params[["train_instance_type"]] = job_details$ResourceConfig$InstanceType
-    init_params[["train_volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
-    init_params[["train_max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
+    init_params[["instance_type"]] = job_details$ResourceConfig$InstanceType
+    init_params[["volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
+    init_params[["max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
     init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
     init_params[["base_job_name"]] = job_details$TrainingJobName
     init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
@@ -995,15 +995,15 @@ Estimator = R6Class("Estimator",
     #'              might use the IAM role, if it needs to access an AWS resource.
     #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
-    #' @param train_instance_type (str): Type of EC2 instance to use for training,
+    #' @param instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
-    #' @param train_volume_size (int): Size in GB of the EBS volume to use for
+    #' @param volume_size (int): Size in GB of the EBS volume to use for
     #'              storing input data during training (default: 30). Must be large
     #'              enough to store training data if File Mode is used (which is the
     #'              default).
-    #' @param train_volume_kms_key (str): Optional. KMS key ID for encrypting EBS
+    #' @param volume_kms_key (str): Optional. KMS key ID for encrypting EBS
     #'              volume attached to the training instance (default: NULL).
-    #' @param train_max_run (int): Timeout in seconds for training (default: 24 *
+    #' @param max_run (int): Timeout in seconds for training (default: 24 *
     #'              60 * 60). After this amount of time Amazon SageMaker terminates
     #'              the job regardless of its current status.
     #' @param input_mode (str): The input mode that the algorithm supports
@@ -1059,13 +1059,13 @@ Estimator = R6Class("Estimator",
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic
     #'              between training containers is encrypted for the training job
     #'              (default: ``False``).
-    #' @param train_use_spot_instances (bool): Specifies whether to use SageMaker
+    #' @param use_spot_instances (bool): Specifies whether to use SageMaker
     #'              Managed Spot instances for training. If enabled then the
-    #'              `train_max_wait` arg should also be set.
+    #'              `max_wait` arg should also be set.
     #'              More information:
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/model-managed-spot-training.html
     #'              (default: ``False``).
-    #' @param train_max_wait (int): Timeout in seconds waiting for spot training
+    #' @param max_wait (int): Timeout in seconds waiting for spot training
     #'              instances (default: NULL). After this amount of time Amazon
     #'              SageMaker will stop waiting for Spot instances to become
     #'              available (default: ``NULL``).
@@ -1108,10 +1108,10 @@ Estimator = R6Class("Estimator",
     initialize = function(image_uri,
                           role,
                           instance_count,
-                          train_instance_type,
-                          train_volume_size=30,
-                          train_volume_kms_key=NULL,
-                          train_max_run=24 * 60 * 60,
+                          instance_type,
+                          volume_size=30,
+                          volume_kms_key=NULL,
+                          max_run=24 * 60 * 60,
                           input_mode="File",
                           output_path=NULL,
                           output_kms_key=NULL,
@@ -1125,8 +1125,8 @@ Estimator = R6Class("Estimator",
                           model_channel_name="model",
                           metric_definitions=NULL,
                           encrypt_inter_container_traffic=FALSE,
-                          train_use_spot_instances=FALSE,
-                          train_max_wait=NULL,
+                          use_spot_instances=FALSE,
+                          max_wait=NULL,
                           checkpoint_s3_uri=NULL,
                           checkpoint_local_path=NULL,
                           enable_network_isolation=FALSE,
@@ -1140,10 +1140,10 @@ Estimator = R6Class("Estimator",
       super$initialize(
         role,
         instance_count,
-        train_instance_type,
-        train_volume_size,
-        train_volume_kms_key,
-        train_max_run,
+        instance_type,
+        volume_size,
+        volume_kms_key,
+        max_run,
         input_mode,
         output_path,
         output_kms_key,
@@ -1156,8 +1156,8 @@ Estimator = R6Class("Estimator",
         model_channel_name=model_channel_name,
         metric_definitions=metric_definitions,
         encrypt_inter_container_traffic=encrypt_inter_container_traffic,
-        train_use_spot_instances=train_use_spot_instances,
-        train_max_wait=train_max_wait,
+        use_spot_instances=use_spot_instances,
+        max_wait=max_wait,
         checkpoint_s3_uri=checkpoint_s3_uri,
         checkpoint_local_path=checkpoint_local_path,
         rules=rules,
@@ -1579,7 +1579,7 @@ Framework = R6Class("Framework",
       return (ImageUris$new()$retrieve(
         attributes(self)$`_framework_name`,
         self$sagemaker_session$paws_region_name,
-        instance_type=self$train_instance_type,
+        instance_type=self$instance_type,
         version=self$framework_version,
         py_version=self$py_version,
         image_scope="training")

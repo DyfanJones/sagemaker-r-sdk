@@ -69,10 +69,10 @@
       output_config = private$.prepare_output_config(estimator$output_path, estimator$output_kms_key)
 
       resource_config = private$.prepare_resource_config(
-        estimator$train_instance_count,
-        estimator$train_instance_type,
-        estimator$train_volume_size,
-        estimator$train_volume_kms_key)
+        estimator$instance_count,
+        estimator$instance_type,
+        estimator$volume_size,
+        estimator$volume_kms_key)
 
       stop_condition = private$.prepare_stop_condition(
         estimator$train_max_run,
@@ -241,13 +241,13 @@
     .prepare_resource_config = function(instance_count,
                                         instance_type,
                                         volume_size,
-                                        train_volume_kms_key = NULL){
+                                        volume_kms_key = NULL){
       resource_config = list("InstanceCount"= instance_count,
                              "InstanceType"= instance_type,
                              "VolumeSizeInGB"= volume_size)
 
-      if (!is.null(train_volume_kms_key) || length(train_volume_kms_key) == 0)
-        resource_config[["VolumeKmsKeyId"]] = train_volume_kms_key
+      if (!is.null(volume_kms_key) || length(volume_kms_key) == 0)
+        resource_config[["VolumeKmsKeyId"]] = volume_kms_key
 
         return(resource_config)
     },

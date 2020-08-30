@@ -30,16 +30,16 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
      #'              access training data and model artifacts. After the endpoint
      #'              is created, the inference code might use the IAM role, if it
      #'              needs to access an AWS resource.
-     #' @param train_instance_count (int): Number of Amazon EC2 instances to
+     #' @param instance_count (int): Number of Amazon EC2 instances to
      #'              use for training.
-     #' @param train_instance_type (str): Type of EC2
+     #' @param instance_type (str): Type of EC2
      #'              instance to use for training, for example, 'ml.c4.xlarge'.
-     #' @param train_volume_size (int): Size in GB of the EBS volume to use for
+     #' @param volume_size (int): Size in GB of the EBS volume to use for
      #'              storing input data during training (default: 30). Must be large enough to store
      #'              training data if File Mode is used (which is the default).
-     #' @param train_volume_kms_key (str): Optional. KMS key ID for encrypting EBS volume attached
+     #' @param volume_kms_key (str): Optional. KMS key ID for encrypting EBS volume attached
      #'              to the training instance (default: NULL).
-     #' @param train_max_run (int): Timeout in seconds for training (default: 24 * 60 * 60).
+     #' @param max_run (int): Timeout in seconds for training (default: 24 * 60 * 60).
      #'              After this amount of time Amazon SageMaker terminates the
      #'              job regardless of its current status.
      #' @param input_mode (str): The input mode that the algorithm supports
@@ -95,11 +95,11 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
      #'              to ignore the irrelevant arguments.
      initialize = function(algorithm_arn,
                            role,
-                           train_instance_count,
-                           train_instance_type,
-                           train_volume_size=30,
-                           train_volume_kms_key=NULL,
-                           train_max_run=24 * 60 * 60,
+                           instance_count,
+                           instance_type,
+                           volume_size=30,
+                           volume_kms_key=NULL,
+                           max_run=24 * 60 * 60,
                            input_mode="File",
                            output_path=NULL,
                            output_kms_key=NULL,
@@ -117,11 +117,11 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
        self$algorithm_arn = algorithm_arn
        super$initialize(
          role,
-         train_instance_count,
-         train_instance_type,
-         train_volume_size,
-         train_volume_kms_key,
-         train_max_run,
+         instance_count,
+         instance_type,
+         volume_size,
+         volume_kms_key,
+         max_run,
          input_mode,
          output_path,
          output_kms_key,
@@ -159,16 +159,16 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
 
        # Check that the training instance type is compatible with the algorithm.
        supported_instances = train_spec[["SupportedTrainingInstanceTypes"]]
-       if (!(self$train_instance_type %in% supported_instances)){
-         stop(sprint("Invalid train_instance_type: %s. %s supports the following instance types: %s",
-                     self$train_instance_type, algorithm_name, supported_instances),
+       if (!(self$instance_type %in% supported_instances)){
+         stop(sprint("Invalid instance_type: %s. %s supports the following instance types: %s",
+                     self$instance_type, algorithm_name, supported_instances),
               call. = F)}
 
        # Verify if distributed training is supported by the algorithm
-       if (self$train_instance_count > 1
+       if (self$instance_count > 1
          && "SupportsDistributedTraining" %in% train_spec
          && !is.null(train_spec[["SupportsDistributedTraining"]]))
-         stop(sprintf("Distributed training is not supported by %s. Please set train_instance_count=1", algorithm_name),
+         stop(sprintf("Distributed training is not supported by %s. Please set instance_count=1", algorithm_name),
               call. = F)
      },
 

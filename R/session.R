@@ -272,7 +272,7 @@ Session = R6Class("Session",
     #' @param algorithm_arn (str): Algorithm Arn from Marketplace.
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic between training
     #'              containers is encrypted for the training job (default: ``False``).
-    #' @param train_use_spot_instances (bool): whether to use spot instances for training.
+    #' @param use_spot_instances (bool): whether to use spot instances for training.
     #' @param checkpoint_s3_uri (str): The S3 URI in which to persist checkpoints
     #'              that the algorithm persists (if any) during training. (default: ``None``).
     #' @param checkpoint_local_path (str): The local path that the algorithm
@@ -311,7 +311,7 @@ Session = R6Class("Session",
                      image=NULL,
                      algorithm_arn=NULL,
                      encrypt_inter_container_traffic=FALSE,
-                     train_use_spot_instances=FALSE,
+                     use_spot_instances=FALSE,
                      checkpoint_s3_uri=NULL,
                      checkpoint_local_path=NULL,
                      experiment_config=NULL,
@@ -348,7 +348,7 @@ Session = R6Class("Session",
       train_request$EnableNetworkIsolation = enable_network_isolation
 
       train_request$EnableInterContainerTrafficEncryption = encrypt_inter_container_traffic
-      train_request$EnableManagedSpotTraining = train_use_spot_instances
+      train_request$EnableManagedSpotTraining = use_spot_instances
 
       train_request$CheckpointConfig = NULL
 
@@ -1081,7 +1081,7 @@ Session = R6Class("Session",
     #'                              The key in vpc_config is 'Subnets'.}
     #'                \item{\strong{security_group_ids (list[str]):} List of security group ids.
     #'                              The key in vpc_config is 'SecurityGroupIds'.}}
-    #' @param train_use_spot_instances (bool): whether to use spot instances for training.
+    #' @param use_spot_instances (bool): whether to use spot instances for training.
     #' @param checkpoint_s3_uri (str): The S3 URI in which to persist checkpoints
     #'             that the algorithm persists (if any) during training. (Default: \code{FALSE}).
     #' @param checkpoint_local_path (str): The local path that the algorithm
@@ -1115,7 +1115,7 @@ Session = R6Class("Session",
                     early_stopping_type="Off",
                     encrypt_inter_container_traffic=FALSE,
                     vpc_config=NULL,
-                    train_use_spot_instances=FALSE,
+                    use_spot_instances=FALSE,
                     checkpoint_s3_uri=NULL,
                     checkpoint_local_path=NULL){
 
@@ -1144,7 +1144,7 @@ Session = R6Class("Session",
           stop_condition=stop_condition,
           enable_network_isolation=enable_network_isolation,
           encrypt_inter_container_traffic=encrypt_inter_container_traffic,
-          train_use_spot_instances=train_use_spot_instances,
+          use_spot_instances=use_spot_instances,
           checkpoint_s3_uri=checkpoint_s3_uri,
           checkpoint_local_path=checkpoint_local_path
         )
@@ -2217,7 +2217,7 @@ Session = R6Class("Session",
                                     objective_type=NULL,
                                     objective_metric_name=NULL,
                                     parameter_ranges=NULL,
-                                    train_use_spot_instances=FALSE,
+                                    use_spot_instances=FALSE,
                                     checkpoint_s3_uri=NULL,
                                     checkpoint_local_path=NULL){
 
@@ -2249,7 +2249,7 @@ Session = R6Class("Session",
 
       if (encrypt_inter_container_traffic) training_job_definition["EnableInterContainerTrafficEncryption"] = TRUE
 
-      if (train_use_spot_instances)  training_job_definition["EnableManagedSpotTraining"] = TRUE
+      if (use_spot_instances)  training_job_definition["EnableManagedSpotTraining"] = TRUE
 
 
       if (!is.null(checkpoint_s3_uri)){
