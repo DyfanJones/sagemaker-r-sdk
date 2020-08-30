@@ -723,229 +723,231 @@ EstimatorBase = R6Class("EstimatorBase",
     }
     ),
   private = list(
-  .prepare_rules = function(){
-    self$debugger_rule_configs = list()
-    if (!is.null(self$rules)){
-      # Iterate through each of the provided rules.
-      for (rule in self$rules){
-        # Set the image URI using the default rule evaluator image and the region.
-        if (rule$image_uri == "DEFAULT_RULE_EVALUATOR_IMAGE"){
-            rule$image_uri = get_rule_container_image_uri(self$sagemaker_session$paws_region())
-            rule$instance_type = NULL
-            rule$volume_size_in_gb = NULL
-        }
-        # If source was provided as a rule parameter, upload to S3 and save the S3 uri.
-        if ("source_s3_uri" %in% rule$rule_parameters){
-          parse_result = url_parse(rule$rule_parameters$source_s3_uri)
+
+
+    .prepare_rules = function(){
+      self$debugger_rule_configs = list()
+      if (!is.null(self$rules)){
+        # Iterate through each of the provided rules.
+        for (rule in self$rules){
+          # Set the image URI using the default rule evaluator image and the region.
+          if (rule$image_uri == "DEFAULT_RULE_EVALUATOR_IMAGE"){
+              rule$image_uri = get_rule_container_image_uri(self$sagemaker_session$paws_region())
+              rule$instance_type = NULL
+              rule$volume_size_in_gb = NULL
           }
-        if (parse_result$scheme != "s3"){
-          desired_s3_uri = file.path(
-            "s3://",
-            self$sagemaker_session$default_bucket(),
-            rule$name,
-            UUIDgenerate())
-          s3_uri = S3Uploader$new()$upload(
-                      local_path=rule$rule_parameters$source_s3_uri,
-                      desired_s3_uri=desired_s3_uri,
-                      session=self$sagemaker_session)
-          rule$rule_parameters$source_s3_uri = s3_uri
+          # If source was provided as a rule parameter, upload to S3 and save the S3 uri.
+          if ("source_s3_uri" %in% rule$rule_parameters){
+            parse_result = url_parse(rule$rule_parameters$source_s3_uri)
+            }
+          if (parse_result$scheme != "s3"){
+            desired_s3_uri = file.path(
+              "s3://",
+              self$sagemaker_session$default_bucket(),
+              rule$name,
+              UUIDgenerate())
+            s3_uri = S3Uploader$new()$upload(
+                        local_path=rule$rule_parameters$source_s3_uri,
+                        desired_s3_uri=desired_s3_uri,
+                        session=self$sagemaker_session)
+            rule$rule_parameters$source_s3_uri = s3_uri
+          }
+        # Save the request dictionary for the rule.
+        self$debugger_rule_configs = c(self$debugger_rule_configs, rule$to_debugger_rule_config_dict())
         }
-      # Save the request dictionary for the rule.
-      self$debugger_rule_configs = c(self$debugger_rule_configs, rule$to_debugger_rule_config_dict())
       }
+    },
+
+    .prepare_collection_configs = function(){
+      # Create a set to de-duplicate CollectionConfigs.
+      self$collection_configs = list()
+      # Iterate through the rules and add their respective CollectionConfigs to the set.
+      if (!is.null(self$rules)) {
+        for (rule in self$rules)
+          self$collection_configs$update(rule$collection_configs)
+      }
+      # Add the CollectionConfigs from DebuggerHookConfig to the set.
+      if (!is.null(self$debugger_hook_config))
+        self$collection_configs$update(self$debugger_hook_config$collection_configs %||% list())
+    },
+
+    .ensure_latest_training_job = function(error_message = "Estimator is not associated with a training job"){
+      if (is.null(self$latest_training_job))
+        stop(error_message, call. =F)
+    },
+
+
+    # ------------------------ incorporate _TrainingJob calls -------------------
+
+    # Create a new Amazon SageMaker training job from the estimator.
+    # Args:
+    #   estimator (sagemaker.estimator.EstimatorBase): Estimator object
+    # created by the user.
+    # inputs (str): Parameters used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.
+    # experiment_config (dict[str, str]): Experiment management configuration used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.  Dictionary contains
+    # three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+    # Returns:
+    #   sagemaker.estimator._TrainingJob: Constructed object that captures
+    # all information about the started training job.
+    .start_new = function(inputs,
+                          experiment_config = NULL){
+      local_mode = self$sagemaker_session$local_mode
+      model_uri = self$model_uri
+
+      # Allow file:// input only in local mode
+      if (private$.is_local_channel(inputs) || private$.is_local_channel(model_uri)){
+        if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
+      }
+
+      config = .Job$private_methods$.load_config(inputs, self)
+
+      if (!islistempty(self$hyperparameters())){
+        hyperparameters = self$hyperparameters()}
+
+
+      train_args = config
+      train_args[["input_mode"]] = self$input_mode
+      train_args[["job_name"]] = self$.current_job_name
+      train_args[["hyperparameters"]] = hyperparameters
+      train_args[["tags"]] = self$tags
+      train_args[["metric_definitions"]] = self$metric_definitions
+      train_args[["experiment_config"]] = experiment_config
+
+      if (inherits(inputs, "s3_input")){
+        if ("InputMode" %in% inputs$config){
+          log_debug("Selecting s3_input's input_mode (%s) for TrainingInputMode.",
+                    inputs$config$InputMode)
+          train_args[["input_mode"]] = inputs$config$InputMod}
+      }
+
+
+      if (self$enable_network_isolation()){
+        train_args[["enable_network_isolation"]] = TRUE}
+
+      if (self$encrypt_inter_container_traffic){
+        train_args[["encrypt_inter_container_traffic"]] = TRUE}
+
+      if (inherits(self, "Algorithmself")){
+        train_args[["algorithm_arn"]] = self$algorithm_arn
+      } else {
+        train_args[["image"]] = self$training_image_uri()}
+
+
+      if (!islistempty(self$debugger_rule_configs))
+        train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
+
+      if (!islistempty(self$debugger_hook_config)){
+        self$debugger_hook_config[["collection_configs"]] = self$collection_configs
+        train_args[["debugger_hook_config"]] = self$debugger_hook_config$to_request_list()}
+
+      if (!islistempty(self$tensorboard_output_config))
+        train_args[["tensorboard_output_config"]] = self$tensorboard_output_config$to_request_list()
+
+      train_args = c(train_args, private$.add_spot_checkpoint_args(local_mode, train_args))
+
+
+      if (!islistempty(self$enable_sagemaker_metrics))
+        train_args[["enable_sagemaker_metrics"]] = self$enable_sagemaker_metrics
+      do.call(self$sagemaker_session$train, train_args)
+    },
+
+    .add_spot_checkpoint_args = function(local_mode,
+                                         train_args){
+      train_args = list()
+      if (self$use_spot_instances){
+        if (local_mode){
+          stop("Spot training is not supported in local mode.", call. = F)}
+        train_args[["use_spot_instances"]] = TRUE
+      }
+
+      if (!islistempty(self$checkpoint_s3_uri)){
+        if (local_mode){
+          stop("Setting checkpoint_s3_uri is not supported in local mode.", call. = F)}
+        train_args[["checkpoint_s3_uri"]] = self$checkpoint_s3_uri
+      }
+
+      if (!islistempty(self$checkpoint_local_path)){
+        if (local_mode){
+        stop("Setting checkpoint_local_path is not supported in local mode.", call. = F)}
+        train_args[["checkpoint_local_path"]] = self$checkpoint_local_path
+      }
+      return(train_args)
+    },
+
+    .is_local_channel = function(input_uri){
+      return(inherits(input_uri, "character") && startsWith(input_uri,"file://"))
+    },
+
+    # ---------------------------------------------------------------------------
+    .compilation_job_name = function(){
+      base_name = self$base_job_name %||% base_name_from_image(self$training_image_uri())
+      return (name_from_base(paste0("compilation-", base_name)))
+    },
+
+    # Convert the job description to init params that can be handled by the
+    # class constructor
+    # Args:
+    #   job_details: the returned job details from a describe_training_job
+    # API call.
+    # model_channel_name (str): Name of the channel where pre-trained
+    # model data will be downloaded.
+    # Returns:
+    #   dictionary: The transformed init_params
+    .prepare_init_params_from_job_description = function(job_details,
+                                                         model_channel_name=NULL){
+      init_params = list()
+
+      init_params[["role"]] = job_details$RoleArn
+      init_params[["instance_count"]] = job_details$ResourceConfig$InstanceCount
+      init_params[["instance_type"]] = job_details$ResourceConfig$InstanceType
+      init_params[["volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
+      init_params[["max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
+      init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
+      init_params[["base_job_name"]] = job_details$TrainingJobName
+      init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
+      init_params[["output_kms_key"]] = job_details$OutputDataConfig$KmsKeyId
+      if ("EnableNetworkIsolation" %in% names(job_details))
+        init_params[["enable_network_isolation"]] = job_details$EnableNetworkIsolation
+
+      has_hps = !islistempty(job_details$HyperParameters)
+      init_params[["hyperparameters"]] = if (has_hps) job_details$HyperParameters else list()
+
+      if (!islistempty(job_details$AlgorithmSpecification$AlgorithmName)) {
+        init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
+      }
+
+      if (!islistempty(job_details$AlgorithmSpecification$TrainingImage)) {
+        init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
+      } else {
+        stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
+          "AlgorithmName is expected. NULL was found.", call. = F)}
+
+      if (!islistempty(job_details$AlgorithmSpecification$MetricDefinitons))
+        init_params[["metric_definitions"]] = job_details$AlgorithmSpecification$MetricsDefinition
+
+      if (!islistempty(job_details$EnableInterContainerTrafficEncryption))
+        init_params[["encrypt_inter_container_traffic"]] = job_details$EnableInterContainerTrafficEncryption
+
+      vpc_list = vpc_from_list(job_details$VpcConfig)
+      if (!islistempty(vpc_list$Subnets)){
+        init_params[["subnets"]] = vpc_list$Subnets}
+
+      if (!islistempty(vpc_list$SecurityGroupIds)){
+        init_params[["security_group_ids"]] = vpc_list$SecurityGroupIds}
+
+      if ("InputDataConfig" %in% names(job_details) && !is.null(model_channel_name)){
+        for(channel in job_details$InputDataConfig){
+         if (channel$ChannelName == model_channel_name){
+            init_params[["model_channel_name"]] = model_channel_name
+            init_params[["model_uri"]] = channel$DataSource$S3DataSource$S3Uri
+            break}
+          }
+      }
+
+      return(init_params)
     }
-  },
-
-  .prepare_collection_configs = function(){
-    # Create a set to de-duplicate CollectionConfigs.
-    self$collection_configs = list()
-    # Iterate through the rules and add their respective CollectionConfigs to the set.
-    if (!is.null(self$rules)) {
-      for (rule in self$rules)
-        self$collection_configs$update(rule$collection_configs)
-    }
-    # Add the CollectionConfigs from DebuggerHookConfig to the set.
-    if (!is.null(self$debugger_hook_config))
-      self$collection_configs$update(self$debugger_hook_config$collection_configs %||% list())
-  },
-
-  .ensure_latest_training_job = function(error_message = "Estimator is not associated with a training job"){
-    if (is.null(self$latest_training_job))
-      stop(error_message, call. =F)
-  },
-
-
-  # ------------------------ incorporate _TrainingJob calls -------------------
-
-  # Create a new Amazon SageMaker training job from the estimator.
-  # Args:
-  #   estimator (sagemaker.estimator.EstimatorBase): Estimator object
-  # created by the user.
-  # inputs (str): Parameters used when called
-  # :meth:`~sagemaker.estimator.EstimatorBase.fit`.
-  # experiment_config (dict[str, str]): Experiment management configuration used when called
-  # :meth:`~sagemaker.estimator.EstimatorBase.fit`.  Dictionary contains
-  # three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
-  # Returns:
-  #   sagemaker.estimator._TrainingJob: Constructed object that captures
-  # all information about the started training job.
-  .start_new = function(inputs,
-                        experiment_config = NULL){
-    local_mode = self$sagemaker_session$local_mode
-    model_uri = self$model_uri
-
-    # Allow file:// input only in local mode
-    if (private$.is_local_channel(inputs) || private$.is_local_channel(model_uri)){
-      if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
-    }
-
-    config = .Job$private_methods$.load_config(inputs, self)
-
-    if (!islistempty(self$hyperparameters())){
-      hyperparameters = self$hyperparameters()}
-
-
-    train_args = config
-    train_args[["input_mode"]] = self$input_mode
-    train_args[["job_name"]] = self$.current_job_name
-    train_args[["hyperparameters"]] = hyperparameters
-    train_args[["tags"]] = self$tags
-    train_args[["metric_definitions"]] = self$metric_definitions
-    train_args[["experiment_config"]] = experiment_config
-
-    if (inherits(inputs, "s3_input")){
-      if ("InputMode" %in% inputs$config){
-        log_debug("Selecting s3_input's input_mode (%s) for TrainingInputMode.",
-                  inputs$config$InputMode)
-        train_args[["input_mode"]] = inputs$config$InputMod}
-    }
-
-
-    if (self$enable_network_isolation()){
-      train_args[["enable_network_isolation"]] = TRUE}
-
-    if (self$encrypt_inter_container_traffic){
-      train_args[["encrypt_inter_container_traffic"]] = TRUE}
-
-    if (inherits(self, "Algorithmself")){
-      train_args[["algorithm_arn"]] = self$algorithm_arn
-    } else {
-      train_args[["image"]] = self$training_image_uri()}
-
-
-    if (!islistempty(self$debugger_rule_configs))
-      train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
-
-    if (!islistempty(self$debugger_hook_config)){
-      self$debugger_hook_config[["collection_configs"]] = self$collection_configs
-      train_args[["debugger_hook_config"]] = self$debugger_hook_config$to_request_list()}
-
-    if (!islistempty(self$tensorboard_output_config))
-      train_args[["tensorboard_output_config"]] = self$tensorboard_output_config$to_request_list()
-
-    train_args = c(train_args, private$.add_spot_checkpoint_args(local_mode, train_args))
-
-
-    if (!islistempty(self$enable_sagemaker_metrics))
-      train_args[["enable_sagemaker_metrics"]] = self$enable_sagemaker_metrics
-    do.call(self$sagemaker_session$train, train_args)
-  },
-
-  .add_spot_checkpoint_args = function(local_mode,
-                                       train_args){
-    train_args = list()
-    if (self$use_spot_instances){
-      if (local_mode){
-        stop("Spot training is not supported in local mode.", call. = F)}
-      train_args[["use_spot_instances"]] = TRUE
-    }
-
-    if (!islistempty(self$checkpoint_s3_uri)){
-      if (local_mode){
-        stop("Setting checkpoint_s3_uri is not supported in local mode.", call. = F)}
-      train_args[["checkpoint_s3_uri"]] = self$checkpoint_s3_uri
-    }
-
-    if (!islistempty(self$checkpoint_local_path)){
-      if (local_mode){
-      stop("Setting checkpoint_local_path is not supported in local mode.", call. = F)}
-      train_args[["checkpoint_local_path"]] = self$checkpoint_local_path
-    }
-    return(train_args)
-  },
-
-  .is_local_channel = function(input_uri){
-    return(inherits(input_uri, "character") && startsWith(input_uri,"file://"))
-  },
-
-  # ---------------------------------------------------------------------------
-  .compilation_job_name = function(){
-    base_name = self$base_job_name %||% base_name_from_image(self$training_image_uri())
-    return (name_from_base(paste0("compilation-", base_name)))
-  },
-
-  # Convert the job description to init params that can be handled by the
-  # class constructor
-  # Args:
-  #   job_details: the returned job details from a describe_training_job
-  # API call.
-  # model_channel_name (str): Name of the channel where pre-trained
-  # model data will be downloaded.
-  # Returns:
-  #   dictionary: The transformed init_params
-  .prepare_init_params_from_job_description = function(job_details,
-                                                       model_channel_name=NULL){
-    init_params = list()
-
-    init_params[["role"]] = job_details$RoleArn
-    init_params[["instance_count"]] = job_details$ResourceConfig$InstanceCount
-    init_params[["instance_type"]] = job_details$ResourceConfig$InstanceType
-    init_params[["volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
-    init_params[["max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
-    init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
-    init_params[["base_job_name"]] = job_details$TrainingJobName
-    init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
-    init_params[["output_kms_key"]] = job_details$OutputDataConfig$KmsKeyId
-    if ("EnableNetworkIsolation" %in% names(job_details))
-      init_params[["enable_network_isolation"]] = job_details$EnableNetworkIsolation
-
-    has_hps = !islistempty(job_details$HyperParameters)
-    init_params[["hyperparameters"]] = if (has_hps) job_details$HyperParameters else list()
-
-    if (!islistempty(job_details$AlgorithmSpecification$AlgorithmName)) {
-      init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
-    }
-
-    if (!islistempty(job_details$AlgorithmSpecification$TrainingImage)) {
-      init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
-    } else {
-      stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
-        "AlgorithmName is expected. NULL was found.", call. = F)}
-
-    if (!islistempty(job_details$AlgorithmSpecification$MetricDefinitons))
-      init_params[["metric_definitions"]] = job_details$AlgorithmSpecification$MetricsDefinition
-
-    if (!islistempty(job_details$EnableInterContainerTrafficEncryption))
-      init_params[["encrypt_inter_container_traffic"]] = job_details$EnableInterContainerTrafficEncryption
-
-    vpc_list = vpc_from_list(job_details$VpcConfig)
-    if (!islistempty(vpc_list$Subnets)){
-      init_params[["subnets"]] = vpc_list$Subnets}
-
-    if (!islistempty(vpc_list$SecurityGroupIds)){
-      init_params[["security_group_ids"]] = vpc_list$SecurityGroupIds}
-
-    if ("InputDataConfig" %in% names(job_details) && !is.null(model_channel_name)){
-      for(channel in job_details$InputDataConfig){
-       if (channel$ChannelName == model_channel_name){
-          init_params[["model_channel_name"]] = model_channel_name
-          init_params[["model_uri"]] = channel$DataSource$S3DataSource$S3Uri
-          break}
-        }
-    }
-
-    return(init_params)
-  }
 
   ),
 
