@@ -32,7 +32,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              endpoints use this role to access training data and model
     #'              artifacts. After the endpoint is created, the inference code
     #'              might use the IAM role, if it needs to access an AWS resource.
-    #' @param train_instance_count (int): Number of Amazon EC2 instances to use
+    #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
     #' @param train_instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
@@ -145,7 +145,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              (such as the Internet). The container does not make any inbound or
     #'              outbound network calls. Also known as Internet-free mode.
     initialize = function(role,
-                          train_instance_count,
+                          instance_count,
                           train_instance_type,
                           train_volume_size = 30,
                           train_volume_kms_key = NULL,
@@ -172,7 +172,7 @@ EstimatorBase = R6Class("EstimatorBase",
                           enable_sagemaker_metrics = NULL,
                           enable_network_isolation = FALSE) {
       self$role = role
-      self$train_instance_count = train_instance_count
+      self$instance_count = instance_count
       self$train_instance_type = train_instance_type
       self$train_volume_size = train_volume_size
       self$train_volume_kms_key = train_volume_kms_key
@@ -186,7 +186,7 @@ EstimatorBase = R6Class("EstimatorBase",
       self$code_channel_name = "code"
 
       if (self$train_instance_type %in% c("local", "local_gpu")) {
-        if (self$train_instance_type == "local_gpu" && self$train_instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
+        if (self$train_instance_type == "local_gpu" && self$instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
         stop("Currently don't support local sagemaker", call. = F)
         self$sagemaker_session = sagemaker_session #  LocalSession()
         if (!inherist(self$sagemaker_session, "Session")) stop("instance_type local or local_gpu is only supported with an instance of LocalSession", call. = FALSE)
@@ -898,7 +898,7 @@ EstimatorBase = R6Class("EstimatorBase",
     init_params = list()
 
     init_params[["role"]] = job_details$RoleArn
-    init_params[["train_instance_count"]] = job_details$ResourceConfig$InstanceCount
+    init_params[["instance_count"]] = job_details$ResourceConfig$InstanceCount
     init_params[["train_instance_type"]] = job_details$ResourceConfig$InstanceType
     init_params[["train_volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
     init_params[["train_max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
@@ -993,7 +993,7 @@ Estimator = R6Class("Estimator",
     #'              endpoints use this role to access training data and model
     #'              artifacts. After the endpoint is created, the inference code
     #'              might use the IAM role, if it needs to access an AWS resource.
-    #' @param train_instance_count (int): Number of Amazon EC2 instances to use
+    #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
     #' @param train_instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
@@ -1107,7 +1107,7 @@ Estimator = R6Class("Estimator",
     #'              (default: ``NULL``).
     initialize = function(image_uri,
                           role,
-                          train_instance_count,
+                          instance_count,
                           train_instance_type,
                           train_volume_size=30,
                           train_volume_kms_key=NULL,
@@ -1139,7 +1139,7 @@ Estimator = R6Class("Estimator",
       self$hyperparam_list = if (!islistempty(hyperparameters)) hyperparameters else list()
       super$initialize(
         role,
-        train_instance_count,
+        instance_count,
         train_instance_type,
         train_volume_size,
         train_volume_kms_key,
@@ -1295,7 +1295,7 @@ Estimator = R6Class("Estimator",
 #'              Subclasses define functionality pertaining to specific ML frameworks,
 #'              such as training/deployment images and predictor instances.
 #' @export
-FrameWork = R6Class("FrameWork",
+Framework = R6Class("Framework",
   inherit = EstimatorBase,
   public = list(
     #' @field LAUNCH_PS_ENV_NAME
@@ -1841,6 +1841,17 @@ FrameWork = R6Class("FrameWork",
       init_params$hyperparameters = hyperparameters
 
       return(init_params)
+    },
+
+    # Get the appropriate value to pass as ``entry_point`` to a model constructor.
+    # Returns:
+    #   str: The path to the entry point script. This can be either an absolute path or
+    # a path relative to ``self._model_source_dir()``.
+    .model_entry_point = function(){
+      if (self$sagemaker_session$local_mode || is.null(private$.model_source_dir()))
+        return(self$entry_point)
+
+      return(self$uploaded_code$script_name)
     }
   ),
   lock_objects = F
