@@ -336,9 +336,9 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              strings are "All", "NULL", "Training", or "Rules". To maintain backwards
     #'              compatibility, boolean values are also accepted and converted to strings.
     wait = function(logs = "All"){
-      if(inherits(logs, "logical")) logs = ifelse(logs, "All", "NULL")
+      if(inherits(logs, "logical")) logs = ifelse(logs, "All", "None")
 
-      if(logs != "NULL"){
+      if(logs != "None"){
           self$sagemaker_session$logs_for_job(job_name = self$latest_training_job, wait=TRUE, log_type=logs)
       } else {
           self$sagemaker_session$wait_for_job(job = self$latest_training_job)}
