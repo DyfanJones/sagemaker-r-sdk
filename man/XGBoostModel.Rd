@@ -46,7 +46,7 @@ Initialize an XGBoostModel.
   framework_version,
   image_uri = NULL,
   py_version = "py3",
-  predictor_cls = XGBoostPredictor$new(),
+  predictor_cls = XGBoostPredictor,
   model_server_workers = NULL,
   ...
 )}\if{html}{\out{</div>}}

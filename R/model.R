@@ -699,9 +699,9 @@ FrameworkModel = R6Class("FrameworkModel",
                          dependencies=NULL,
                          git_config=NULL,
                          ...){
-     super$initialize(image_uri,
-                      model_data,
-                      role,
+     super$initialize(image_uri=image_uri,
+                      model_data=model_data,
+                      role=role,
                       predictor_cls=predictor_cls,
                       env=env,
                       name=name,
@@ -712,7 +712,7 @@ FrameworkModel = R6Class("FrameworkModel",
      self$dependencies = dependencies %||% list()
      self$git_config = git_config
      # Align logging level with python logging
-     container_log_level = match.arg(toupper(container_log_level))
+     container_log_level = match.arg(container_log_level)
      container_log_level = switch(container_log_level,
                                   "INFO" = "20",
                                   "WARN" = "30",

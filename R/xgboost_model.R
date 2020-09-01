@@ -69,12 +69,12 @@ XGBoostModel = R6Class("XGBoostModel",
                           framework_version,
                           image_uri=NULL,
                           py_version="py3",
-                          predictor_cls=XGBoostPredictor$new(),
+                          predictor_cls=XGBoostPredictor,
                           model_server_workers=NULL,
                           ...){
 
       super$initialize(
-        model_data, image_uri, role, entry_point, predictor_cls=predictor_cls, ...
+        model_data=model_data, image_uri=image_uri, role=role, entry_point=entry_point, predictor_cls=predictor_cls, ...
       )
 
       self$py_version = py_version
