@@ -26,8 +26,7 @@ BaseSerializer = R6Class("BaseSerializer",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<BaseSerializer>")
-     invisible(self)
+      print_class(self)
    }
   )
 )
@@ -51,14 +50,6 @@ CsvSerializer = R6Class("CsvSerializer",
       obj = readBin(TempFile, "raw", n = file.size(TempFile))
       unlink(TempFile)
       return(obj)
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<CsvBaseSerializer>")
-      invisible(self)
     }
   )
 )
@@ -86,14 +77,6 @@ JsonSerializer = R6Class("JsonSerializer",
      write_json(data, con, dataframe = "columns", auto_unbox = T)
 
      return(rawConnectionValue(con))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<JsonBaseSerializer>")
-     invisible(self)
    }
   )
 )
@@ -108,6 +91,7 @@ json_serializer <- JsonSerializer$new()
 #'              <label> <index1>:<value1> <index2>:<value2> ...
 #'              It is suitable for sparse datasets since it does not store zero-valued
 #'              features.
+#' @export
 LibSVMSerializer = R6Class("LibSVMSerializer",
    inherit = BaseSerializer,
    public = list(
@@ -127,14 +111,6 @@ LibSVMSerializer = R6Class("LibSVMSerializer",
          sparsio::write_svmlight(x, file = f)
          obj = readBin(f, what = "raw", n = file.size(f))
          return(obj)
-      },
-
-      #' @description
-      #' Printer.
-      #' @param ... (ignored).
-      print = function(...){
-         cat("<LibSVMSerializer>")
-         invisible(self)
       }
    )
 )

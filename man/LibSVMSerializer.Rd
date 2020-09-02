@@ -18,13 +18,13 @@ Serialize data of various formats to a LibSVM-formatted string.
 \itemize{
 \item \href{#method-new}{\code{LibSVMSerializer$new()}}
 \item \href{#method-serialize}{\code{LibSVMSerializer$serialize()}}
-\item \href{#method-print}{\code{LibSVMSerializer$print()}}
 \item \href{#method-clone}{\code{LibSVMSerializer$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseSerializer" data-id="print">}\href{../../R6sagemaker/html/BaseSerializer.html#method-print}{\code{R6sagemaker::BaseSerializer$print()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -57,23 +57,6 @@ file-like object.}
 }
 \subsection{Returns}{
 str: The data serialized as a LibSVM-formatted string.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibSVMSerializer$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

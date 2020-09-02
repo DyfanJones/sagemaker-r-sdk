@@ -21,13 +21,13 @@ Use json format to deserialize raw data stream
 \itemize{
 \item \href{#method-new}{\code{JsonDeserializer$new()}}
 \item \href{#method-deserialize}{\code{JsonDeserializer$deserialize()}}
-\item \href{#method-print}{\code{JsonDeserializer$print()}}
 \item \href{#method-clone}{\code{JsonDeserializer$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseDeserializer" data-id="print">}\href{../../R6sagemaker/html/BaseDeserializer.html#method-print}{\code{R6sagemaker::BaseDeserializer$print()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -56,23 +56,6 @@ Takes raw data stream and deserializes it.
 \item{\code{stream}}{raw data to be deserialize}
 
 \item{\code{content_type}}{(str): The MIME type of the data.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{JsonDeserializer$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

@@ -27,8 +27,7 @@ BaseDeserializer = R6Class("BaseDeserializer",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-     cat("<BaseDeserializer>")
-     invisible(self)
+      print_class(self)
     }
   )
 )
@@ -54,14 +53,6 @@ StringDeserializer = R6Class("StringBaseDeserializer",
    deserialize = function(stream, content_type) {
      obj = rawToChar(stream)
      return(obj)
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<StringBaseDeserializer>")
-     invisible(self)
    }
   )
 )
@@ -93,14 +84,6 @@ CsvDeserializer = R6Class("CsvBaseDeserializer",
         return(melt(dt, measure = 1:ncol(dt), value.name ="prediction")[,-"variable"])
       }
       fread(stream, col.names = "prediction")
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<CsvBaseDeserializer>")
-      invisible(self)
     }
   )
 )
@@ -133,14 +116,6 @@ JsonDeserializer = R6Class("JsonBaseDeserializer",
      on.exit(close(con))
      data = as.data.table(parse_json(con))
      return(data)
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<JsonBaseDeserializer>")
-     invisible(self)
    }
   )
 )
