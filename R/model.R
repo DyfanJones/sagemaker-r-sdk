@@ -444,8 +444,7 @@ Model = R6Class("Model",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<Model>")
-      invisible(self)
+      return(print_class(self))
     }
   ),
   private = list(
@@ -758,14 +757,6 @@ FrameworkModel = R6Class("FrameworkModel",
      deploy_env = list(self$env)
      deploy_env = c(deploy_env, private$.framework_env_vars())
      return (container_def(self$image_uri, self$model_data, deploy_env))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<FrameworkModel>")
-     invisible(self)
    }
   ),
   private = list(

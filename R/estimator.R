@@ -742,8 +742,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<EstimatorBase>")
-      invisible(self)
+      return(print_class(self))
     }
     ),
   private = list(
@@ -1318,14 +1317,6 @@ Estimator = R6Class("Estimator",
           args$enable_network_isolation = self$enable_network_isolation()
 
       return (do.call(Model$new, args))
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<Estimator>")
-      invisible(self)
     }
   ),
 

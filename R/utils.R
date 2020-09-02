@@ -355,3 +355,8 @@ IsSubR6Class <- function(subclass, cls) {
 }
 
 ECR_URI_PATTERN <- "^(\\d+)(\\.)dkr(\\.)ecr(\\.)(.+)(\\.)(.*)(/)(.*:.*)$"
+
+print_class = function(self){
+  cat(paste0("<", class(self)[1],">"))
+  invisible(self)
+}

@@ -2147,8 +2147,7 @@ Session = R6Class("Session",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<Session>")
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(
