@@ -811,7 +811,7 @@ EstimatorBase = R6Class("EstimatorBase",
           self$collection_configs$update(rule$collection_configs)
       }
       # Add the CollectionConfigs from DebuggerHookConfig to the set.
-      if (!is.null(self$debugger_hook_config))
+      if (!islistempty(self$debugger_hook_config))
         self$collection_configs$update(self$debugger_hook_config$collection_configs %||% list())
     },
 
@@ -1521,7 +1521,7 @@ Framework = R6Class("Framework",
                           checkpoint_local_path=NULL,
                           enable_sagemaker_metrics=NULL,
                           ...){
-      super$intialize(enable_network_isolation=enable_network_isolation, ...)
+      super$initialize(enable_network_isolation=enable_network_isolation, ...)
       if (startsWith(entry_point,"s3://")){
         stop(sprintf("Invalid entry point script: %s. Must be a path to a local file.",
             entry_point))}
@@ -1533,7 +1533,7 @@ Framework = R6Class("Framework",
       self$uploaded_code = NULL
 
       # Align logging level with python logging
-      container_log_level = match.arg(toupper(container_log_level))
+      container_log_level = match.arg(container_log_level)
       container_log_level = switch(container_log_level,
                                    "INFO" = 20,
                                    "WARN" = 30,
@@ -1571,7 +1571,7 @@ Framework = R6Class("Framework",
 
       # validate source dir will raise a ValueError if there is something wrong with the
       # source directory. We are intentionally not handling it because this is a critical error.
-      if (!is.null(self$source_dir) && !startWith(tolower(self$source_dir),"s3://"))
+      if (!is.null(self$source_dir) && !startsWith(tolower(self$source_dir),"s3://"))
         validate_source_dir(self$entry_point, self$source_dir)
 
       # if we are in local mode with local_code=True. We want the container to just
