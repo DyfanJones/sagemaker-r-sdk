@@ -78,7 +78,7 @@ Model = R6Class("Model",
       self$name = name
       self$.base_name = NULL
       self$vpc_config = vpc_config
-      self$sagemaker_session = sagemaker_session
+      self$sagemaker_session = sagemaker_session %||% Session$new()
       self$endpoint_name = NULL
       self$.is_compiled_model = FALSE
       self$.enable_network_isolation = enable_network_isolation
@@ -748,7 +748,7 @@ FrameworkModel = R6Class("FrameworkModel",
    #'              model. For example, 'ml.eia1.medium'.
    #' @return dict[str, str]: A container definition object usable with the
    #'              CreateModel API.
-   prepaper_container = function(instance_type=NULL,
+   prepare_container = function(instance_type=NULL,
                                  accelerator_type=NULL){
      deploy_key_prefix = model_code_key_prefix(
        self$key_prefix, self$name, self$image_uri
