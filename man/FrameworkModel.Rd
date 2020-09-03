@@ -14,7 +14,7 @@ This class hosts user-defined code in S3 and sets code location and
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{FrameworkModel$new()}}
-\item \href{#method-prepaper_container}{\code{FrameworkModel$prepaper_container()}}
+\item \href{#method-prepare_container}{\code{FrameworkModel$prepare_container()}}
 \item \href{#method-clone}{\code{FrameworkModel$clone()}}
 }
 }
@@ -188,17 +188,14 @@ credential storage for authentication.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-prepaper_container"></a>}}
-\if{latex}{\out{\hypertarget{method-prepaper_container}{}}}
-\subsection{Method \code{prepaper_container()}}{
+\if{html}{\out{<a id="method-prepare_container"></a>}}
+\if{latex}{\out{\hypertarget{method-prepare_container}{}}}
+\subsection{Method \code{prepare_container()}}{
 Return a container definition with framework configuration set in
              model environment variables.
              This also uploads user-supplied code to S3.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$prepaper_container(
-  instance_type = NULL,
-  accelerator_type = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$prepare_container(instance_type = NULL, accelerator_type = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

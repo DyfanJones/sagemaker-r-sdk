@@ -29,7 +29,7 @@ An XGBoost SageMaker ``Model`` that can be deployed to a SageMaker ``Endpoint``.
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker::Model$enable_network_isolation()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="FrameworkModel" data-id="prepaper_container">}\href{../../R6sagemaker/html/FrameworkModel.html#method-prepaper_container}{\code{R6sagemaker::FrameworkModel$prepaper_container()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="FrameworkModel" data-id="prepare_container">}\href{../../R6sagemaker/html/FrameworkModel.html#method-prepare_container}{\code{R6sagemaker::FrameworkModel$prepare_container()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -121,7 +121,7 @@ dict[str, str]: A container definition object usable with the CreateModel API.
 \if{html}{\out{<a id="method-serving_image_uri"></a>}}
 \if{latex}{\out{\hypertarget{method-serving_image_uri}{}}}
 \subsection{Method \code{serving_image_uri()}}{
-reate a URI for the serving image.
+Create a URI for the serving image.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{XGBoostModel$serving_image_uri(region_name, instance_type)}\if{html}{\out{</div>}}
 }
