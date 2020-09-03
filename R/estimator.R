@@ -7,6 +7,7 @@
 #' @include vpc_utils.R
 #' @include analytics.R
 #' @include image_uris.R
+#' @include job.R
 
 #' @import paws
 #' @import jsonlite
@@ -808,11 +809,13 @@ EstimatorBase = R6Class("EstimatorBase",
       # Iterate through the rules and add their respective CollectionConfigs to the set.
       if (!is.null(self$rules)) {
         for (rule in self$rules)
-          self$collection_configs$update(rule$collection_configs)
+          self$collection_configs = c(self$collection_configs, rule$collection_configs)
       }
       # Add the CollectionConfigs from DebuggerHookConfig to the set.
       if (!islistempty(self$debugger_hook_config))
-        self$collection_configs$update(self$debugger_hook_config$collection_configs %||% list())
+        self$collection_configs = c(
+          self$collection_configs, self$debugger_hook_config$collection_configs %||% list()
+        )
     },
 
     .ensure_latest_training_job = function(error_message = "Estimator is not associated with a training job"){
@@ -863,7 +866,7 @@ EstimatorBase = R6Class("EstimatorBase",
         if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
       }
 
-      config = .Job$private_methods$.load_config(inputs, self)
+      config = .Job$new()$.__enclos_env__$private$.load_config(inputs, self)
 
       if (!islistempty(self$hyperparameters())){
         hyperparameters = self$hyperparameters()}
@@ -1834,10 +1837,10 @@ Framework = R6Class("Framework",
 
     # Set defaults for debugging
     .validate_and_set_debugger_configs = function(){
-      if (is.null(self$debugger_hook_config)
+      if (!islistempty(self$debugger_hook_config)
           && .region_supports_debugger(self$sagemaker_session$paws_region_name))
         self$debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)
-      else if(!self$debugger_hook_config)
+      else if(islistempty(self$debugger_hook_config))
         self$debugger_hook_config = NULL
       },
 
