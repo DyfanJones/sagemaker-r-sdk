@@ -55,7 +55,15 @@
     describe = function(){stop("I'm an abstract interface method", call. = F)},
 
     #' @description Stop the job.
-    stop = function(){stop("I'm an abstract interface method", call. = F)}
+    stop = function(){stop("I'm an abstract interface method", call. = F)},
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
+    }
+
     ),
   private = list(
     .load_config = function(inputs,
