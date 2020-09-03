@@ -65,7 +65,7 @@ XGBoost = R6Class("XGBoost",
                           image_uri=NULL,
                           ...){
       super$initialize(
-        entry_point, source_dir, hyperparameters, image_uri=image_uri, ...
+        entry_point=entry_point, source_dir=source_dir, hyperparameters=hyperparameters, image_uri=image_uri, ...
       )
 
       kwargs = list(...)
@@ -73,9 +73,11 @@ XGBoost = R6Class("XGBoost",
       self$py_version = py_version
       self$framework_version = framework_version
 
+      attr(self, "_framework_name") = XGBOOST_NAME
+
       if (is.null(image_uri)){
         self.image_uri = ImageUris$new()$retrieve(
-          self$.framework_name,
+          attr(self, "_framework_name"),
           self$sagemaker_session$paws_region_name,
           version=framework_version,
           py_version=self$py_version,
@@ -83,7 +85,6 @@ XGBoost = R6Class("XGBoost",
           image_scope="training"
         )
       }
-      .framework_name = XGBOOST_NAME
     },
 
     #' @description Create a SageMaker ``XGBoostModel`` object that can be deployed to an ``Endpoint``.
