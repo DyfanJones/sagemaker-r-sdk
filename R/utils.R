@@ -188,9 +188,12 @@ islistempty = function(obj) {(is.null(obj) || length(obj) == 0)}
 #   Returns:
 #   (str): path to created tar file
 create_tar_file = function(source_files, target=NULL){
-  if (!is.null(target)) filename = target else filename = tempfile(fileext = ".tar.gz")
+  if (!is.null(target))
+    filename = target
+  else filename = tempfile(fileext = ".tar.gz")
 
-  tar_subdir(filename, source_files)
+  source_dir = unique(dirname(source_files))
+  tar_subdir(filename, source_dir)
   return(filename)
 }
 
