@@ -111,12 +111,13 @@ XGBoostModel = R6Class("XGBoostModel",
       return(container_def(deploy_image, self$model_data, deploy_env))
     },
 
-    #' @description reate a URI for the serving image.
+    #' @description Create a URI for the serving image.
     #' @param region_name (str): AWS region where the image is uploaded.
     #' @param instance_type (str): SageMaker instance type. Must be a CPU instance type.
     #' @return str: The appropriate image URI based on the given parameters.
     serving_image_uri = function(region_name,
                                  instance_type){
+      if(missing(region_name)) region_name = self$sagemaker_session$paws_region_name
       return(ImageUris$new()$retrieve(
         attr(self, "_framework_name"),
         region_name,
