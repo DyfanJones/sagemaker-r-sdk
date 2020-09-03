@@ -60,7 +60,8 @@ tar_and_upload_dir <- function(sagemaker_session,
                               directory=NULL,
                               dependencies=NULL,
                               kms_key=NULL){
-  if (!is.null(directory) && tolower(startsWith(directory,"s3://"))){
+  print(directory)
+  if (!is.null(directory) && startsWith(tolower(directory),"s3://")){
     UploadedCode$s3_prefix=directory
     UploadedCode$script_name= basename(script)
     return(UploadedCode)}
@@ -70,7 +71,7 @@ tar_and_upload_dir <- function(sagemaker_session,
   key = sprintf("%s/sourcedir.tar.gz",s3_key_prefix)
   tmp = tempdir()
 
-  tryCatch({source_files = c(.list_files_to_compress(script, directory), dependencies)
+  tryCatch({source_files = unlist(c(.list_files_to_compress(script, directory), dependencies))
             tar_file = create_tar_file(source_files, file.path(tmp, .TAR_SOURCE_FILENAME))})
 
   if (!is.null(kms_key)) {
