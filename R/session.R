@@ -1920,7 +1920,7 @@ Session = R6Class("Session",
     expand_role = function(role){
       iam = paws::iam(config = self$paws_credentials$credentials)
       if(grepl("/", role)) return(role)
-      return(iam$get_role(RoleName = role_name)$Role$Arn)
+      return(iam$get_role(RoleName = role)$Role$Arn)
     },
 
     #' @description  Returns the ARN user or role whose credentials are used to call the API.
