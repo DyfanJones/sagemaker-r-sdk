@@ -60,7 +60,6 @@ tar_and_upload_dir <- function(sagemaker_session,
                               directory=NULL,
                               dependencies=NULL,
                               kms_key=NULL){
-  print(directory)
   if (!is.null(directory) && startsWith(tolower(directory),"s3://")){
     UploadedCode$s3_prefix=directory
     UploadedCode$script_name= basename(script)
