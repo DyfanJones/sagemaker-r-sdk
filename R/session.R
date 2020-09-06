@@ -43,7 +43,7 @@ Session = R6Class("Session",
       self$config <- NULL
       # get sagemaker object from paws
       self$sagemaker = paws::sagemaker(config = self$paws_credentials$credentials)
-
+      self$s3 = paws::s3(config = self$paws_credentials$credentials)
       self$local_mode = FALSE
     },
 
@@ -79,13 +79,10 @@ Session = R6Class("Session",
       # if bucke parameter hasn't been selected use class parameter
       bucket = bucket %||% self$default_bucket()
 
-      # Get s3 object from paws
-      s3 <- paws::s3(config = self$paws_credentials$credentials)
-
       # Upload file to s3
       for (i in 1:length(local_path)){
         obj <- readBin(local_path[i], "raw", n = file.size(local_path[i]))
-        s3$put_object(Body = obj, Bucket = bucket, Key = s3_key[i], ...)}
+        self$s3$put_object(Body = obj, Bucket = bucket, Key = s3_key[i], ...)}
 
       s3_uri = sprintf("s3://%s/%s", bucket, key_prefix)
 
@@ -105,13 +102,11 @@ Session = R6Class("Session",
                                           bucket,
                                           key,
                                           kms_key=NULL){
-      # Get s3 object from paws
-      s3 <- paws::s3(config = self$paws_credentials$credentials)
 
       if (!is.null(kms_key))
-        s3$put_object(Bucket = bucket, Body=charToRaw(body), SSEKMSKeyId=kms_key, ServerSideEncryption="aws:kms")
+        self$s3$put_object(Bucket = bucket, Body=charToRaw(body), SSEKMSKeyId=kms_key, ServerSideEncryption="aws:kms")
       else
-        s3$put_object(Bucket = bucket, Body=charToRaw(body))
+        self$s3$put_object(Bucket = bucket, Body=charToRaw(body))
 
       s3_uri = sprintf("s3://%s/%s",bucket, key)
       return (s3_uri)

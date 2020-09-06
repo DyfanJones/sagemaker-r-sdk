@@ -81,12 +81,14 @@ tar_and_upload_dir <- function(sagemaker_session,
     SSEKMSKeyId =  NULL
     }
 
-  s3_resource = paws::s3(sagemaker_session$paws_credentials$credentials)
+  if(!is.null(sagemaker_session$s3)) {
+    s3_resource = sagemaker_session$s3
 
-  obj <- readBin(tar_file, "raw", n = file.size(tar_file))
-  s3_resource$put_object(Body = obj, Bucket = bucket, Key = key,
-                         ServerSideEncryption = ServerSideEncryption,
-                         SSEKMSKeyId = SSEKMSKeyId)
+    obj <- readBin(tar_file, "raw", n = file.size(tar_file))
+    s3_resource$put_object(Body = obj, Bucket = bucket, Key = key,
+                           ServerSideEncryption = ServerSideEncryption,
+                           SSEKMSKeyId = SSEKMSKeyId)
+  }
 
   on.exit(unlink(tmp, recursive = T))
 
