@@ -9,7 +9,7 @@ Predictor for inference against XGBoost Endpoints.
              for XGBoost inference.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}}
+\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}} -> \code{XGBoostPredictor}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -27,6 +27,7 @@ Predictor for inference against XGBoost Endpoints.
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="enable_data_capture">}\href{../../R6sagemaker/html/Predictor.html#method-enable_data_capture}{\code{R6sagemaker::Predictor$enable_data_capture()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="list_monitor">}\href{../../R6sagemaker/html/Predictor.html#method-list_monitor}{\code{R6sagemaker::Predictor$list_monitor()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="predict">}\href{../../R6sagemaker/html/Predictor.html#method-predict}{\code{R6sagemaker::Predictor$predict()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="print">}\href{../../R6sagemaker/html/Predictor.html#method-print}{\code{R6sagemaker::Predictor$print()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="update_data_capture_config">}\href{../../R6sagemaker/html/Predictor.html#method-update_data_capture_config}{\code{R6sagemaker::Predictor$update_data_capture_config()}}\out{</span>}
 }
 \out{</details>}
