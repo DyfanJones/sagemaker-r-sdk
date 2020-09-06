@@ -471,7 +471,7 @@ Model = R6Class("Model",
 
     # Generate a new model name if ``self._base_name`` is present.
     .set_model_name_if_needed = function(){
-      if (!is.null(self._base_name))
+      if (!is.null(self$.base_name))
         self$name = name_from_base(self$.base_name)
     },
 
