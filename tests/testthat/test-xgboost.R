@@ -1,5 +1,7 @@
 context("xgboost")
 
+setwd("/Users/lmar763/Packages/sagemaker-r-sdk/tests/testthat")
+
 ENDPOINT_DESC = list("EndpointConfigName"= "test-endpoint")
 
 ENDPOINT_CONFIG_DESC = list("ProductionVariants"= list(list("ModelName"= "model-1"), list("ModelName"= "model-2")))
@@ -50,6 +52,8 @@ sagemaker_session$sagemaker$describe_endpoint_config <- Mock$new()$return_value(
 sagemaker_session$sagemaker$sagemaker$list_tags <- Mock$new()$return_value(describe)
 sagemaker_session$default_bucket <- Mock$new()$return_value(BUCKET_NAME)
 sagemaker_session$expand_role <- Mock$new()$return_value(ROLE)
+sagemaker_session$create_model <- Mock$new()$return_value("something")
+sagemaker_session$endpoint_from_production_variants <- Mock$new()$return_value("something_new")
 
 test_that("test create model", {
   source_dir = "s3://mybucket/source"
@@ -61,7 +65,7 @@ test_that("test create model", {
     framework_version=xgboost_framework_version)
   default_image_uri = .get_full_cpu_image_uri(xgboost_framework_version)
   model_values = xgboost_model$prepare_container_def(CPU)
-  expect_equal(model_values[[1]]$Image, default_image_uri)
+  expect_equal(model_values$Image, default_image_uri)
 })
 
 test_that("test training image uri", {
@@ -78,3 +82,13 @@ test_that("test training image uri", {
   expect_equal(default_image_uri, model_uri)
 })
 
+test_that("test deploy model", {
+  model = XGBoostModel$new(
+    "s3://some/data.tar.gz",
+    role=ROLE,
+    framework_version=xgboost_framework_version,
+    entry_point=SCRIPT_PATH,
+    sagemaker_session=sagemaker_session)
+  predictor = model$deploy(1, CPU)
+  expect_true(inherits(predictor, "XGBoostPredictor"))
+})
