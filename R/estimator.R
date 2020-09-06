@@ -1623,7 +1623,7 @@ Framework = R6Class("Framework",
     #'              training.
     #' @return str: The URI of the Docker image.
     training_image_uri = function(){
-      if (self$image_uri)
+      if (!is.null(self$image_uri))
         return (self$image_uri)
       return (ImageUris$new()$retrieve(
         attributes(self)$`_framework_name`,
