@@ -1,7 +1,6 @@
 # Class to mock R6 classes
 # used for testing only
-
-Mock <- R6Class("Mock",
+Mock <- R6::R6Class("Mock",
   public = list(
     initialize = function(name, ... ){
       if(!missing(name)) class(self) <- append(name, class(self))
