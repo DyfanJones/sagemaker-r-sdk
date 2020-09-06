@@ -41,9 +41,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #'              endpoints use this role to access training data and model
     #'              artifacts. After the endpoint is created, the inference code
     #'              might use the IAM role, if it needs to access an AWS resource.
-    #' @param train_instance_count (int): Number of Amazon EC2 instances to use
+    #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
-    #' @param train_instance_type (str): Type of EC2 instance to use for training,
+    #' @param instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
     #' @param data_location (str or None): The s3 prefix to upload RecordSet
     #'              objects to, expressed as an S3 url. For example
@@ -57,14 +57,14 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #' @param ... : Additional parameters passed to
     #'             :class:`~sagemaker.estimator.EstimatorBase`.
     initialize = function(role,
-                          train_instance_count,
-                          train_instance_type,
+                          instance_count,
+                          instance_type,
                           data_location=NULL,
                           enable_network_isolation=FALSE,
                           ...){
       super$initialize(role,
-                       train_instance_count,
-                       train_instance_type,
+                       instance_count,
+                       instance_type,
                        enable_network_isolation=enable_network_isolation,
                        ...)
 
@@ -153,7 +153,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #'              uploaded to new S3 locations. A manifest file is generated containing
     #'              the list of objects created and also stored in S3.
     #'              The number of S3 objects created is controlled by the
-    #'              ``train_instance_count`` property on this Estimator. One S3 object is
+    #'              ``instance_count`` property on this Estimator. One S3 object is
     #'              created per training instance.
     #' @param train (numpy.ndarray): A 2D numpy array of training data.
     #' @param labels (numpy.ndarray): A 1D numpy array of labels. Its length must
@@ -177,7 +177,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       key_prefix = trimws(key_prefix, "left", "/")
       log_debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
       manifest_s3_file = upload_matrix_to_s3_shards(
-        self$train_instance_count, s3, bucket, key_prefix, train, labels, encrypt
+        self$instance_count, s3, bucket, key_prefix, train, labels, encrypt
       )
 
       log_debug("Created manifest file %s", manifest_s3_file)

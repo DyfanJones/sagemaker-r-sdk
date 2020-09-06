@@ -31,6 +31,10 @@ DebuggerHookConfig <- R6Class("DebuggerHookConfig",
             collection_config_request[["CollectionParameters"]] = as.list(self$collection_configs$parameters)}
           debugger_hook_config_request[["CollectionConfigurations"]] = collection_config_request}
         return(debugger_hook_config_request)
-      }
-    )
+      },
+
+    print = function(...){
+      return(print_class(self))
+    }
+  )
 )

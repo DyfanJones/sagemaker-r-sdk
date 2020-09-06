@@ -36,6 +36,7 @@ This class shouldn't be directly instantiated.
 \item \href{#method-wait}{\code{.Job$wait()}}
 \item \href{#method-describe}{\code{.Job$describe()}}
 \item \href{#method-stop}{\code{.Job$stop()}}
+\item \href{#method-print}{\code{.Job$print()}}
 \item \href{#method-clone}{\code{.Job$clone()}}
 }
 }
@@ -116,6 +117,23 @@ Stop the job.
 \if{html}{\out{<div class="r">}}\preformatted{.Job$stop()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{.Job$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

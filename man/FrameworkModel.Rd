@@ -8,14 +8,13 @@ This class hosts user-defined code in S3 and sets code location and
              configuration in model environment variables.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:Model]{R6sagemaker::Model}} -> \code{FrameWorkModel}
+\code{\link[R6sagemaker:Model]{R6sagemaker::Model}} -> \code{FrameworkModel}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{FrameworkModel$new()}}
-\item \href{#method-prepaper_container}{\code{FrameworkModel$prepaper_container()}}
-\item \href{#method-print}{\code{FrameworkModel$print()}}
+\item \href{#method-prepare_container}{\code{FrameworkModel$prepare_container()}}
 \item \href{#method-clone}{\code{FrameworkModel$clone()}}
 }
 }
@@ -29,6 +28,7 @@ This class hosts user-defined code in S3 and sets code location and
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker/html/Model.html#method-deploy}{\code{R6sagemaker::Model$deploy()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker::Model$enable_network_isolation()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="prepare_container_def">}\href{../../R6sagemaker/html/Model.html#method-prepare_container_def}{\code{R6sagemaker::Model$prepare_container_def()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
 }
 \out{</details>}
@@ -188,17 +188,14 @@ credential storage for authentication.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-prepaper_container"></a>}}
-\if{latex}{\out{\hypertarget{method-prepaper_container}{}}}
-\subsection{Method \code{prepaper_container()}}{
+\if{html}{\out{<a id="method-prepare_container"></a>}}
+\if{latex}{\out{\hypertarget{method-prepare_container}{}}}
+\subsection{Method \code{prepare_container()}}{
 Return a container definition with framework configuration set in
              model environment variables.
              This also uploads user-supplied code to S3.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$prepaper_container(
-  instance_type = NULL,
-  accelerator_type = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$prepare_container(instance_type = NULL, accelerator_type = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -216,23 +213,6 @@ model. For example, 'ml.eia1.medium'.}
 \subsection{Returns}{
 dict[str, str]: A container definition object usable with the
              CreateModel API.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

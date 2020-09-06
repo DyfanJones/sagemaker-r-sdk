@@ -14,13 +14,13 @@ Make Raw data using text/csv format
 \itemize{
 \item \href{#method-new}{\code{CsvSerializer$new()}}
 \item \href{#method-serialize}{\code{CsvSerializer$serialize()}}
-\item \href{#method-print}{\code{CsvSerializer$print()}}
 \item \href{#method-clone}{\code{CsvSerializer$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseSerializer" data-id="print">}\href{../../R6sagemaker/html/BaseSerializer.html#method-print}{\code{R6sagemaker::BaseSerializer$print()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -48,23 +48,6 @@ Take data of various data formats and serialize them into CSV.
 \describe{
 \item{\code{data}}{(object): Data to be serialized. Any list of same length vectors; e.g. data.frame and data.table.
 If matrix, it gets internally coerced to data.table preserving col names but not row names}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CsvSerializer$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

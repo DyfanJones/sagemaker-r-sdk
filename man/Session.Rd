@@ -288,7 +288,7 @@ Create an Amazon SageMaker training job. Train the learner on a set of observati
   image = NULL,
   algorithm_arn = NULL,
   encrypt_inter_container_traffic = FALSE,
-  train_use_spot_instances = FALSE,
+  use_spot_instances = FALSE,
   checkpoint_s3_uri = NULL,
   checkpoint_local_path = NULL,
   experiment_config = NULL,
@@ -363,7 +363,7 @@ network isolation or not.}
 \item{\code{encrypt_inter_container_traffic}}{(bool): Specifies whether traffic between training
 containers is encrypted for the training job (default: ``False``).}
 
-\item{\code{train_use_spot_instances}}{(bool): whether to use spot instances for training.}
+\item{\code{use_spot_instances}}{(bool): whether to use spot instances for training.}
 
 \item{\code{checkpoint_s3_uri}}{(str): The S3 URI in which to persist checkpoints
 that the algorithm persists (if any) during training. (default: ``None``).}
@@ -1135,7 +1135,7 @@ Create an Amazon SageMaker hyperparameter tuning job
   early_stopping_type = "Off",
   encrypt_inter_container_traffic = FALSE,
   vpc_config = NULL,
-  train_use_spot_instances = FALSE,
+  use_spot_instances = FALSE,
   checkpoint_s3_uri = NULL,
   checkpoint_local_path = NULL
 )}\if{html}{\out{</div>}}
@@ -1230,7 +1230,7 @@ tuning job (Default: \code{FALSE}).}
   \item{\strong{security_group_ids (list[str]):} List of security group ids.
                 The key in vpc_config is 'SecurityGroupIds'.}}}
 
-\item{\code{train_use_spot_instances}}{(bool): whether to use spot instances for training.}
+\item{\code{use_spot_instances}}{(bool): whether to use spot instances for training.}
 
 \item{\code{checkpoint_s3_uri}}{(str): The S3 URI in which to persist checkpoints
 that the algorithm persists (if any) during training. (Default: \code{FALSE}).}

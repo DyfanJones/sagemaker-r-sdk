@@ -464,7 +464,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     },
 
     #' @description Deploy the best trained or user specified model to an Amazon
-    #'              SageMaker endpoint and return a ``sagemaker.RealTimePredictor`` object.
+    #'              SageMaker endpoint and return a ``sagemaker.Predictor`` object.
     #'              For more information:
     #'              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
     #' @param initial_instance_count (int): Minimum number of EC2 instances to
@@ -493,7 +493,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     #' @param ... : Other arguments needed for deployment. Please refer to the
     #'              ``create_model()`` method of the associated estimator to see
     #'              what other arguments are needed.
-    #' @return sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()``
+    #' @return sagemaker.predictor.Predictor: A predictor that provides a ``predict()``
     #'              method, which can be used to send requests to the Amazon SageMaker endpoint
     #'              and obtain inferences.
     deploy = function(initial_instance_count,
@@ -541,7 +541,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     },
 
     #' @description Return the estimator that has best training job attached. The trained model can then
-    #'              be deployed to an Amazon SageMaker endpoint and return a ``sagemaker.RealTimePredictor``
+    #'              be deployed to an Amazon SageMaker endpoint and return a ``sagemaker.Predictor``
     #'              object.
     #' @param best_training_job (dict): Dictionary containing "TrainingJobName" and
     #'              "TrainingJobDefinitionName".
@@ -1427,7 +1427,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       training_config$enable_network_isolation = estimator$enable_network_isolation()
       training_config$encrypt_inter_container_traffic = estimator$encrypt_inter_container_traffic
 
-      training_config$train_use_spot_instances = estimator$train_use_spot_instances
+      training_config$use_spot_instances = estimator$use_spot_instances
       training_config$checkpoint_s3_uri = estimator$checkpoint_s3_uri
       training_config$checkpoint_local_path = estimator$checkpoint_local_path
 

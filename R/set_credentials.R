@@ -64,8 +64,7 @@ PawsCredentials = R6Class("PawsCredentials",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<PawsCredentials>")
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(
@@ -89,7 +88,7 @@ PawsCredentials = R6Class("PawsCredentials",
       config$credentials <- add_list(credentials)
       config$region <- region_name
 
-      config
+      return(config)
       }
     )
 )
