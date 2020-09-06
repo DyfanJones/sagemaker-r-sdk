@@ -2516,7 +2516,7 @@ container_def <- function(image,
 
   c_def$ModelDataUrl = model_data_url
   c_def$Mode = container_mode
-  return(list(c_def))
+  return(c_def)
 }
 
 #' @title Create a definition for executing a pipeline of containers as part of a SageMaker model.
