@@ -2,7 +2,7 @@
 
 #' @include utils.R
 
-.TAR_SOURCE_FILENAME <- "source.tar.gz"
+.TAR_SOURCE_FILENAME <- ".tar.gz"
 
 UploadedCode <- list("s3_prefix" = NULL, "script_name" = NULL)
 
@@ -54,12 +54,12 @@ validate_source_dir <- function(script, directory){
 #   sagemaker.fw_utils.UserCode: An object with the S3 bucket and key (S3 prefix) and
 # script name.
 tar_and_upload_dir <- function(sagemaker_session,
-                              bucket,
-                              s3_key_prefix,
-                              script,
-                              directory=NULL,
-                              dependencies=NULL,
-                              kms_key=NULL){
+                               bucket,
+                               s3_key_prefix,
+                               script,
+                               directory=NULL,
+                               dependencies=NULL,
+                               kms_key=NULL){
   if (!is.null(directory) && startsWith(tolower(directory),"s3://")){
     UploadedCode$s3_prefix=directory
     UploadedCode$script_name= basename(script)
@@ -68,10 +68,10 @@ tar_and_upload_dir <- function(sagemaker_session,
   script_name =  if(!is.null(directory)) script else basename(script)
   dependencies = dependencies %||% list()
   key = sprintf("%s/sourcedir.tar.gz",s3_key_prefix)
-  tmp = tempdir()
+  tmp = tempfile(fileext = .TAR_SOURCE_FILENAME)
 
   tryCatch({source_files = unlist(c(.list_files_to_compress(script, directory), dependencies))
-            tar_file = create_tar_file(source_files, file.path(tmp, .TAR_SOURCE_FILENAME))})
+            tar_file = create_tar_file(source_files, tmp)})
 
   if (!is.null(kms_key)) {
     ServerSideEncryption = "aws:kms"
