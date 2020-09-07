@@ -226,6 +226,13 @@ Predictor = R6Class("Predictor",
       }
 
       return(monitors)
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
     }
   ),
   private = list(

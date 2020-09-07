@@ -15,7 +15,7 @@
 #'              This is able to serialize Python lists, dictionaries, and numpy arrays to xgb.DMatrix
 #'              for XGBoost inference.
 #' @export
-XGBoostPredictor = R6Class(
+XGBoostPredictor = R6Class("XGBoostPredictor",
   inherit = Predictor,
   public = list(
 
@@ -28,7 +28,7 @@ XGBoostPredictor = R6Class(
     initialize = function(endpoint_name,
                           sagemaker_session=NULL){
       super$initialize(
-        endpoint_name, sagemaker_session, LibSVMSerializer$new(), CSVDeserializer$new()
+        endpoint_name, sagemaker_session, LibSVMSerializer$new(), CsvDeserializer$new()
         )
     }
   )

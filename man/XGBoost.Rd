@@ -115,7 +115,7 @@ Create a SageMaker ``XGBoostModel`` object that can be deployed to an ``Endpoint
 \if{html}{\out{<div class="r">}}\preformatted{XGBoost$create_model(
   model_server_workers = NULL,
   role = NULL,
-  vpc_config_override = VPC_CONFIG_DEFAULT,
+  vpc_config_override = "VPC_CONFIG_DEFAULT",
   entry_point = NULL,
   source_dir = NULL,
   dependencies = NULL,

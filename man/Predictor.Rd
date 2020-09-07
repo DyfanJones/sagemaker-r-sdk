@@ -38,6 +38,7 @@ Make prediction requests to an Amazon SageMaker endpoint.
 \item \href{#method-disable_data_capture}{\code{Predictor$disable_data_capture()}}
 \item \href{#method-update_data_capture_config}{\code{Predictor$update_data_capture_config()}}
 \item \href{#method-list_monitor}{\code{Predictor$list_monitor()}}
+\item \href{#method-print}{\code{Predictor$print()}}
 \item \href{#method-clone}{\code{Predictor$clone()}}
 }
 }
@@ -218,6 +219,23 @@ Generates ModelMonitor objects (or DefaultModelMonitors) based on the schedule(s
 \subsection{Returns}{
 [sagemaker.model_monitor.model_monitoring.ModelMonitor]: A list of
              ModelMonitor (or DefaultModelMonitor) objects.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Predictor$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

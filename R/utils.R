@@ -1,6 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/utils.py
 
 #' @importFrom stats runif
+#' @importFrom utils tar
 
 `%||%` <- function(x, y) if (is.null(x)) return(y) else return(x)
 
