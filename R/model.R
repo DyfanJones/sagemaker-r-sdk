@@ -711,14 +711,16 @@ FrameworkModel = R6Class("FrameworkModel",
      self$dependencies = dependencies %||% list()
      self$git_config = git_config
      # Align logging level with python logging
-     container_log_level = match.arg(container_log_level)
-     container_log_level = switch(container_log_level,
-                                  "INFO" = "20",
-                                  "WARN" = "30",
-                                  "ERROR" = "40",
-                                  "FATAL" = "50",
-                                  "CRITICAL" = "50")
-     self$container_log_level = container_log_level
+     if(!is.numeric(container_log_level)){
+       container_log_level = match.arg(container_log_level)
+       container_log_level = switch(container_log_level,
+                                    "INFO" = 20,
+                                    "WARN" = 30,
+                                    "ERROR" = 40,
+                                    "FATAL" = 50,
+                                    "CRITICAL" = 50)
+     }
+     self$container_log_level = as.character(container_log_level)
      if (!is.null(code_location)){
        s3_parts = split_s3_uri(code_location)
        self$bucket =s3_parts$bucket
