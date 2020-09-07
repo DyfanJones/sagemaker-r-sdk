@@ -114,7 +114,7 @@ XGBoost = R6Class("XGBoost",
     #'              See :func:`~sagemaker.xgboost.model.XGBoostModel` for full details.
     create_model = function(model_server_workers=NULL,
                             role=NULL,
-                            vpc_config_override=VPC_CONFIG_DEFAULT,
+                            vpc_config_override="VPC_CONFIG_DEFAULT",
                             entry_point=NULL,
                             source_dir=NULL,
                             dependencies=NULL,
