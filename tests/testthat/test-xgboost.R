@@ -1,7 +1,5 @@
 context("xgboost")
 
-setwd("/Users/lmar763/Packages/sagemaker-r-sdk/tests/testthat")
-
 ENDPOINT_DESC = list("EndpointConfigName"= "test-endpoint")
 
 ENDPOINT_CONFIG_DESC = list("ProductionVariants"= list(list("ModelName"= "model-1"), list("ModelName"= "model-2")))
@@ -52,8 +50,10 @@ sagemaker_session$sagemaker$describe_endpoint_config <- Mock$new()$return_value(
 sagemaker_session$sagemaker$sagemaker$list_tags <- Mock$new()$return_value(describe)
 sagemaker_session$default_bucket <- Mock$new()$return_value(BUCKET_NAME)
 sagemaker_session$expand_role <- Mock$new()$return_value(ROLE)
-sagemaker_session$create_model <- Mock$new()$return_value("something")
-sagemaker_session$endpoint_from_production_variants <- Mock$new()$return_value("something_new")
+sagemaker_session$create_model <- Mock$new()$return_value("sagemaker-xgboost")
+sagemaker_session$endpoint_from_production_variants <- Mock$new()$return_value("sagemaker-xgboost-endpoint")
+sagemaker_session$train <- Mock$new()$return_value(list(TrainingJobArn = "sagemaker-xgboost-dummy"))
+sagemaker_session$logs_for_job <- Mock$new()$return_value(NULL)
 
 test_that("test create model", {
   source_dir = "s3://mybucket/source"
@@ -68,6 +68,50 @@ test_that("test create model", {
   expect_equal(model_values$Image, default_image_uri)
 })
 
+test_that("test create model from estimator",{
+  container_log_level = 'INFO'
+  source_dir = "s3://mybucket/source"
+  base_job_name = "job"
+
+  xgboost = XGBoost$new(
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_type=INSTANCE_TYPE,
+    instance_count=1,
+    framework_version=xgboost_framework_version,
+    container_log_level=container_log_level,
+    py_version=PYTHON_VERSION,
+    base_job_name=base_job_name,
+    source_dir=source_dir
+  )
+  xgboost$fit(inputs="s3://mybucket/train", job_name="new_name")
+  xgboost$uploaded_code
+  model_name = "model_name"
+  model = xgboost$create_model()
+
+  expect_equal(model$sagemaker_session, sagemaker_session)
+  expect_equal(model$framework_version, xgboost_framework_version)
+  expect_equal(model$py_version, xgboost$py_version)
+  expect_equal(model$entry_point, basename(SCRIPT_PATH))
+  expect_equal(model$role, ROLE)
+  expect_equal(model$container_log_level, "20")
+  expect_equal(model$source_dir, source_dir)
+  expect_null(model$vpc_config)
+
+})
+
+test_that("test deploy model", {
+  model = XGBoostModel$new(
+    "s3://some/data.tar.gz",
+    role=ROLE,
+    framework_version=xgboost_framework_version,
+    entry_point=SCRIPT_PATH,
+    sagemaker_session=sagemaker_session)
+  predictor = model$deploy(1, CPU)
+  expect_true(inherits(predictor, "XGBoostPredictor"))
+})
+
 test_that("test training image uri", {
   xgboost = XGBoost$new(
     entry_point=SCRIPT_PATH,
@@ -80,15 +124,4 @@ test_that("test training image uri", {
   default_image_uri = .get_full_cpu_image_uri(xgboost_framework_version)
   model_uri = xgboost$training_image_uri()
   expect_equal(default_image_uri, model_uri)
-})
-
-test_that("test deploy model", {
-  model = XGBoostModel$new(
-    "s3://some/data.tar.gz",
-    role=ROLE,
-    framework_version=xgboost_framework_version,
-    entry_point=SCRIPT_PATH,
-    sagemaker_session=sagemaker_session)
-  predictor = model$deploy(1, CPU)
-  expect_true(inherits(predictor, "XGBoostPredictor"))
 })
