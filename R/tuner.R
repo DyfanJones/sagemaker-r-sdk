@@ -298,13 +298,13 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     #'              ``fit()`` method of the associated estimator, as this can take
     #'              any of the following forms:
     #'              * (str) - The S3 location where training data is saved.
-    #'              * (dict[str, str] or dict[str, sagemaker.session.s3_input]) -
+    #'              * (dict[str, str] or dict[str, TrainingInput]) -
     #'              If using multiple channels for training data, you can specify
     #'              a dict mapping channel names to strings or
-    #'              :func:`~sagemaker.session.s3_input` objects.
-    #'              * (sagemaker.session.s3_input) - Channel configuration for S3 data sources that can
+    #'              :func:`~TrainingInput` objects.
+    #'              * (TrainingInput) - Channel configuration for S3 data sources that can
     #'              provide additional information about the training dataset.
-    #'              See :func:`sagemaker.session.s3_input` for full details.
+    #'              See :func:`TrainingInput` for full details.
     #'              * (sagemaker.session.FileSystemInput) - channel configuration for
     #'              a file system data source that can provide additional information as well as
     #'              the path to the training dataset.
@@ -1411,10 +1411,10 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
       training_config$input_mode = estimator$input_mode
       training_config$metric_definitions = metric_definitions
 
-      if (inherits(inputs, "s3_input")){
+      if (inherits(inputs, "TrainingInput")){
         if ("InputMode" %in% names(inputs$config)){
           log_debug(
-            "Selecting s3_input's input_mode (%s) for TrainingInputMode.",
+            "Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
             toJSON(inputs$config$InputMode, pretty = T, auto_unbox = T))
           training_config$input_mode = inputs$config$InputMode}
       }

@@ -142,7 +142,7 @@
       } else if (inherits(inputs, "FileSystemInput")) {
         input_dict[["training"]] = inputs
       } else{
-        msg = "Cannot format input %s. Expecting one of str, dict, s3_input or FileSystemInput"
+        msg = "Cannot format input %s. Expecting one of str, dict, TrainingInput or FileSystemInput"
         stop(sprintf(msg,inputs), call. = F)
       }
 
@@ -173,7 +173,7 @@
                                         compression=NULL,
                                         target_attribute_name=NULL){
       if (inherits(uri_input, "character") && validate_uri && startsWith(uri_input,"s3://")){
-        s3_input_result = s3_input$new(uri_input,
+        s3_input_result = TrainingInput$new(uri_input,
                                    content_type=content_type,
                                    input_mode=input_mode,
                                    compression=compression,
@@ -187,17 +187,17 @@
         stop(sprintf('URI input %s must be a valid S3 or FILE URI: must start with "s3://" or "file://"',uri_input),
              call. = F)
       if (inherits(uri_input, "character")){
-          s3_input_result = s3_input$new(uri_input,
+          s3_input_result = TrainingInput$new(uri_input,
                                     content_type=content_type,
                                     input_mode=input_mode,
                                     compression=compression,
                                     target_attribute_name=target_attribute_name)
         return(s3_input_result)}
-      if (inherits(uri_input, c("s3_input", "file_input", "FileSystemInput")))
+      if (inherits(uri_input, c("TrainingInput", "file_input", "FileSystemInput")))
           return(uri_input)
 
 
-      stop(sprintf("Cannot format input %s. Expecting one of str, s3_input, file_input or FileSystemInput", uri_input),
+      stop(sprintf("Cannot format input %s. Expecting one of str, TrainingInput, file_input or FileSystemInput", uri_input),
            call. = F)
     },
 

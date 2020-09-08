@@ -340,9 +340,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       train_args[["metric_definitions"]] = self$metric_definitions
       train_args[["experiment_config"]] = experiment_config
 
-      if (inherits(inputs, "s3_input")){
+      if (inherits(inputs, "TrainingInput")){
         if ("InputMode" %in% inputs$config){
-          log_debug("Selecting s3_input's input_mode (%s) for TrainingInputMode.",
+          log_debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
                     inputs$config$InputMode)
           train_args[["input_mode"]] = inputs$config$InputMod}
       }
@@ -415,9 +415,9 @@ RecordSet = R6Class("RecordSet",
       return(output)
     },
 
-    #' @description Return a s3_input to represent the training data
+    #' @description Return a TrainingInput to represent the training data
     recods_s3_input = function(){
-      return(s3_input$new(self$s3_data, distribution="ShardedByS3Key", s3_data_type=self$s3_data_type))
+      return(TrainingInput$new(self$s3_data, distribution="ShardedByS3Key", s3_data_type=self$s3_data_type))
     },
 
     #' @description Return an unambiguous representation of this RecordSet
