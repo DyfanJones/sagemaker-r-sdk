@@ -23,7 +23,7 @@ For introduction to model training and deployment, see
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{EstimatorBase$new()}}
-\item \href{#method-train_image}{\code{EstimatorBase$train_image()}}
+\item \href{#method-training_image_uri}{\code{EstimatorBase$training_image_uri()}}
 \item \href{#method-hyperparameters}{\code{EstimatorBase$hyperparameters()}}
 \item \href{#method-enable_network_isolation}{\code{EstimatorBase$enable_network_isolation()}}
 \item \href{#method-prepare_workflow_for_training}{\code{EstimatorBase$prepare_workflow_for_training()}}
@@ -231,15 +231,15 @@ outbound network calls. Also known as Internet-free mode.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-train_image"></a>}}
-\if{latex}{\out{\hypertarget{method-train_image}{}}}
-\subsection{Method \code{train_image()}}{
+\if{html}{\out{<a id="method-training_image_uri"></a>}}
+\if{latex}{\out{\hypertarget{method-training_image_uri}{}}}
+\subsection{Method \code{training_image_uri()}}{
 Return the Docker image to use for training.
              The :meth:`~sagemaker.estimator.EstimatorBase.fit` method, which does
              the model training, calls this method to find the image to use for model
              training.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$train_image()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$training_image_uri()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

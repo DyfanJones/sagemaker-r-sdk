@@ -32,7 +32,7 @@ Base class that cannot be instantiated directly.
 \item \href{#method-new}{\code{FrameWork$new()}}
 \item \href{#method-.prepare_for_training}{\code{FrameWork$.prepare_for_training()}}
 \item \href{#method-hyperparameters}{\code{FrameWork$hyperparameters()}}
-\item \href{#method-train_image}{\code{FrameWork$train_image()}}
+\item \href{#method-training_image_uri}{\code{FrameWork$training_image_uri()}}
 \item \href{#method-attach}{\code{FrameWork$attach()}}
 \item \href{#method-transformer}{\code{FrameWork$transformer()}}
 \item \href{#method-clone}{\code{FrameWork$clone()}}
@@ -275,15 +275,15 @@ dict[str, str]: The hyperparameters.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-train_image"></a>}}
-\if{latex}{\out{\hypertarget{method-train_image}{}}}
-\subsection{Method \code{train_image()}}{
+\if{html}{\out{<a id="method-training_image_uri"></a>}}
+\if{latex}{\out{\hypertarget{method-training_image_uri}{}}}
+\subsection{Method \code{training_image_uri()}}{
 Return the Docker image to use for training.
              The :meth:`~sagemaker.estimator.EstimatorBase.fit` method, which does
              the model training, calls this method to find the image to use for model
              training.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameWork$train_image()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FrameWork$training_image_uri()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
