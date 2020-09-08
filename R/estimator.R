@@ -52,7 +52,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              'Pipe' - Amazon SageMaker streams data directly from S3 to the
     #'              container via a Unix-named pipe. This argument can be overriden
     #'              on a per-channel basis using
-    #'              ``sagemaker.session.s3_input.input_mode``.
+    #'              ``TrainingInput.input_mode``.
     #' @param output_path (str): S3 location for saving the training result (model
     #'              artifacts and output files). If not specified, results are
     #'              stored to a default bucket. If the bucket with the specific name
@@ -291,17 +291,17 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              This is a synchronous operation. After the model training
     #'              successfully completes, you can call the ``deploy()`` method to host the
     #'              model using the Amazon SageMaker hosting services.
-    #' @param inputs (str or dict or sagemaker.session.s3_input): Information
+    #' @param inputs (str or dict or TrainingInput): Information
     #'              about the training data. This can be one of three types:
     #'              \itemize{
     #'                \item{\strong{(str)} the S3 location where training data is saved, or a file:// path in
     #'              local mode.}
-    #'                \item{\strong{(dict[str, str]} or dict[str, sagemaker.session.s3_input]) If using multiple
+    #'                \item{\strong{(dict[str, str]} or dict[str, TrainingInput]) If using multiple
     #'              channels for training data, you can specify a dict mapping channel names to
-    #'              strings or :func:`~sagemaker.session.s3_input` objects.}
-    #'                \item{\strong{(sagemaker.session.s3_input)} - channel configuration for S3 data sources that can
+    #'              strings or :func:`~TrainingInput` objects.}
+    #'                \item{\strong{(TrainingInput)} - channel configuration for S3 data sources that can
     #'              provide additional information as well as the path to the training dataset.
-    #'              See :func:`sagemaker.session.s3_input` for full details.}
+    #'              See :func:`TrainingInput` for full details.}
     #'                \item{\strong{(sagemaker.session.FileSystemInput)} - channel configuration for
     #'              a file system data source that can provide additional information as well as
     #'              the path to the training dataset.}}
@@ -879,7 +879,7 @@ EstimatorBase = R6Class("EstimatorBase",
       train_args[["metric_definitions"]] = self$metric_definitions
       train_args[["experiment_config"]] = experiment_config
 
-      if (inherits(inputs, c("TrainingInputs", "s3_input"))){
+      if (inherits(inputs, c("TrainingInputs"))){
         if ("InputMode" %in% inputs$config){
           log_debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
                     inputs$config$InputMode)
@@ -1077,7 +1077,7 @@ Estimator = R6Class("Estimator",
     #'              * 'Pipe' - Amazon SageMaker streams data directly from S3 to the
     #'              container via a Unix-named pipe.
     #'              This argument can be overriden on a per-channel basis using
-    #'              ``sagemaker.session.s3_input.input_mode``.
+    #'              ``TrainingInput.input_mode``.
     #' @param output_path (str): S3 location for saving the training result (model
     #'              artifacts and output files). If not specified, results are
     #'              stored to a default bucket. If the bucket with the specific name

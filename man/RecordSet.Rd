@@ -65,7 +65,7 @@ Return a dictionary to represent the training data in a channel for
 \if{html}{\out{<a id="method-recods_s3_input"></a>}}
 \if{latex}{\out{\hypertarget{method-recods_s3_input}{}}}
 \subsection{Method \code{recods_s3_input()}}{
-Return a s3_input to represent the training data
+Return a TrainingInput to represent the training data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RecordSet$recods_s3_input()}\if{html}{\out{</div>}}
 }

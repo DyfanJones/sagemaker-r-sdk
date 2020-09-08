@@ -117,7 +117,7 @@ S3 location to a local directory.
 * 'Pipe' - Amazon SageMaker streams data directly from S3 to the
 container via a Unix-named pipe.
 This argument can be overriden on a per-channel basis using
-``sagemaker.session.s3_input.input_mode``.}
+``TrainingInput.input_mode``.}
 
 \item{\code{output_path}}{(str): S3 location for saving the training result (model
 artifacts and output files). If not specified, results are
