@@ -74,27 +74,33 @@ test_that(
     
     )
   
+  expect_error(
+    
+    vpc_from_list()
+    
+  )
   
-
-
+  expect_error(
+    
+    vpc_from_list(SUBNETS_KEY,subnets)
+    
   )
 
-
-
-# Not sure 
-
-  with pytest.raises(KeyError):
-    from_dict({})
-  with pytest.raises(KeyError):
-    from_dict({SUBNETS_KEY: subnets})
-  with pytest.raises(KeyError):
-    from_dict({SECURITY_GROUP_IDS_KEY: security_groups})
+  expect_error(
+    
+    vpc_from_list(SECURITY_GROUP_IDS_KEY, security_groups)
+    
+  )
   
-  with pytest.raises(ValueError):
-    from_dict({}, do_sanitize=True)
-
-
   
+  expect_error(
+    
+    vpc_from_list(do_sanitize = TRUE)
+    
+  )
+  
+  )
+
   
   
 # Sanitize section 
@@ -119,27 +125,43 @@ test_that(
     )
     
     
-    expect_error()
+    expect_error(
+      
+      vpc_sannitize()
+      
+    )
     
+    
+    expect_error(
+      
+      
+      vpc_sannitize(list('SUBNETS_KEY' = 1))
+      
+    )
+    
+    expect_error(
+      
+      
+      vpc_sannitize(list('SUBNETS_KEY' = NULL))
+      
+    )
+    
+    expect_error(
+      
+      
+      vpc_sannitize(list('SECURITY_GROUP_IDS_KEY' = 1, 'SUBNETS_KEY' = subnets))
+      
+    )
+    
+    
+    expect_error(
+      
+      
+      vpc_sannitize(list('SECURITY_GROUP_IDS_KEY' = NULL, 'SUBNETS_KEY' = subnets))
+      
+    )
     
     
   )
   
   
-# Not sure   
-  
-  with pytest.raises(ValueError):
-    sanitize([])
-  with pytest.raises(ValueError):
-    sanitize({})
-  
-  with pytest.raises(ValueError):
-    sanitize({SUBNETS_KEY: 1})
-  with pytest.raises(ValueError):
-    sanitize({SUBNETS_KEY: []})
-  
-  with pytest.raises(ValueError):
-    sanitize({SECURITY_GROUP_IDS_KEY: 1, SUBNETS_KEY: subnets})
-  with pytest.raises(ValueError):
-    sanitize({SECURITY_GROUP_IDS_KEY: [], SUBNETS_KEY: subnets})
-
