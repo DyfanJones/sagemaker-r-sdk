@@ -51,7 +51,7 @@ expect_equal(subnets,security_groups) # Needs to be updated to reflect the asser
 
     
   })
-
+ 
 
 test_that(
   
