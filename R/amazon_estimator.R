@@ -1,11 +1,13 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/af7f75ae336f0481e52bb968e4cc6df91b1bac2c/src/sagemaker/amazon/amazon_estimator.py
 
 #' @include utils.R
-#' @include xgboost_estimator.R
+#' @include estimator.R
 #' @include fw_registry.R
 #' @include s3.R
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
+#' @include amazon_common.R
+#' @include image_uris.R
 
 #' @import R6
 #' @importFrom urltools url_parse
@@ -26,14 +28,6 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #' @field repo_version
     #' Version fo repo to call
     repo_version = NULL,
-
-    #' @field .feature_dim
-    #' descriptor class
-    .feature_dim = NULL,
-
-    #' @field .mini_batch_size
-    #' descriptor class
-    .mini_batch_size = NULL,
 
     #' @description Initialize an AmazonAlgorithmEstimatorBase.
     #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
@@ -69,11 +63,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                        ...)
 
       data_location = data_location %||% sprintf("s3://%s/sagemaker-record-sets/", self$sagemaker_session$default_bucket())
-
+      private$.feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=DataTypes$new()$int, obj = self)
+      private$.mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=DataTypes$new()$int, obj = self)
       self$.data_location = data_location
-
-      self$.feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer, obj = self)
-      self$.mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer, obj = self)
     },
 
     #' @description Return algorithm image URI for the given AWS region, repository name, and
@@ -220,14 +212,14 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       self$.data_location = data_location
     },
 
-    # --------- User Active binding to mimic Python's Descriptor Class
+    # --------- User Active binding to mimic Python's Descriptor Class ---------
 
     #' @field feature_dim
     #' Hyperparameter class for feature_dim
     feature_dim = function(value){
       if(missing(value))
-        return(self$.feature_dim$descriptor)
-      self$.feature_dim$descriptor = value
+        return(private$.feature_dim$descriptor)
+      private$.feature_dim$descriptor = value
     },
 
     #' @field mini_batch_size
@@ -239,6 +231,10 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     }
   ),
   private = list(
+    # --------- initializing private objects of r python descriptor class ---------
+    .feature_dim = NULL,
+    .mini_batch_size = NULL,
+
     # Convert the job description to init params that can be handled by the
     # class constructor
     # Args:

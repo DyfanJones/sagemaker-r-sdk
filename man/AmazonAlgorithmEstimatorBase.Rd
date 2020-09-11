@@ -16,10 +16,6 @@ Base class for Amazon first-party Estimator implementations. This class
 \item{\code{repo_name}}{The repo name for the account}
 
 \item{\code{repo_version}}{Version fo repo to call}
-
-\item{\code{.feature_dim}}{descriptor class}
-
-\item{\code{.mini_batch_size}}{descriptor class}
 }
 \if{html}{\out{</div>}}
 }
