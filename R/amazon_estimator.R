@@ -56,9 +56,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                           data_location=NULL,
                           enable_network_isolation=FALSE,
                           ...){
-      super$initialize(role,
-                       instance_count,
-                       instance_type,
+      super$initialize(role = role,
+                       instance_count = instance_count,
+                       instance_type = instance_type,
                        enable_network_isolation=enable_network_isolation,
                        ...)
 
@@ -160,8 +160,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                           labels=NULL,
                           channel="train",
                           encrypt=FALSE){
-      s3 = paws::s3(config = self$sagemaker_session$paws_credentials$credentials)
-
+      if(is.vector(train)) train = as.array(train)
       parsed_s3_url = url_parse(self$data_location)
       bucket = parsed_s3_url$domain
       key_prefix = parsed_s3_url$path
@@ -169,11 +168,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       key_prefix = trimws(key_prefix, "left", "/")
       log_debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
       manifest_s3_file = upload_matrix_to_s3_shards(
-        self$instance_count, s3, bucket, key_prefix, train, labels, encrypt
+        self$instance_count, self$sagemaker_session$s3, bucket, key_prefix, train, labels, encrypt
       )
-
       log_debug("Created manifest file %s", manifest_s3_file)
-
       return(RecordSet$new(
         manifest_s3_file,
         num_records=dim(train)[1],
@@ -395,7 +392,11 @@ RecordSet = R6Class("RecordSet",
     #'              single s3 manifest file, listing each s3 object to train on.
     #' @param channel (str): The SageMaker Training Job channel this RecordSet
     #'              should be bound to
-    initialize = function(){
+    initialize = function(s3_data,
+                          num_records,
+                          feature_dim,
+                          s3_data_type="ManifestFile",
+                          channel="train"){
       self$s3_data = s3_data
       self$feature_dim = feature_dim
       self$num_records = num_records
@@ -523,11 +524,13 @@ FileSystemRecordSet = R6Class("FileSystemRecordSet",
     stop("Array length is less than num shards")
 
   max_row = dim(array)[1]
-
   split_vec <- seq(1, max_row, shard_size)
-  lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
-}
 
+  if(length(dim(array)) == 1)
+    lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1))])
+  else
+    lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
+}
 
 # Upload the training ``array`` and ``labels`` arrays to ``num_shards`` S3
 # objects, stored in "s3:// ``bucket`` / ``key_prefix`` /". Optionally
@@ -539,6 +542,9 @@ upload_matrix_to_s3_shards = function(num_shards,
                                       array,
                                       labels=NULL,
                                       encrypt=FALSE){
+  # initialise protobuf
+  initProtoBuf()
+
   shards = .build_shards(num_shards, array)
 
   if (!is.null(labels))
