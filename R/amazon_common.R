@@ -76,11 +76,11 @@ RecordDeserializer = R6Class("RecordDeserializer",
 
 .write_label_tensor <- function(resolved_type, record, scalar){
   if (resolved_type == "Int32")
-    record$label[[1]]$values$int32_tensor$values <- c(scalar)
+    record$label[[1]]$value$int32_tensor$values <- c(scalar)
   if (resolved_type == "Float64")
-    record$label[[1]]$values$float64_tensor$values <- c(scalar)
+    record$label[[1]]$value$float64_tensor$values <- c(scalar)
   if (resolved_type == "Float32")
-    record$label[[1]]$values$float32_tensor$values <- c(scalar)
+    record$label[[1]]$value$float32_tensor$values <- c(scalar)
 }
 
 .write_keys_tensor <- function(resolved_type, record, vector){
@@ -133,6 +133,7 @@ write_matrix_to_dense_tensor <- function(file, array, labels = NULL){
 }
 
 write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
+  initProtoBuf()
   requireNamespace("Matrix")
   if (!is(array, "sparseMatrix"))
     stop("Array must be sparse", call. = F)
