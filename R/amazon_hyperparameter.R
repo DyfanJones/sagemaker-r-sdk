@@ -130,21 +130,21 @@ DataTypes = R6Class("DataTypes",
       tryCatch(
         as.numeric(x),
         warning = function(w) {
-          stop(error_message, call. = F)
+          stop(self$error_message, call. = F)
         })
     },
     str = function(x){
       tryCatch(
         as.character(x),
         warning = function(w) {
-          stop(error_message, call. = F)
+          stop(self$error_message, call. = F)
         })
     },
     int = function(x){
       tryCatch(
         as.integer(x),
         warning = function(w) {
-          stop(error_message, call. = F)
+          stop(self$error_message, call. = F)
       })
     }
   )
