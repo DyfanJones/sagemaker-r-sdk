@@ -89,8 +89,8 @@ Hyperparameter = R6Class("Hyperparameter",
 
     # Validate the supplied value and set this hyperparameter to value
     # Placeholder: until get R6 equivalent
-    .set = function(value = NULL){
-      value = if(is.null(value)) NULL else self$data_type(value)
+    .set = function(value){
+      value = self$data_type(value)
       self$validate(value)
       if (!(".hyperparameters" %in% names(self$obj)))
         self$obj[[".hyperparameters"]] = list()
@@ -114,7 +114,7 @@ Hyperparameter = R6Class("Hyperparameter",
 
       # delete method
       if(is.null(value))
-        return(private$.delete(value))
+        return(private$.delete())
 
       # set method
       return(private$.set(value))
