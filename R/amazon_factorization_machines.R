@@ -126,7 +126,7 @@ FactorizationMachines = R6Class("FactorizationMachines",
     #'              parameters for initializing this class at
     #'              :class:`~sagemaker.estimator.amazon_estimator.AmazonAlgorithmEstimatorBase` and
     #'              :class:`~sagemaker.estimator.EstimatorBase`.
-    intialize = function(role,
+    initialize = function(role,
                          instance_count,
                          instance_type,
                          num_factors,
@@ -154,7 +154,8 @@ FactorizationMachines = R6Class("FactorizationMachines",
                          factors_init_sigma=NULL,
                          factors_init_value=NULL,
                          ...){
-      super$initialize(role, instance_count, instance_type, ...)
+
+      super$initialize(role = role, instance_count = instance_count, instance_type = instance_type, ...)
 
       private$.num_factors = Hyperparameter$new("num_factors", Validation$new()$gt(0), "An integer greater than zero", DataTypes$new()$int, self)
       private$.predictor_type = Hyperparameter$new(
@@ -479,7 +480,8 @@ FactorizationMachines = R6Class("FactorizationMachines",
     .factors_init_scale = NULL,
     .factors_init_sigma = NULL,
     .factors_init_value = NULL
-  )
+  ),
+  lock_objects = F
 )
 
 #' @title Performs binary-classification or regression prediction from input
