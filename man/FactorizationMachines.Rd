@@ -96,7 +96,7 @@ constant'.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-intialize}{\code{FactorizationMachines$intialize()}}
+\item \href{#method-new}{\code{FactorizationMachines$new()}}
 \item \href{#method-creat_model}{\code{FactorizationMachines$creat_model()}}
 \item \href{#method-clone}{\code{FactorizationMachines$clone()}}
 }
@@ -119,7 +119,6 @@ constant'.}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transformer">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transformer}{\code{R6sagemaker::EstimatorBase$transformer()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AmazonAlgorithmEstimatorBase" data-id="fit">}\href{../../R6sagemaker/html/AmazonAlgorithmEstimatorBase.html#method-fit}{\code{R6sagemaker::AmazonAlgorithmEstimatorBase$fit()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AmazonAlgorithmEstimatorBase" data-id="hyperparameters">}\href{../../R6sagemaker/html/AmazonAlgorithmEstimatorBase.html#method-hyperparameters}{\code{R6sagemaker::AmazonAlgorithmEstimatorBase$hyperparameters()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AmazonAlgorithmEstimatorBase" data-id="initialize">}\href{../../R6sagemaker/html/AmazonAlgorithmEstimatorBase.html#method-initialize}{\code{R6sagemaker::AmazonAlgorithmEstimatorBase$initialize()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AmazonAlgorithmEstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/AmazonAlgorithmEstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::AmazonAlgorithmEstimatorBase$prepare_workflow_for_training()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AmazonAlgorithmEstimatorBase" data-id="record_set">}\href{../../R6sagemaker/html/AmazonAlgorithmEstimatorBase.html#method-record_set}{\code{R6sagemaker::AmazonAlgorithmEstimatorBase$record_set()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AmazonAlgorithmEstimatorBase" data-id="training_image_uri">}\href{../../R6sagemaker/html/AmazonAlgorithmEstimatorBase.html#method-training_image_uri}{\code{R6sagemaker::AmazonAlgorithmEstimatorBase$training_image_uri()}}\out{</span>}
@@ -128,9 +127,9 @@ constant'.}
 \out{</details>}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-intialize"></a>}}
-\if{latex}{\out{\hypertarget{method-intialize}{}}}
-\subsection{Method \code{intialize()}}{
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
 Factorization Machines is :class:`Estimator` for general-purpose
              supervised learning.
              Amazon SageMaker Factorization Machines is a general-purpose
@@ -164,7 +163,7 @@ Factorization Machines is :class:`Estimator` for general-purpose
              please consult AWS technical documentation:
              https://docs.aws.amazon.com/sagemaker/latest/dg/fact-machines.html
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FactorizationMachines$intialize(
+\if{html}{\out{<div class="r">}}\preformatted{FactorizationMachines$new(
   role,
   instance_count,
   instance_type,

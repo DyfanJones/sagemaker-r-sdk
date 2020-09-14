@@ -25,7 +25,13 @@ RecordSet Class
 A collection of Amazon :class:~`Record` objects serialized and stored
              in S3.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RecordSet$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RecordSet$new(
+  s3_data,
+  num_records,
+  feature_dim,
+  s3_data_type = "ManifestFile",
+  channel = "train"
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
