@@ -231,7 +231,7 @@ FactorizationMachines = R6Class("FactorizationMachines",
     #'              * 'Subnets' (list[str]): List of subnet ids.
     #'              * 'SecurityGroupIds' (list[str]): List of security group ids.
     #' @param ... : Additional kwargs passed to the FactorizationMachinesModel constructor.
-    creat_model = function(vpc_config_override="VPC_CONFIG_DEFAULT", ...){
+    create_model = function(vpc_config_override="VPC_CONFIG_DEFAULT", ...){
       return(FactorizationMachinesModel$new(
         self$model_data,
         self$role,

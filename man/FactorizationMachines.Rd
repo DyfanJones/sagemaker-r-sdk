@@ -97,7 +97,7 @@ constant'.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{FactorizationMachines$new()}}
-\item \href{#method-creat_model}{\code{FactorizationMachines$creat_model()}}
+\item \href{#method-create_model}{\code{FactorizationMachines$create_model()}}
 \item \href{#method-clone}{\code{FactorizationMachines$clone()}}
 }
 }
@@ -107,7 +107,6 @@ constant'.}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id=".prepare_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-.prepare_for_training}{\code{R6sagemaker::EstimatorBase$.prepare_for_training()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="attach">}\href{../../R6sagemaker/html/EstimatorBase.html#method-attach}{\code{R6sagemaker::EstimatorBase$attach()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="compile_model">}\href{../../R6sagemaker/html/EstimatorBase.html#method-compile_model}{\code{R6sagemaker::EstimatorBase$compile_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="create_model">}\href{../../R6sagemaker/html/EstimatorBase.html#method-create_model}{\code{R6sagemaker::EstimatorBase$create_model()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="delete_endpoint">}\href{../../R6sagemaker/html/EstimatorBase.html#method-delete_endpoint}{\code{R6sagemaker::EstimatorBase$delete_endpoint()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="deploy">}\href{../../R6sagemaker/html/EstimatorBase.html#method-deploy}{\code{R6sagemaker::EstimatorBase$deploy()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_network_isolation}{\code{R6sagemaker::EstimatorBase$enable_network_isolation()}}\out{</span>}
@@ -293,13 +292,13 @@ parameters for initializing this class at
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-creat_model"></a>}}
-\if{latex}{\out{\hypertarget{method-creat_model}{}}}
-\subsection{Method \code{creat_model()}}{
+\if{html}{\out{<a id="method-create_model"></a>}}
+\if{latex}{\out{\hypertarget{method-create_model}{}}}
+\subsection{Method \code{create_model()}}{
 Return a :class:`~sagemaker.amazon.FactorizationMachinesModel`
              referencing the latest s3 model data produced by this Estimator.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FactorizationMachines$creat_model(
+\if{html}{\out{<div class="r">}}\preformatted{FactorizationMachines$create_model(
   vpc_config_override = "VPC_CONFIG_DEFAULT",
   ...
 )}\if{html}{\out{</div>}}
