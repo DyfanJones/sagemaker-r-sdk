@@ -24,6 +24,10 @@ Hyperparameter = R6Class("Hyperparameter",
     #' function to convert data type
     data_type = NULL,
 
+    #' @field obj
+    #' parent class to alter
+    obj = NULL,
+
     #' @param name (str): The name of this hyperparameter validate
     #' @param validate (callable[object]->[bool]): A validation function or list of validation
     #'                    functions.
@@ -41,7 +45,7 @@ Hyperparameter = R6Class("Hyperparameter",
       stopifnot(is.character(validation_message),
                 is.function(data_type))
 
-      self$validation = validate
+      self$validation = if(!inherits(validate,"list")) list(validate) else validate
       self$validation_message = validation_message
       self$name = name
       self$data_type = data_type
@@ -58,7 +62,7 @@ Hyperparameter = R6Class("Hyperparameter",
         if (!valid(value)){
           error_message = sprintf("Invalid hyperparameter value %s for %s", value, self$name)
           if (!is.null(self$validation_message))
-            error_message = error_message + ". Expecting: " + self.validation_message
+            error_message = paste0(error_message, ". Expecting: ", self$validation_message)
           stop(error_message, call. = F)
         }
       }
@@ -78,15 +82,15 @@ Hyperparameter = R6Class("Hyperparameter",
   private = list(
     # Placeholder: until get R6 equivalent
     .get = function(){
-      if (!(".hyperparameters" %in% names(self$obj)) || !(self$name %in% self$obj[[".hyperparameters"]]))
+      if (!(".hyperparameters" %in% names(self$obj)) || !(self$name %in% names(self$obj[[".hyperparameters"]])))
         stop("Attribute Error", call. = F)
       return(self$obj[[".hyperparameters"]][[self$name]])
     },
 
     # Validate the supplied value and set this hyperparameter to value
     # Placeholder: until get R6 equivalent
-    .set = function(value = NULL){
-      value = if(is.null(value)) NULL else self$data_type(value)
+    .set = function(value){
+      value = self$data_type(value)
       self$validate(value)
       if (!(".hyperparameters" %in% names(self$obj)))
         self$obj[[".hyperparameters"]] = list()
@@ -110,7 +114,7 @@ Hyperparameter = R6Class("Hyperparameter",
 
       # delete method
       if(is.null(value))
-        return(private$.delete(value))
+        return(private$.delete())
 
       # set method
       return(private$.set(value))
@@ -118,3 +122,29 @@ Hyperparameter = R6Class("Hyperparameter",
   )
 )
 
+# Throw error when failed to convert object
+DataTypes = R6Class("DataTypes",
+  public = list(
+    float = function(x){
+      tryCatch(
+        as.numeric(x),
+        warning = function(w) {
+          stop(sprintf("Could not convert object '%s' to numeric", x), call. = F)
+        })
+    },
+    str = function(x){
+      tryCatch(
+        as.character(x),
+        warning = function(w) {
+          stop(sprintf("Could not convert object '%s' to character", x), call. = F)
+        })
+    },
+    int = function(x){
+      tryCatch(
+        as.integer(x),
+        warning = function(w) {
+          stop(sprintf("Could not convert object '%s' to integer", x), call. = F)
+      })
+    }
+  )
+)

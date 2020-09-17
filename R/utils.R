@@ -35,6 +35,14 @@ name_from_base <- function(base, max_length = 63, short = FALSE){
   return(sprintf("%s-%s", trimmed_base, timestamp))
 }
 
+unique_name_from_base <- function(base, max_length=63){
+  unique = sprintf("%04x", as.integer(runif(1,max= 16**4)))  # 4-digit hex
+  ts = as.character(as.integer(Sys.time()))
+  available_length = max_length - 2 - nchar(ts) - nchar(unique)
+  trimmed = substring(base, 1, available_length)
+  return(sprintf("%s-%s-%s",trimmed, ts, unique))
+}
+
 base_name_from_image <- function(image){
   m <- grepl("^(.+/)?([^:/]+)(:[^:]+)?$", image)
   algo_name = if(m) gsub(".*/|:.*", "", image) else image

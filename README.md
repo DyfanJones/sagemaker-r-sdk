@@ -34,3 +34,7 @@ remotes::install_github("DyfanJones/sagemaker-r-sdk")
 
 
 **Note: If a feature hasn't yet been implemented please feel free to raise a pull request or a ticket**
+
+## For developers
+
+To keep the package within the CRAN size limit of 5MB. R6sagemaker is currently using a separate repository ([sagemaker-r-test-data](https://github.com/DyfanJones/sagemaker-r-test-data)) to store R variants of test data stored in [sagemaker-python-sdk](https://github.com/aws/sagemaker-python-sdk). sagemaker-r-test-data will only consist of data that can't be read into R natively i.e. python pickle files. For other test data R6sagemaker will read it directly from sagemaker-python-sdk.

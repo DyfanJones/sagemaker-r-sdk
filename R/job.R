@@ -122,7 +122,7 @@
       if (is.null(inputs))
         return(NULL)
 
-      if (inherits(inputs, "RecordSet") && inherits(inputs, "FileSystemRecordSet"))
+      if (inherits(inputs, c("RecordSet", "FileSystemRecordSet")))
         inputs = inputs$data_channel()
 
       input_dict = list()

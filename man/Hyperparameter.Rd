@@ -17,6 +17,8 @@ An algorithm hyperparameter with optional validation. Implemented as a
 \item{\code{name}}{name of hyperparameter validate}
 
 \item{\code{data_type}}{function to convert data type}
+
+\item{\code{obj}}{parent class to alter}
 }
 \if{html}{\out{</div>}}
 }

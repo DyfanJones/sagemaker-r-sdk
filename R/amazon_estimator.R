@@ -1,11 +1,13 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/af7f75ae336f0481e52bb968e4cc6df91b1bac2c/src/sagemaker/amazon/amazon_estimator.py
 
 #' @include utils.R
-#' @include xgboost_estimator.R
+#' @include estimator.R
 #' @include fw_registry.R
 #' @include s3.R
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
+#' @include amazon_common.R
+#' @include image_uris.R
 
 #' @import R6
 #' @importFrom urltools url_parse
@@ -26,14 +28,6 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     #' @field repo_version
     #' Version fo repo to call
     repo_version = NULL,
-
-    #' @field .feature_dim
-    #' descriptor class
-    .feature_dim = NULL,
-
-    #' @field .mini_batch_size
-    #' descriptor class
-    .mini_batch_size = NULL,
 
     #' @description Initialize an AmazonAlgorithmEstimatorBase.
     #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
@@ -62,18 +56,16 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                           data_location=NULL,
                           enable_network_isolation=FALSE,
                           ...){
-      super$initialize(role,
-                       instance_count,
-                       instance_type,
+      super$initialize(role = role,
+                       instance_count = instance_count,
+                       instance_type = instance_type,
                        enable_network_isolation=enable_network_isolation,
                        ...)
 
       data_location = data_location %||% sprintf("s3://%s/sagemaker-record-sets/", self$sagemaker_session$default_bucket())
-
+      private$.feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=DataTypes$new()$int, obj = self)
+      private$.mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=DataTypes$new()$int, obj = self)
       self$.data_location = data_location
-
-      self$.feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=as.integer, obj = self)
-      self$.mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=as.integer, obj = self)
     },
 
     #' @description Return algorithm image URI for the given AWS region, repository name, and
@@ -168,8 +160,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                           labels=NULL,
                           channel="train",
                           encrypt=FALSE){
-      s3 = paws::s3(config = self$sagemaker_session$paws_credentials$credentials)
-
+      if(is.vector(train)) train = as.array(train)
       parsed_s3_url = url_parse(self$data_location)
       bucket = parsed_s3_url$domain
       key_prefix = parsed_s3_url$path
@@ -177,11 +168,9 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       key_prefix = trimws(key_prefix, "left", "/")
       log_debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
       manifest_s3_file = upload_matrix_to_s3_shards(
-        self$instance_count, s3, bucket, key_prefix, train, labels, encrypt
+        self$instance_count, self$sagemaker_session$s3, bucket, key_prefix, train, labels, encrypt
       )
-
       log_debug("Created manifest file %s", manifest_s3_file)
-
       return(RecordSet$new(
         manifest_s3_file,
         num_records=dim(train)[1],
@@ -220,14 +209,14 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       self$.data_location = data_location
     },
 
-    # --------- User Active binding to mimic Python's Descriptor Class
+    # --------- User Active binding to mimic Python's Descriptor Class ---------
 
     #' @field feature_dim
     #' Hyperparameter class for feature_dim
     feature_dim = function(value){
       if(missing(value))
-        return(self$.feature_dim$descriptor)
-      self$.feature_dim$descriptor = value
+        return(private$.feature_dim$descriptor)
+      private$.feature_dim$descriptor = value
     },
 
     #' @field mini_batch_size
@@ -239,6 +228,10 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
     }
   ),
   private = list(
+    # --------- initializing private objects of r python descriptor class ---------
+    .feature_dim = NULL,
+    .mini_batch_size = NULL,
+
     # Convert the job description to init params that can be handled by the
     # class constructor
     # Args:
@@ -326,7 +319,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
         if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
       }
 
-      config = .Job$private_methods$.load_config(inputs, self)
+      config = .Job$new()$.__enclos_env__$private$.load_config(inputs, self)
 
       if (!islistempty(self$hyperparameters())){
         hyperparameters = self$hyperparameters()}
@@ -399,7 +392,11 @@ RecordSet = R6Class("RecordSet",
     #'              single s3 manifest file, listing each s3 object to train on.
     #' @param channel (str): The SageMaker Training Job channel this RecordSet
     #'              should be bound to
-    initialize = function(){
+    initialize = function(s3_data,
+                          num_records,
+                          feature_dim,
+                          s3_data_type="ManifestFile",
+                          channel="train"){
       self$s3_data = s3_data
       self$feature_dim = feature_dim
       self$num_records = num_records
@@ -416,7 +413,7 @@ RecordSet = R6Class("RecordSet",
     },
 
     #' @description Return a TrainingInput to represent the training data
-    recods_s3_input = function(){
+    records_s3_input = function(){
       return(TrainingInput$new(self$s3_data, distribution="ShardedByS3Key", s3_data_type=self$s3_data_type))
     },
 
@@ -527,11 +524,13 @@ FileSystemRecordSet = R6Class("FileSystemRecordSet",
     stop("Array length is less than num shards")
 
   max_row = dim(array)[1]
-
   split_vec <- seq(1, max_row, shard_size)
-  lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
-}
 
+  if(length(dim(array)) == 1)
+    lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1))])
+  else
+    lapply(split_vec, function(i) array[i:min(max_row,(i+shard_size-1)),])
+}
 
 # Upload the training ``array`` and ``labels`` arrays to ``num_shards`` S3
 # objects, stored in "s3:// ``bucket`` / ``key_prefix`` /". Optionally
@@ -543,6 +542,9 @@ upload_matrix_to_s3_shards = function(num_shards,
                                       array,
                                       labels=NULL,
                                       encrypt=FALSE){
+  # initialise protobuf
+  initProtoBuf()
+
   shards = .build_shards(num_shards, array)
 
   if (!is.null(labels))
