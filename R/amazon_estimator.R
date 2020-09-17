@@ -319,7 +319,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
         if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
       }
 
-      config = .Job$private_methods$.load_config(inputs, self)
+      config = .Job$new()$.__enclos_env__$private$.load_config(inputs, self)
 
       if (!islistempty(self$hyperparameters())){
         hyperparameters = self$hyperparameters()}
@@ -413,7 +413,7 @@ RecordSet = R6Class("RecordSet",
     },
 
     #' @description Return a TrainingInput to represent the training data
-    recods_s3_input = function(){
+    records_s3_input = function(){
       return(TrainingInput$new(self$s3_data, distribution="ShardedByS3Key", s3_data_type=self$s3_data_type))
     },
 
