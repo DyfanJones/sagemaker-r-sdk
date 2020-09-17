@@ -82,7 +82,7 @@ Hyperparameter = R6Class("Hyperparameter",
   private = list(
     # Placeholder: until get R6 equivalent
     .get = function(){
-      if (!(".hyperparameters" %in% names(self$obj)) || !(self$name %in% self$obj[[".hyperparameters"]]))
+      if (!(".hyperparameters" %in% names(self$obj)) || !(self$name %in% names(self$obj[[".hyperparameters"]])))
         stop("Attribute Error", call. = F)
       return(self$obj[[".hyperparameters"]][[self$name]])
     },
@@ -125,26 +125,25 @@ Hyperparameter = R6Class("Hyperparameter",
 # Throw error when failed to convert object
 DataTypes = R6Class("DataTypes",
   public = list(
-    error_message = "Could not convert object",
     float = function(x){
       tryCatch(
         as.numeric(x),
         warning = function(w) {
-          stop(self$error_message, call. = F)
+          stop(sprintf("Could not convert object '%s' to numeric", x), call. = F)
         })
     },
     str = function(x){
       tryCatch(
         as.character(x),
         warning = function(w) {
-          stop(self$error_message, call. = F)
+          stop(sprintf("Could not convert object '%s' to character", x), call. = F)
         })
     },
     int = function(x){
       tryCatch(
         as.integer(x),
         warning = function(w) {
-          stop(self$error_message, call. = F)
+          stop(sprintf("Could not convert object '%s' to integer", x), call. = F)
       })
     }
   )
