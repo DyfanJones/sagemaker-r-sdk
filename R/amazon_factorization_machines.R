@@ -497,7 +497,7 @@ FactorizationMachines = R6Class("FactorizationMachines",
 #'              the ``Record.label`` field. Please refer to the formats details described:
 #'              https://docs.aws.amazon.com/sagemaker/latest/dg/fm-in-formats.html
 #' @export
-FactorizationMachinesPredictor = R6Class(
+FactorizationMachinesPredictor = R6Class("FactorizationMachinesPredictor",
   inherit = Predictor,
   public = list(
 
@@ -517,7 +517,8 @@ FactorizationMachinesPredictor = R6Class(
         deserializer=RecordDeserializer$new()
       )
     }
-  )
+  ),
+  lock_objects = F
 )
 
 
@@ -564,5 +565,6 @@ FactorizationMachinesModel = R6Class("FactorizationMachinesModel",
         ...
       )
     }
-  )
+  ),
+  lock_objects = F
 )

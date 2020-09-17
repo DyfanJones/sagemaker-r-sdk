@@ -17,7 +17,7 @@ The implementation of
              https://docs.aws.amazon.com/sagemaker/latest/dg/fm-in-formats.html
 }
 \section{Super class}{
-\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}}
+\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}} -> \code{FactorizationMachinesPredictor}
 }
 \section{Methods}{
 \subsection{Public methods}{
