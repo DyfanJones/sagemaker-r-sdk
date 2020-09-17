@@ -13,7 +13,7 @@ RecordSet Class
 \itemize{
 \item \href{#method-new}{\code{RecordSet$new()}}
 \item \href{#method-data_channel}{\code{RecordSet$data_channel()}}
-\item \href{#method-recods_s3_input}{\code{RecordSet$recods_s3_input()}}
+\item \href{#method-records_s3_input}{\code{RecordSet$records_s3_input()}}
 \item \href{#method-print}{\code{RecordSet$print()}}
 \item \href{#method-clone}{\code{RecordSet$clone()}}
 }
@@ -68,12 +68,12 @@ Return a dictionary to represent the training data in a channel for
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-recods_s3_input"></a>}}
-\if{latex}{\out{\hypertarget{method-recods_s3_input}{}}}
-\subsection{Method \code{recods_s3_input()}}{
+\if{html}{\out{<a id="method-records_s3_input"></a>}}
+\if{latex}{\out{\hypertarget{method-records_s3_input}{}}}
+\subsection{Method \code{records_s3_input()}}{
 Return a TrainingInput to represent the training data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RecordSet$recods_s3_input()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RecordSet$records_s3_input()}\if{html}{\out{</div>}}
 }
 
 }
