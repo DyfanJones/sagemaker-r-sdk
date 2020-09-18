@@ -94,11 +94,11 @@ RandomCutForest = R6Class("RandomCutForest",
         data_type=as.list,
         obj = self
       )
-      private$.num_trees = Hyperparameter$new("num_trees", list(Validation$new()$ge(50), Validation$new()$le(1000)), "An integer in [50, 1000]", int, obj = self)
+      private$.num_trees = Hyperparameter$new("num_trees", list(Validation$new()$ge(50), Validation$new()$le(1000)), "An integer in [50, 1000]", DataTypes$new()$int, obj = self)
       private$.num_samples_per_tree = Hyperparameter$new(
-        "num_samples_per_tree", list(Validation$new()$ge(1), Validation$new()$le(2048)), "An integer in [1, 2048]", int, obj = self
+        "num_samples_per_tree", list(Validation$new()$ge(1), Validation$new()$le(2048)), "An integer in [1, 2048]", DataTypes$new()$int, obj = self
       )
-      private$.feature_dim = Hyperparameter$new("feature_dim", list(Validation$new()$ge(1), Validation$new()$le(10000)), "An integer in [1, 10000]", int, obj = self)
+      private$.feature_dim = Hyperparameter$new("feature_dim", list(Validation$new()$ge(1), Validation$new()$le(10000)), "An integer in [1, 10000]", DataTypes$new()$int, obj = self)
 
       self$num_samples_per_tree = num_samples_per_tree
       self$num_trees = num_trees
