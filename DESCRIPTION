@@ -56,6 +56,7 @@ Collate:
     'fw_registry.R'
     'amazon_estimator.R'
     'amazon_factorization_machines.R'
+    'amazon_randomcutforest.R'
     'data_capture_config.R'
     'debugger.R'
     'model_monitoring.R'
