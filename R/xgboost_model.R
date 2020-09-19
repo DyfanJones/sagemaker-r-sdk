@@ -28,7 +28,7 @@ XGBoostPredictor = R6Class("XGBoostPredictor",
     initialize = function(endpoint_name,
                           sagemaker_session=NULL){
       super$initialize(
-        endpoint_name, sagemaker_session, LibSVMSerializer$new(), CsvDeserializer$new()
+        endpoint_name, sagemaker_session, LibSVMSerializer$new(), CSVDeserializer$new()
         )
     }
   )

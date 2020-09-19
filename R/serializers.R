@@ -31,10 +31,10 @@ BaseSerializer = R6Class("BaseSerializer",
   )
 )
 
-#' @title CsvSerializer Class
+#' @title CSVSerializer Class
 #' @description Make Raw data using text/csv format
 #' @export
-CsvSerializer = R6Class("CsvSerializer",
+CSVSerializer = R6Class("CSVSerializer",
   inherit = BaseSerializer,
   public = list(
     #' @description Initialize BaseSerializer Class
@@ -54,14 +54,14 @@ CsvSerializer = R6Class("CsvSerializer",
   )
 )
 
-#' @title S3 method to call CsvSerializer class
+#' @title S3 method to call CSVSerializer class
 #' @export
-csv_serializer <- CsvSerializer$new()
+csv_serializer <- CSVSerializer$new()
 
-#' @title JsonSerializer Class
+#' @title JSONSerializer Class
 #' @description Make Raw data using json format
 #' @export
-JsonSerializer = R6Class("JsonSerializer",
+JSONSerializer = R6Class("JSONSerializer",
   inherit = BaseSerializer,
   public = list(
    #' @description Initialize Csv BaseSerializer
@@ -83,7 +83,7 @@ JsonSerializer = R6Class("JsonSerializer",
 
 #' @title S3 method to call JsonSerializer class
 #' @export
-json_serializer <- JsonSerializer$new()
+json_serializer <- JSONSerializer$new()
 
 #' @title LibSVMSerializer Class
 #' @description Serialize data of various formats to a LibSVM-formatted string.

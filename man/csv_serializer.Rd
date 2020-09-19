@@ -3,14 +3,14 @@
 \docType{data}
 \name{csv_serializer}
 \alias{csv_serializer}
-\title{S3 method to call CsvSerializer class}
+\title{S3 method to call CSVSerializer class}
 \format{
-An object of class \code{CsvSerializer} (inherits from \code{BaseSerializer}, \code{R6}) of length 6.
+An object of class \code{CSVSerializer} (inherits from \code{BaseSerializer}, \code{R6}) of length 6.
 }
 \usage{
 csv_serializer
 }
 \description{
-S3 method to call CsvSerializer class
+S3 method to call CSVSerializer class
 }
 \keyword{datasets}

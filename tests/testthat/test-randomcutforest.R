@@ -177,7 +177,7 @@ test_that("test model image", {
   expect_equal(model$image_uri, ImageUris$new()$retrieve("randomcutforest", REGION))
 })
 
-test_that("test model image", {
+test_that("test predictor type", {
   rf_args = c(sagemaker_session=sagemaker_session, ALL_REQ_ARGS)
   randomcutforest=do.call(RandomCutForest$new, rf_args)
   data = RecordSet$new(
