@@ -3,14 +3,14 @@
 \docType{data}
 \name{json_deserializer}
 \alias{json_deserializer}
-\title{S3 method to call StringBaseDeserializer class}
+\title{S3 method to call JSONDeserializer class}
 \format{
-An object of class \code{JsonBaseDeserializer} (inherits from \code{BaseDeserializer}, \code{R6}) of length 7.
+An object of class \code{JSONDeserializer} (inherits from \code{BaseDeserializer}, \code{R6}) of length 7.
 }
 \usage{
 json_deserializer
 }
 \description{
-S3 method to call StringBaseDeserializer class
+S3 method to call JSONDeserializer class
 }
 \keyword{datasets}

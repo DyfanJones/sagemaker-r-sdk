@@ -61,10 +61,10 @@ StringDeserializer = R6Class("StringBaseDeserializer",
 #' @export
 string_deserializer <- StringDeserializer$new()
 
-#' @title CsvBaseDeserializer Class
+#' @title CSVDeserializer Class
 #' @description  Use csv format to deserialize raw data stream
 #' @export
-CsvDeserializer = R6Class("CsvBaseDeserializer",
+CSVDeserializer = R6Class("CSVDeserializer",
   inherit = BaseDeserializer,
   public = list(
     #' @description Initialize CsvSerializer Class
@@ -88,15 +88,15 @@ CsvDeserializer = R6Class("CsvBaseDeserializer",
   )
 )
 
-#' @title S3 method to call CsvBaseDeserializer class
+#' @title S3 method to call CSVDeserializer class
 #' @export
-csv_deserializer <- CsvDeserializer$new()
+csv_deserializer <- CSVDeserializer$new()
 
 
-#' @title JsonBaseDeserializer Class
+#' @title JSONDeserializer Class
 #' @description  Use json format to deserialize raw data stream
 #' @export
-JsonDeserializer = R6Class("JsonBaseDeserializer",
+JSONDeserializer = R6Class("JSONDeserializer",
   inherit = BaseDeserializer,
   public = list(
 
@@ -120,9 +120,9 @@ JsonDeserializer = R6Class("JsonBaseDeserializer",
   )
 )
 
-#' @title S3 method to call StringBaseDeserializer class
+#' @title S3 method to call JSONDeserializer class
 #' @export
-json_deserializer <- JsonDeserializer$new()
+json_deserializer <- JSONDeserializer$new()
 
 
 # TODO: DeSerialize classes:

@@ -3,14 +3,14 @@
 \docType{data}
 \name{csv_deserializer}
 \alias{csv_deserializer}
-\title{S3 method to call CsvBaseDeserializer class}
+\title{S3 method to call CSVDeserializer class}
 \format{
-An object of class \code{CsvBaseDeserializer} (inherits from \code{BaseDeserializer}, \code{R6}) of length 6.
+An object of class \code{CSVDeserializer} (inherits from \code{BaseDeserializer}, \code{R6}) of length 6.
 }
 \usage{
 csv_deserializer
 }
 \description{
-S3 method to call CsvBaseDeserializer class
+S3 method to call CSVDeserializer class
 }
 \keyword{datasets}
