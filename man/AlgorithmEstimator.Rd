@@ -46,8 +46,8 @@ A generic Estimator to train using any algorithm object (with an
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker::EstimatorBase$get_vpc_config()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker/html/EstimatorBase.html#method-logs}{\code{R6sagemaker::EstimatorBase$logs()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transform">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transform}{\code{R6sagemaker::EstimatorBase$transform()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
 }
 \out{</details>}
@@ -61,11 +61,11 @@ Initialize an ``AlgorithmEstimator`` instance.
 \if{html}{\out{<div class="r">}}\preformatted{AlgorithmEstimator$new(
   algorithm_arn,
   role,
-  train_instance_count,
-  train_instance_type,
-  train_volume_size = 30,
-  train_volume_kms_key = NULL,
-  train_max_run = 24 * 60 * 60,
+  instance_count,
+  instance_type,
+  volume_size = 30,
+  volume_kms_key = NULL,
+  max_run = 24 * 60 * 60,
   input_mode = "File",
   output_path = NULL,
   output_kms_key = NULL,
@@ -95,20 +95,20 @@ access training data and model artifacts. After the endpoint
 is created, the inference code might use the IAM role, if it
 needs to access an AWS resource.}
 
-\item{\code{train_instance_count}}{(int): Number of Amazon EC2 instances to
+\item{\code{instance_count}}{(int): Number of Amazon EC2 instances to
 use for training.}
 
-\item{\code{train_instance_type}}{(str): Type of EC2
+\item{\code{instance_type}}{(str): Type of EC2
 instance to use for training, for example, 'ml.c4.xlarge'.}
 
-\item{\code{train_volume_size}}{(int): Size in GB of the EBS volume to use for
+\item{\code{volume_size}}{(int): Size in GB of the EBS volume to use for
 storing input data during training (default: 30). Must be large enough to store
 training data if File Mode is used (which is the default).}
 
-\item{\code{train_volume_kms_key}}{(str): Optional. KMS key ID for encrypting EBS volume attached
+\item{\code{volume_kms_key}}{(str): Optional. KMS key ID for encrypting EBS volume attached
 to the training instance (default: NULL).}
 
-\item{\code{train_max_run}}{(int): Timeout in seconds for training (default: 24 * 60 * 60).
+\item{\code{max_run}}{(int): Timeout in seconds for training (default: 24 * 60 * 60).
 After this amount of time Amazon SageMaker terminates the
 job regardless of its current status.}
 
@@ -119,7 +119,7 @@ the S3 location to a local directory.
 * 'Pipe' - Amazon SageMaker streams data directly from S3 to
 the container via a Unix-named pipe.
 This argument can be overriden on a per-channel basis using
-``sagemaker.session.s3_input.input_mode``.}
+``TrainingInput.input_mode``.}
 
 \item{\code{output_path}}{(str): S3 location for saving the training result (model artifacts and
 output files). If not specified, results are stored to a default bucket. If
@@ -253,7 +253,7 @@ bool: Whether this Estimator needs network isolation or not.
 \subsection{Method \code{create_model()}}{
 Create a model to deploy.
              The serializer, deserializer, content_type, and accept arguments are
-             only used to define a default RealTimePredictor. They are ignored if an
+             only used to define a default Predictor They are ignored if an
              explicit predictor class is passed in. Other arguments are passed
              through to the Model class.
 \subsection{Usage}{
@@ -408,17 +408,17 @@ Train a model using the input training dataset.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{inputs}}{(str or dict or sagemaker.session.s3_input): Information
+\item{\code{inputs}}{(str or dict or TrainingInput): Information
 about the training data. This can be one of three types:
 \itemize{
   \item{\strong{(str)} the S3 location where training data is saved, or a file:// path in
 local mode.}
-  \item{\strong{(dict[str, str]} or dict[str, sagemaker.session.s3_input]) If using multiple
+  \item{\strong{(dict[str, str]} or dict[str, TrainingInput]) If using multiple
 channels for training data, you can specify a dict mapping channel names to
-strings or :func:`~sagemaker.session.s3_input` objects.}
-  \item{\strong{(sagemaker.session.s3_input)} - channel configuration for S3 data sources that can
+strings or :func:`~TrainingInput` objects.}
+  \item{\strong{(TrainingInput)} - channel configuration for S3 data sources that can
 provide additional information as well as the path to the training dataset.
-See :func:`sagemaker.session.s3_input` for full details.}
+See :func:`TrainingInput` for full details.}
   \item{\strong{(sagemaker.session.FileSystemInput)} - channel configuration for
 a file system data source that can provide additional information as well as
 the path to the training dataset.}}}

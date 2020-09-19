@@ -3,9 +3,15 @@
 #' @import R6
 
 #' @title Create a definition for input data used by an SageMaker training job.
+#' @description Amazon SageMaker channel configurations for S3 data sources.
 #' @export
-s3_input = R6Class("s3_input",
+TrainingInput = R6Class("TrainingInput",
   public = list(
+
+   #' @field config
+   #' A SageMaker ``DataSource`` referencing a SageMaker ``S3DataSource``.
+   config = NULL,
+
    #' @description See AWS documentation on the ``CreateTrainingJob`` API for more details on the parameters.
    #' @param s3_data (str): Defines the location of s3 data to train on.
    #' @param distribution (str): Valid values: 'FullyReplicated', 'ShardedByS3Key'
@@ -48,46 +54,55 @@ s3_input = R6Class("s3_input",
                          attribute_names=NULL,
                          target_attribute_name=NULL,
                          shuffle_config=NULL){
-     self$s3_data = s3_data
-     self$distribution= distribution
-     self$compression= compression
-     self$content_type=content_type
-     self$record_wrapping=record_wrapping
-     self$s3_data_type=s3_data_type
-     self$input_mode=input_mode
-     self$attribute_names=attribute_names
-     self$target_attribute_name=target_attribute_name
-     self$shuffle_config=shuffle_config
-
-     log_warn("'s3_input' class will be renamed to 'TrainingInput' to align with SageMaker Python SDK v2.")
-
-     config <- list(DataSource =
-                      list(S3DataSource =
-                             list(S3DataType = self$s3_data_type, S3Uri = self$s3_data)))
+     self$config <- list(DataSource = list(S3DataSource = list(S3DataType = s3_data_type, S3Uri = s3_data)))
 
      if (is.null(self$target_attribute_name) || is.null(self$distribution)) distribution = "FullyReplicated"
 
-     config[["DataSource"]][["S3DataSource"]][["S3DataDistributionType"]] = self$distribution
-     config[["CompressionType"]] = self$compression
-     config[["ContentType"]] = self$content_type
-     config[["RecordWrapperType"]] = self$record_wrapping
-     config[["InputMode"]] = self$input_mode
-     config[["DataSource"]][["S3DataSource"]][["AttributeNames"]] = self$attribute_names
-     config[["TargetAttributeName"]] = self$target_attribute_name
-     if(!is.null(self$shuffle_config)) config[["ShuffleConfig"]] = list(Seed = self$shuffle_config)
-
-     self$config = config
+     self$config$DataSource$S3DataSource$S3DataDistributionType = distribution
+     self$config$CompressionType = compression
+     self$config$ContentType = content_type
+     self$config$RecordWrapperType = record_wrapping
+     self$config$InputMode = input_mode
+     self$config$DataSource$S3DataSource$AttributeNames = attribute_names
+     self$config$TargetAttributeName = target_attribute_name
+     if(!is.null(self$shuffle_config))
+        self$config$ShuffleConfig = list(Seed = shuffle_config$seed)
    },
 
    #' @description
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<s3_input>")
-     invisible(self)
+      return(print_class(self))
    }
-  ),
-  lock_objects = F
+  )
+)
+
+#' @title ShuffleConfig Class
+#' @description For configuring channel shuffling using a seed
+#'              For more detail, see the AWS documentation:
+#'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_ShuffleConfig.html
+#' @export
+ShuffleConfig = R6Class("ShuffleConfig",
+   public = list(
+
+      #' @field seed
+      #' value used to seed the shuffled sequence.
+      seed = NULL,
+
+      #' @description Create a ShuffleConfig.
+      #' @param seed (numeric): value used to seed the shuffled sequence.
+      initialize = function(seed){
+         self$seed = seed
+      },
+
+      #' @description
+      #' Printer.
+      #' @param ... (ignored).
+      print = function(...){
+         return(print_class(self))
+      }
+   )
 )
 
 #' @title Amazon SageMaker channel configurations for file system data sources.
@@ -128,16 +143,14 @@ FileSystemInput = R6Class("FileSystemInput",
           )
         )
       )
-      self$config[["ContentType"]] = content_type
-
+      self$config$ContentType = content_type
     },
 
     #' @description
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<FileSystemInput>")
-      invisible(self)
+       return(print_class(self))
     }
   )
 )

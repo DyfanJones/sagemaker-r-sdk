@@ -78,7 +78,7 @@ Model = R6Class("Model",
       self$name = name
       self$.base_name = NULL
       self$vpc_config = vpc_config
-      self$sagemaker_session = sagemaker_session
+      self$sagemaker_session = sagemaker_session %||% Session$new()
       self$endpoint_name = NULL
       self$.is_compiled_model = FALSE
       self$.enable_network_isolation = enable_network_isolation
@@ -444,8 +444,7 @@ Model = R6Class("Model",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<Model>")
-      invisible(self)
+      return(print_class(self))
     }
   ),
   private = list(
@@ -472,12 +471,12 @@ Model = R6Class("Model",
 
     # Generate a new model name if ``self._base_name`` is present.
     .set_model_name_if_needed = function(){
-      if (!is.null(self._base_name))
+      if (!is.null(self$.base_name))
         self$name = name_from_base(self$.base_name)
     },
 
     .framework = function(){
-      return(attr(self, "__framework_name__"))
+      return(attr(self, "_framework_name"))
       },
 
     # TODO: review this private method
@@ -570,7 +569,7 @@ SAGEMAKER_OUTPUT_LOCATION <- "sagemaker_s3_output"
 #' @description This class hosts user-defined code in S3 and sets code location and
 #'              configuration in model environment variables.
 #' @export
-FrameworkModel = R6Class("FrameWorkModel",
+FrameworkModel = R6Class("FrameworkModel",
   inherit = Model,
   public = list(
 
@@ -699,9 +698,9 @@ FrameworkModel = R6Class("FrameWorkModel",
                          dependencies=NULL,
                          git_config=NULL,
                          ...){
-     super$initialize(image_uri,
-                      model_data,
-                      role,
+     super$initialize(image_uri=image_uri,
+                      model_data=model_data,
+                      role=role,
                       predictor_cls=predictor_cls,
                       env=env,
                       name=name,
@@ -712,14 +711,16 @@ FrameworkModel = R6Class("FrameWorkModel",
      self$dependencies = dependencies %||% list()
      self$git_config = git_config
      # Align logging level with python logging
-     container_log_level = match.arg(toupper(container_log_level))
-     container_log_level = switch(container_log_level,
-                                  "INFO" = "20",
-                                  "WARN" = "30",
-                                  "ERROR" = "40",
-                                  "FATAL" = "50",
-                                  "CRITICAL" = "50")
-     self$container_log_level = container_log_level
+     if(!is.numeric(container_log_level)){
+       container_log_level = match.arg(container_log_level)
+       container_log_level = switch(container_log_level,
+                                    "INFO" = 20,
+                                    "WARN" = 30,
+                                    "ERROR" = 40,
+                                    "FATAL" = 50,
+                                    "CRITICAL" = 50)
+     }
+     self$container_log_level = as.character(container_log_level)
      if (!is.null(code_location)){
        s3_parts = split_s3_uri(code_location)
        self$bucket =s3_parts$bucket
@@ -749,7 +750,7 @@ FrameworkModel = R6Class("FrameWorkModel",
    #'              model. For example, 'ml.eia1.medium'.
    #' @return dict[str, str]: A container definition object usable with the
    #'              CreateModel API.
-   prepaper_container = function(instance_type=NULL,
+   prepare_container = function(instance_type=NULL,
                                  accelerator_type=NULL){
      deploy_key_prefix = model_code_key_prefix(
        self$key_prefix, self$name, self$image_uri
@@ -758,14 +759,6 @@ FrameworkModel = R6Class("FrameWorkModel",
      deploy_env = list(self$env)
      deploy_env = c(deploy_env, private$.framework_env_vars())
      return (container_def(self$image_uri, self$model_data, deploy_env))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<FrameworkModel>")
-     invisible(self)
    }
   ),
   private = list(

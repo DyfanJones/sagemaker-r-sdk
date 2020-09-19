@@ -22,6 +22,7 @@ Class to create and format sagemaker docker images stored in ECR
 \item \href{#method-clear_cache}{\code{ImageUris$clear_cache()}}
 \item \href{#method-ecr_tags}{\code{ImageUris$ecr_tags()}}
 \item \href{#method-retrieve_ecr_uri}{\code{ImageUris$retrieve_ecr_uri()}}
+\item \href{#method-print}{\code{ImageUris$print()}}
 \item \href{#method-clone}{\code{ImageUris$clone()}}
 }
 }
@@ -161,6 +162,23 @@ Retrieves the ECR URI for the Docker image matching the given arguments for cust
 
 \item{\code{tag}}{(str): The framework or algorithm version. This is required if there is
 more than one supported version for the given framework or algorithm.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ImageUris$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

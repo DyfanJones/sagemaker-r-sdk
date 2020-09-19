@@ -23,7 +23,6 @@ Provides functionality to retrieve baseline-specific files output from baselinin
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="load_config">}\href{../../R6sagemaker/html/.Job.html#method-load_config}{\code{R6sagemaker::.Job$load_config()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="describe">}\href{../../R6sagemaker/html/ProcessingJob.html#method-describe}{\code{R6sagemaker::ProcessingJob$describe()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="from_processing_arn">}\href{../../R6sagemaker/html/ProcessingJob.html#method-from_processing_arn}{\code{R6sagemaker::ProcessingJob$from_processing_arn()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="from_processing_name">}\href{../../R6sagemaker/html/ProcessingJob.html#method-from_processing_name}{\code{R6sagemaker::ProcessingJob$from_processing_name()}}\out{</span>}

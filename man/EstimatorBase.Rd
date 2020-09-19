@@ -33,10 +33,11 @@ For introduction to model training and deployment, see
 \item \href{#method-wait}{\code{EstimatorBase$wait()}}
 \item \href{#method-compile_model}{\code{EstimatorBase$compile_model()}}
 \item \href{#method-attach}{\code{EstimatorBase$attach()}}
+\item \href{#method-logs}{\code{EstimatorBase$logs()}}
 \item \href{#method-deploy}{\code{EstimatorBase$deploy()}}
 \item \href{#method-create_model}{\code{EstimatorBase$create_model()}}
 \item \href{#method-delete_endpoint}{\code{EstimatorBase$delete_endpoint()}}
-\item \href{#method-transform}{\code{EstimatorBase$transform()}}
+\item \href{#method-transformer}{\code{EstimatorBase$transformer()}}
 \item \href{#method-get_vpc_config}{\code{EstimatorBase$get_vpc_config()}}
 \item \href{#method-.prepare_for_training}{\code{EstimatorBase$.prepare_for_training()}}
 \item \href{#method-print}{\code{EstimatorBase$print()}}
@@ -51,11 +52,11 @@ Initialize an ``EstimatorBase`` instance.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$new(
   role,
-  train_instance_count,
-  train_instance_type,
-  train_volume_size = 30,
-  train_volume_kms_key = NULL,
-  train_max_run = 24 * 60 * 60,
+  instance_count,
+  instance_type,
+  volume_size = 30,
+  volume_kms_key = NULL,
+  max_run = 24 * 60 * 60,
   input_mode = "File",
   output_path = NULL,
   output_kms_key = NULL,
@@ -68,8 +69,8 @@ Initialize an ``EstimatorBase`` instance.
   model_channel_name = "model",
   metric_definitions = NULL,
   encrypt_inter_container_traffic = FALSE,
-  train_use_spot_instances = FALSE,
-  train_max_wait = NULL,
+  use_spot_instances = FALSE,
+  max_wait = NULL,
   checkpoint_s3_uri = NULL,
   checkpoint_local_path = NULL,
   rules = NULL,
@@ -89,21 +90,21 @@ endpoints use this role to access training data and model
 artifacts. After the endpoint is created, the inference code
 might use the IAM role, if it needs to access an AWS resource.}
 
-\item{\code{train_instance_count}}{(int): Number of Amazon EC2 instances to use
+\item{\code{instance_count}}{(int): Number of Amazon EC2 instances to use
 for training.}
 
-\item{\code{train_instance_type}}{(str): Type of EC2 instance to use for training,
+\item{\code{instance_type}}{(str): Type of EC2 instance to use for training,
 for example, 'ml.c4.xlarge'.}
 
-\item{\code{train_volume_size}}{(int): Size in GB of the EBS volume to use for
+\item{\code{volume_size}}{(int): Size in GB of the EBS volume to use for
 storing input data during training (default: 30). Must be large
 enough to store training data if File Mode is used (which is the
 default).}
 
-\item{\code{train_volume_kms_key}}{(str): Optional. KMS key ID for encrypting EBS
+\item{\code{volume_kms_key}}{(str): Optional. KMS key ID for encrypting EBS
 volume attached to the training instance (default: NULL).}
 
-\item{\code{train_max_run}}{(int): Timeout in seconds for training (default: 24 *
+\item{\code{max_run}}{(int): Timeout in seconds for training (default: 24 *
 60 * 60). After this amount of time Amazon SageMaker terminates
 the job regardless of its current status.}
 
@@ -113,7 +114,7 @@ the training dataset from the S3 location to a local directory.
 'Pipe' - Amazon SageMaker streams data directly from S3 to the
 container via a Unix-named pipe. This argument can be overriden
 on a per-channel basis using
-``sagemaker.session.s3_input.input_mode``.}
+``TrainingInput.input_mode``.}
 
 \item{\code{output_path}}{(str): S3 location for saving the training result (model
 artifacts and output files). If not specified, results are
@@ -172,14 +173,14 @@ don't use an Amazon algorithm.}
 between training containers is encrypted for the training job
 (default: ``False``).}
 
-\item{\code{train_use_spot_instances}}{(bool): Specifies whether to use SageMaker
+\item{\code{use_spot_instances}}{(bool): Specifies whether to use SageMaker
 Managed Spot instances for training. If enabled then the
-`train_max_wait` arg should also be set.
+`max_wait` arg should also be set.
 More information:
 https://docs.aws.amazon.com/sagemaker/latest/dg/model-managed-spot-training.html
 (default: ``False``).}
 
-\item{\code{train_max_wait}}{(int): Timeout in seconds waiting for spot training
+\item{\code{max_wait}}{(int): Timeout in seconds waiting for spot training
 instances (default: NULL). After this amount of time Amazon
 SageMaker will stop waiting for Spot instances to become
 available (default: ``NULL``).}
@@ -344,17 +345,17 @@ Train a model using the input training dataset.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{inputs}}{(str or dict or sagemaker.session.s3_input): Information
+\item{\code{inputs}}{(str or dict or TrainingInput): Information
 about the training data. This can be one of three types:
 \itemize{
   \item{\strong{(str)} the S3 location where training data is saved, or a file:// path in
 local mode.}
-  \item{\strong{(dict[str, str]} or dict[str, sagemaker.session.s3_input]) If using multiple
+  \item{\strong{(dict[str, str]} or dict[str, TrainingInput]) If using multiple
 channels for training data, you can specify a dict mapping channel names to
-strings or :func:`~sagemaker.session.s3_input` objects.}
-  \item{\strong{(sagemaker.session.s3_input)} - channel configuration for S3 data sources that can
+strings or :func:`~TrainingInput` objects.}
+  \item{\strong{(TrainingInput)} - channel configuration for S3 data sources that can
 provide additional information as well as the path to the training dataset.
-See :func:`sagemaker.session.s3_input` for full details.}
+See :func:`TrainingInput` for full details.}
   \item{\strong{(sagemaker.session.FileSystemInput)} - channel configuration for
 a file system data source that can provide additional information as well as
 the path to the training dataset.}}}
@@ -409,6 +410,10 @@ Compile a Neo model using the input model.
   framework_version = NULL,
   compile_max_run = 15 * 60,
   tags = NULL,
+  target_platform_os = NULL,
+  target_platform_arch = NULL,
+  target_platform_accelerator = NULL,
+  compiler_options = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -441,6 +446,25 @@ terminates the compilation job regardless of its current status.}
 \item{\code{tags}}{(list[dict]): List of tags for labeling a compilation job. For
 more, see
 https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+
+\item{\code{target_platform_os}}{(str): Target Platform OS, for example: 'LINUX'.
+For allowed strings see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+It can be used instead of target_instance_family.}
+
+\item{\code{target_platform_arch}}{(str): Target Platform Architecture, for example: 'X86_64'.
+For allowed strings see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+It can be used instead of target_instance_family.}
+
+\item{\code{target_platform_accelerator}}{(str, optional): Target Platform Accelerator,
+for example: 'NVIDIA'. For allowed strings see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+It can be used instead of target_instance_family.}
+
+\item{\code{compiler_options}}{(dict, optional): Additional parameters for compiler.
+Compiler Options are TargetPlatform / target_instance_family specific. See
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html for details.}
 
 \item{\code{...}}{: Passed to invocation of ``create_model()``.
 Implementations may customize ``create_model()`` to accept
@@ -505,11 +529,23 @@ Instance of the calling ``Estimator`` Class with the attached
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-logs"></a>}}
+\if{latex}{\out{\hypertarget{method-logs}{}}}
+\subsection{Method \code{logs()}}{
+Display the logs for Estimator's training job.
+             If the output is a tty or a Jupyter cell, it will be color-coded based
+             on which instance the log entry is from.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$logs()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-deploy"></a>}}
 \if{latex}{\out{\hypertarget{method-deploy}{}}}
 \subsection{Method \code{deploy()}}{
 Deploy the trained model to an Amazon SageMaker endpoint and return a
-             ``sagemaker.RealTimePredictor`` object.
+             ``sagemaker.Predictor`` object.
              More information:
              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
 \subsection{Usage}{
@@ -587,7 +623,7 @@ For more, see the implementation docs.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()`` method,
+sagemaker.predictor.Predictor: A predictor that provides a ``predict()`` method,
              which can be used to send requests to the Amazon SageMaker
              endpoint and obtain inferences.
 }
@@ -626,14 +662,14 @@ Delete an Amazon SageMaker ``Endpoint``.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-transform"></a>}}
-\if{latex}{\out{\hypertarget{method-transform}{}}}
-\subsection{Method \code{transform()}}{
+\if{html}{\out{<a id="method-transformer"></a>}}
+\if{latex}{\out{\hypertarget{method-transformer}{}}}
+\subsection{Method \code{transformer()}}{
 Return a ``Transformer`` that uses a SageMaker Model based on the
              training job. It reuses the SageMaker Session and base job name used by
              the Estimator.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$transform(
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$transformer(
   instance_count,
   instance_type,
   strategy = NULL,

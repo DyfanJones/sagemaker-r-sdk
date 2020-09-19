@@ -43,7 +43,7 @@ Session = R6Class("Session",
       self$config <- NULL
       # get sagemaker object from paws
       self$sagemaker = paws::sagemaker(config = self$paws_credentials$credentials)
-
+      self$s3 = paws::s3(config = self$paws_credentials$credentials)
       self$local_mode = FALSE
     },
 
@@ -79,13 +79,10 @@ Session = R6Class("Session",
       # if bucke parameter hasn't been selected use class parameter
       bucket = bucket %||% self$default_bucket()
 
-      # Get s3 object from paws
-      s3 <- paws::s3(config = self$paws_credentials$credentials)
-
       # Upload file to s3
       for (i in 1:length(local_path)){
         obj <- readBin(local_path[i], "raw", n = file.size(local_path[i]))
-        s3$put_object(Body = obj, Bucket = bucket, Key = s3_key[i], ...)}
+        self$s3$put_object(Body = obj, Bucket = bucket, Key = s3_key[i], ...)}
 
       s3_uri = sprintf("s3://%s/%s", bucket, key_prefix)
 
@@ -105,13 +102,11 @@ Session = R6Class("Session",
                                           bucket,
                                           key,
                                           kms_key=NULL){
-      # Get s3 object from paws
-      s3 <- paws::s3(config = self$paws_credentials$credentials)
 
       if (!is.null(kms_key))
-        s3$put_object(Bucket = bucket, Body=charToRaw(body), SSEKMSKeyId=kms_key, ServerSideEncryption="aws:kms")
+        self$s3$put_object(Bucket = bucket, Body=charToRaw(body), SSEKMSKeyId=kms_key, ServerSideEncryption="aws:kms")
       else
-        s3$put_object(Bucket = bucket, Body=charToRaw(body))
+        self$s3$put_object(Bucket = bucket, Body=charToRaw(body))
 
       s3_uri = sprintf("s3://%s/%s",bucket, key)
       return (s3_uri)
@@ -272,7 +267,7 @@ Session = R6Class("Session",
     #' @param algorithm_arn (str): Algorithm Arn from Marketplace.
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic between training
     #'              containers is encrypted for the training job (default: ``False``).
-    #' @param train_use_spot_instances (bool): whether to use spot instances for training.
+    #' @param use_spot_instances (bool): whether to use spot instances for training.
     #' @param checkpoint_s3_uri (str): The S3 URI in which to persist checkpoints
     #'              that the algorithm persists (if any) during training. (default: ``None``).
     #' @param checkpoint_local_path (str): The local path that the algorithm
@@ -311,7 +306,7 @@ Session = R6Class("Session",
                      image=NULL,
                      algorithm_arn=NULL,
                      encrypt_inter_container_traffic=FALSE,
-                     train_use_spot_instances=FALSE,
+                     use_spot_instances=FALSE,
                      checkpoint_s3_uri=NULL,
                      checkpoint_local_path=NULL,
                      experiment_config=NULL,
@@ -348,7 +343,7 @@ Session = R6Class("Session",
       train_request$EnableNetworkIsolation = enable_network_isolation
 
       train_request$EnableInterContainerTrafficEncryption = encrypt_inter_container_traffic
-      train_request$EnableManagedSpotTraining = train_use_spot_instances
+      train_request$EnableManagedSpotTraining = use_spot_instances
 
       train_request$CheckpointConfig = NULL
 
@@ -1081,7 +1076,7 @@ Session = R6Class("Session",
     #'                              The key in vpc_config is 'Subnets'.}
     #'                \item{\strong{security_group_ids (list[str]):} List of security group ids.
     #'                              The key in vpc_config is 'SecurityGroupIds'.}}
-    #' @param train_use_spot_instances (bool): whether to use spot instances for training.
+    #' @param use_spot_instances (bool): whether to use spot instances for training.
     #' @param checkpoint_s3_uri (str): The S3 URI in which to persist checkpoints
     #'             that the algorithm persists (if any) during training. (Default: \code{FALSE}).
     #' @param checkpoint_local_path (str): The local path that the algorithm
@@ -1115,7 +1110,7 @@ Session = R6Class("Session",
                     early_stopping_type="Off",
                     encrypt_inter_container_traffic=FALSE,
                     vpc_config=NULL,
-                    train_use_spot_instances=FALSE,
+                    use_spot_instances=FALSE,
                     checkpoint_s3_uri=NULL,
                     checkpoint_local_path=NULL){
 
@@ -1144,7 +1139,7 @@ Session = R6Class("Session",
           stop_condition=stop_condition,
           enable_network_isolation=enable_network_isolation,
           encrypt_inter_container_traffic=encrypt_inter_container_traffic,
-          train_use_spot_instances=train_use_spot_instances,
+          use_spot_instances=use_spot_instances,
           checkpoint_s3_uri=checkpoint_s3_uri,
           checkpoint_local_path=checkpoint_local_path
         )
@@ -1920,7 +1915,7 @@ Session = R6Class("Session",
     expand_role = function(role){
       iam = paws::iam(config = self$paws_credentials$credentials)
       if(grepl("/", role)) return(role)
-      return(iam$get_role(RoleName = role_name)$Role$Arn)
+      return(iam$get_role(RoleName = role)$Role$Arn)
     },
 
     #' @description  Returns the ARN user or role whose credentials are used to call the API.
@@ -2147,8 +2142,7 @@ Session = R6Class("Session",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<Session>")
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(
@@ -2217,7 +2211,7 @@ Session = R6Class("Session",
                                     objective_type=NULL,
                                     objective_metric_name=NULL,
                                     parameter_ranges=NULL,
-                                    train_use_spot_instances=FALSE,
+                                    use_spot_instances=FALSE,
                                     checkpoint_s3_uri=NULL,
                                     checkpoint_local_path=NULL){
 
@@ -2249,7 +2243,7 @@ Session = R6Class("Session",
 
       if (encrypt_inter_container_traffic) training_job_definition["EnableInterContainerTrafficEncryption"] = TRUE
 
-      if (train_use_spot_instances)  training_job_definition["EnableManagedSpotTraining"] = TRUE
+      if (use_spot_instances)  training_job_definition["EnableManagedSpotTraining"] = TRUE
 
 
       if (!is.null(checkpoint_s3_uri)){
@@ -2522,7 +2516,7 @@ container_def <- function(image,
 
   c_def$ModelDataUrl = model_data_url
   c_def$Mode = container_mode
-  return(list(c_def))
+  return(c_def)
 }
 
 #' @title Create a definition for executing a pipeline of containers as part of a SageMaker model.
@@ -2574,7 +2568,7 @@ production_variant <- function(model_name,
 }
 
 #' @title Return the role ARN whose credentials are used to call the API.
-#' @param sagemaker_session(Session): Current sagemaker session
+#' @param sagemaker_session (Session): Current sagemaker session
 #' @return (str): The role ARN
 #' @export
 get_execution_role <- function(sagemaker_session = NULL){

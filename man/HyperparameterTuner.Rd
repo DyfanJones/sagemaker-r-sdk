@@ -168,13 +168,13 @@ Start a hyperparameter tuning job.
 ``fit()`` method of the associated estimator, as this can take
 any of the following forms:
 * (str) - The S3 location where training data is saved.
-* (dict[str, str] or dict[str, sagemaker.session.s3_input]) -
+* (dict[str, str] or dict[str, TrainingInput]) -
 If using multiple channels for training data, you can specify
 a dict mapping channel names to strings or
-:func:`~sagemaker.session.s3_input` objects.
-* (sagemaker.session.s3_input) - Channel configuration for S3 data sources that can
+:func:`~TrainingInput` objects.
+* (TrainingInput) - Channel configuration for S3 data sources that can
 provide additional information about the training dataset.
-See :func:`sagemaker.session.s3_input` for full details.
+See :func:`TrainingInput` for full details.
 * (sagemaker.session.FileSystemInput) - channel configuration for
 a file system data source that can provide additional information as well as
 the path to the training dataset.
@@ -342,7 +342,7 @@ sagemaker.tuner.HyperparameterTuner: A ``HyperparameterTuner``
 \if{latex}{\out{\hypertarget{method-deploy}{}}}
 \subsection{Method \code{deploy()}}{
 Deploy the best trained or user specified model to an Amazon
-             SageMaker endpoint and return a ``sagemaker.RealTimePredictor`` object.
+             SageMaker endpoint and return a ``sagemaker.Predictor`` object.
              For more information:
              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
 \subsection{Usage}{
@@ -400,7 +400,7 @@ what other arguments are needed.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()``
+sagemaker.predictor.Predictor: A predictor that provides a ``predict()``
              method, which can be used to send requests to the Amazon SageMaker endpoint
              and obtain inferences.
 }
@@ -440,7 +440,7 @@ Wait for latest hyperparameter tuning job to finish.
 \if{latex}{\out{\hypertarget{method-best_estimator}{}}}
 \subsection{Method \code{best_estimator()}}{
 Return the estimator that has best training job attached. The trained model can then
-             be deployed to an Amazon SageMaker endpoint and return a ``sagemaker.RealTimePredictor``
+             be deployed to an Amazon SageMaker endpoint and return a ``sagemaker.Predictor``
              object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuner$best_estimator(best_training_job = NULL)}\if{html}{\out{</div>}}

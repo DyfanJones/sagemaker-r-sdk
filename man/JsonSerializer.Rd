@@ -14,13 +14,13 @@ Make Raw data using json format
 \itemize{
 \item \href{#method-new}{\code{JsonSerializer$new()}}
 \item \href{#method-serialize}{\code{JsonSerializer$serialize()}}
-\item \href{#method-print}{\code{JsonSerializer$print()}}
 \item \href{#method-clone}{\code{JsonSerializer$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseSerializer" data-id="print">}\href{../../R6sagemaker/html/BaseSerializer.html#method-print}{\code{R6sagemaker::BaseSerializer$print()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -47,23 +47,6 @@ Take data of various data formats and serialize them into CSV.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{data}}{(object): Data to be serialized.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{JsonSerializer$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

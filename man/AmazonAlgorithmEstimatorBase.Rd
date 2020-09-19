@@ -16,10 +16,6 @@ Base class for Amazon first-party Estimator implementations. This class
 \item{\code{repo_name}}{The repo name for the account}
 
 \item{\code{repo_version}}{Version fo repo to call}
-
-\item{\code{.feature_dim}}{descriptor class}
-
-\item{\code{.mini_batch_size}}{descriptor class}
 }
 \if{html}{\out{</div>}}
 }
@@ -60,8 +56,9 @@ Base class for Amazon first-party Estimator implementations. This class
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker::EstimatorBase$get_vpc_config()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker/html/EstimatorBase.html#method-logs}{\code{R6sagemaker::EstimatorBase$logs()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="print">}\href{../../R6sagemaker/html/EstimatorBase.html#method-print}{\code{R6sagemaker::EstimatorBase$print()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transform">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transform}{\code{R6sagemaker::EstimatorBase$transform()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transformer">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transformer}{\code{R6sagemaker::EstimatorBase$transformer()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -73,8 +70,8 @@ Initialize an AmazonAlgorithmEstimatorBase.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{AmazonAlgorithmEstimatorBase$new(
   role,
-  train_instance_count,
-  train_instance_type,
+  instance_count,
+  instance_type,
   data_location = NULL,
   enable_network_isolation = FALSE,
   ...
@@ -90,10 +87,10 @@ endpoints use this role to access training data and model
 artifacts. After the endpoint is created, the inference code
 might use the IAM role, if it needs to access an AWS resource.}
 
-\item{\code{train_instance_count}}{(int): Number of Amazon EC2 instances to use
+\item{\code{instance_count}}{(int): Number of Amazon EC2 instances to use
 for training.}
 
-\item{\code{train_instance_type}}{(str): Type of EC2 instance to use for training,
+\item{\code{instance_type}}{(str): Type of EC2 instance to use for training,
 for example, 'ml.c4.xlarge'.}
 
 \item{\code{data_location}}{(str or None): The s3 prefix to upload RecordSet
@@ -230,7 +227,7 @@ Build a :class:`~RecordSet` from a numpy :class:`~ndarray` matrix and
              uploaded to new S3 locations. A manifest file is generated containing
              the list of objects created and also stored in S3.
              The number of S3 objects created is controlled by the
-             ``train_instance_count`` property on this Estimator. One S3 object is
+             ``instance_count`` property on this Estimator. One S3 object is
              created per training instance.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{AmazonAlgorithmEstimatorBase$record_set(

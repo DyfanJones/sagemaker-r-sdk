@@ -175,6 +175,13 @@ ImageUris = R6Class("ImageUris",
       }
 
       paste(repos$repositoryUri, tag, sep = ":")
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
     }
   ),
 
@@ -236,19 +243,20 @@ ImageUris = R6Class("ImageUris",
                                                    config,
                                                    framework){
       available_versions = names(config$versions)
-      aliased_versions = names(config$version_aliases)
+      aliased_versions = names(config$version_aliases) %||% list()
+      version = version %||% NA
 
       if (length(available_versions) == 1 && !(version %in% aliased_versions)){
         log_message = sprintf("Defaulting to the only supported framework/algorithm version: %s.", available_versions[[1]])
-        if (!is.null(version) && version != available_versions[[1]])
+        if (!is.na(version) && version != available_versions[[1]])
           log_warn("%s Ignoring framework/algorithm version: %s.", log_message, version)
-        if (is.null(version))
+        if (is.na(version))
           log_info(log_message)
 
         return(available_versions[[1]])
       }
 
-      private$.validate_arg(version, c(available_versions, aliased_versions), sprintf("%s version",framework))
+      private$.validate_arg(if(is.na(version)) NULL else version, c(available_versions, aliased_versions), sprintf("%s version",framework))
       return(version)
     },
 

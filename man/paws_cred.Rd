@@ -19,9 +19,9 @@ paws_cred(
 
 \item{aws_session_token}{(str): AWS token}
 
-\item{region}{(str): AWS region}
+\item{region_name}{(str): AWS region}
 
-\item{profile}{(str): AWS profile}
+\item{profile_name}{(str): AWS profile}
 }
 \description{
 S3 method to call PawsCredentials class

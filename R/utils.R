@@ -1,5 +1,8 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/utils.py
 
+#' @importFrom stats runif
+#' @importFrom utils tar
+
 `%||%` <- function(x, y) if (is.null(x)) return(y) else return(x)
 
 get_aws_env <- function(x) {
@@ -30,6 +33,14 @@ name_from_base <- function(base, max_length = 63, short = FALSE){
   timestamp = if(short) sagemaker_short_timestamp() else sagemaker_timestamp()
   trimmed_base = substring(base, 1,(max_length - length(timestamp) - 1))
   return(sprintf("%s-%s", trimmed_base, timestamp))
+}
+
+unique_name_from_base <- function(base, max_length=63){
+  unique = sprintf("%04x", as.integer(runif(1,max= 16**4)))  # 4-digit hex
+  ts = as.character(as.integer(Sys.time()))
+  available_length = max_length - 2 - nchar(ts) - nchar(unique)
+  trimmed = substring(base, 1, available_length)
+  return(sprintf("%s-%s-%s",trimmed, ts, unique))
 }
 
 base_name_from_image <- function(image){
@@ -186,9 +197,12 @@ islistempty = function(obj) {(is.null(obj) || length(obj) == 0)}
 #   Returns:
 #   (str): path to created tar file
 create_tar_file = function(source_files, target=NULL){
-  if (!is.null(target)) filename = target else filename = tempfile(fileext = ".tar.gz")
+  if (!is.null(target))
+    filename = target
+  else filename = tempfile(fileext = ".tar.gz")
 
-  tar_subdir(filename, source_files)
+  source_dir = unique(dirname(source_files))
+  tar_subdir(filename, source_dir)
   return(filename)
 }
 
@@ -230,7 +244,7 @@ repack_model <- function(inference_script,
                          model_uri,
                          repacked_model_uri,
                          sagemaker_session,
-                         kms_key=None){
+                         kms_key=NULL){
   dependencies = dependencies %||% list()
 
   tmp = tempdir()
@@ -240,7 +254,7 @@ repack_model <- function(inference_script,
 
   # append file to model directory
   .create_or_update_code_dir(
-    model_dir, inference_script, source_directory, dependencies, sagemaker_session, tmps)
+    model_dir, inference_script, source_directory, dependencies, sagemaker_session, tmp)
 
   # repackage model_dir
   tmp_model_path = file.path(tmp, "temp-model.tar.gz")
@@ -333,7 +347,7 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
           SSEKMSKeyId = kms_key)}
     } else {
       file.copy(tmp_model_path,
-                gsub("file://", "", repacked_model_uri.replace), recursive = T)}
+                gsub("file://", "", repacked_model_uri), recursive = T)}
   }
 
 # tar function to use system tar
@@ -353,3 +367,8 @@ IsSubR6Class <- function(subclass, cls) {
 }
 
 ECR_URI_PATTERN <- "^(\\d+)(\\.)dkr(\\.)ecr(\\.)(.+)(\\.)(.*)(/)(.*:.*)$"
+
+print_class <- function(self){
+  cat(paste0("<", class(self)[1],">\n"))
+  invisible(self)
+}

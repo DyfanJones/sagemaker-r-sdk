@@ -18,7 +18,6 @@ A generic Estimator to train using any supplied algorithm. This class is
 \item \href{#method-set_hyperparameters}{\code{Estimator$set_hyperparameters()}}
 \item \href{#method-hyperparameters}{\code{Estimator$hyperparameters()}}
 \item \href{#method-create_model}{\code{Estimator$create_model()}}
-\item \href{#method-print}{\code{Estimator$print()}}
 \item \href{#method-clone}{\code{Estimator$clone()}}
 }
 }
@@ -35,8 +34,10 @@ A generic Estimator to train using any supplied algorithm. This class is
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker::EstimatorBase$get_vpc_config()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker/html/EstimatorBase.html#method-logs}{\code{R6sagemaker::EstimatorBase$logs()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transform">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transform}{\code{R6sagemaker::EstimatorBase$transform()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="print">}\href{../../R6sagemaker/html/EstimatorBase.html#method-print}{\code{R6sagemaker::EstimatorBase$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transformer">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transformer}{\code{R6sagemaker::EstimatorBase$transformer()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
 }
 \out{</details>}
@@ -50,11 +51,11 @@ Initialize an ``Estimator`` instance.
 \if{html}{\out{<div class="r">}}\preformatted{Estimator$new(
   image_uri,
   role,
-  train_instance_count,
-  train_instance_type,
-  train_volume_size = 30,
-  train_volume_kms_key = NULL,
-  train_max_run = 24 * 60 * 60,
+  instance_count,
+  instance_type,
+  volume_size = 30,
+  volume_kms_key = NULL,
+  max_run = 24 * 60 * 60,
   input_mode = "File",
   output_path = NULL,
   output_kms_key = NULL,
@@ -68,8 +69,8 @@ Initialize an ``Estimator`` instance.
   model_channel_name = "model",
   metric_definitions = NULL,
   encrypt_inter_container_traffic = FALSE,
-  train_use_spot_instances = FALSE,
-  train_max_wait = NULL,
+  use_spot_instances = FALSE,
+  max_wait = NULL,
   checkpoint_s3_uri = NULL,
   checkpoint_local_path = NULL,
   enable_network_isolation = FALSE,
@@ -91,21 +92,21 @@ endpoints use this role to access training data and model
 artifacts. After the endpoint is created, the inference code
 might use the IAM role, if it needs to access an AWS resource.}
 
-\item{\code{train_instance_count}}{(int): Number of Amazon EC2 instances to use
+\item{\code{instance_count}}{(int): Number of Amazon EC2 instances to use
 for training.}
 
-\item{\code{train_instance_type}}{(str): Type of EC2 instance to use for training,
+\item{\code{instance_type}}{(str): Type of EC2 instance to use for training,
 for example, 'ml.c4.xlarge'.}
 
-\item{\code{train_volume_size}}{(int): Size in GB of the EBS volume to use for
+\item{\code{volume_size}}{(int): Size in GB of the EBS volume to use for
 storing input data during training (default: 30). Must be large
 enough to store training data if File Mode is used (which is the
 default).}
 
-\item{\code{train_volume_kms_key}}{(str): Optional. KMS key ID for encrypting EBS
+\item{\code{volume_kms_key}}{(str): Optional. KMS key ID for encrypting EBS
 volume attached to the training instance (default: NULL).}
 
-\item{\code{train_max_run}}{(int): Timeout in seconds for training (default: 24 *
+\item{\code{max_run}}{(int): Timeout in seconds for training (default: 24 *
 60 * 60). After this amount of time Amazon SageMaker terminates
 the job regardless of its current status.}
 
@@ -116,7 +117,7 @@ S3 location to a local directory.
 * 'Pipe' - Amazon SageMaker streams data directly from S3 to the
 container via a Unix-named pipe.
 This argument can be overriden on a per-channel basis using
-``sagemaker.session.s3_input.input_mode``.}
+``TrainingInput.input_mode``.}
 
 \item{\code{output_path}}{(str): S3 location for saving the training result (model
 artifacts and output files). If not specified, results are
@@ -175,14 +176,14 @@ don't use an Amazon algorithm.}
 between training containers is encrypted for the training job
 (default: ``False``).}
 
-\item{\code{train_use_spot_instances}}{(bool): Specifies whether to use SageMaker
+\item{\code{use_spot_instances}}{(bool): Specifies whether to use SageMaker
 Managed Spot instances for training. If enabled then the
-`train_max_wait` arg should also be set.
+`max_wait` arg should also be set.
 More information:
 https://docs.aws.amazon.com/sagemaker/latest/dg/model-managed-spot-training.html
 (default: ``False``).}
 
-\item{\code{train_max_wait}}{(int): Timeout in seconds waiting for spot training
+\item{\code{max_wait}}{(int): Timeout in seconds waiting for spot training
 instances (default: NULL). After this amount of time Amazon
 SageMaker will stop waiting for Spot instances to become
 available (default: ``NULL``).}
@@ -280,12 +281,12 @@ Returns the hyperparameters as a dictionary to use for training.
 \subsection{Method \code{create_model()}}{
 Create a model to deploy.
              The serializer, deserializer, content_type, and accept arguments are only used to define a
-             default RealTimePredictor. They are ignored if an explicit predictor class is passed in.
+             default Predictor. They are ignored if an explicit predictor class is passed in.
              Other arguments are passed through to the Model class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Estimator$create_model(
   role = NULL,
-  image = NULL,
+  image_uri = NULL,
   predictor_cls = NULL,
   serializer = NULL,
   deserializer = NULL,
@@ -303,10 +304,10 @@ Create a model to deploy.
 which is also used during transform jobs. If not specified, the
 role from the Estimator will be used.}
 
-\item{\code{image}}{(str): An container image to use for deploying the model.
+\item{\code{image_uri}}{(str): An container image to use for deploying the model.
 Defaults to the image used for training.}
 
-\item{\code{predictor_cls}}{(RealTimePredictor): The predictor class to use when
+\item{\code{predictor_cls}}{(Predictor): The predictor class to use when
 deploying the model.}
 
 \item{\code{serializer}}{(callable): Should accept a single argument, the input
@@ -339,23 +340,6 @@ You can find additional parameters for using this method at
 }
 \subsection{Returns}{
 (sagemaker.model.Model) a Model ready for deployment.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Estimator$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

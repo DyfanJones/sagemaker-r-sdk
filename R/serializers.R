@@ -26,8 +26,7 @@ BaseSerializer = R6Class("BaseSerializer",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<BaseSerializer>")
-     invisible(self)
+      print_class(self)
    }
   )
 )
@@ -51,14 +50,6 @@ CsvSerializer = R6Class("CsvSerializer",
       obj = readBin(TempFile, "raw", n = file.size(TempFile))
       unlink(TempFile)
       return(obj)
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<CsvBaseSerializer>")
-      invisible(self)
     }
   )
 )
@@ -86,14 +77,6 @@ JsonSerializer = R6Class("JsonSerializer",
      write_json(data, con, dataframe = "columns", auto_unbox = T)
 
      return(rawConnectionValue(con))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<JsonBaseSerializer>")
-     invisible(self)
    }
   )
 )
@@ -102,10 +85,39 @@ JsonSerializer = R6Class("JsonSerializer",
 #' @export
 json_serializer <- JsonSerializer$new()
 
+#' @title LibSVMSerializer Class
+#' @description Serialize data of various formats to a LibSVM-formatted string.
+#'              The data must already be in LIBSVM file format:
+#'              <label> <index1>:<value1> <index2>:<value2> ...
+#'              It is suitable for sparse datasets since it does not store zero-valued
+#'              features.
+#' @export
+LibSVMSerializer = R6Class("LibSVMSerializer",
+   inherit = BaseSerializer,
+   public = list(
+      #' @description Initialize Csv BaseSerializer
+      initialize = function(){
+         self$CONTENT_TYPE = "text/libsvm"
+         if(!requireNamespace('sparsio', quietly=TRUE))
+            stop('Please install sparsio package and try again', call. = F)
+      },
+      #' @description Serialize data of various formats to a LibSVM-formatted string.
+      #' @param data (object): Data to be serialized. Can be a string or a
+      #'              file-like object.
+      #' @return str: The data serialized as a LibSVM-formatted string.
+      serialize = function(data) {
+         f = tempfile(fileext = ".svmlight")
+         on.exit(unlink(f))
+         sparsio::write_svmlight(x, file = f)
+         obj = readBin(f, what = "raw", n = file.size(f))
+         return(obj)
+      }
+   )
+)
+
 # TODO: Serializers:
 # - NumpySerializer (R equivalent Matrix?)
 # - IdentitySerializer
 # - JSONLinesSerializer
 # - SparseMatrixSerializer (issue write .npz format: possibly look into (https://github.com/scipy/scipy/blob/e777eb9e4a4cd9844629a3c37b3e94902328ad0b/scipy/sparse/_matrix_io.py) in combination with the use of RcppCNPy)
-# - LibSVMSerializer (consider using sparsio)
 

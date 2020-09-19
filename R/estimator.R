@@ -7,6 +7,7 @@
 #' @include vpc_utils.R
 #' @include analytics.R
 #' @include image_uris.R
+#' @include job.R
 
 #' @import paws
 #' @import jsonlite
@@ -32,17 +33,17 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              endpoints use this role to access training data and model
     #'              artifacts. After the endpoint is created, the inference code
     #'              might use the IAM role, if it needs to access an AWS resource.
-    #' @param train_instance_count (int): Number of Amazon EC2 instances to use
+    #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
-    #' @param train_instance_type (str): Type of EC2 instance to use for training,
+    #' @param instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
-    #' @param train_volume_size (int): Size in GB of the EBS volume to use for
+    #' @param volume_size (int): Size in GB of the EBS volume to use for
     #'              storing input data during training (default: 30). Must be large
     #'              enough to store training data if File Mode is used (which is the
     #'              default).
-    #' @param train_volume_kms_key (str): Optional. KMS key ID for encrypting EBS
+    #' @param volume_kms_key (str): Optional. KMS key ID for encrypting EBS
     #'              volume attached to the training instance (default: NULL).
-    #' @param train_max_run (int): Timeout in seconds for training (default: 24 *
+    #' @param max_run (int): Timeout in seconds for training (default: 24 *
     #'              60 * 60). After this amount of time Amazon SageMaker terminates
     #'              the job regardless of its current status.
     #' @param input_mode (str): The input mode that the algorithm supports
@@ -51,7 +52,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              'Pipe' - Amazon SageMaker streams data directly from S3 to the
     #'              container via a Unix-named pipe. This argument can be overriden
     #'              on a per-channel basis using
-    #'              ``sagemaker.session.s3_input.input_mode``.
+    #'              ``TrainingInput.input_mode``.
     #' @param output_path (str): S3 location for saving the training result (model
     #'              artifacts and output files). If not specified, results are
     #'              stored to a default bucket. If the bucket with the specific name
@@ -98,13 +99,13 @@ EstimatorBase = R6Class("EstimatorBase",
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic
     #'              between training containers is encrypted for the training job
     #'              (default: ``False``).
-    #' @param train_use_spot_instances (bool): Specifies whether to use SageMaker
+    #' @param use_spot_instances (bool): Specifies whether to use SageMaker
     #'              Managed Spot instances for training. If enabled then the
-    #'              `train_max_wait` arg should also be set.
+    #'              `max_wait` arg should also be set.
     #'              More information:
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/model-managed-spot-training.html
     #'              (default: ``False``).
-    #' @param train_max_wait (int): Timeout in seconds waiting for spot training
+    #' @param max_wait (int): Timeout in seconds waiting for spot training
     #'              instances (default: NULL). After this amount of time Amazon
     #'              SageMaker will stop waiting for Spot instances to become
     #'              available (default: ``NULL``).
@@ -145,11 +146,11 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              (such as the Internet). The container does not make any inbound or
     #'              outbound network calls. Also known as Internet-free mode.
     initialize = function(role,
-                          train_instance_count,
-                          train_instance_type,
-                          train_volume_size = 30,
-                          train_volume_kms_key = NULL,
-                          train_max_run = 24 * 60 * 60,
+                          instance_count,
+                          instance_type,
+                          volume_size = 30,
+                          volume_kms_key = NULL,
+                          max_run = 24 * 60 * 60,
                           input_mode = "File",
                           output_path = NULL,
                           output_kms_key = NULL,
@@ -162,8 +163,8 @@ EstimatorBase = R6Class("EstimatorBase",
                           model_channel_name = "model",
                           metric_definitions = NULL,
                           encrypt_inter_container_traffic = FALSE,
-                          train_use_spot_instances =FALSE,
-                          train_max_wait = NULL,
+                          use_spot_instances =FALSE,
+                          max_wait = NULL,
                           checkpoint_s3_uri = NULL,
                           checkpoint_local_path = NULL,
                           rules = NULL,
@@ -172,11 +173,11 @@ EstimatorBase = R6Class("EstimatorBase",
                           enable_sagemaker_metrics = NULL,
                           enable_network_isolation = FALSE) {
       self$role = role
-      self$train_instance_count = train_instance_count
-      self$train_instance_type = train_instance_type
-      self$train_volume_size = train_volume_size
-      self$train_volume_kms_key = train_volume_kms_key
-      self$train_max_run = train_max_run
+      self$instance_count = instance_count
+      self$instance_type = instance_type
+      self$volume_size = volume_size
+      self$volume_kms_key = volume_kms_key
+      self$max_run = max_run
       self$input_mode = input_mode
       self$tags = tags
       self$metric_definitions = metric_definitions
@@ -185,8 +186,8 @@ EstimatorBase = R6Class("EstimatorBase",
       self$code_uri = NULL
       self$code_channel_name = "code"
 
-      if (self$train_instance_type %in% c("local", "local_gpu")) {
-        if (self$train_instance_type == "local_gpu" && self$train_instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
+      if (self$instance_type %in% c("local", "local_gpu")) {
+        if (self$instance_type == "local_gpu" && self$instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
         stop("Currently don't support local sagemaker", call. = F)
         self$sagemaker_session = sagemaker_session #  LocalSession()
         if (!inherist(self$sagemaker_session, "Session")) stop("instance_type local or local_gpu is only supported with an instance of LocalSession", call. = FALSE)
@@ -214,8 +215,8 @@ EstimatorBase = R6Class("EstimatorBase",
       self$security_group_ids = security_group_ids
 
       self$encrypt_inter_container_traffic = encrypt_inter_container_traffic
-      self$train_use_spot_instances = train_use_spot_instances
-      self$train_max_wait = train_max_wait
+      self$use_spot_instances = use_spot_instances
+      self$max_wait = max_wait
       self$checkpoint_s3_uri = checkpoint_s3_uri
       self$checkpoint_local_path = checkpoint_local_path
 
@@ -290,17 +291,17 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              This is a synchronous operation. After the model training
     #'              successfully completes, you can call the ``deploy()`` method to host the
     #'              model using the Amazon SageMaker hosting services.
-    #' @param inputs (str or dict or sagemaker.session.s3_input): Information
+    #' @param inputs (str or dict or TrainingInput): Information
     #'              about the training data. This can be one of three types:
     #'              \itemize{
     #'                \item{\strong{(str)} the S3 location where training data is saved, or a file:// path in
     #'              local mode.}
-    #'                \item{\strong{(dict[str, str]} or dict[str, sagemaker.session.s3_input]) If using multiple
+    #'                \item{\strong{(dict[str, str]} or dict[str, TrainingInput]) If using multiple
     #'              channels for training data, you can specify a dict mapping channel names to
-    #'              strings or :func:`~sagemaker.session.s3_input` objects.}
-    #'                \item{\strong{(sagemaker.session.s3_input)} - channel configuration for S3 data sources that can
+    #'              strings or :func:`~TrainingInput` objects.}
+    #'                \item{\strong{(TrainingInput)} - channel configuration for S3 data sources that can
     #'              provide additional information as well as the path to the training dataset.
-    #'              See :func:`sagemaker.session.s3_input` for full details.}
+    #'              See :func:`TrainingInput` for full details.}
     #'                \item{\strong{(sagemaker.session.FileSystemInput)} - channel configuration for
     #'              a file system data source that can provide additional information as well as
     #'              the path to the training dataset.}}
@@ -336,9 +337,9 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              strings are "All", "NULL", "Training", or "Rules". To maintain backwards
     #'              compatibility, boolean values are also accepted and converted to strings.
     wait = function(logs = "All"){
-      if(inherits(logs, "logical")) logs = ifelse(logs, "All", "NULL")
+      if(inherits(logs, "logical")) logs = ifelse(logs, "All", "None")
 
-      if(logs != "NULL"){
+      if(logs != "None"){
           self$sagemaker_session$logs_for_job(job_name = self$latest_training_job, wait=TRUE, log_type=logs)
       } else {
           self$sagemaker_session$wait_for_job(job = self$latest_training_job)}
@@ -364,6 +365,21 @@ EstimatorBase = R6Class("EstimatorBase",
     #' @param tags (list[dict]): List of tags for labeling a compilation job. For
     #'              more, see
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
+    #' @param target_platform_os (str): Target Platform OS, for example: 'LINUX'.
+    #'              For allowed strings see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    #'              It can be used instead of target_instance_family.
+    #' @param target_platform_arch (str): Target Platform Architecture, for example: 'X86_64'.
+    #'              For allowed strings see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    #'              It can be used instead of target_instance_family.
+    #' @param target_platform_accelerator (str, optional): Target Platform Accelerator,
+    #'              for example: 'NVIDIA'. For allowed strings see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html.
+    #'              It can be used instead of target_instance_family.
+    #' @param compiler_options (dict, optional): Additional parameters for compiler.
+    #'              Compiler Options are TargetPlatform / target_instance_family specific. See
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_OutputConfig.html for details.
     #' @param ... : Passed to invocation of ``create_model()``.
     #'              Implementations may customize ``create_model()`` to accept
     #'              ``**kwargs`` to customize model creation during deploy. For
@@ -378,6 +394,10 @@ EstimatorBase = R6Class("EstimatorBase",
                              framework_version=NULL,
                              compile_max_run=15 * 60,
                              tags=NULL,
+                             target_platform_os=NULL,
+                             target_platform_arch=NULL,
+                             target_platform_accelerator=NULL,
+                             compiler_options=NULL,
                              ...){
 
       if (!islistempty(framework)
@@ -402,7 +422,11 @@ EstimatorBase = R6Class("EstimatorBase",
         private$.compilation_job_name(),
         compile_max_run,
         framework=framework,
-        framework_version=framework_version)
+        framework_version=framework_version,
+        target_platform_os=target_platform_os,
+        target_platform_arch=target_platform_arch,
+        target_platform_accelerator=target_platform_accelerator,
+        compiler_options=compiler_options)
 
       return(self$.compiled_models$target_instance_family)
     },
@@ -455,13 +479,20 @@ EstimatorBase = R6Class("EstimatorBase",
       estimator$latest_training_job = init_params$base_job_name
       estimator$.current_job_name = estimator$latest_training_job
 
-      estimator$wait()
+      estimator$wait(logs = "None")
 
       return(estimator)
     },
 
+    #' @description Display the logs for Estimator's training job.
+    #'              If the output is a tty or a Jupyter cell, it will be color-coded based
+    #'              on which instance the log entry is from.
+    logs = function(){
+      self$sagemaker_session$logs_for_job(self$latest_training_job, wait=TRUE)
+    },
+
     #' @description Deploy the trained model to an Amazon SageMaker endpoint and return a
-    #'              ``sagemaker.RealTimePredictor`` object.
+    #'              ``sagemaker.Predictor`` object.
     #'              More information:
     #'              http://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
     #' @param initial_instance_count (int): Minimum number of EC2 instances to
@@ -504,7 +535,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              Implementations may customize ``create_model()`` to accept
     #'              ``...`` to customize model creation during deploy.
     #'              For more, see the implementation docs.
-    #' @return sagemaker.predictor.RealTimePredictor: A predictor that provides a ``predict()`` method,
+    #' @return sagemaker.predictor.Predictor: A predictor that provides a ``predict()`` method,
     #'              which can be used to send requests to the Amazon SageMaker
     #'              endpoint and obtain inferences.
     deploy = function(initial_instance_count,
@@ -523,8 +554,11 @@ EstimatorBase = R6Class("EstimatorBase",
       create_model_args = list(...)
 
       private$.ensure_latest_training_job()
-      endpoint_name = endpoint_name %||% self$latest_training_job
-      model_name = model_name %||% self$latest_training_job
+      private$.ensure_base_job_name()
+      default_name = name_from_base(self$base_job_name)
+      endpoint_name = endpoint_name %||% default_name
+      model_name = model_name %||% default_name
+
       self$deploy_instance_type = instance_type
       if (use_compiled_model){
         family = gsub("\\.", "_", instance_type)
@@ -535,7 +569,8 @@ EstimatorBase = R6Class("EstimatorBase",
         model = self$.compiled_models[[family]]
       } else{
         create_model_args$model_kms_key = self$output_kms_key
-        model = do.call(self$create_model, create_model_args)}
+        model = do.call(self$create_model, create_model_args)
+      }
       model$name = model_name
 
       return (model$deploy(
@@ -611,36 +646,37 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              current configuration.
     #' @param model_name (str): Name to use for creating an Amazon SageMaker
     #'              model. If not specified, the name of the training job is used.
-    transform = function(instance_count,
-                         instance_type,
-                         strategy=NULL,
-                         assemble_with=NULL,
-                         output_path=NULL,
-                         output_kms_key=NULL,
-                         accept=NULL,
-                         env=NULL,
-                         max_concurrent_transforms=NULL,
-                         max_payload=NULL,
-                         tags=NULL,
-                         role=NULL,
-                         volume_kms_key=NULL,
-                         vpc_config_override="VPC_CONFIG_DEFAULT",
-                         enable_network_isolation=NULL,
-                         model_name=NULL){
+    transformer = function(instance_count,
+                           instance_type,
+                           strategy=NULL,
+                           assemble_with=NULL,
+                           output_path=NULL,
+                           output_kms_key=NULL,
+                           accept=NULL,
+                           env=NULL,
+                           max_concurrent_transforms=NULL,
+                           max_payload=NULL,
+                           tags=NULL,
+                           role=NULL,
+                           volume_kms_key=NULL,
+                           vpc_config_override="VPC_CONFIG_DEFAULT",
+                           enable_network_isolation=NULL,
+                           model_name=NULL){
 
+      tags = tags %||% self$tags
+      model_name = private$.get_or_create_name(model_name)
 
       if (is.null(self$latest_training_job)){
         log_warn(paste("No finished training job found associated with this estimator. Please make sure",
                 "this estimator is only used for building workflow config"))
-        model_name = model_name %||% self$.current_job_name
-        } else {
-          model_name = model_name %||% self$latest_training_job
-          if (is.null(enable_network_isolation)){
-            enable_network_isolation = self.enable_network_isolation()}
-          model = self$create_model(
-            vpc_config_override=vpc_config_override,
-            model_kms_key=self.output_kms_key,
-            enable_network_isolation=enable_network_isolation)
+      } else {
+        if (is.null(enable_network_isolation))
+          enable_network_isolation = self$enable_network_isolation()
+
+        model = self$create_model(
+          vpc_config_override=vpc_config_override,
+          model_kms_key=self.output_kms_key,
+          enable_network_isolation=enable_network_isolation)
 
           # not all create_model() implementations have the same kwargs
           model$name = model_name
@@ -682,21 +718,10 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              specified, one is generated, using the base name given to the
     #'              constructor if applicable.
     .prepare_for_training = function(job_name = NULL) {
-      if(!is.null(job_name)){
-        self$.current_job_name = job_name
-      } else {
-        # honor supplied base_job_name or generate it
-        if (!is.null(self$base_job_name)){
-          base_name = self$base_job_name
-        } else if (inherits(self, "AlgorithmEstimator")){ # need to work on this alittle more :)
-          base_name = split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))]
-        } else {
-          base_name = base_name_from_image(self$training_image_uri())}
-        self$.current_job_name = name_from_base(base_name)}
+      self$.current_job_name = private$.get_or_create_name(job_name)
 
       # if output_path was specified we use it otherwise initialize here.
       # For Local Mode with local_code=True we don't need an explicit output_path
-
       if(is.null(self$output_path)) {
         local_code = get_config_value("local.local_code", self$sagemaker_session$config)
         if (self$sagemaker_session$local_mode && !is.null(local_code)) {
@@ -708,7 +733,7 @@ EstimatorBase = R6Class("EstimatorBase",
       if (!is.null(self$rules) && is.null(self$debugger_hook_config)) {
         self$debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)}
       # If an object was provided without an S3 URI is not provided, default it for the customer.
-      if (is.null(self$debugger_hook_config) && !is.null(self$debugger_hook_config$s3_output_path))
+      if (!is.null(self$debugger_hook_config) && is.null(self$debugger_hook_config$s3_output_path))
         self$debugger_hook_config$s3_output_path = self$output_path
       private$.prepare_rules()
       private$.prepare_collection_configs()
@@ -718,234 +743,273 @@ EstimatorBase = R6Class("EstimatorBase",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<EstimatorBase>")
-      invisible(self)
+      return(print_class(self))
     }
     ),
   private = list(
-  .prepare_rules = function(){
-    self$debugger_rule_configs = list()
-    if (!is.null(self$rules)){
-      # Iterate through each of the provided rules.
-      for (rule in self$rules){
-        # Set the image URI using the default rule evaluator image and the region.
-        if (rule$image_uri == "DEFAULT_RULE_EVALUATOR_IMAGE"){
-            rule$image_uri = get_rule_container_image_uri(self$sagemaker_session$paws_region())
-            rule$instance_type = NULL
-            rule$volume_size_in_gb = NULL
-        }
-        # If source was provided as a rule parameter, upload to S3 and save the S3 uri.
-        if ("source_s3_uri" %in% rule$rule_parameters){
-          parse_result = url_parse(rule$rule_parameters$source_s3_uri)
+
+    # Set ``self.base_job_name`` if it is not set already.
+    .ensure_base_job_name = function(){
+      # honor supplied base_job_name or generate it
+      if (is.null(self$base_job_name))
+        self$base_job_name = base_name_from_image(self$training_image_uri())
+    },
+
+    # Generate a name based on the base job name or training image if needed.
+    # Args:
+    #   name (str): User-supplied name. If not specified, a name is generated from
+    # the base job name or training image.
+    # Returns:
+    #   str: Either the user-supplied name or a generated name.
+    .get_or_create_name = function(name = NULL){
+      if (!is.null(name))
+        return(name)
+
+      private$.ensure_base_job_name()
+      return(name_from_base(self$base_job_name))
+    },
+
+    # Set any necessary values in debugger rules, if they are provided.
+    .prepare_rules = function(){
+      self$debugger_rule_configs = list()
+      if (!is.null(self$rules)){
+        # Iterate through each of the provided rules.
+        for (rule in self$rules){
+          # Set the image URI using the default rule evaluator image and the region.
+          if (rule$image_uri == "DEFAULT_RULE_EVALUATOR_IMAGE"){
+              rule$image_uri = get_rule_container_image_uri(self$sagemaker_session$paws_region())
+              rule$instance_type = NULL
+              rule$volume_size_in_gb = NULL
           }
-        if (parse_result$scheme != "s3"){
-          desired_s3_uri = file.path(
-            "s3://",
-            self$sagemaker_session$default_bucket(),
-            rule$name,
-            UUIDgenerate())
-          s3_uri = S3Uploader$new()$upload(
-                      local_path=rule$rule_parameters$source_s3_uri,
-                      desired_s3_uri=desired_s3_uri,
-                      session=self$sagemaker_session)
-          rule$rule_parameters$source_s3_uri = s3_uri
+          # If source was provided as a rule parameter, upload to S3 and save the S3 uri.
+          if ("source_s3_uri" %in% rule$rule_parameters){
+            parse_result = url_parse(rule$rule_parameters$source_s3_uri)
+            if (parse_result$scheme != "s3"){
+              desired_s3_uri = file.path(
+                "s3://",
+                self$sagemaker_session$default_bucket(),
+                rule$name,
+                UUIDgenerate())
+              s3_uri = S3Uploader$new()$upload(
+                local_path=rule$rule_parameters$source_s3_uri,
+                desired_s3_uri=desired_s3_uri,
+                session=self$sagemaker_session)
+              rule$rule_parameters$source_s3_uri = s3_uri
+            }
+          }
+        # Save the request dictionary for the rule.
+        self$debugger_rule_configs = c(self$debugger_rule_configs, rule$to_debugger_rule_config_dict())
         }
-      # Save the request dictionary for the rule.
-      self$debugger_rule_configs = c(self$debugger_rule_configs, rule$to_debugger_rule_config_dict())
       }
+    },
+
+    .prepare_collection_configs = function(){
+      # Create a set to de-duplicate CollectionConfigs.
+      self$collection_configs = list()
+      # Iterate through the rules and add their respective CollectionConfigs to the set.
+      if (!is.null(self$rules)) {
+        for (rule in self$rules)
+          self$collection_configs = c(self$collection_configs, rule$collection_configs)
+      }
+      # Add the CollectionConfigs from DebuggerHookConfig to the set.
+      if (!islistempty(self$debugger_hook_config))
+        self$collection_configs = c(
+          self$collection_configs, self$debugger_hook_config$collection_configs %||% list()
+        )
+    },
+
+    .ensure_latest_training_job = function(error_message = "Estimator is not associated with a training job"){
+      if (is.null(self$latest_training_job))
+        stop(error_message, call. =F)
+    },
+
+
+    # ------------------------ incorporate _TrainingJob calls -------------------
+
+    # Create a new Amazon SageMaker training job from the estimator.
+    # Args:
+    #   estimator (sagemaker.estimator.EstimatorBase): Estimator object
+    # created by the user.
+    # inputs (str): Parameters used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.
+    # experiment_config (dict[str, str]): Experiment management configuration used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.  Dictionary contains
+    # three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+    # Returns:
+    #   sagemaker.estimator._TrainingJob: Constructed object that captures
+    # all information about the started training job.
+    .start_new = function(inputs,
+                          experiment_config = NULL){
+      train_args= private$.get_train_args(inputs, experiment_config)
+
+      do.call(self$sagemaker_session$train, train_args)
+    },
+
+    # Constructs a dict of arguments for an Amazon SageMaker training job from the estimator.
+    # Args:
+    #  estimator (sagemaker.estimator.EstimatorBase): Estimator object
+    # created by the user.
+    # inputs (str): Parameters used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.
+    # experiment_config (dict[str, str]): Experiment management configuration used when called
+    # :meth:`~sagemaker.estimator.EstimatorBase.fit`.  Dictionary contains
+    # three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+    # Returns:
+    #  Dict: dict for `sagemaker.session.Session.train` method
+    .get_train_args = function(inputs,
+                               experiment_config) {
+      local_mode = self$sagemaker_session$local_mode
+      model_uri = self$model_uri
+
+      # Allow file:// input only in local mode
+      if (private$.is_local_channel(inputs) || private$.is_local_channel(model_uri)){
+        if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
+      }
+
+      config = .Job$new()$.__enclos_env__$private$.load_config(inputs, self)
+
+      if (!islistempty(self$hyperparameters())){
+        hyperparameters = self$hyperparameters()}
+
+      train_args = config
+      train_args[["input_mode"]] = self$input_mode
+      train_args[["job_name"]] = self$.current_job_name
+      train_args[["hyperparameters"]] = hyperparameters
+      train_args[["tags"]] = self$tags
+      train_args[["metric_definitions"]] = self$metric_definitions
+      train_args[["experiment_config"]] = experiment_config
+
+      if (inherits(inputs, c("TrainingInputs"))){
+        if ("InputMode" %in% inputs$config){
+          log_debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
+                    inputs$config$InputMode)
+          train_args[["input_mode"]] = inputs$config$InputMod}
+      }
+
+      if (self$enable_network_isolation()){
+        train_args[["enable_network_isolation"]] = TRUE}
+
+      if (self$encrypt_inter_container_traffic){
+        train_args[["encrypt_inter_container_traffic"]] = TRUE}
+
+      if (inherits(self, "AlgorithmEstimator")){
+        train_args[["algorithm_arn"]] = self$algorithm_arn
+      } else {
+        train_args[["image"]] = self$training_image_uri()}
+
+      if (!islistempty(self$debugger_rule_configs))
+        train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
+
+      if (!islistempty(self$debugger_hook_config)){
+        self$debugger_hook_config[["collection_configs"]] = self$collection_configs
+        train_args[["debugger_hook_config"]] = self$debugger_hook_config$to_request_list()}
+
+      if (!islistempty(self$tensorboard_output_config))
+        train_args[["tensorboard_output_config"]] = self$tensorboard_output_config$to_request_list()
+
+      train_args = c(train_args, private$.add_spot_checkpoint_args(local_mode, train_args))
+
+      if (!islistempty(self$enable_sagemaker_metrics))
+        train_args[["enable_sagemaker_metrics"]] = self$enable_sagemaker_metrics
+
+      return(train_args)
+    },
+
+    .add_spot_checkpoint_args = function(local_mode,
+                                         train_args){
+      train_args = list()
+      if (self$use_spot_instances){
+        if (local_mode){
+          stop("Spot training is not supported in local mode.", call. = F)}
+        train_args[["use_spot_instances"]] = TRUE
+      }
+
+      if (!islistempty(self$checkpoint_s3_uri)){
+        if (local_mode){
+          stop("Setting checkpoint_s3_uri is not supported in local mode.", call. = F)}
+        train_args[["checkpoint_s3_uri"]] = self$checkpoint_s3_uri
+      }
+
+      if (!islistempty(self$checkpoint_local_path)){
+        if (local_mode){
+        stop("Setting checkpoint_local_path is not supported in local mode.", call. = F)}
+        train_args[["checkpoint_local_path"]] = self$checkpoint_local_path
+      }
+      return(train_args)
+    },
+
+    .is_local_channel = function(input_uri){
+      return(inherits(input_uri, "character") && startsWith(input_uri,"file://"))
+    },
+
+    # ---------------------------------------------------------------------------
+    .compilation_job_name = function(){
+      base_name = self$base_job_name %||% base_name_from_image(self$training_image_uri())
+      return (name_from_base(paste0("compilation-", base_name)))
+    },
+
+    # Convert the job description to init params that can be handled by the
+    # class constructor
+    # Args:
+    #   job_details: the returned job details from a describe_training_job
+    # API call.
+    # model_channel_name (str): Name of the channel where pre-trained
+    # model data will be downloaded.
+    # Returns:
+    #   dictionary: The transformed init_params
+    .prepare_init_params_from_job_description = function(job_details,
+                                                         model_channel_name=NULL){
+      init_params = list()
+
+      init_params[["role"]] = job_details$RoleArn
+      init_params[["instance_count"]] = job_details$ResourceConfig$InstanceCount
+      init_params[["instance_type"]] = job_details$ResourceConfig$InstanceType
+      init_params[["volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
+      init_params[["max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
+      init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
+      init_params[["base_job_name"]] = job_details$TrainingJobName
+      init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
+      init_params[["output_kms_key"]] = job_details$OutputDataConfig$KmsKeyId
+      if ("EnableNetworkIsolation" %in% names(job_details))
+        init_params[["enable_network_isolation"]] = job_details$EnableNetworkIsolation
+
+      has_hps = !islistempty(job_details$HyperParameters)
+      init_params[["hyperparameters"]] = if (has_hps) job_details$HyperParameters else list()
+
+      if (!islistempty(job_details$AlgorithmSpecification$AlgorithmName)) {
+        init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
+      }
+
+      if (!islistempty(job_details$AlgorithmSpecification$TrainingImage)) {
+        init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
+      } else {
+        stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
+          "AlgorithmName is expected. NULL was found.", call. = F)}
+
+      if (!islistempty(job_details$AlgorithmSpecification$MetricDefinitons))
+        init_params[["metric_definitions"]] = job_details$AlgorithmSpecification$MetricsDefinition
+
+      if (!islistempty(job_details$EnableInterContainerTrafficEncryption))
+        init_params[["encrypt_inter_container_traffic"]] = job_details$EnableInterContainerTrafficEncryption
+
+      vpc_list = vpc_from_list(job_details$VpcConfig)
+      if (!islistempty(vpc_list$Subnets)){
+        init_params[["subnets"]] = vpc_list$Subnets}
+
+      if (!islistempty(vpc_list$SecurityGroupIds)){
+        init_params[["security_group_ids"]] = vpc_list$SecurityGroupIds}
+
+      if ("InputDataConfig" %in% names(job_details) && !is.null(model_channel_name)){
+        for(channel in job_details$InputDataConfig){
+         if (channel$ChannelName == model_channel_name){
+            init_params[["model_channel_name"]] = model_channel_name
+            init_params[["model_uri"]] = channel$DataSource$S3DataSource$S3Uri
+            break}
+          }
+      }
+
+      return(init_params)
     }
-  },
-
-  .prepare_collection_configs = function(){
-    # Create a set to de-duplicate CollectionConfigs.
-    self$collection_configs = list()
-    # Iterate through the rules and add their respective CollectionConfigs to the set.
-    if (!is.null(self$rules)) {
-      for (rule in self$rules)
-        self$collection_configs$update(rule$collection_configs)
-    }
-    # Add the CollectionConfigs from DebuggerHookConfig to the set.
-    if (!is.null(self$debugger_hook_config))
-      self$collection_configs$update(self$debugger_hook_config$collection_configs %||% list())
-  },
-
-  .ensure_latest_training_job = function(error_message = "Estimator is not associated with a training job"){
-    if (is.null(self$latest_training_job))
-      stop(error_message, call. =F)
-  },
-
-
-  # ------------------------ incorporate _TrainingJob calls -------------------
-
-  # Create a new Amazon SageMaker training job from the estimator.
-  # Args:
-  #   estimator (sagemaker.estimator.EstimatorBase): Estimator object
-  # created by the user.
-  # inputs (str): Parameters used when called
-  # :meth:`~sagemaker.estimator.EstimatorBase.fit`.
-  # experiment_config (dict[str, str]): Experiment management configuration used when called
-  # :meth:`~sagemaker.estimator.EstimatorBase.fit`.  Dictionary contains
-  # three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
-  # Returns:
-  #   sagemaker.estimator._TrainingJob: Constructed object that captures
-  # all information about the started training job.
-  .start_new = function(inputs,
-                        experiment_config = NULL){
-    local_mode = self$sagemaker_session$local_mode
-    model_uri = self$model_uri
-
-    # Allow file:// input only in local mode
-    if (private$.is_local_channel(inputs) || private$.is_local_channel(model_uri)){
-      if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
-    }
-
-    config = .Job$new()$load_config(inputs, self)
-
-    if (!islistempty(self$hyperparameters())){
-      hyperparameters = self$hyperparameters()}
-
-
-    train_args = config
-    train_args[["input_mode"]] = self$input_mode
-    train_args[["job_name"]] = self$.current_job_name
-    train_args[["hyperparameters"]] = hyperparameters
-    train_args[["tags"]] = self$tags
-    train_args[["metric_definitions"]] = self$metric_definitions
-    train_args[["experiment_config"]] = experiment_config
-
-    if (inherits(inputs, "s3_input")){
-      if ("InputMode" %in% inputs$config){
-        log_debug("Selecting s3_input's input_mode (%s) for TrainingInputMode.",
-                  inputs$config$InputMode)
-        train_args[["input_mode"]] = inputs$config$InputMod}
-    }
-
-
-    if (self$enable_network_isolation()){
-      train_args[["enable_network_isolation"]] = TRUE}
-
-    if (self$encrypt_inter_container_traffic){
-      train_args[["encrypt_inter_container_traffic"]] = TRUE}
-
-    if (inherits(self, "Algorithmself")){
-      train_args[["algorithm_arn"]] = self$algorithm_arn
-    } else {
-      train_args[["image"]] = self$training_image_uri()}
-
-
-    if (!islistempty(self$debugger_rule_configs))
-      train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
-
-    if (!islistempty(self$debugger_hook_config)){
-      self$debugger_hook_config[["collection_configs"]] = self$collection_configs
-      train_args[["debugger_hook_config"]] = self$debugger_hook_config$to_request_list()}
-
-    if (!islistempty(self$tensorboard_output_config))
-      train_args[["tensorboard_output_config"]] = self$tensorboard_output_config$to_request_list()
-
-    train_args = c(train_args, private$.add_spot_checkpoint_args(local_mode, train_args))
-
-
-    if (!islistempty(self$enable_sagemaker_metrics))
-      train_args[["enable_sagemaker_metrics"]] = self$enable_sagemaker_metrics
-    do.call(self$sagemaker_session$train, train_args)
-  },
-
-  .add_spot_checkpoint_args = function(local_mode,
-                                       train_args){
-    train_args = list()
-    if (self$train_use_spot_instances){
-      if (local_mode){
-        stop("Spot training is not supported in local mode.", call. = F)}
-      train_args[["train_use_spot_instances"]] = TRUE
-    }
-
-    if (!islistempty(self$checkpoint_s3_uri)){
-      if (local_mode){
-        stop("Setting checkpoint_s3_uri is not supported in local mode.", call. = F)}
-      train_args[["checkpoint_s3_uri"]] = self$checkpoint_s3_uri
-    }
-
-    if (!islistempty(self$checkpoint_local_path)){
-      if (local_mode){
-      stop("Setting checkpoint_local_path is not supported in local mode.", call. = F)}
-      train_args[["checkpoint_local_path"]] = self$checkpoint_local_path
-    }
-    return(train_args)
-  },
-
-  .is_local_channel = function(input_uri){
-    return(inherits(input_uri, "character") && startsWith(input_uri,"file://"))
-  },
-
-  # ---------------------------------------------------------------------------
-  .compilation_job_name = function(){
-    base_name = self$base_job_name %||% base_name_from_image(self$training_image_uri())
-    return (name_from_base(paste0("compilation-", base_name)))
-  },
-
-  # Convert the job description to init params that can be handled by the
-  # class constructor
-  # Args:
-  #   job_details: the returned job details from a describe_training_job
-  # API call.
-  # model_channel_name (str): Name of the channel where pre-trained
-  # model data will be downloaded.
-  # Returns:
-  #   dictionary: The transformed init_params
-  .prepare_init_params_from_job_description = function(job_details,
-                                                       model_channel_name=NULL){
-    init_params = list()
-
-    init_params[["role"]] = job_details$RoleArn
-    init_params[["train_instance_count"]] = job_details$ResourceConfig$InstanceCount
-    init_params[["train_instance_type"]] = job_details$ResourceConfig$InstanceType
-    init_params[["train_volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
-    init_params[["train_max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
-    init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
-    init_params[["base_job_name"]] = job_details$TrainingJobName
-    init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
-    init_params[["output_kms_key"]] = job_details$OutputDataConfig$KmsKeyId
-    if ("EnableNetworkIsolation" %in% names(job_details))
-      init_params[["enable_network_isolation"]] = job_details$EnableNetworkIsolation
-
-    has_hps = !islistempty(job_details$HyperParameters)
-    init_params[["hyperparameters"]] = if (has_hps) job_details$HyperParameters else list()
-
-    if (!islistempty(job_details$AlgorithmSpecification$AlgorithmName)) {
-      init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
-    }
-
-    if (!islistempty(job_details$AlgorithmSpecification$TrainingImage)) {
-      init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
-    } else {
-      stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
-        "AlgorithmName is expected. NULL was found.", call. = F)}
-
-    if (!islistempty(job_details$AlgorithmSpecification$MetricDefinitons))
-      init_params[["metric_definitions"]] = job_details$AlgorithmSpecification$MetricsDefinition
-
-    if (!islistempty(job_details$EnableInterContainerTrafficEncryption))
-      init_params[["encrypt_inter_container_traffic"]] = job_details$EnableInterContainerTrafficEncryption
-
-    vpc_list = vpc_from_list(job_details$VpcConfig)
-    if (!islistempty(vpc_list$Subnets)){
-      init_params[["subnets"]] = vpc_list$Subnets}
-
-    if (!islistempty(vpc_list$SecurityGroupIds)){
-      init_params[["security_group_ids"]] = vpc_list$SecurityGroupIds}
-
-    if ("InputDataConfig" %in% names(job_details) && !is.null(model_channel_name)){
-      for(channel in job_details$InputDataConfig){
-       if (channel$ChannelName == model_channel_name){
-          init_params[["model_channel_name"]] = model_channel_name
-          init_params[["model_uri"]] = channel$DataSource$S3DataSource$S3Uri
-          break}
-        }
-    }
-
-    return(init_params)
-  }
 
   ),
 
@@ -993,17 +1057,17 @@ Estimator = R6Class("Estimator",
     #'              endpoints use this role to access training data and model
     #'              artifacts. After the endpoint is created, the inference code
     #'              might use the IAM role, if it needs to access an AWS resource.
-    #' @param train_instance_count (int): Number of Amazon EC2 instances to use
+    #' @param instance_count (int): Number of Amazon EC2 instances to use
     #'              for training.
-    #' @param train_instance_type (str): Type of EC2 instance to use for training,
+    #' @param instance_type (str): Type of EC2 instance to use for training,
     #'              for example, 'ml.c4.xlarge'.
-    #' @param train_volume_size (int): Size in GB of the EBS volume to use for
+    #' @param volume_size (int): Size in GB of the EBS volume to use for
     #'              storing input data during training (default: 30). Must be large
     #'              enough to store training data if File Mode is used (which is the
     #'              default).
-    #' @param train_volume_kms_key (str): Optional. KMS key ID for encrypting EBS
+    #' @param volume_kms_key (str): Optional. KMS key ID for encrypting EBS
     #'              volume attached to the training instance (default: NULL).
-    #' @param train_max_run (int): Timeout in seconds for training (default: 24 *
+    #' @param max_run (int): Timeout in seconds for training (default: 24 *
     #'              60 * 60). After this amount of time Amazon SageMaker terminates
     #'              the job regardless of its current status.
     #' @param input_mode (str): The input mode that the algorithm supports
@@ -1013,7 +1077,7 @@ Estimator = R6Class("Estimator",
     #'              * 'Pipe' - Amazon SageMaker streams data directly from S3 to the
     #'              container via a Unix-named pipe.
     #'              This argument can be overriden on a per-channel basis using
-    #'              ``sagemaker.session.s3_input.input_mode``.
+    #'              ``TrainingInput.input_mode``.
     #' @param output_path (str): S3 location for saving the training result (model
     #'              artifacts and output files). If not specified, results are
     #'              stored to a default bucket. If the bucket with the specific name
@@ -1059,13 +1123,13 @@ Estimator = R6Class("Estimator",
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic
     #'              between training containers is encrypted for the training job
     #'              (default: ``False``).
-    #' @param train_use_spot_instances (bool): Specifies whether to use SageMaker
+    #' @param use_spot_instances (bool): Specifies whether to use SageMaker
     #'              Managed Spot instances for training. If enabled then the
-    #'              `train_max_wait` arg should also be set.
+    #'              `max_wait` arg should also be set.
     #'              More information:
     #'              https://docs.aws.amazon.com/sagemaker/latest/dg/model-managed-spot-training.html
     #'              (default: ``False``).
-    #' @param train_max_wait (int): Timeout in seconds waiting for spot training
+    #' @param max_wait (int): Timeout in seconds waiting for spot training
     #'              instances (default: NULL). After this amount of time Amazon
     #'              SageMaker will stop waiting for Spot instances to become
     #'              available (default: ``NULL``).
@@ -1107,11 +1171,11 @@ Estimator = R6Class("Estimator",
     #'              (default: ``NULL``).
     initialize = function(image_uri,
                           role,
-                          train_instance_count,
-                          train_instance_type,
-                          train_volume_size=30,
-                          train_volume_kms_key=NULL,
-                          train_max_run=24 * 60 * 60,
+                          instance_count,
+                          instance_type,
+                          volume_size=30,
+                          volume_kms_key=NULL,
+                          max_run=24 * 60 * 60,
                           input_mode="File",
                           output_path=NULL,
                           output_kms_key=NULL,
@@ -1125,8 +1189,8 @@ Estimator = R6Class("Estimator",
                           model_channel_name="model",
                           metric_definitions=NULL,
                           encrypt_inter_container_traffic=FALSE,
-                          train_use_spot_instances=FALSE,
-                          train_max_wait=NULL,
+                          use_spot_instances=FALSE,
+                          max_wait=NULL,
                           checkpoint_s3_uri=NULL,
                           checkpoint_local_path=NULL,
                           enable_network_isolation=FALSE,
@@ -1135,15 +1199,15 @@ Estimator = R6Class("Estimator",
                           tensorboard_output_config=NULL,
                           enable_sagemaker_metrics=NULL){
 
-      self$image_name = image_uri
+      self$image_uri = image_uri
       self$hyperparam_list = if (!islistempty(hyperparameters)) hyperparameters else list()
       super$initialize(
         role,
-        train_instance_count,
-        train_instance_type,
-        train_volume_size,
-        train_volume_kms_key,
-        train_max_run,
+        instance_count,
+        instance_type,
+        volume_size,
+        volume_kms_key,
+        max_run,
         input_mode,
         output_path,
         output_kms_key,
@@ -1156,8 +1220,8 @@ Estimator = R6Class("Estimator",
         model_channel_name=model_channel_name,
         metric_definitions=metric_definitions,
         encrypt_inter_container_traffic=encrypt_inter_container_traffic,
-        train_use_spot_instances=train_use_spot_instances,
-        train_max_wait=train_max_wait,
+        use_spot_instances=use_spot_instances,
+        max_wait=max_wait,
         checkpoint_s3_uri=checkpoint_s3_uri,
         checkpoint_local_path=checkpoint_local_path,
         rules=rules,
@@ -1172,7 +1236,7 @@ Estimator = R6Class("Estimator",
     #'              The fit() method, that does the model training, calls this method to
     #'              find the image to use for model training.
     training_image_uri = function(){
-      return(self$image_name)
+      return(self$image_uri)
     },
 
     #' @description formats hyperparameters for model tunning
@@ -1194,14 +1258,14 @@ Estimator = R6Class("Estimator",
 
     #' @description Create a model to deploy.
     #'              The serializer, deserializer, content_type, and accept arguments are only used to define a
-    #'              default RealTimePredictor. They are ignored if an explicit predictor class is passed in.
+    #'              default Predictor. They are ignored if an explicit predictor class is passed in.
     #'              Other arguments are passed through to the Model class.
     #' @param role (str): The ``ExecutionRoleArn`` IAM Role ARN for the ``Model``,
     #'              which is also used during transform jobs. If not specified, the
     #'              role from the Estimator will be used.
-    #' @param image (str): An container image to use for deploying the model.
+    #' @param image_uri (str): An container image to use for deploying the model.
     #'              Defaults to the image used for training.
-    #' @param predictor_cls (RealTimePredictor): The predictor class to use when
+    #' @param predictor_cls (Predictor): The predictor class to use when
     #'              deploying the model.
     #' @param serializer (callable): Should accept a single argument, the input
     #'              data, and return a sequence of bytes. May provide a content_type
@@ -1225,7 +1289,7 @@ Estimator = R6Class("Estimator",
     #'              :class:`~sagemaker.model.Model`.
     #' @return (sagemaker.model.Model) a Model ready for deployment.
     create_model = function(role=NULL,
-                            image=NULL,
+                            image_uri=NULL,
                             predictor_cls=NULL,
                             serializer=NULL,
                             deserializer=NULL,
@@ -1234,16 +1298,16 @@ Estimator = R6Class("Estimator",
                             vpc_config_override="VPC_CONFIG_DEFAULT",
                             ...){
       args = list(role = role %||% self$role,
-                  image_uri = image %||% self$training_image_uri(),
+                  image_uri = image_uri %||% self$training_image_uri(),
                   vpc_config = self$get_vpc_config(vpc_config_override),
                   sagemaker_session = self$sagemaker_session,
                   model_data = self$model_data,
                   ...)
 
-      if(is.null(args$predictor_cls)){
+      if(is.null(predictor_cls)){
 
         predict_wrapper = function(endpoint, session){
-          return(RealTimePredictor$new(
+          return(Predictor$new(
             endpoint, session, serializer, deserializer, content_type, accept))
         }
 
@@ -1256,14 +1320,6 @@ Estimator = R6Class("Estimator",
           args$enable_network_isolation = self$enable_network_isolation()
 
       return (do.call(Model$new, args))
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<Estimator>")
-      invisible(self)
     }
   ),
 
@@ -1295,7 +1351,7 @@ Estimator = R6Class("Estimator",
 #'              Subclasses define functionality pertaining to specific ML frameworks,
 #'              such as training/deployment images and predictor instances.
 #' @export
-FrameWork = R6Class("FrameWork",
+Framework = R6Class("Framework",
   inherit = EstimatorBase,
   public = list(
     #' @field LAUNCH_PS_ENV_NAME
@@ -1355,9 +1411,6 @@ FrameWork = R6Class("FrameWork",
     #'              SageMaker. For convenience, this accepts other types for keys
     #'              and values, but ``str()`` will be called to convert them before
     #'              training.
-    #' @param enable_cloudwatch_metrics (bool): [DEPRECATED] Now there are
-    #'              cloudwatch metrics emitted by all SageMaker training jobs. This
-    #'              will be ignored for now and removed in a further release.
     #' @param container_log_level (str): Log level to use within the container
     #'              (default: "INFO")
     #' @param code_location (str): The S3 prefix URI where custom code will be
@@ -1471,7 +1524,7 @@ FrameWork = R6Class("FrameWork",
                           checkpoint_local_path=NULL,
                           enable_sagemaker_metrics=NULL,
                           ...){
-      super$intialize(enable_network_isolation=enable_network_isolation, ...)
+      super$initialize(enable_network_isolation=enable_network_isolation, ...)
       if (startsWith(entry_point,"s3://")){
         stop(sprintf("Invalid entry point script: %s. Must be a path to a local file.",
             entry_point))}
@@ -1480,11 +1533,10 @@ FrameWork = R6Class("FrameWork",
       self$git_config = git_config
       self$source_dir = source_dir
       self$dependencies = dependencies %||% list()
-
-      self$enable_cloudwatch_metrics = FALSE
+      self$uploaded_code = NULL
 
       # Align logging level with python logging
-      container_log_level = match.arg(toupper(container_log_level))
+      container_log_level = match.arg(container_log_level)
       container_log_level = switch(container_log_level,
                                    "INFO" = 20,
                                    "WARN" = 30,
@@ -1493,16 +1545,14 @@ FrameWork = R6Class("FrameWork",
                                    "CRITICAL" = 50)
       self$container_log_level = container_log_level
       self$code_location = code_location
-      self$image_name = image_uri
-
-      self$uploaded_code = NULL
+      self$image_uri = image_uri
 
       self$.hyperparameters = hyperparameters %||% list()
       self$checkpoint_s3_uri = checkpoint_s3_uri
       self$checkpoint_local_path = checkpoint_local_path
       self$enable_sagemaker_metrics = enable_sagemaker_metrics
 
-      attr(self, "__framework_name__") = NULL
+      attr(self, "_framework_name") = NULL
     },
 
     #' @description Set hyperparameters needed for training. This method will also
@@ -1524,7 +1574,7 @@ FrameWork = R6Class("FrameWork",
 
       # validate source dir will raise a ValueError if there is something wrong with the
       # source directory. We are intentionally not handling it because this is a critical error.
-      if (!is.null(self$source_dir) && !startWith(tolower(self$source_dir),"s3://"))
+      if (!is.null(self$source_dir) && !startsWith(tolower(self$source_dir),"s3://"))
         validate_source_dir(self$entry_point, self$source_dir)
 
       # if we are in local mode with local_code=True. We want the container to just
@@ -1539,7 +1589,7 @@ FrameWork = R6Class("FrameWork",
         code_dir = paste0("file://", self$source_dir)
         script = self$entry_point
       } else if (self$enable_network_isolation() && !is.null(self$entry_point)){
-        self$uploaded_code = self$.stage_user_code_in_s3()
+        self$uploaded_code = private$.stage_user_code_in_s3()
         code_dir = self$CONTAINER_CODE_CHANNEL_SOURCEDIR_PATH
         script = self$uploaded_code$script_name
         self$code_uri = self$uploaded_code$s3_prefix
@@ -1552,7 +1602,6 @@ FrameWork = R6Class("FrameWork",
       # Modify hyperparameters in-place to point to the right code directory and script URIs
       self$.hyperparameters[[DIR_PARAM_NAME]] = code_dir
       self$.hyperparameters[[SCRIPT_PARAM_NAME]] = script
-      self$.hyperparameters[[CLOUDWATCH_METRICS_PARAM_NAME]] = self$enable_cloudwatch_metrics
       self$.hyperparameters[[CONTAINER_LOG_LEVEL_PARAM_NAME]] = self$container_log_level
       self$.hyperparameters[[JOB_NAME_PARAM_NAME]] = self$.current_job_name
       self$.hyperparameters[[SAGEMAKER_REGION_PARAM_NAME]] = self$sagemaker_session$paws_region_name
@@ -1574,12 +1623,12 @@ FrameWork = R6Class("FrameWork",
     #'              training.
     #' @return str: The URI of the Docker image.
     training_image_uri = function(){
-      if (self$image_name)
-        return (self$image_name)
+      if (!is.null(self$image_uri))
+        return (self$image_uri)
       return (ImageUris$new()$retrieve(
-        attributes(self)$`__framework_name__`,
+        attributes(self)$`_framework_name`,
         self$sagemaker_session$paws_region_name,
-        instance_type=self$train_instance_type,
+        instance_type=self$instance_type,
         version=self$framework_version,
         py_version=self$py_version,
         image_scope="training")
@@ -1702,6 +1751,7 @@ FrameWork = R6Class("FrameWork",
                            model_name=NULL){
       role = role %||% self$role
       tags = tags %||% self$tags
+      model_name = private$.get_or_create_name(model_name)
 
       if (!is.null(self$latest_training_job)){
         if (is.null(enable_network_isolation))
@@ -1717,7 +1767,6 @@ FrameWork = R6Class("FrameWork",
           name=model_name)
         model$.create_sagemaker_model(instance_type, tags=tags)
 
-        model_name = model.name
         transform_env = model$env
         if (!islistempty(env))
           transform_env = c(transform_env, env)
@@ -1788,10 +1837,10 @@ FrameWork = R6Class("FrameWork",
 
     # Set defaults for debugging
     .validate_and_set_debugger_configs = function(){
-      if (is.null(self$debugger_hook_config)
+      if (!islistempty(self$debugger_hook_config)
           && .region_supports_debugger(self$sagemaker_session$paws_region_name))
-        self.debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)
-      else if(!self$debugger_hook_config)
+        self$debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)
+      else if(islistempty(self$debugger_hook_config))
         self$debugger_hook_config = NULL
       },
 
@@ -1822,7 +1871,6 @@ FrameWork = R6Class("FrameWork",
       init_params$entry_point = init_params$hyperparameters[[SCRIPT_PARAM_NAME]]
 
       init_params$source_dir = init_params$hyperparameters[[DIR_PARAM_NAME]]
-      init_params$enable_cloudwatch_metrics = init_params$hyperparameters[[CLOUDWATCH_METRICS_PARAM_NAME]]
       init_params$container_log_level = init_params$hyperparameters[[CONTAINER_LOG_LEVEL_PARAM_NAME]]
 
       hyperparameters = list()
@@ -1841,6 +1889,17 @@ FrameWork = R6Class("FrameWork",
       init_params$hyperparameters = hyperparameters
 
       return(init_params)
+    },
+
+    # Get the appropriate value to pass as ``entry_point`` to a model constructor.
+    # Returns:
+    #   str: The path to the entry point script. This can be either an absolute path or
+    # a path relative to ``self._model_source_dir()``.
+    .model_entry_point = function(){
+      if (self$sagemaker_session$local_mode || is.null(private$.model_source_dir()))
+        return(self$entry_point)
+
+      return(self$uploaded_code$script_name)
     }
   ),
   lock_objects = F
