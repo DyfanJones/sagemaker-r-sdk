@@ -93,7 +93,7 @@ IPInsights = R6Class("IPInsights",
                           ...){
 
       private$.num_entity_vectors = Hyperparameter$new(
-        "num_entity_vectors", list(ge(1), le(250000000)), "An integer in [1, 250000000]", DataTypes$new()$int, obj = self
+        "num_entity_vectors", list(Validation$new()$ge(1), Validation$new()$le(250000000)), "An integer in [1, 250000000]", DataTypes$new()$int, obj = self
       )
       private$.vector_dim = Hyperparameter$new("vector_dim", list(Validation$new()$ge(4), Validation$new()$le(4096)), "An integer in [4, 4096]", DataTypes$new()$int, obj = self)
 
@@ -278,7 +278,7 @@ IPInsightsPredictor = R6Class("IPInsightsPredictor",
         endpoint_name,
         sagemaker_session,
         serializer=CSVSerializer$new(),
-        deserializer=JSONDeserializer$new(),
+        deserializer=JSONDeserializer$new()
       )
     }
   ),
