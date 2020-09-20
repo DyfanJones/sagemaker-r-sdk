@@ -57,6 +57,7 @@ Collate:
     'amazon_estimator.R'
     'amazon_factorization_machines.R'
     'amazon_ipinsights.R'
+    'amazon_kmeans.R'
     'amazon_randomcutforest.R'
     'data_capture_config.R'
     'debugger.R'
