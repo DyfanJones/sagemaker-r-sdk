@@ -28,9 +28,11 @@ For classification problems, the algorithm queries the k points that are closest
 
 \item{\code{sample_size}}{Number of data points to be sampled from the training data set}
 
-\item{\code{dimension_reduction_target}}{Type of inference to use on the data's labels}
+\item{\code{predictor_type}}{Type of inference to use on the data's labels}
 
-\item{\code{dimension_reduction_type}}{Type of inference to use on the data's labels}
+\item{\code{dimension_reduction_target}}{Target dimension to reduce to}
+
+\item{\code{dimension_reduction_type}}{Type of dimension reduction technique to use}
 
 \item{\code{index_metric}}{Distance metric to measure between points when finding nearest neighbors}
 

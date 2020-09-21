@@ -95,37 +95,37 @@ KNN = R6Class("KNN",
                           faiss_index_ivf_nlists=NULL,
                           faiss_index_pq_m=NULL,
                           ...){
-      k = Hyperparameter$new("k", list(Validation$new()$ge(1)), "An integer greater than 0", DataTypes$new()$int, obj = self)
-      sample_size = Hyperparameter$new("sample_size", list(Validation$new()$ge(1)), "An integer greater than 0", DataTypes$new()$int, obj = self)
-      predictor_type = Hyperparameter$new(
+      private$.k = Hyperparameter$new("k", list(Validation$new()$ge(1)), "An integer greater than 0", DataTypes$new()$int, obj = self)
+      private$.sample_size = Hyperparameter$new("sample_size", list(Validation$new()$ge(1)), "An integer greater than 0", DataTypes$new()$int, obj = self)
+      private$.predictor_type = Hyperparameter$new(
         "predictor_type", Validation$new()$isin(c("classifier", "regressor")), 'One of "classifier" or "regressor"', DataTypes$new()$str, obj = self
       )
-      dimension_reduction_target = Hyperparameter$new(
+      private$.dimension_reduction_target = Hyperparameter$new(
         "dimension_reduction_target",
         list(Validation$new()$ge(1)),
         "An integer greater than 0 and less than feature_dim",
         DataTypes$new()$int,
         obj = self
       )
-      dimension_reduction_type = Hyperparameter$new(
+      private$.dimension_reduction_type = Hyperparameter$new(
         "dimension_reduction_type", Validation$new()$isin(c("sign", "fjlt")), 'One of "sign" or "fjlt"', DataTypes$new()$str, obj = self
       )
-      index_metric = Hyperparameter$new(
+      private$.index_metric = Hyperparameter$new(
         "index_metric",
         Validation$new()$isin(c("COSINE", "INNER_PRODUCT", "L2")),
         'One of "COSINE", "INNER_PRODUCT", "L2"',
         DataTypes$new()$str,
         obj = self
       )
-      index_type = Hyperparameter$new(
+      private$.index_type = Hyperparameter$new(
         "index_type",
         Validation$new()$isin(c("faiss.Flat", "faiss.IVFFlat", "faiss.IVFPQ")),
         'One of "faiss.Flat", "faiss.IVFFlat", "faiss.IVFPQ"',
         DataTypes$new()$str,
         obj = self
       )
-      faiss_index_ivf_nlists = Hyperparameter$new("faiss_index_ivf_nlists", list(), '"auto" or an integer greater than 0', DataTypes$new()$str, obj = self)
-      faiss_index_pq_m = Hyperparameter$new("faiss_index_pq_m", list(Validation$new()$ge(1)), "An integer greater than 0", DataTypes$new()$int, obj = self)
+      private$.faiss_index_ivf_nlists = Hyperparameter$new("faiss_index_ivf_nlists", list(), '"auto" or an integer greater than 0', DataTypes$new()$str, obj = self)
+      private$.faiss_index_pq_m = Hyperparameter$new("faiss_index_pq_m", list(Validation$new()$ge(1)), "An integer greater than 0", DataTypes$new()$int, obj = self)
 
       super$initialize(role, instance_count, instance_type, ...)
       self$k = k
@@ -138,7 +138,7 @@ KNN = R6Class("KNN",
       self$faiss_index_ivf_nlists = faiss_index_ivf_nlists
       self$faiss_index_pq_m = faiss_index_pq_m
 
-      if (is.null(dimension_reduction_type) && !is.null(dimension_reduction_target))
+      if (!is.null(dimension_reduction_type) && is.null(dimension_reduction_target))
         stop('"dimension_reduction_target" is required when "dimension_reduction_type" is set.',
              call. = F)
     },
@@ -182,6 +182,7 @@ KNN = R6Class("KNN",
     # --------- User Active binding to mimic Python's Descriptor Class ---------
     .k = NULL,
     .sample_size = NULL,
+    .predictor_type = NULL,
     .dimension_reduction_target = NULL,
     .dimension_reduction_type = NULL,
     .index_metric = NULL,
@@ -207,8 +208,16 @@ KNN = R6Class("KNN",
       private$.sample_size$descriptor = value
     },
 
-    #' @field dimension_reduction_target
+    #' @field predictor_type
     #' Type of inference to use on the data's labels
+    predictor_type = function(value){
+      if(missing(value))
+        return(private$.predictor_type$descriptor)
+      private$.predictor_type$descriptor = value
+    },
+
+    #' @field dimension_reduction_target
+    #' Target dimension to reduce to
     dimension_reduction_target = function(value){
       if(missing(value))
         return(private$.dimension_reduction_target$descriptor)
@@ -216,7 +225,7 @@ KNN = R6Class("KNN",
     },
 
     #' @field dimension_reduction_type
-    #' Type of inference to use on the data's labels
+    #' Type of dimension reduction technique to use
     dimension_reduction_type = function(value){
       if(missing(value))
         return(private$.dimension_reduction_type$descriptor)
