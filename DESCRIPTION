@@ -60,6 +60,7 @@ Collate:
     'amazon_kmeans.R'
     'amazon_knn.R'
     'amazon_lda.R'
+    'amazon_linear_learner.R'
     'amazon_randomcutforest.R'
     'data_capture_config.R'
     'debugger.R'
