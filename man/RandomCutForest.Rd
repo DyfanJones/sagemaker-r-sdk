@@ -18,7 +18,7 @@ These are observations which diverge from otherwise well-structured or patterned
 
 \item{\code{repo_version}}{version of framework}
 
-\item{\code{MINI_BATCH_SIZE}}{The size of each mini-batch to use when training. If None, a default value will be used.}
+\item{\code{MINI_BATCH_SIZE}}{The size of each mini-batch to use when training.}
 }
 \if{html}{\out{</div>}}
 }
