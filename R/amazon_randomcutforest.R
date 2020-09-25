@@ -31,7 +31,7 @@ RandomCutForest = R6Class("RandomCutForest",
     repo_version = 1,
 
     #' @field MINI_BATCH_SIZE
-    #' The size of each mini-batch to use when training. If None, a default value will be used.
+    #' The size of each mini-batch to use when training.
     MINI_BATCH_SIZE = 1000,
 
     #' @description An `Estimator` class implementing a Random Cut Forest.
