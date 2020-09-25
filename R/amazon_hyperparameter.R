@@ -145,6 +145,13 @@ DataTypes = R6Class("DataTypes",
         warning = function(w) {
           stop(sprintf("Could not convert object '%s' to integer", x), call. = F)
       })
-    }
+    },
+    bool = function(x){
+      tryCatch(
+        as.logical(x),
+        warning = function(w) {
+          stop(sprintf("Could not convert object '%s' to boolean", x), call. = F)
+        })
+      }
   )
 )
