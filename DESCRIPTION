@@ -63,6 +63,7 @@ Collate:
     'amazon_linear_learner.R'
     'amazon_ntm.R'
     'amazon_object2vec.R'
+    'amazon_pca.R'
     'amazon_randomcutforest.R'
     'data_capture_config.R'
     'debugger.R'
