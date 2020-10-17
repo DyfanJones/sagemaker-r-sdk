@@ -16,7 +16,25 @@
 AutoML = R6Class("AutoML",
   public = list(
 
-
+    #' @description Initialize AutoML class
+    #'              Place holder doc string
+    #' @param role :
+    #' @param target_attribute_name :
+    #' @param output_kms_key :
+    #' @param output_path :
+    #' @param base_job_name :
+    #' @param compression_type :
+    #' @param sagemaker_session :
+    #' @param volume_kms_key :
+    #' @param encrypt_inter_container_traffic :
+    #' @param vpc_config :
+    #' @param problem_type :
+    #' @param max_candidates :
+    #' @param max_runtime_per_training_job_in_seconds :
+    #' @param total_job_runtime_in_seconds :
+    #' @param job_objective :
+    #' @param generate_candidate_definitions_only :
+    #' @param tags :
     initialize = function(role,
                           target_attribute_name,
                           output_kms_key=NULL,
@@ -85,7 +103,7 @@ AutoML = R6Class("AutoML",
       }
       private$.prepare_for_auto_ml_job(job_name=job_name)
 
-      self$latest_auto_ml_job = AutoMLJob$new().start_new(self, inputs)  # pylint: disable=W0201
+      self$latest_auto_ml_job = AutoMLJob$new(self$sagemaker_session)$start_new(self, inputs)  # pylint: disable=W0201
       if (wait)
         self$latest_auto_ml_job$wait(logs=logs)
     },
@@ -398,6 +416,13 @@ AutoML = R6Class("AutoML",
         }
         previous_container_output = current_container_output
       }
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
     }
   ),
   private = list(
@@ -537,6 +562,202 @@ AutoMLInput = R6Class("AutoMLInput",
           input_entry$CompressionType = self$compression
         auto_ml_input = c(auto_ml_input, input_entry)}
       return(auto_ml_input)
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
+    }
+  ),
+  lock_objects = F
+)
+
+#' @title AutoMLJob class
+#' @description A class for interacting with CreateAutoMLJob API.
+AutoMLJob = R6Class("AutoMLJob",
+  inherit = .Job,
+  public = list(
+
+    #' @description Initialize AutoMLJob class
+    #' @param sagemaker_session (sagemaker.session.Session): A SageMaker Session
+    #'              object, used for SageMaker interactions (default: None). If not
+    #'              specified, the one originally associated with the ``AutoMLJob`` instance is used.
+    #' @param job_name :
+    #' @param inputs (str, list[str]): Parameters used when called
+    #'              :meth:`~sagemaker.automl.AutoML.fit`.
+    initialize = function(sagemaker_session,
+                          job_name = NULL,
+                          inputs= NULL){
+      self$inputs = inputs
+      self$job_name = job_name
+      super$initialize(sagemaker_session=sagemaker_session, job_name=job_name)
+    },
+
+    #' @description Create a new Amazon SageMaker AutoML job from auto_ml.
+    #' @param auto_ml (sagemaker.automl.AutoML): AutoML object
+    #'              created by the user.
+    #' @param inputs (str, list[str]): Parameters used when called
+    #'              :meth:`~sagemaker.automl.AutoML.fit`.
+    #' @return sagemaker.automl.AutoMLJob: Constructed object that captures
+    #'              all information about the started AutoML job.
+    start_new = function(auto_ml,
+                         inputs){
+      auto_ml_args = private$.load_config(inputs, auto_ml)
+      auto_ml_args$job_name = auto_ml$current_job_name
+      auto_ml_args$problem_type = auto_ml$problem_type
+      auto_ml_args$job_objective = auto_ml$job_objective
+      auto_ml_args$tags = auto_ml$tags
+
+      do.call(auto_ml$sagemaker_session$auto_ml, auto_ml_args)
+
+      cls = self$clone()
+      cls$initialize(auto_ml$sagemaker_session, auto_ml$current_job_name, inputs)
+      return(cls)
+    },
+
+    #' @description Prints out a response from the DescribeAutoMLJob API call.
+    describe = function(){
+      return(self$sagemaker_session$describe_auto_ml_job(self$job_name))
+    },
+
+    #' @description Wait for the AutoML job to finish.
+    #' @param logs (bool): indicate whether to output logs.
+    wait = function(logs=TRUE){
+      if (logs)
+        self$sagemaker_session$logs_for_auto_ml_job(self$job_name, wait=TRUE)
+      else
+        self$sagemaker_session$wait_for_auto_ml_job(self$job_name)
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
+    }
+  ),
+  private = list(
+
+    # Load job_config, input_config and output config from auto_ml and inputs.
+    # Args:
+    #   inputs (str): S3 Uri where the training data is stored, must start
+    # with "s3://".
+    # auto_ml (AutoML): an AutoML object that user initiated.
+    # expand_role (str): The expanded role arn that allows for Sagemaker
+    # executionts.
+    # validate_uri (bool): indicate whether to validate the S3 uri.
+    # Returns (dict): a config dictionary that contains input_config, output_config,
+    # job_config and role information.
+    .load_config = function(inputs,
+                            auto_ml,
+                            expand_role=TRUE,
+                            validate_uri=TRUE){
+      # JobConfig
+      # InputDataConfig
+      # OutputConfig
+
+      if (inherits(inputs, "AutoMLInput"))
+        input_config = inputs$to_request_list()
+      else {
+        input_config = private$.format_inputs_to_input_config(
+          inputs, validate_uri, auto_ml$compression_type, auto_ml$target_attribute_name)
+        }
+      output_config = .Job$private_methods$.prepare_output_config(auto_ml$output_path, auto_ml$output_kms_key)
+
+      role =if(expand_role) auto_ml$sagemaker_session$expand_role(auto_ml$role) else auto_ml$role
+
+      stop_condition = private$.prepare_auto_ml_stop_condition(
+        auto_ml$max_candidate,
+        auto_ml$max_runtime_per_training_job_in_seconds,
+        auto_ml$total_job_runtime_in_seconds
+      )
+
+      auto_ml_job_config = list(
+        "CompletionCriteria" = stop_condition,
+        "SecurityConfig" = list(
+          "EnableInterContainerTrafficEncryption" = auto_ml$encrypt_inter_container_traffic
+        )
+      )
+
+      auto_ml_job_config$SecurityConfig$VolumeKmsKeyId = auto_ml$volume_kms_key
+      auto_ml_job_config$SecurityConfig$VpcConfig = auto_ml$vpc_config
+
+      config = list(
+        "input_config" = input_config,
+        "output_config" = output_config,
+        "auto_ml_job_config" = auto_ml_job_config,
+        "role" = role,
+        "generate_candidate_definitions_only" = auto_ml$generate_candidate_definitions_only
+      )
+      return(config)
+    },
+
+    # Convert inputs to AutoML InputDataConfig.
+    # Args:
+    #   inputs (str, list[str]): local path(s) or S3 uri(s) of input datasets.
+    # validate_uri (bool): indicates whether it is needed to validate S3 uri.
+    # compression (str): Compression type of the input data.
+    # target_attribute_name (str): the target attribute name for classification
+    # or regression.
+    # Returns (dict): a dict of AutoML InputDataConfig
+    .format_inputs_to_input_config = function(inputs,
+                                              validate_uri=TRUE,
+                                              compression=NULL,
+                                              target_attribute_name=NULL){
+      if (is.null(inputs))
+        return(NULL)
+
+      channels = list()
+      if (inherits(inputs, "AutoMLInput")) {
+        channels = c(channels, inputs.to_request_list())
+      } else if (inherits(inputs, "character")) {
+        channel = .Job$private_methods$.format_string_uri_input(
+          inputs,
+          validate_uri,
+          compression=compression,
+          target_attribute_name=target_attribute_name
+          )$config
+        channels = c(channels, channel)
+      } else if (inherits(inputs, "list")) {
+        for (input_entry in inputs) {
+        channel = .Job$private_methods$.format_string_uri_input(
+          input_entry,
+          validate_uri,
+          compression=compression,
+          target_attribute_name=target_attribute_name
+          )$config
+        channels = c(channels, channel)
+        }
+      } else {
+        msg = "Cannot format input %s. Expecting a string or a list of strings."
+        stop(sprintf(msg,inputs), call. = F)
+      }
+
+      for (channel in channels){
+        if (islistempty(channel$TargetAttributeName))
+          stop("TargetAttributeName cannot be None.", call. = F)
+      }
+      return(channels)
+    },
+
+    # Defines the CompletionCriteria of an AutoMLJob.
+    # Args:
+    #   max_candidates (int): the maximum number of candidates returned by an
+    # AutoML job.
+    # max_runtime_per_training_job_in_seconds (int): the maximum time of each
+    # training job in seconds.
+    # total_job_runtime_in_seconds (int): the total wait time of an AutoML job.
+    # Returns (dict): an AutoML CompletionCriteria.
+    .prepare_auto_ml_stop_condition = function(max_candidates,
+                                               max_runtime_per_training_job_in_seconds = NULL,
+                                              total_job_runtime_in_seconds = NULL){
+      stopping_condition = list("MaxCandidates"= max_candidates)
+
+      stopping_condition$MaxRuntimePerTrainingJobInSeconds = max_runtime_per_training_job_in_seconds
+      stopping_condition$MaxAutoMLJobRuntimeInSeconds = total_job_runtime_in_seconds
+      return(stopping_condition)
     }
   ),
   lock_objects = F
