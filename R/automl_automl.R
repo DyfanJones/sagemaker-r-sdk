@@ -576,6 +576,7 @@ AutoMLInput = R6Class("AutoMLInput",
 
 #' @title AutoMLJob class
 #' @description A class for interacting with CreateAutoMLJob API.
+#' @export
 AutoMLJob = R6Class("AutoMLJob",
   inherit = .Job,
   public = list(
