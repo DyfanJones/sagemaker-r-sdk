@@ -501,4 +501,43 @@ AutoML = R6Class("AutoML",
   lock_objects = F
 )
 
+#' @title Accepts parameters that specify an S3 input for an auto ml job
+#' @description Provides a method to turn those parameters into a dictionary.
+#' @export
+AutoMLInput = R6Class("AutoMLInput",
+  public = list(
 
+    #' @description Convert an S3 Uri or a list of S3 Uri to an AutoMLInput object.
+    #' @param inputs (str, list[str]): a string or a list of string that points to (a)
+    #'              S3 location(s) where input data is stored.
+    #' @param  target_attribute_name (str): the target attribute name for regression
+    #'              or classification.
+    #' @param  compression (str): if training data is compressed, the compression type.
+    #'              The default value is None.
+    initialize = function(inputs,
+                          target_attribute_name,
+                          compression=NULL){
+      self$inputs = inputs
+      self$target_attribute_name = target_attribute_name
+      self$compression = compression
+    },
+
+    #' @description Generates a request dictionary using the parameters provided to the class.
+    to_request_list = function(){
+      # Create the request dictionary.
+      auto_ml_input = list()
+      if (inherits(self$inputs, "character"))
+        self$inputs = list(self$inputs)
+      for(entry in self.inputs){
+        input_entry = list(
+          "DataSource"= list("S3DataSource" = list("S3DataType"= "S3Prefix", "S3Uri"= entry)),
+          "TargetAttributeName" = self$target_attribute_name
+        )
+        if (!is.null(self$compression))
+          input_entry$CompressionType = self$compression
+        auto_ml_input = c(auto_ml_input, input_entry)}
+      return(auto_ml_input)
+    }
+  ),
+  lock_objects = F
+)
