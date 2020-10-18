@@ -2,10 +2,9 @@
 % Please edit documentation in R/pipeline.R
 \name{PipeLineModel}
 \alias{PipeLineModel}
-\title{PipeLineModel Class}
+\title{A pipeline of SageMaker `Model` instances.}
 \description{
-A pipeline of SageMaker
-             ``Model``s that can be deployed to an ``Endpoint``.
+This pipeline can be deployed as an `Endpoint` on SageMaker.
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -31,7 +30,8 @@ Initialize an SageMaker ``Model`` which can be used to build an
   predictor_cls = NULL,
   name = NULL,
   vpc_config = NULL,
-  sagemaker_session = NULL
+  sagemaker_session = NULL,
+  enable_network_isolation = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -65,6 +65,11 @@ selected on each ``deploy``.}
 object, used for SageMaker interactions (default: None). If not
 specified, one is created using the default AWS configuration
 chain.}
+
+\item{\code{enable_network_isolation}}{(bool): Default False. if True, enables
+network isolation in the endpoint, isolating the model
+container. No inbound or outbound network calls can be made to
+or from the model container.Boolean}
 }
 \if{html}{\out{</div>}}
 }
@@ -99,8 +104,8 @@ list[dict[str, str]]: A list of container definition objects usable
 \if{html}{\out{<a id="method-deploy"></a>}}
 \if{latex}{\out{\hypertarget{method-deploy}{}}}
 \subsection{Method \code{deploy()}}{
-Deploy this ``Model`` to an ``Endpoint`` and optionally return a
-             ``Predictor``.
+Deploy the ``Model`` to an ``Endpoint``.
+             It optionally return a ``Predictor``.
              Create a SageMaker ``Model`` and ``EndpointConfig``, and deploy an
              ``Endpoint`` from this ``Model``. If ``self.predictor_cls`` is not None,
              this method returns a the result of invoking ``self.predictor_cls`` on
@@ -113,6 +118,8 @@ Deploy this ``Model`` to an ``Endpoint`` and optionally return a
 \if{html}{\out{<div class="r">}}\preformatted{PipeLineModel$deploy(
   initial_instance_count,
   instance_type,
+  serializer = NULL,
+  deserializer = NULL,
   endpoint_name = NULL,
   tags = NULL,
   wait = TRUE,
@@ -129,6 +136,15 @@ in the ``Endpoint`` created from this ``Model``.}
 
 \item{\code{instance_type}}{(str): The EC2 instance type to deploy this Model to.
 For example, 'ml.p2.xlarge'.}
+
+\item{\code{serializer}}{(:class:`~sagemaker.serializers.BaseSerializer`): A
+serializer object, used to encode data for an inference endpoint
+(default: None). If ``serializer`` is not None, then
+``serializer`` will override the default serializer. The
+default serializer is set by the ``predictor_cls``.}
+
+\item{\code{deserializer}}{(:class:`~sagemaker.deserializers.BaseDeserializer`): A
+deserializer object, used to decode data from an inference}
 
 \item{\code{endpoint_name}}{(str): The name of the endpoint to create (default:
 None). If not specified, a unique endpoint name will be created.}
@@ -148,6 +164,10 @@ False, a new endpoint will be created. Default: False}
 \item{\code{data_capture_config}}{(sagemaker.model_monitor.DataCaptureConfig): Specifies
 configuration related to Endpoint data capture for use with
 Amazon SageMaker Model Monitoring. Default: None.}
+
+\item{\code{endpoint}}{(default: None). If ``deserializer`` is not None, then
+``deserializer`` will override the default deserializer. The
+default deserializer is set by the ``predictor_cls``.}
 }
 \if{html}{\out{</div>}}
 }
