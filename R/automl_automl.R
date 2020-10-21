@@ -93,10 +93,10 @@ AutoML = R6Class("AutoML",
                    job_name=NULL){
       if (!wait && logs){
         logs = FALSE
-        log_warn("Setting logs to False. logs is only meaningful when wait is True.")}
+        log_warn("Setting `logs` to FALSE. `logs` is only meaningful when `wait` is TRUE.")}
 
       # upload data for users if provided local path
-      # validations are done in _Job._format_inputs_to_input_config
+      # validations are done in .Job._format_inputs_to_input_config
       if (inherits(inputs, "character")){
         if (!startsWith(inputs, "s3://"))
           inputs = self$sagemaker_session$upload_data(inputs, key_prefix="auto-ml-input-data")
@@ -720,7 +720,7 @@ AutoMLJob = R6Class("AutoMLJob",
           compression=compression,
           target_attribute_name=target_attribute_name
           )$config
-        channels = c(channels, channel)
+        channels = c(channels, list(channel))
       } else if (inherits(inputs, "list")) {
         for (input_entry in inputs) {
         channel = .Job$private_methods$.format_string_uri_input(
@@ -729,7 +729,7 @@ AutoMLJob = R6Class("AutoMLJob",
           compression=compression,
           target_attribute_name=target_attribute_name
           )$config
-        channels = c(channels, channel)
+        channels = c(channels, list(channel))
         }
       } else {
         msg = "Cannot format input %s. Expecting a string or a list of strings."
@@ -738,7 +738,7 @@ AutoMLJob = R6Class("AutoMLJob",
 
       for (channel in channels){
         if (islistempty(channel$TargetAttributeName))
-          stop("TargetAttributeName cannot be None.", call. = F)
+          stop("TargetAttributeName cannot be NULL", call. = F)
       }
       return(channels)
     },
