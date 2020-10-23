@@ -48,10 +48,11 @@ bucket based on a naming convention which includes the current AWS account ID.
 \item \href{#method-describe_auto_ml_job}{\code{Session$describe_auto_ml_job()}}
 \item \href{#method-list_candidates}{\code{Session$list_candidates()}}
 \item \href{#method-wait_for_auto_ml_job}{\code{Session$wait_for_auto_ml_job()}}
-\item \href{#method-logs_for_auto_ml}{\code{Session$logs_for_auto_ml()}}
+\item \href{#method-logs_for_auto_ml_job}{\code{Session$logs_for_auto_ml_job()}}
 \item \href{#method-compile_model}{\code{Session$compile_model()}}
 \item \href{#method-tune}{\code{Session$tune()}}
 \item \href{#method-create_tuning_job}{\code{Session$create_tuning_job()}}
+\item \href{#method-describe_tuning_job}{\code{Session$describe_tuning_job()}}
 \item \href{#method-stop_tuning_job}{\code{Session$stop_tuning_job()}}
 \item \href{#method-transform}{\code{Session$transform()}}
 \item \href{#method-create_model}{\code{Session$create_model()}}
@@ -93,7 +94,7 @@ bucket based on a naming convention which includes the current AWS account ID.
 Creates a new instance of this [R6][R6::R6Class] class.
              Initialize a SageMaker \code{Session}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$new(paws_credentials = NULL, bucket = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$new(paws_credentials = NULL, default_bucket = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -101,7 +102,7 @@ Creates a new instance of this [R6][R6::R6Class] class.
 \describe{
 \item{\code{paws_credentials}}{(PawsCredentials): The underlying AWS credentails passed to paws SDK.}
 
-\item{\code{bucket}}{(str): The default Amazon S3 bucket to be used by this session.
+\item{\code{default_bucket}}{(str): The default Amazon S3 bucket to be used by this session.
 This will be created the next time an Amazon S3 bucket is needed (by calling
 :func:\code{default_bucket}).
 If not provided, a default bucket will be created based on the following format:
@@ -184,7 +185,7 @@ str: The S3 URI of the uploaded file.
 \subsection{Method \code{download_data()}}{
 Download file or directory from S3.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$download_data(path = "", bucket, key_prefix = "", ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$download_data(path, bucket, key_prefix = "", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1038,14 +1039,14 @@ Wait for an Amazon SageMaker AutoML job to complete.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-logs_for_auto_ml"></a>}}
-\if{latex}{\out{\hypertarget{method-logs_for_auto_ml}{}}}
-\subsection{Method \code{logs_for_auto_ml()}}{
+\if{html}{\out{<a id="method-logs_for_auto_ml_job"></a>}}
+\if{latex}{\out{\hypertarget{method-logs_for_auto_ml_job}{}}}
+\subsection{Method \code{logs_for_auto_ml_job()}}{
 Display the logs for a given AutoML job, optionally tailing them until the
              job is complete. If the output is a tty or a Jupyter cell, it will be color-coded
              based on which instance the log entry is from.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$logs_for_auto_ml(job_name, wait = False, poll = 10)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$logs_for_auto_ml_job(job_name, wait = FALSE, poll = 10)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1286,6 +1287,27 @@ other required configurations.}
 https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-describe_tuning_job"></a>}}
+\if{latex}{\out{\hypertarget{method-describe_tuning_job}{}}}
+\subsection{Method \code{describe_tuning_job()}}{
+Calls the DescribeHyperParameterTuningJob API for the given job name
+             and returns the response.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$describe_tuning_job(job_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job_name}}{(str): The name of the hyperparameter tuning job to describe.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+dict: A dictionary response with the hyperparameter tuning job description.
 }
 }
 \if{html}{\out{<hr>}}

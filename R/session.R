@@ -420,7 +420,6 @@ Session = R6Class("Session",
                        tags = NULL,
                        experiment_config=NULL){
 
-
       process_request = list(
         ProcessingJobName = job_name,
         ProcessingResources = resources,
@@ -940,14 +939,13 @@ Session = R6Class("Session",
     #'              (Default: FALSE).
     #' @param poll (int): The interval in seconds between polling for new log entries and job
     #'              completion (Default: 10).
-    logs_for_auto_ml = function(job_name,
-                                wait=False,
-                                poll=10){
+    logs_for_auto_ml_job = function(job_name,
+                                    wait=FALSE,
+                                    poll=10){
 
-      description = self$sagemaker$describe_training_job(TrainingJobName=job_name)
-      cloudwatchlogs = paws::cloudwatchlogs(config = self$paws_credentials$credentials)
+      description = self$sagemaker$describe_auto_ml_job(AutoMLJobName=job_name)
 
-      init_log = .log_init(description, "Processing")
+      init_log = .log_init(description, "AutoML")
 
       state = .get_initial_job_state(description, "AutoMLJobStatus", wait)
 
@@ -968,12 +966,15 @@ Session = R6Class("Session",
           writeLines("")
           state = LogState$COMPLETE
         } else if(Sys.time() - last_describe_job_call >= 30){
-          description = self.sagemaker_client.describe_auto_ml_job(AutoMLJobName=job_name)
+          description = self$sagemaker_client$describe_auto_ml_job(AutoMLJobName=job_name)
           last_describe_job_call = Sys.time()
 
           status = description$ProcessingJobStatus
 
-          if (status %in% c("Completed", "Failed", "Stopped")) state = LogState$JOB_COMPLETE
+          if (status %in% c("Completed", "Failed", "Stopped")) {
+            writeLines("")
+            state = LogState$JOB_COMPLETE
+          }
         }
       }
 
@@ -1114,16 +1115,17 @@ Session = R6Class("Session",
 
       strategy = match.arg(strategy)
 
-      tune_request$HyperParameterTuningJobName = job_name
-      tune_request$HyperParameterTuningJobConfig = private$.map_tuning_config(
-        strategy=strategy,
-        max_jobs=max_jobs,
-        max_parallel_jobs=max_parallel_jobs,
-        objective_type=objective_type,
-        objective_metric_name=objective_metric_name,
-        parameter_ranges=parameter_ranges,
-        early_stopping_type=early_stopping_type)
-      tune_request$TrainingJobDefinition = private$.map_training_config(
+      tune_request = list(
+        "HyperParameterTuningJobName" = job_name,
+        "HyperParameterTuningJobConfig" = private$.map_tuning_config(
+          strategy=strategy,
+          max_jobs=max_jobs,
+          max_parallel_jobs=max_parallel_jobs,
+          objective_type=objective_type,
+          objective_metric_name=objective_metric_name,
+          parameter_ranges=parameter_ranges,
+          early_stopping_type=early_stopping_type),
+        "TrainingJobDefinition" = private$.map_training_config(
           static_hyperparameters=static_hyperparameters,
           role=role,
           input_mode=input_mode,
@@ -1140,7 +1142,8 @@ Session = R6Class("Session",
           use_spot_instances=use_spot_instances,
           checkpoint_s3_uri=checkpoint_s3_uri,
           checkpoint_local_path=checkpoint_local_path
-        )
+          )
+      )
 
       tune_request$WarmStartConfig = warm_start_config
       tune_request$Tags = tags
@@ -1200,6 +1203,16 @@ Session = R6Class("Session",
                                                        TrainingJobDefinitions = tune_request$TrainingJobDefinitions,
                                                        WarmStartConfig = tune_request$WarmStartConfig,
                                                        Tags = tune_request$Tags)
+    },
+
+    #' @description Calls the DescribeHyperParameterTuningJob API for the given job name
+    #'              and returns the response.
+    #' @param job_name (str): The name of the hyperparameter tuning job to describe.
+    #' @return dict: A dictionary response with the hyperparameter tuning job description.
+    describe_tuning_job = function(job_name){
+      return(self$sagemaker$describe_hyper_parameter_tuning_job(
+        HyperParameterTuningJobName=job_name)
+      )
     },
 
     #' @description Stop the Amazon SageMaker hyperparameter tuning job with the specified name.
