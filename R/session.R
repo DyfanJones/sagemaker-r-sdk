@@ -31,16 +31,17 @@ Session = R6Class("Session",
     #'              Initialize a SageMaker \code{Session}.
     #'
     #' @param paws_credentials (PawsCredentials): The underlying AWS credentails passed to paws SDK.
-    #' @param bucket (str): The default Amazon S3 bucket to be used by this session.
+    #' @param default_bucket (str): The default Amazon S3 bucket to be used by this session.
     #'              This will be created the next time an Amazon S3 bucket is needed (by calling
     #'              :func:\code{default_bucket}).
     #'              If not provided, a default bucket will be created based on the following format:
     #'              "sagemaker-{region}-{aws-account-id}". Example: "sagemaker-my-custom-bucket".
     initialize = function(paws_credentials = NULL,
-                          bucket = NULL) {
-      self$paws_credentials <- if(inherits(paws_credentials, "PawsCredentials")) paws_credentials else PawsCredentials$new()
-      self$bucket <- bucket
-      self$config <- NULL
+                          default_bucket = NULL) {
+      self$paws_credentials  <- if(inherits(paws_credentials, "PawsCredentials")) paws_credentials else PawsCredentials$new()
+
+      private$.default_bucket_name_override = default_bucket
+      self$config = NULL
       # get sagemaker object from paws
       self$sagemaker = paws::sagemaker(config = self$paws_credentials$credentials)
       self$s3 = paws::s3(config = self$paws_credentials$credentials)
@@ -122,17 +123,14 @@ Session = R6Class("Session",
     #'              https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-example-download-file.html
     #' @return
     #' NULL invisibly
-    download_data = function(path="", bucket, key_prefix = "", ...){
-
-      # Get s3 object from paws
-      s3 = paws::s3(config = self$paws_credentials$credentials)
+    download_data = function(path, bucket, key_prefix = "", ...){
 
       next_token = NULL
       keys = character()
       # Loop through the contents of the bucket, 1,000 objects at a time. Gathering all keys into
       # a "keys" list.
       while(!identical(next_token, character(0))){
-        response = s3$list_objects_v2(Bucket = bucket, Prefix = key_prefix, ContinuationToken = next_token)
+        response = self$s3$list_objects_v2(Bucket = bucket, Prefix = key_prefix, ContinuationToken = next_token)
         # For each object, save its key or directory.
         keys = c(keys, sapply(response$Contents, function(x) x$Key))
         next_token = response$ContinuationToken
@@ -159,7 +157,7 @@ Session = R6Class("Session",
       sapply(dirname(destination_path), dir.create, showWarnings = F, recursive = T)
 
       for (i in 1:length(keys[files])){
-        obj = s3$get_object(Bucket = bucket, Key = keys[i], ...)
+        obj = self$s3$get_object(Bucket = bucket, Key = keys[i], ...)
         write_bin(obj$Body, destination_path[i])
       }
       return(invisible(NULL))
@@ -172,11 +170,8 @@ Session = R6Class("Session",
     read_s3_file = function(bucket,
                             key_prefix){
 
-      # Get s3 object from paws
-      s3 = paws::s3(config = self$paws_credentials$credentials)
-
       # Explicitly passing a None kms_key to boto3 throws a validation error.
-      s3_object = s3$get_object(Bucket=bucket, Key=key_prefix)
+      s3_object = self$s3$get_object(Bucket=bucket, Key=key_prefix)
 
       return(rawToChar(s3_object$Body))
     },
@@ -186,14 +181,12 @@ Session = R6Class("Session",
     #' @param key_prefix (str): S3 object key name prefix.
     #' @return (str): The list of files at the S3 path.
     list_s3_files = function(bucket, key_prefix){
-      # Get s3 object from paws
-      s3 = paws::s3(config = self$paws_credentials$credentials)
       next_token = NULL
       keys = character()
       # Loop through the contents of the bucket, 1,000 objects at a time. Gathering all keys into
       # a "keys" list.
       while(!identical(next_token, character(0))){
-        response = s3$list_objects_v2(Bucket = bucket, Prefix = key_prefix, ContinuationToken = next_token)
+        response = self$s3$list_objects_v2(Bucket = bucket, Prefix = key_prefix, ContinuationToken = next_token)
         keys = c(keys, sapply(response$Contents, function(x) x$Key))
         next_token = response$ContinuationToken
       }
@@ -204,18 +197,23 @@ Session = R6Class("Session",
     #' @return (str): The name of the default bucket, which is of the form:
     #'  ``sagemaker-{region}-{AWS account ID}``.
     default_bucket = function(){
-      if (!is.null(self$bucket)) return(self$bucket)
+
+      if (!is.null(private$.default_bucket)) return(private$.default_bucket)
 
       region = self$paws_region_name
 
-      if(is.null(self$bucket)) {
+      default_bucket = private$.default_bucket_name_override
+
+      if(is.null(default_bucket)) {
         account = paws::sts(config = self$paws_credentials$credentials)$get_caller_identity()$Account
-        self$bucket = sprintf("sagemaker-%s-%s", region, account)
+        default_bucket = sprintf("sagemaker-%s-%s", region, account)
       }
 
       private$.create_s3_bucket_if_it_does_not_exist(bucket_name = self$bucket, region = region)
 
-      return(self$bucket)
+      private$.default_bucket = default_bucket
+
+      return(private$.default_bucket)
     },
 
     #' @description Create an Amazon SageMaker training job. Train the learner on a set of observations of the provided `task`.
@@ -2146,23 +2144,40 @@ Session = R6Class("Session",
     }
   ),
   private = list(
+    .default_bucket = NULL,
+    .default_bucket_name_override = NULL,
+
+    # Creates an S3 Bucket if it does not exist.
+    # Also swallows a few common exceptions that indicate that the bucket already exists or
+    # that it is being created.
+    # Args:
+    #   bucket_name (str): Name of the S3 bucket to be created.
+    #   region (str): The region in which to create the bucket.
     .create_s3_bucket_if_it_does_not_exist = function(bucket_name, region){
-      # Creates an S3 Bucket if it does not exist.
-      # Also swallows a few common exceptions that indicate that the bucket already exists or
-      # that it is being created.
-      # Args:
-      #   bucket_name (str): Name of the S3 bucket to be created.
-      #   region (str): The region in which to create the bucket.
-
-      s3 <- paws::s3(config = self$paws_credentials$credentials)
-
-      resp <- tryCatch(s3$head_bucket(Bucket = bucket_name), error = function(e) e)
+      resp <- tryCatch(self$s3$head_bucket(Bucket = bucket_name), error = function(e) e)
 
       # check if bucket exists: HTTP 404 bucket not found
       if(inherits(resp, "http_404")){
-        s3$create_bucket(Bucket = bucket_name, CreateBucketConfiguration= list(LocationConstraint = region))
-       log_info("Created S3 bucket: %s", bucket_name)}
-
+        tryCatch({
+          self$s3$create_bucket(
+            Bucket = bucket_name,
+            CreateBucketConfiguration = list(LocationConstraint = region))
+          log_info("Created S3 bucket: %s", bucket_name)},
+          error = function(e) {
+            code = attributes(e)$error_response$Code
+            message = attributes(e)$error_response$Message
+            if (error_code == "BucketAlreadyOwnedByYou") {
+              invisible(NULL)
+            } else if (error_code == "OperationAborted" &&
+                     grepl("conflicting conditional operation", message)) {
+              # If this bucket is already being concurrently created, we don't need to create
+              # it again.
+              invisible(NULL)
+            } else
+              stop(e$message, call. = F)
+          }
+        )
+      }
     },
 
     .map_tuning_config = function(strategy,
