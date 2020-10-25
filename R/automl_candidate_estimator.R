@@ -23,7 +23,7 @@ CandidateEstimator = R6Class("CandidateEstimator",
                           sagemaker_session=NULL){
       self$name = candidate$CandidateName
       self$containers = candidate$InferenceContainers
-      self$steps = self._process_steps(candidate$CandidateSteps)
+      self$steps = private$.process_steps(candidate$CandidateSteps)
       self$sagemaker_session = sagemaker_session %||% Session$new()
     },
 
@@ -76,8 +76,8 @@ CandidateEstimator = R6Class("CandidateEstimator",
                    logs=TRUE){
       if (logs && !wait)
         stop(
-          "Logs can only be shown if wait is set to True.",
-          "Please either set wait to True or set logs to False.", call. = F
+          "Logs can only be shown if `wait` is set to `TRUE`.",
+          "Please either set `wait` to `TRUE` or set `logs` to `FALSE`.", call. = F
         )
 
       self$name = candidate_name %||% self$name
@@ -105,8 +105,7 @@ CandidateEstimator = R6Class("CandidateEstimator",
             .Job$private_methods$.convert_input_to_channel(names(input_dict)[i], input_dict[[i]]))
 
           desc = self$sagemaker_session$sagemaker$describe_training_job(
-            TrainingJobName=step_name
-          )
+            TrainingJobName=step_name)
 
           base_name = "sagemaker-automl-training-rerun"
           step_name = name_from_base(base_name)
@@ -117,8 +116,7 @@ CandidateEstimator = R6Class("CandidateEstimator",
             step_name,
             volume_kms_key,
             encrypt_inter_container_traffic,
-            vpc_config
-          )
+            vpc_config)
 
           do.call(self$sagemaker_session$train, train_args)
           running_jobs[[step_name]] = TRUE
@@ -128,8 +126,7 @@ CandidateEstimator = R6Class("CandidateEstimator",
             msg = "Cannot format input %s. Expecting a string starts with file:// or s3://"
             stop(sprintf(msg, inputs), call. = F)}
           desc = self$sagemaker_session$sagemaker$describe_transform_job(
-             TransformJobName=step_name
-           )
+             TransformJobName=step_name)
           base_name = "sagemaker-automl-transform-rerun"
           step_name = name_from_base(base_name)
           step$name = step_name
@@ -140,7 +137,7 @@ CandidateEstimator = R6Class("CandidateEstimator",
       }
 
       if (wait){
-        while(True){
+        while(TRUE){
           for (step in self$steps){
             status = NULL
             step_type = step$type
@@ -148,14 +145,14 @@ CandidateEstimator = R6Class("CandidateEstimator",
             if (step_type == "TrainingJob"){
               status = self$sagemaker_session$sagemaker$describe_training_job(
                 TrainingJobName=step_name)$TrainingJobStatus
-            } else if (step_type == "TransformJob")
+            } else if (step_type == "TransformJob") {
               status = self$sagemaker_session$sagemaker$describe_transform_job(
-                TransformJobName=step_name)$TransformJobStatus
-            if (status %in% c("Completed", "Failed", "Stopped"))
-              running_jobs[[step_name]] = FALSE
-            if (private$.check_all_job_finished(running_jobs))
-              break
+                TransformJobName=step_name)$TransformJobStatus}
+            if (status %in% c("Completed", "Failed", "Stopped")){
+              running_jobs[[step_name]] = FALSE}
           }
+          if (private$.check_all_job_finished(running_jobs)){
+            break}
         }
       }
     },
@@ -282,9 +279,11 @@ CandidateEstimator = R6Class("CandidateEstimator",
     .process_steps = function(steps){
       processed_steps = list()
       for (step in steps){
-        step_name = step$CandidateStepName
-        step_type = split_str(step$CandidateStepType, "::")[3]
-        processed_steps= c(processed_steps, list("name"= step_name, "type"= step_type))
+        candidate = list(
+          "name" = step$CandidateStepName,
+          "type" = split_str(step$CandidateStepType, "::")[3]
+        )
+        processed_steps= c(processed_steps, list(candidate))
       }
       return(processed_steps)
     }
@@ -324,6 +323,13 @@ CandidateStep = R6Class("CandidateStep",
       self$inputs = inputs
       self$type = step_type
       self$description = description
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
     }
   )
 )
