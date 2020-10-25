@@ -121,7 +121,7 @@ AutoML = R6Class("AutoML",
       sagemaker_session = sagemaker_session %||% Session$new()
 
       auto_ml_job_desc = sagemaker_session$describe_auto_ml_job(auto_ml_job_name)
-      automl_job_tags = sagemaker_session$sagemaker_client$list_tags(
+      automl_job_tags = sagemaker_session$sagemaker$list_tags(
         ResourceArn=auto_ml_job_desc$AutoMLJobArn
       )$Tags
 
@@ -262,7 +262,7 @@ AutoML = R6Class("AutoML",
 
       inference_containers = candidate$containers
 
-      self$validate_and_update_inference_response(inference_containers, inference_response_keys)
+      inference_containers = self$validate_and_update_inference_response(inference_containers, inference_response_keys)
 
       # construct Model objects
       models = list()
@@ -394,27 +394,26 @@ AutoML = R6Class("AutoML",
 
       previous_container_output = NULL
 
-      for (container in inference_containers) {
+      for (i in seq_along(inference_containers)) {
         supported_inference_keys_container = private$.get_supported_inference_keys(
-          container, default=c())
+          inference_containers[[i]], default=list())
         if (islistempty(supported_inference_keys_container)) {
           previous_container_output = NULL
           next}
         current_container_output = NULL
         for (key in inference_response_keys) {
-          if (key %in% names(supported_inference_keys_container)){
+          if (key %in% supported_inference_keys_container){
             current_container_output = if(!is.null(current_container_output)) paste0(current_container_output, ",",  key)  else key
           }
         }
+        if (!islistempty(previous_container_output))
+          inference_containers[[i]]$Environment$SAGEMAKER_INFERENCE_INPUT = previous_container_output
+        if (!islistempty(current_container_output))
+          inference_containers[[i]]$Environment$SAGEMAKER_INFERENCE_OUTPUT = current_container_output
 
-        if (!islistempty(previous_container_output)) {
-          container$Environment = list("SAGEMAKER_INFERENCE_INPUT"= previous_container_output)
-        }
-        if (!islistempty(current_container_output)) {
-          container$Environment = list("SAGEMAKER_INFERENCE_OUTPUT"= current_container_output)
-        }
         previous_container_output = current_container_output
       }
+      return(inference_containers)
     },
 
     #' @description
@@ -444,7 +443,6 @@ AutoML = R6Class("AutoML",
           call. = F
         )
     },
-
 
     # Set any values in the AutoMLJob that need to be set before creating request.
     # Args:
@@ -477,8 +475,8 @@ AutoML = R6Class("AutoML",
   # no marker environment variable SAGEMAKER_INFERENCE_SUPPORTED.
   .get_supported_inference_keys = function(container,
                                            default=NULL){
-    tryCatch(
-      return(trimws(split_str(container$Environment$SAGEMAKER_INFERENCE_SUPPORTED, ","))),
+    tryCatch({
+      return(trimws(split_str(container$Environment$SAGEMAKER_INFERENCE_SUPPORTED, ",")))},
       error= function(e){
         if (is.null(default))
           stop()
@@ -499,28 +497,28 @@ AutoML = R6Class("AutoML",
                                    containers){
     if (missing(inference_response_keys))
       return(invisible(NULL))
-    tryCatch(
-      supported_inference_keys = private$.get_supported_inference_keys(container=containers[[length(containers)]]),
-    error = function(e) {
-      stop(
-        "The inference model does not support selection of inference content beyond ",
-        "it's default content. Please retry without setting ",
-        "inference_response_keys key word argument.", call. = F
-      )}
+    tryCatch({
+      supported_inference_keys = private$.get_supported_inference_keys(container=containers[[length(containers)]])},
+      error = function(e) {
+        stop(
+          "The inference model does not support selection of inference content beyond ",
+          "it's default content. Please retry without setting ",
+          "inference_response_keys key word argument.", call. = F)
+      }
     )
 
     bad_keys = list()
     for (key in inference_response_keys){
-      if (!(key %in% names(supported_inference_keys)))
-      bad_keys = c(bad_keys, key)}
+      if (!(key %in% supported_inference_keys))
+        bad_keys = c(bad_keys, key)}
 
     if (!islistempty(bad_keys))
       stop(
         "Requested inference output keys [", paste(bad_keys, collapse = ", "), "] are unsupported. ",
-        "The supported inference keys are [", paste(supported_inference_keys, collapse = ","), "]",
+        "The supported inference keys are [", paste(supported_inference_keys, collapse = ", "), "]",
         call. = F
       )
-  }
+    }
   ),
   lock_objects = F
 )
