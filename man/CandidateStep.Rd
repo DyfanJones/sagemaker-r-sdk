@@ -23,6 +23,7 @@ A class that maintains an AutoML Candidate step's name, inputs, type, and descri
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CandidateStep$new()}}
+\item \href{#method-print}{\code{CandidateStep$print()}}
 \item \href{#method-clone}{\code{CandidateStep$clone()}}
 }
 }
@@ -45,6 +46,23 @@ Initialize CandidateStep Class
 \item{\code{step_type}}{(str): Type of the candidate step, Training or Transform}
 
 \item{\code{description}}{(dict): Description of candidate step job}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CandidateStep$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }
