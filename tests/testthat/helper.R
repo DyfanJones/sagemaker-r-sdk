@@ -21,9 +21,13 @@ Mock <- R6::R6Class("Mock",
       return(private$.effect)
     },
 
-    add_function = function(name, meth) {
-      self[[name]] <- meth
-      environment(self[[name]]) <- environment(self$add_function)
+    call_args = function(name){
+      self[[name]] = function(...){
+        args = list(...)
+        if(length(args) != 0)
+          private[[paste0(".",name)]] = args
+        return(private[[paste0(".",name)]])
+      }
     }
   ),
   private = list(
@@ -35,8 +39,3 @@ Mock <- R6::R6Class("Mock",
   ),
   lock_objects = F
 )
-
-call_args = function(...){
-  private$.args = list(...)
-  return(private$.args)
-}
