@@ -6,11 +6,10 @@
 
 #' @import R6
 
-#' @title PipeLineModel Class
-#' @description A pipeline of SageMaker
-#'              ``Model``s that can be deployed to an ``Endpoint``.
+#' @title A pipeline of SageMaker `Model` instances.
+#' @description This pipeline can be deployed as an `Endpoint` on SageMaker.
 #' @export
-PipeLineModel = R6Class("PipeLineModel",
+PipelineModel = R6Class("PipelineModel",
   public = list(
 
     #' @description Initialize an SageMaker ``Model`` which can be used to build an
@@ -37,19 +36,24 @@ PipeLineModel = R6Class("PipeLineModel",
     #'              object, used for SageMaker interactions (default: None). If not
     #'              specified, one is created using the default AWS configuration
     #'              chain.
+    #' @param enable_network_isolation (bool): Default False. if True, enables
+    #'              network isolation in the endpoint, isolating the model
+    #'              container. No inbound or outbound network calls can be made to
+    #'              or from the model container.Boolean
     initialize = function(models,
                           role,
                           predictor_cls=NULL,
                           name=NULL,
                           vpc_config=NULL,
-                          sagemaker_session=NULL){
+                          sagemaker_session=NULL,
+                          enable_network_isolation=FALSE){
       self$models = models
       self$role = role
       self$predictor_cls = predictor_cls
       self$name = name
       self$vpc_config = vpc_config
       self$sagemaker_session = sagemaker_session
-      self$.model_name = NULL
+      self$enable_network_isolation = enable_network_isolation
       self$endpoint_name = NULL
     },
 
@@ -66,8 +70,8 @@ PipeLineModel = R6Class("PipeLineModel",
       return(pipeline_container_def(self$models, instance_type))
     },
 
-    #' @description Deploy this ``Model`` to an ``Endpoint`` and optionally return a
-    #'              ``Predictor``.
+    #' @description Deploy the ``Model`` to an ``Endpoint``.
+    #'              It optionally return a ``Predictor``.
     #'              Create a SageMaker ``Model`` and ``EndpointConfig``, and deploy an
     #'              ``Endpoint`` from this ``Model``. If ``self.predictor_cls`` is not None,
     #'              this method returns a the result of invoking ``self.predictor_cls`` on
@@ -80,6 +84,16 @@ PipeLineModel = R6Class("PipeLineModel",
     #'              in the ``Endpoint`` created from this ``Model``.
     #' @param instance_type (str): The EC2 instance type to deploy this Model to.
     #'              For example, 'ml.p2.xlarge'.
+    #' @param serializer (:class:`~sagemaker.serializers.BaseSerializer`): A
+    #'              serializer object, used to encode data for an inference endpoint
+    #'              (default: None). If ``serializer`` is not None, then
+    #'              ``serializer`` will override the default serializer. The
+    #'              default serializer is set by the ``predictor_cls``.
+    #' @param deserializer (:class:`~sagemaker.deserializers.BaseDeserializer`): A
+    #'              deserializer object, used to decode data from an inference
+    #' @param endpoint (default: None). If ``deserializer`` is not None, then
+    #'              ``deserializer`` will override the default deserializer. The
+    #'              default deserializer is set by the ``predictor_cls``.
     #' @param endpoint_name (str): The name of the endpoint to create (default:
     #'              None). If not specified, a unique endpoint name will be created.
     #' @param tags (List[dict[str, str]]): The list of tags to attach to this
@@ -99,6 +113,8 @@ PipeLineModel = R6Class("PipeLineModel",
     #'              is not None. Otherwise, return None.
     deploy = function(initial_instance_count,
                       instance_type,
+                      serializer=NULL,
+                      deserializer=NULL,
                       endpoint_name=NULL,
                       tags=NULL,
                       wait=TRUE,
@@ -107,43 +123,53 @@ PipeLineModel = R6Class("PipeLineModel",
       if (is.null(self$sagemaker_session))
         self$sagemaker_session = Session$new()
 
-      containers = self$pipeline_container_def(instance_type)
+        containers = self$pipeline_container_def(instance_type)
 
-      self$name = self$name %||% name_from_image(containers[[1]]$Image)
-      self$sagemaker_session$create_model(
-        self$name, self$role, containers, vpc_config=self$vpc_config)
+        self$name = self$name %||% name_from_image(containers[[1]]$Image)
+        self$sagemaker_session$create_model(
+          self$name,
+          self$role,
+          containers,
+          vpc_config=self$vpc_config,
+          enable_network_isolation=self$enable_network_isolation
+        )
 
-      production_variant = production_variant(
-        self$name, instance_type, initial_instance_count)
-      self$endpoint_name = endpoint_name %||% self$name
+        production_variant = production_variant(
+          self$name, instance_type, initial_instance_count
+        )
+        self$endpoint_name = endpoint_name %||% self$name
 
-      data_capture_config_dict = NULL
-      if (!is.null(data_capture_config))
-        data_capture_config_dict = data_capture_config$to_request_list()
+        data_capture_config_dict = NULL
+        if (!is.null(data_capture_config))
+          data_capture_config_dict = data_capture_config$to_request_list()
 
-      if (update_endpoint){
-        endpoint_config_name = self$sagemaker_session$create_endpoint_config(
-          name=self$name,
-          model_name=self$name,
-          initial_instance_count=initial_instance_count,
-          instance_type=instance_type,
-          tags=tags,
-          data_capture_config_dict=data_capture_config_dict)
+        if (update_endpoint){
+          endpoint_config_name = self$sagemaker_session$create_endpoint_config(
+            name=self$name,
+            model_name=self$name,
+            initial_instance_count=initial_instance_count,
+            instance_type=instance_type,
+            tags=tags,
+            data_capture_config_dict=data_capture_config_dict)
+          self$sagemaker_session$update_endpoint(
+            self$endpoint_name, endpoint_config_name, wait=wait)
+        } else {
+          self$sagemaker_session$endpoint_from_production_variants(
+            name=self$endpoint_name,
+            production_variants=list(production_variant),
+            tags=tags,
+            wait=wait,
+            data_capture_config_dict=data_capture_config_dict)
+        }
 
-        self$sagemaker_session$update_endpoint(
-          self$endpoint_name, endpoint_config_name, wait=wait)
-      } else{
-        self$sagemaker_session$endpoint_from_production_variants(
-          name=self$endpoint_name,
-          production_variants=list(production_variant),
-          tags=tags,
-          wait=wait,
-          data_capture_config_list=data_capture_config_dict)
-      }
-
-      if (!is.null(self$predictor_cls))
-        return(self$predictor_cls$new(self$endpoint_name, self$sagemaker_session))
-      return(NULL)
+        if (!islistempty(self$predictor_cls)){
+          predictor = self$predictor_cls(self$endpoint_name, self$sagemaker_session)
+          if (!islistempty(serializer))
+            predictor$serializer = serializer
+          if (!islistempty(deserializer))
+            predictor$deserializer = deserializer
+          return(predictor)}
+        return(NULL)
     },
 
     #' @description Return a ``Transformer`` that uses this Model.
@@ -224,14 +250,19 @@ PipeLineModel = R6Class("PipeLineModel",
     # used for, this is only used to determine if the image needs GPU
     # support or not.
     .create_sagemaker_pipeline_model = function(instance_type){
-      if (is.null(self$sagemaker_session))
+      if (!is.null(self$sagemaker_session))
         self$sagemaker_session = Session$new()
 
       containers = self$pipeline_container_def(instance_type)
 
-      self$name = self$name %||% name_from_image(containers[[1]]$Image)
+      self$name = self.$name %||% name_from_image(containers[[1]]$Image)
       self$sagemaker_session$create_model(
-        self$name, self$role, containers, vpc_config=self$vpc_config)
+        self$name,
+        self$role,
+        containers,
+        vpc_config=self$vpc_config,
+        enable_network_isolation=self$enable_network_isolation
+      )
     }
   ),
   lock_objects = F

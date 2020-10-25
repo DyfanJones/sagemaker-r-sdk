@@ -54,19 +54,20 @@ TrainingInput = R6Class("TrainingInput",
                          attribute_names=NULL,
                          target_attribute_name=NULL,
                          shuffle_config=NULL){
-     self$config <- list(DataSource = list(S3DataSource = list(S3DataType = s3_data_type, S3Uri = s3_data)))
+      self$config <- list(DataSource = list(S3DataSource = list(S3DataType = s3_data_type, S3Uri = s3_data)))
 
-     if (is.null(self$target_attribute_name) || is.null(self$distribution)) distribution = "FullyReplicated"
+      if (!(!is.null(target_attribute_name) || !is.null(distribution)))
+         distribution = "FullyReplicated"
 
-     self$config$DataSource$S3DataSource$S3DataDistributionType = distribution
-     self$config$CompressionType = compression
-     self$config$ContentType = content_type
-     self$config$RecordWrapperType = record_wrapping
-     self$config$InputMode = input_mode
-     self$config$DataSource$S3DataSource$AttributeNames = attribute_names
-     self$config$TargetAttributeName = target_attribute_name
-     if(!is.null(self$shuffle_config))
-        self$config$ShuffleConfig = list(Seed = shuffle_config$seed)
+      self$config$DataSource$S3DataSource$S3DataDistributionType = distribution
+      self$config$CompressionType = compression
+      self$config$ContentType = content_type
+      self$config$RecordWrapperType = record_wrapping
+      self$config$InputMode = input_mode
+      self$config$DataSource$S3DataSource$AttributeNames = attribute_names
+      self$config$TargetAttributeName = target_attribute_name
+      if(!is.null(self$shuffle_config))
+         self$config$ShuffleConfig = list(Seed = shuffle_config$seed)
    },
 
    #' @description
