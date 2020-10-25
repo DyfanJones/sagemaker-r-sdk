@@ -174,7 +174,7 @@ AutoML = R6Class("AutoML",
 
       if (is.null(job_name))
         job_name = self$current_job_name
-      if (is.null(self._auto_ml_job_desc))
+      if (is.null(self$.auto_ml_job_desc))
         self$.auto_ml_job_desc = self$sagemaker_session$describe_auto_ml_job(job_name)
       if (self$.auto_ml_job_desc$AutoMLJobName != job_name)
         self$.auto_ml_job_desc = self$sagemaker_session$describe_auto_ml_job(job_name)
@@ -255,7 +255,6 @@ AutoML = R6Class("AutoML",
 
       if (is.null(candidate)) {
         candidate_dict = self$best_candidate()
-        # TODO: CandidateEstimator class
         candidate = CandidateEstimator$new(candidate_dict, sagemaker_session=sagemaker_session)
       } else if (inherits(candidate, "list")){
           candidate = CandidateEstimator$new(candidate, sagemaker_session=sagemaker_session)
@@ -455,7 +454,7 @@ AutoML = R6Class("AutoML",
       if (!is.null(job_name)){
         self$current_job_name = job_name
       } else {
-        if (self.base_job_name){
+        if (!is.null(self$base_job_name)){
           base_name = self$base_job_name
         } else {
           base_name = "automl"}
@@ -553,14 +552,14 @@ AutoMLInput = R6Class("AutoMLInput",
       auto_ml_input = list()
       if (inherits(self$inputs, "character"))
         self$inputs = list(self$inputs)
-      for(entry in self.inputs){
+      for(entry in self$inputs){
         input_entry = list(
           "DataSource"= list("S3DataSource" = list("S3DataType"= "S3Prefix", "S3Uri"= entry)),
           "TargetAttributeName" = self$target_attribute_name
         )
         if (!is.null(self$compression))
           input_entry$CompressionType = self$compression
-        auto_ml_input = c(auto_ml_input, input_entry)}
+        auto_ml_input = c(auto_ml_input, list(input_entry))}
       return(auto_ml_input)
     },
 
@@ -712,7 +711,7 @@ AutoMLJob = R6Class("AutoMLJob",
 
       channels = list()
       if (inherits(inputs, "AutoMLInput")) {
-        channels = c(channels, inputs.to_request_list())
+        channels = c(channels, inputs$to_request_list())
       } else if (inherits(inputs, "character")) {
         channel = .Job$private_methods$.format_string_uri_input(
           inputs,
