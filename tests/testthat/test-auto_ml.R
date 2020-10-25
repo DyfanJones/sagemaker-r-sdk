@@ -228,7 +228,7 @@ test_that("test auto ml default channel name", {
   inputs = DEFAULT_S3_INPUT_DATA
   AutoMLJob$new(sagemaker_session)$start_new(auto_ml, inputs)
 
-  args = auto_ml$sagemaker_session$auto_ml
+  args = auto_ml$sagemaker_session$auto_ml()
   args$input_config
 
   expect_equal(args$input_config,
@@ -273,7 +273,9 @@ test_that("test auto ml fit set logs to false", {
   )
 
   inputs = DEFAULT_S3_INPUT_DATA
-  auto_ml$fit(inputs, job_name=JOB_NAME, wait=FALSE, logs=TRUE)
+
+  expect_output(auto_ml$fit(inputs, job_name=JOB_NAME, wait=FALSE, logs=TRUE),
+                "Setting `logs` to FALSE. `logs` is only meaningful when `wait` is TRUE.")
 })
 
 test_that("test auto ml additional optional params", {
