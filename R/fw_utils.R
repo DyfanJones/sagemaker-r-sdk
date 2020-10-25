@@ -190,3 +190,31 @@ model_code_key_prefix <- function(code_location_key_prefix, model_name, image){
 .region_supports_debugger <- function(region_name){
   return (!(tolower(region_name) %in% DEBUGGER_UNSUPPORTED_REGIONS))
 }
+
+# Checks if version or image arguments are specified.
+# Validates framework and model arguments to enforce version or image specification.
+# Args:
+#   framework_version (str): The version of the framework.
+# py_version (str): The version of Python.
+# image_uri (str): The URI of the image.
+# Raises:
+#   ValueError: if `image_uri` is None and either `framework_version` or `py_version` is
+# None.
+validate_version_or_image_args <- function(framework_version, py_version, image_uri){
+  if ((is.null(framework_version) %||% is.null(py_version)) && islistempty(image_uri))
+    stop(
+      "`framework_version` or `py_version` was NULL, yet `image_uri` was also NULL.",
+      "Either specify both `framework_version` and `py_version`, or specify `image_uri`.",
+      call. = F
+    )
+}
+
+PYTHON_2_DEPRECATION_WARNING <- paste(
+  "%s is the latest version of %s that supports",
+  "Python 2. Newer versions of %s will only be available for Python 3.",
+  "Please set the argument \"py_version='py3'\" to use the Python 3 %s image.")
+
+python_deprecation_warning <- function(framework, latest_supported_version){
+  return(sprintf(PYTHON_2_DEPRECATION_WARNING,
+                 latest_supported_version, framework, framework))
+}
