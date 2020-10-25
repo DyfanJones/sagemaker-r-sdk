@@ -9,7 +9,7 @@
 #' @title A pipeline of SageMaker `Model` instances.
 #' @description This pipeline can be deployed as an `Endpoint` on SageMaker.
 #' @export
-PipeLineModel = R6Class("PipeLineModel",
+PipelineModel = R6Class("PipelineModel",
   public = list(
 
     #' @description Initialize an SageMaker ``Model`` which can be used to build an
