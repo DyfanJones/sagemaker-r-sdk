@@ -159,7 +159,7 @@ NumpySerializer = R6Class("NumpySerializer",
          } else {
             f = tempfile(fileext = ".npy")
             on.exit(unlink(f))
-            np$save(f, data)
+            self$np$save(f, data)
          }
 
          obj = readBin(f, what = "raw", n = file.size(f))

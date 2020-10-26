@@ -163,7 +163,7 @@ NumpyDeserializer = R6Class("NumpyDeserializer",
         if(content_type == "application/x-npy"){
           TempFile = tempfile()
           write_bin(stream, TempFile)
-          return(np$load(TempFile, allow_pickle = self$allow_pickle))
+          return(self$np$load(TempFile, allow_pickle = self$allow_pickle))
           }
         },
         finally = function(f) unlink(TempFile)
