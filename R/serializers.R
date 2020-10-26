@@ -142,7 +142,7 @@ NumpySerializer = R6Class("NumpySerializer",
       #' @return str: The data serialized as a LibSVM-formatted string.
       serialize = function(data) {
 
-         if(inherits(data, "matrix")){
+         if(inherits(data, "array")){
             if(length(data) == 0)
                stop("Cannot serialize empty array.", call. = F)
          }

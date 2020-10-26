@@ -137,20 +137,20 @@ NumpyDeserializer = R6Class("NumpyDeserializer",
     #' Python Numpy package
     np = NULL,
 
+    #' @field allow_pickle
+    #' Allow loading pickled object arrays
+    allow_pickle = NULL,
+
     #' @description Initialize the dtype and allow_pickle arguments.
-    #' @param dtype (str): The dtype of the data (default: None).
     #' @param accept (str): The MIME type that is expected from the inference
     #'              endpoint (default: "application/x-npy").
     #' @param allow_pickle (bool): Allow loading pickled object arrays (default: True).
-    initialize = function(dtype=NULL,
-                          accept="application/x-npy",
+    initialize = function(accept="application/x-npy",
                           allow_pickle=TRUE){
       if(!requireNamespace('reticulate', quietly=TRUE))
         stop('Please install reticulate package and try again', call. = F)
-      self$npy = reticulate::import("numpy")
-
-      self$dtype = dtype
-      self$accept = accept
+      self$np = reticulate::import("numpy")
+      self$ACCEPT = accept
       self$allow_pickle = allow_pickle
     },
 
@@ -172,20 +172,8 @@ NumpyDeserializer = R6Class("NumpyDeserializer",
                    class(self)[1L], content_type),
            call. = F)
     }
-  ),
-  active = list(
-
-    #' @field ACCEPT
-    #' The content types that are expected from the inference endpoint.
-    #'        To maintain backwards compatability with legacy images, the
-    #'        NumpyDeserializer supports sending only one content type in the Accept
-    #'        header.
-    ACCEPT = function(){
-      return (self$accept)
-    }
   )
 )
-
 
 # TODO: DeSerialize classes:
 # - BytesDeserializer

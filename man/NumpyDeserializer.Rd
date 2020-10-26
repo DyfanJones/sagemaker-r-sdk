@@ -15,16 +15,8 @@ Deserialize a stream of data in the .npy format.
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{np}}{Python Numpy package}
-}
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{ACCEPT}}{The content types that are expected from the inference endpoint.
-To maintain backwards compatability with legacy images, the
-NumpyDeserializer supports sending only one content type in the Accept
-header.}
+
+\item{\code{allow_pickle}}{Allow loading pickled object arrays}
 }
 \if{html}{\out{</div>}}
 }
@@ -49,18 +41,12 @@ header.}
 \subsection{Method \code{new()}}{
 Initialize the dtype and allow_pickle arguments.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NumpyDeserializer$new(
-  dtype = NULL,
-  accept = "application/x-npy",
-  allow_pickle = TRUE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{NumpyDeserializer$new(accept = "application/x-npy", allow_pickle = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{dtype}}{(str): The dtype of the data (default: None).}
-
 \item{\code{accept}}{(str): The MIME type that is expected from the inference
 endpoint (default: "application/x-npy").}
 
