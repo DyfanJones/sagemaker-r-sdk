@@ -133,7 +133,7 @@ NumpySerializer = R6Class("NumpySerializer",
         self$CONTENT_TYPE = "application/x-npy"
         if(!requireNamespace('reticulate', quietly=TRUE))
            stop('Please install reticulate package and try again', call. = F)
-        self$npy = reticulate::import("numpy")
+        self$np = reticulate::import("numpy")
       },
 
       #' @description Serialize data of various formats to a Numpy file.
