@@ -28,7 +28,7 @@ Make Raw data using json format
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize Csv BaseSerializer
+Initialize JSONSerializer
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{JSONSerializer$new()}\if{html}{\out{</div>}}
 }

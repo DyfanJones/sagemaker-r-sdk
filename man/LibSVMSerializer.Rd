@@ -32,7 +32,7 @@ Serialize data of various formats to a LibSVM-formatted string.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize Csv BaseSerializer
+Initialize LibSVMSerializer class
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{LibSVMSerializer$new()}\if{html}{\out{</div>}}
 }
