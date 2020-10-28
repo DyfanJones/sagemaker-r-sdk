@@ -227,20 +227,19 @@ Chainer = R6Class("Chainer",
         self$.use_mpi,
         self$.num_processes,
         self$.process_slots_per_host,
-        self$.dditional_mpi_options)){
+        self$.additional_mpi_options)){
 
         value = init_params$hyperparameters[[argument]]
         init_params$hyperparameters[[argument]] = NULL
 
         if (!islistempty(value)){
-          len = length(init_params[[argument]])
-          init_params[[argument[nchar("sagemaker_"):len]]] = value
+          init_params[[gsub("sagemaker_", "", argument)]] = value
         }
       }
       image_uri = init_params$image_uri
       init_params$image_uri = NULL
       img_split = framework_name_from_image(image_uri)
-      # framework, py_version, tag, _ = framework_name_from_image(image_uri)
+      names(img_split) = c("framework", "py_version", "tag", "scriptmode")
 
       if (is.null(img_split$tag))
         img_split$framework_version = NULL
@@ -252,7 +251,7 @@ Chainer = R6Class("Chainer",
       if (islistempty(img_split$framework)){
         # If we were unable to parse the framework name from the image it is not one of our
         # officially supported images, in this case just add the image to the init params.
-        init_params$image_uri = img_split$image_uri
+        init_params$image_uri = image_uri
         return(init_params)}
 
       if (img_split$framework != attr(self, "_framework_name"))
