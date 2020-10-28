@@ -43,6 +43,19 @@ unique_name_from_base <- function(base, max_length=63){
   return(sprintf("%s-%s-%s",trimmed, ts, unique))
 }
 
+# Extract the base name of the resource name (for use with future resource name generation).
+# This function looks for timestamps that match the ones produced by
+# :func:`~sagemaker.utils.name_from_base`.
+# Args:
+#   name (str): The resource name.
+# Returns:
+#   str: The base name, as extracted from the resource name.
+base_from_name <- function(name){
+  pattern = "^(.+)-(\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{3}|\\d{6}-\\d{4})"
+  m = regmatches(name, regexec(pattern, name))[[1]]
+  return(if (!islistempty(m)) m[[2]] else name)
+}
+
 base_name_from_image <- function(image){
   m <- grepl("^(.+/)?([^:/]+)(:[^:]+)?$", image)
   algo_name = if(m) gsub(".*/|:.*", "", image) else image
