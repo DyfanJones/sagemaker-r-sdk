@@ -2374,7 +2374,7 @@ Session = R6Class("Session",
       # Get last job description
       last_desc = private$.last_job_desc
 
-      desc = sagemaker_client.describe_training_job(TrainingJobName=job_name)
+      desc = self$sagemaker$describe_training_job(TrainingJobName=job_name)
       status = desc$TrainingJobStatus
 
       if(secondary_training_status_changed(desc, last_desc)){
