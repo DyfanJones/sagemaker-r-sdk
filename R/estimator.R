@@ -469,7 +469,8 @@ EstimatorBase = R6Class("EstimatorBase",
 
       init_params = private$.prepare_init_params_from_job_description(job_details, model_channel_name)
       tags = sagemaker_session$sagemaker$list_tags(ResourceArn=job_details$TrainingJobArn)$Tags
-      init_params[["tags"]] = tags
+      init_params$tags = tags
+      init_params$sagemaker_session = sagemaker_session # pass sagemaker session
 
       # clone current class
       estimator = self$clone()
@@ -961,49 +962,49 @@ EstimatorBase = R6Class("EstimatorBase",
                                                          model_channel_name=NULL){
       init_params = list()
 
-      init_params[["role"]] = job_details$RoleArn
-      init_params[["instance_count"]] = job_details$ResourceConfig$InstanceCount
-      init_params[["instance_type"]] = job_details$ResourceConfig$InstanceType
-      init_params[["volume_size"]] = job_details$ResourceConfig$VolumeSizeInGB
-      init_params[["max_run"]] = job_details$StoppingCondition$MaxRuntimeInSeconds
-      init_params[["input_mode"]] = job_details$AlgorithmSpecification$TrainingInputMode
-      init_params[["base_job_name"]] = job_details$TrainingJobName
-      init_params[["output_path"]] = job_details$OutputDataConfig$S3OutputPath
-      init_params[["output_kms_key"]] = job_details$OutputDataConfig$KmsKeyId
+      init_params$role = job_details$RoleArn
+      init_params$instance_count = job_details$ResourceConfig$InstanceCount
+      init_params$instance_type = job_details$ResourceConfig$InstanceType
+      init_params$volume_size = job_details$ResourceConfig$VolumeSizeInGB
+      init_params$max_run = job_details$StoppingCondition$MaxRuntimeInSeconds
+      init_params$input_mode = job_details$AlgorithmSpecification$TrainingInputMode
+      init_params$base_job_name = base_from_name(job_details$TrainingJobName)
+      init_params$output_path = job_details$OutputDataConfig$S3OutputPath
+      init_params$output_kms_key = job_details$OutputDataConfig$KmsKeyId
       if ("EnableNetworkIsolation" %in% names(job_details))
-        init_params[["enable_network_isolation"]] = job_details$EnableNetworkIsolation
+        init_params$enable_network_isolation = job_details$EnableNetworkIsolation
 
       has_hps = !islistempty(job_details$HyperParameters)
-      init_params[["hyperparameters"]] = if (has_hps) job_details$HyperParameters else list()
+      init_params$hyperparameters = if (has_hps) job_details$HyperParameters else list()
 
       if (!islistempty(job_details$AlgorithmSpecification$AlgorithmName)) {
-        init_params[["algorithm_arn"]] = job_details$AlgorithmSpecification$AlgorithmName
+        init_params$algorithm_arn = job_details$AlgorithmSpecification$AlgorithmName
       }
 
       if (!islistempty(job_details$AlgorithmSpecification$TrainingImage)) {
-        init_params[["image"]] = job_details$AlgorithmSpecification$TrainingImage
+        init_params$image_uri = job_details$AlgorithmSpecification$TrainingImage
       } else {
         stop("Invalid AlgorithmSpecification. Either TrainingImage or ",
           "AlgorithmName is expected. NULL was found.", call. = F)}
 
       if (!islistempty(job_details$AlgorithmSpecification$MetricDefinitons))
-        init_params[["metric_definitions"]] = job_details$AlgorithmSpecification$MetricsDefinition
+        init_params$metric_definitions = job_details$AlgorithmSpecification$MetricsDefinition
 
       if (!islistempty(job_details$EnableInterContainerTrafficEncryption))
-        init_params[["encrypt_inter_container_traffic"]] = job_details$EnableInterContainerTrafficEncryption
+        init_params$encrypt_inter_container_traffic = job_details$EnableInterContainerTrafficEncryption
 
       vpc_list = vpc_from_list(job_details$VpcConfig)
       if (!islistempty(vpc_list$Subnets)){
-        init_params[["subnets"]] = vpc_list$Subnets}
+        init_params$subnets = vpc_list$Subnets}
 
       if (!islistempty(vpc_list$SecurityGroupIds)){
-        init_params[["security_group_ids"]] = vpc_list$SecurityGroupIds}
+        init_params$security_group_ids = vpc_list$SecurityGroupIds}
 
       if ("InputDataConfig" %in% names(job_details) && !is.null(model_channel_name)){
         for(channel in job_details$InputDataConfig){
          if (channel$ChannelName == model_channel_name){
-            init_params[["model_channel_name"]] = model_channel_name
-            init_params[["model_uri"]] = channel$DataSource$S3DataSource$S3Uri
+            init_params$model_channel_name = model_channel_name
+            init_params$model_uri = channel$DataSource$S3DataSource$S3Uri
             break}
           }
       }
