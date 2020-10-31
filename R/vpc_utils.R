@@ -17,7 +17,7 @@
 #           * vpc_config must have key `Subnets` and the value must be a non-empty list
 #           * vpc_config must have key `SecurityGroupIds` and the value must be a non-empty list
 #   """
-vpc_sannitize <- function(vpc_config = NULL){
+vpc_sanitize <- function(vpc_config = NULL){
   if (is.null(vpc_config)) return(vpc_config)
   if (!inherits(vpc_config, "list")) stop("vpc_config is not a `list()`: ", vpc_config, call. = F)
 
@@ -55,7 +55,7 @@ vpc_sannitize <- function(vpc_config = NULL){
 vpc_from_list <- function(vpc_config,
                          do_sanitize=FALSE){
   if (do_sanitize)
-    vpc_config = vpc_sannitize(vpc_config)
+    vpc_config = vpc_sanitize(vpc_config)
   if (islistempty(vpc_config))
     return(list(Subnets= NULL, SecurityGroupIds= NULL))
   return (list(Subnets = vpc_config$Subnets, SecurityGroupIds= vpc_config$SecurityGroupIds))
