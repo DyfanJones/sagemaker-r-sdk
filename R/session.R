@@ -1802,7 +1802,7 @@ Session = R6Class("Session",
       deployment_image = deployment_image %||% job_desc$AlgorithmSpecification$TrainingImage
       role = role %||% job_desc$RoleArn
       name = name %||% job_name
-      vpc_config_override = if(vpc_config_override == "VPC_CONFIG_DEFAULT") job_desc$VpcConfig else vpc_sannitize(vpc_config_override)
+      vpc_config_override = if(vpc_config_override == "VPC_CONFIG_DEFAULT") job_desc$VpcConfig else vpc_sanitize(vpc_config_override)
 
       return (self$endpoint_from_model_data(
         model_s3_location=output_url,
@@ -1862,7 +1862,7 @@ Session = R6Class("Session",
                                         data_capture_config=NULL){
       model_environment_vars = model_environment_vars %||% list()
       name = name %||% name_from_image(deployment_image)
-      model_vpc_config = vpc_sannitize(model_vpc_config)
+      model_vpc_config = vpc_sanitize(model_vpc_config)
 
       if (.deployment_entity_exists(self$sagemaker$describe_endpoint(EndpointName=name))){
         stop(sprintf('Endpoint with name "%s" already exists; please pick a different name.',name), call. = F)
@@ -2301,7 +2301,7 @@ Session = R6Class("Session",
                                              vpc_config_override="VPC_CONFIG_DEFAULT"){
 
       if (vpc_config_override == "VPC_CONFIG_DEFAULT"){return(training_job_desc$VpcConfig)}
-      return(vpc_sannitize(vpc_config_override))
+      return(vpc_sanitize(vpc_config_override))
 
     },
 
