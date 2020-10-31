@@ -365,6 +365,9 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
 
 # tar function to use system tar
 tar_subdir <- function(tarfile, srdir, compress = "gzip", ...){
+  if(!dir.exists(srdir))
+    stop(sprintf("Directory '%s' doesn't exist, please check directory location and try again.", srdir),
+         call. = F)
   current_dir = getwd()
   setwd(srdir)
   on.exit(setwd(current_dir))
