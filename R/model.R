@@ -269,6 +269,7 @@ Model = R6Class("Model",
     #' @param data_capture_config (sagemaker.model_monitor.DataCaptureConfig): Specifies
     #'              configuration related to Endpoint data capture for use with
     #'              Amazon SageMaker Model Monitoring. Default: None.
+    #' @param ... : pass deprecated parameters.
     #' @return callable[string, sagemaker.session.Session] or None: Invocation of
     #'              ``self.predictor_cls`` on the created endpoint name, if ``self.predictor_cls``
     #'              is not None. Otherwise, return None.
@@ -281,7 +282,10 @@ Model = R6Class("Model",
                       tags=NULL,
                       kms_key=NULL,
                       wait=TRUE,
-                      data_capture_config=NULL){
+                      data_capture_config=NULL,
+                      ...){
+      kwargs = list(...)
+      removed_kwargs("update_endpoint", kwargs)
       private$.init_sagemaker_session_if_does_not_exist(instance_type)
 
       if(is.null(self$role))
@@ -800,11 +804,11 @@ FrameworkModel = R6Class("FrameworkModel",
 
    .framework_env_vars = function(){
      if (!is.null(self$uploaded_code)){
-       script_name = self$uploaded_code$UserCode$script_name
+       script_name = self$uploaded_code$script_name
        if (self$enable_network_isolation())
          dir_name = "/opt/ml/model/code"
        else
-         dir_name = self$uploaded_code$UserCode$s3_prefix
+         dir_name = self$uploaded_code$s3_prefix
      } else if (!islistempty(self$entry_point)){
         script_name = self$entry_point
         dir_name = paste0("file://", self$source_dir)
@@ -814,13 +818,11 @@ FrameworkModel = R6Class("FrameworkModel",
 
      output = list(script_name,
                    dir_name,
-                   tolower(as.character(self$enable_cloudwatch_metrics)),
                    self$container_log_level,
                    self$sagemaker_session$paws_region_name)
 
      names(output) = c(toupper(SCRIPT_PARAM_NAME),
                        toupper(DIR_PARAM_NAME),
-                       toupper(CLOUDWATCH_METRICS_PARAM_NAME),
                        toupper(CONTAINER_LOG_LEVEL_PARAM_NAME),
                        toupper(SAGEMAKER_REGION_PARAM_NAME))
 
