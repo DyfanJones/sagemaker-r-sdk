@@ -23,7 +23,7 @@ Suggests:
     readr,
     Matrix,
     sparsio,
-    qs
+    reticulate
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
@@ -68,8 +68,12 @@ Collate:
     'automl_candidate_estimator.R'
     'pipeline.R'
     'automl_automl.R'
+    'chainer_default.R'
+    'chainer_model.R'
+    'chainer_estimator.R'
     'data_capture_config.R'
     'debugger.R'
+    'deprecations.R'
     'model_monitoring.R'
     'monitoring_files.R'
     'multidatamodel.R'

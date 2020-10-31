@@ -37,7 +37,7 @@ BaseSerializer = R6Class("BaseSerializer",
 CSVSerializer = R6Class("CSVSerializer",
   inherit = BaseSerializer,
   public = list(
-    #' @description Initialize BaseSerializer Class
+    #' @description Initialize CSVSerializer Class
     initialize = function(){
       self$CONTENT_TYPE = "text/csv"
     },
@@ -64,7 +64,7 @@ csv_serializer <- CSVSerializer$new()
 JSONSerializer = R6Class("JSONSerializer",
   inherit = BaseSerializer,
   public = list(
-   #' @description Initialize Csv BaseSerializer
+   #' @description Initialize JSONSerializer
    initialize = function(){
      self$CONTENT_TYPE = "application/json"
    },
@@ -95,7 +95,7 @@ json_serializer <- JSONSerializer$new()
 LibSVMSerializer = R6Class("LibSVMSerializer",
    inherit = BaseSerializer,
    public = list(
-      #' @description Initialize Csv BaseSerializer
+      #' @description Initialize LibSVMSerializer class
       initialize = function(){
          self$CONTENT_TYPE = "text/libsvm"
          if(!requireNamespace('sparsio', quietly=TRUE))
@@ -108,7 +108,60 @@ LibSVMSerializer = R6Class("LibSVMSerializer",
       serialize = function(data) {
          f = tempfile(fileext = ".svmlight")
          on.exit(unlink(f))
-         sparsio::write_svmlight(x, file = f)
+         sparsio::write_svmlight(data, file = f)
+         obj = readBin(f, what = "raw", n = file.size(f))
+         return(obj)
+      }
+   )
+)
+
+#' @title NumpySerializer Class
+#' @description Serialize data of various formats to a numpy npy file format.
+#'              This serializer class uses python numpy package to serialize,
+#'              R objects through the use of the `reticualte` package.
+#' @export
+NumpySerializer = R6Class("NumpySerializer",
+   inherit = BaseSerializer,
+   public = list(
+
+      #' @field np
+      #' Python Numpy package
+      np = NULL,
+
+      #' @description Initialize NumpySerializer class
+      initialize = function(){
+        self$CONTENT_TYPE = "application/x-npy"
+        if(!requireNamespace('reticulate', quietly=TRUE))
+           stop('Please install reticulate package and try again', call. = F)
+        self$np = reticulate::import("numpy")
+      },
+
+      #' @description Serialize data of various formats to a Numpy file.
+      #' @param data (object): Data to be serialized. Can be a string or a
+      #'              file-like object.
+      #' @return str: The data serialized as a LibSVM-formatted string.
+      serialize = function(data) {
+
+         if(inherits(data, "array")){
+            if(length(data) == 0)
+               stop("Cannot serialize empty array.", call. = F)
+         }
+
+         if(inherits(data, "data.frame")){
+            if(nrow(data) == 0)
+               stop("Cannot serialize empty data.frame.", call. = F)
+         }
+
+         if(inherits(data, "character")){
+            if(!file.exists(data))
+               stop(sprintf("File '%s' doesn't exist.", data), call. = F)
+            f = data
+         } else {
+            f = tempfile(fileext = ".npy")
+            on.exit(unlink(f))
+            self$np$save(f, data)
+         }
+
          obj = readBin(f, what = "raw", n = file.size(f))
          return(obj)
       }
@@ -116,7 +169,6 @@ LibSVMSerializer = R6Class("LibSVMSerializer",
 )
 
 # TODO: Serializers:
-# - NumpySerializer (R equivalent Matrix?)
 # - IdentitySerializer
 # - JSONLinesSerializer
 # - SparseMatrixSerializer (issue write .npz format: possibly look into (https://github.com/scipy/scipy/blob/e777eb9e4a4cd9844629a3c37b3e94902328ad0b/scipy/sparse/_matrix_io.py) in combination with the use of RcppCNPy)

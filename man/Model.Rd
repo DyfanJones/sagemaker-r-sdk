@@ -261,7 +261,8 @@ Deploy this ``Model`` to an ``Endpoint`` and optionally return a
   tags = NULL,
   kms_key = NULL,
   wait = TRUE,
-  data_capture_config = NULL
+  data_capture_config = NULL,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -309,6 +310,8 @@ this model completes (default: True).}
 \item{\code{data_capture_config}}{(sagemaker.model_monitor.DataCaptureConfig): Specifies
 configuration related to Endpoint data capture for use with
 Amazon SageMaker Model Monitoring. Default: None.}
+
+\item{\code{...}}{: pass deprecated parameters.}
 }
 \if{html}{\out{</div>}}
 }

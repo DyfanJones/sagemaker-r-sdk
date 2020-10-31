@@ -28,7 +28,7 @@ Make Raw data using text/csv format
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize BaseSerializer Class
+Initialize CSVSerializer Class
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CSVSerializer$new()}\if{html}{\out{</div>}}
 }

@@ -124,10 +124,59 @@ JSONDeserializer = R6Class("JSONDeserializer",
 #' @export
 json_deserializer <- JSONDeserializer$new()
 
+#' @title NumpySerializer Class
+#' @description Deserialize a stream of data in the .npy format.
+#'              This serializer class uses python numpy package to deserialize,
+#'              R objects through the use of the `reticualte` package.
+#' @export
+NumpyDeserializer = R6Class("NumpyDeserializer",
+  inherit = BaseDeserializer,
+  public = list(
+
+    #' @field np
+    #' Python Numpy package
+    np = NULL,
+
+    #' @field allow_pickle
+    #' Allow loading pickled object arrays
+    allow_pickle = NULL,
+
+    #' @description Initialize the dtype and allow_pickle arguments.
+    #' @param accept (str): The MIME type that is expected from the inference
+    #'              endpoint (default: "application/x-npy").
+    #' @param allow_pickle (bool): Allow loading pickled object arrays (default: True).
+    initialize = function(accept="application/x-npy",
+                          allow_pickle=TRUE){
+      if(!requireNamespace('reticulate', quietly=TRUE))
+        stop('Please install reticulate package and try again', call. = F)
+      self$np = reticulate::import("numpy")
+      self$ACCEPT = accept
+      self$allow_pickle = allow_pickle
+    },
+
+    #' @description Deserialize data from an inference endpoint into a NumPy array.
+    #' @param stream (botocore.response.StreamingBody): Data to be deserialized.
+    #' @param content_type (str): The MIME type of the data.
+    #' @return matrix: The data deserialized into a NumPy array.
+    deserialize = function(stream, content_type){
+      tryCatch({
+        if(content_type == "application/x-npy"){
+          TempFile = tempfile()
+          write_bin(stream, TempFile)
+          return(self$np$load(TempFile, allow_pickle = self$allow_pickle))
+          }
+        },
+        finally = function(f) unlink(TempFile)
+      )
+      stop(sprintf("%s cannot read content type %s.",
+                   class(self)[1L], content_type),
+           call. = F)
+    }
+  )
+)
 
 # TODO: DeSerialize classes:
 # - BytesDeserializer
 # - StreamDeserializer
-# - NumpyDeserializer (R equivalent: possibly MatrixDeserializer)
 # - PandasDeserializer (Should R have dplyr / data.table Deserializers?)
 # - JSONLinesDeserializer
