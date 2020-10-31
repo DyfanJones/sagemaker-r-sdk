@@ -94,9 +94,9 @@ ChainerModel = R6Class("ChainerModel",
 
       attr(self, "_framework_name") = "chainer"
 
-      if (py_version == "py2")
+      if (identical(py_version, "py2"))
         log_warn(
-          python_deprecation_warning(self._framework_name, LATEST_PY2_VERSION)
+          python_deprecation_warning(attr(self, "_framework_name"), LATEST_PY2_VERSION)
         )
 
       self$model_server_workers = model_server_workers
@@ -128,7 +128,7 @@ ChainerModel = R6Class("ChainerModel",
 
       deploy_key_prefix = model_code_key_prefix(self$key_prefix, self$name, deploy_image)
       private$.upload_code(deploy_key_prefix)
-      deploy_env = list(self$env)
+      deploy_env = self$env
       deploy_env = c(deploy_env, private$.framework_env_vars())
 
       if (!islistempty(self$model_server_workers))
