@@ -73,6 +73,7 @@ Collate:
     'chainer_estimator.R'
     'data_capture_config.R'
     'debugger.R'
+    'deprecations.R'
     'model_monitoring.R'
     'monitoring_files.R'
     'multidatamodel.R'
