@@ -122,7 +122,7 @@ Chainer = R6Class("Chainer",
 
       if (identical(py_version, "py2"))
         log_warn(
-          python_deprecation_warning(attr(self, "_framework_name"), LATEST_PY2_VERSION)
+          python_deprecation_warning(attr(self, "_framework_name"), CHAINER_LATEST_PY2_VERSION)
         )
 
       self$use_mpi = use_mpi

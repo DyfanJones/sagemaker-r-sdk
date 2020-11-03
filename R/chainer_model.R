@@ -96,7 +96,7 @@ ChainerModel = R6Class("ChainerModel",
 
       if (identical(py_version, "py2"))
         log_warn(
-          python_deprecation_warning(attr(self, "_framework_name"), LATEST_PY2_VERSION)
+          python_deprecation_warning(attr(self, "_framework_name"), CHAINER_LATEST_PY2_VERSION)
         )
 
       self$model_server_workers = model_server_workers
