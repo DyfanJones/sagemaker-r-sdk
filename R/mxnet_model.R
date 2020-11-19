@@ -88,7 +88,7 @@ MXNetModel = R6Class("MXNetModel",
                           image_uri=NULL,
                           predictor_cls=MXNetPredictor,
                           model_server_workers=NULL,
-                          kwargs){
+                          ...){
       validate_version_or_image_args(framework_version, py_version, image_uri)
 
       self$framework_version = framework_version
@@ -98,7 +98,7 @@ MXNetModel = R6Class("MXNetModel",
         model_data, image_uri, role, entry_point, predictor_cls=predictor_cls, ...
       )
 
-      self.model_server_workers = model_server_workers
+      self$model_server_workers = model_server_workers
       attr(self, "_framework_name") = "mxnet"
 
       if (identical(py_version, "py2"))
