@@ -165,7 +165,7 @@ MXNet = R6Class("MXNet",
 
       kwargs$name = private$.get_or_create_name(kwargs$name)
 
-      kwargs = c(
+      kwargs = c(list(
         model_data = self$model_data,
         role = role %||% self$role,
         entry_point = entry_point,
@@ -177,7 +177,7 @@ MXNet = R6Class("MXNet",
         model_server_workers=model_server_workers,
         sagemaker_session=self$sagemaker_session,
         vpc_config=self$get_vpc_config(vpc_config_override),
-        dependencies=dependencies %||% self$dependencies,
+        dependencies=dependencies %||% self$dependencies),
         kwargs
       )
 
