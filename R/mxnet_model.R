@@ -15,7 +15,7 @@
 #'              This is able to serialize Python lists, dictionaries, and numpy arrays to
 #'              multidimensional tensors for MXNet inference.
 #' @export
-MXNetPredictor = R6Class("",
+MXNetPredictor = R6Class("MXNetPredictor",
   inherit = Predictor,
   public = list(
 
@@ -43,8 +43,8 @@ MXNetModel = R6Class("MXNetModel",
   inherit = FrameworkModel,
   public = list(
 
-    #' @field .LOWEST_SCRIPT_MODE_VERSION
-    #' Lowest MXNet version that can be executed
+    #' @field .LOWEST_MMS_VERSION
+    #' Lowest Multi Model Server MXNet version that can be executed
     .LOWEST_MMS_VERSION = "1.4.0",
 
     #' @description Initialize an MXNetModel.
