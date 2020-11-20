@@ -9,7 +9,7 @@ A Predictor for inference against MXNet Endpoints.
              multidimensional tensors for MXNet inference.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}} -> \code{}
+\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}} -> \code{MXNetPredictor}
 }
 \section{Methods}{
 \subsection{Public methods}{

@@ -12,14 +12,7 @@ An MXNet SageMaker ``Model`` that can be deployed to a SageMaker ``Endpoint``.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{.LOWEST_SCRIPT_MODE_VERSION}}{Lowest MXNet version that can be executed}
-}
-\if{html}{\out{</div>}}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{.LOWEST_SCRIPT_MODE_VERSION}}{Lowest MXNet version that can be executed}
+\item{\code{.LOWEST_MMS_VERSION}}{Lowest Multi Model Server MXNet version that can be executed}
 }
 \if{html}{\out{</div>}}
 }
@@ -62,7 +55,7 @@ Initialize an MXNetModel.
   image_uri = NULL,
   predictor_cls = MXNetPredictor,
   model_server_workers = NULL,
-  kwargs
+  ...
 )}\if{html}{\out{</div>}}
 }
 

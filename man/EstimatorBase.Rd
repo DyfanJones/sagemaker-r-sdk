@@ -552,10 +552,11 @@ Deploy the trained model to an Amazon SageMaker endpoint and return a
 \if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$deploy(
   initial_instance_count,
   instance_type,
+  serializer = NULL,
+  deserializer = NULL,
   accelerator_type = NULL,
   endpoint_name = NULL,
   use_compiled_model = FALSE,
-  update_endpoint = FALSE,
   wait = TRUE,
   model_name = NULL,
   kms_key = NULL,
@@ -574,6 +575,18 @@ deploy to an endpoint for prediction.}
 \item{\code{instance_type}}{(str): Type of EC2 instance to deploy to an endpoint
 for prediction, for example, 'ml.c4.xlarge'.}
 
+\item{\code{serializer}}{(:class:`~sagemaker.serializers.BaseSerializer`): A
+serializer object, used to encode data for an inference endpoint
+(default: None). If ``serializer`` is not None, then
+``serializer`` will override the default serializer. The
+default serializer is set by the ``predictor_cls``.}
+
+\item{\code{deserializer}}{(:class:`~sagemaker.deserializers.BaseDeserializer`): A
+deserializer object, used to decode data from an inference
+endpoint (default: None). If ``deserializer`` is not None, then
+``deserializer`` will override the default deserializer. The
+default deserializer is set by the ``predictor_cls``.}
+
 \item{\code{accelerator_type}}{(str): Type of Elastic Inference accelerator to
 attach to an endpoint for model loading and inference, for
 example, 'ml.eia1.medium'. If not specified, no Elastic
@@ -588,17 +601,12 @@ used.}
 \item{\code{use_compiled_model}}{(bool): Flag to select whether to use compiled
 (optimized) model. Default: False.}
 
-\item{\code{update_endpoint}}{(bool): Flag to update the model in an existing
-Amazon SageMaker endpoint. If True, this will deploy a new
-EndpointConfig to an already existing endpoint and delete
-resources corresponding to the previous EndpointConfig. Default:
-False}
-
 \item{\code{wait}}{(bool): Whether the call should wait until the deployment of
 model completes (default: True).}
 
 \item{\code{model_name}}{(str): Name to use for creating an Amazon SageMaker
-model. If not specified, the name of the training job is used.}
+model. If not specified, the estimator generates a default job name
+based on the training image name and current timestamp.}
 
 \item{\code{kms_key}}{(str): The ARN of the KMS key that is used to encrypt the
 data on the storage volume attached to the instance hosting the
@@ -606,7 +614,7 @@ endpoint.}
 
 \item{\code{data_capture_config}}{(sagemaker.model_monitor.DataCaptureConfig): Specifies
 configuration related to Endpoint data capture for use with
-Amazon SageMaker Model Monitoring. Default: NULL.}
+Amazon SageMaker Model Monitoring. Default: None.}
 
 \item{\code{tags}}{(List[dict[str, str]]): Optional. The list of tags to attach to this specific
 endpoint. Example:
@@ -617,7 +625,7 @@ https://boto3.amazonaws.com/v1/documentation\
 
 \item{\code{...}}{: Passed to invocation of ``create_model()``.
 Implementations may customize ``create_model()`` to accept
-``...`` to customize model creation during deploy.
+``**kwargs`` to customize model creation during deploy.
 For more, see the implementation docs.}
 }
 \if{html}{\out{</div>}}
