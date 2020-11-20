@@ -216,7 +216,7 @@ validate_version_or_image_args <- function(framework_version, py_version, image_
   if ((is.null(framework_version) || is.null(py_version)) && is.null(image_uri))
     stop(
       "`framework_version` or `py_version` was NULL, yet `image_uri` was also NULL.",
-      "Either specify both `framework_version` and `py_version`, or specify `image_uri`.",
+      " Either specify both `framework_version` and `py_version`, or specify `image_uri`.",
       call. = F
     )
 }
