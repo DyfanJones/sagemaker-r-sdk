@@ -8,7 +8,7 @@
 # validation check of s3 uri
 is.s3_uri <- function(x) {
   if(is.null(x) || !is.character(x)) return(FALSE)
-  regex <- '^s3://[a-z0-9][a-z0-9\\.-]+[a-z0-9](/(.*)?)?$'
+  regex <- '^s3://[a-z0-9\\.-]+(/(.*)?)?$'
   grepl(regex, x)
 }
 
