@@ -1,4 +1,4 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/tests/unit/test_chainer.py
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/tests/unit/test_mxnet.py
 
 DATA_DIR = file.path(getwd(), "data")
 SCRIPT_NAME = "dummy_script.py"
@@ -26,6 +26,7 @@ LAUNCH_PS_DISTRIBUTION_DICT = list("parameter_server"= list("enabled"= TRUE))
 mxnet_inference_version = "1.4.0"
 mxnet_inference_py_version = "py3"
 neo_mxnet_version = "1.7"
+EIA_IMAGE = "520713654638.dkr.ecr.us-west-2.amazonaws.com/sagemaker-mxnet-serving-eia:1.4.0-cpu-py3"
 
 ENDPOINT_DESC = list("EndpointConfigName"="test-endpoint")
 
@@ -278,7 +279,7 @@ test_that("test mxnet", {
   expect_true(inherits(predictor, "MXNetPredictor"))
 })
 
-test_that(" test mxnet neo", {
+test_that("test mxnet neo", {
   mx = MXNet$new(
     entry_point=SCRIPT_PATH,
     framework_version="1.6",
@@ -322,3 +323,402 @@ test_that(" test mxnet neo", {
   expect_true(inherits(predictor, "MXNetPredictor"))
 })
 
+test_that("test model", {
+  model = MXNetModel$new(
+    MODEL_DATA,
+    role=ROLE,
+    entry_point=SCRIPT_PATH,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version,
+    sagemaker_session=sagemaker_session
+  )
+  predictor = model$deploy(1, GPU)
+  expect_true(inherits(predictor, "MXNetPredictor"))
+})
+
+test_that("test model mms version", {
+  model_kms_key = "kms-key"
+  model = MXNetModel$new(
+    MODEL_DATA,
+    role=ROLE,
+    entry_point=SCRIPT_PATH,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version,
+    sagemaker_session=sagemaker_session,
+    name="test-mxnet-model",
+    model_kms_key=model_kms_key
+  )
+  predictor = model$deploy(1, GPU)
+
+  expect_equal(model$model_data, MODEL_DATA)
+  expect_equal(model$repacked_model_data, "s3://mybucket/test-mxnet-model/model.tar.gz")
+  expect_equal(model$uploaded_code, list(
+    s3_prefix="s3://mybucket/test-mxnet-model/model.tar.gz",
+    script_name=basename(SCRIPT_PATH))
+  )
+  expect_true(inherits(predictor, "MXNetPredictor"))
+})
+
+test_that("test model image accelerator", {
+  model = MXNetModel$new(
+    MODEL_DATA,
+    role=ROLE,
+    entry_point=SCRIPT_PATH,
+    framework_version="1.4.0",
+    py_version="py3",
+    sagemaker_session=sagemaker_session
+  )
+  container_def = model$prepare_container_def(INSTANCE_TYPE, accelerator_type=ACCELERATOR_TYPE)
+  expect_equal(container_def$Image, EIA_IMAGE)
+})
+
+test_that("test model prepare container def no instance type or image", {
+  model = MXNetModel$new(
+    MODEL_DATA,
+    role=ROLE,
+    entry_point=SCRIPT_PATH,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version
+  )
+
+  expect_error(model$prepare_container_def())
+})
+
+test_that("test attach", {
+  training_image = sprintf("1.dkr.ecr.us-west-2.amazonaws.com/sagemaker-mxnet-%s-cpu:%s-cpu-%s",
+                           mxnet_inference_py_version, mxnet_inference_version, mxnet_inference_py_version)
+  returned_job_description = list(
+    "AlgorithmSpecification"= list("TrainingInputMode"= "File", "TrainingImage"= training_image),
+    "HyperParameters"= list(
+      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
+      "sagemaker_program"= 'iris-dnn-classifier.py',
+      "sagemaker_s3_uri_training"= '"sagemaker-3/integ-test-data/tf_iris"',
+      "sagemaker_container_log_level"= 'INFO',
+      "sagemaker_job_name"= 'neo',
+      "training_steps"= "100",
+      "sagemaker_region"= 'us-west-2'),
+    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
+    "ResourceConfig"= list(
+      "VolumeSizeInGB"= 30,
+      "InstanceCount"= 1,
+      "InstanceType"= "ml.c4.xlarge"),
+    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
+    "TrainingJobName"= "neo",
+    "TrainingJobStatus"= "Completed",
+    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
+    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
+    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
+    )
+  sm <- sagemaker_session$clone()
+  sm$sagemaker$describe_training_job <- Mock$new()$return_value(returned_job_description)
+
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sm,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version
+  )
+
+  estimator = mx$attach(training_job_name="neo", sagemaker_session=sm)
+
+  expect_equal(estimator$latest_training_job, "neo")
+  expect_equal(estimator$py_version, mxnet_inference_py_version)
+  expect_equal(estimator$framework_version, mxnet_inference_version)
+  expect_equal(estimator$role, "arn:aws:iam::366:role/SageMakerRole")
+  expect_equal(estimator$instance_count, 1)
+  expect_equal(estimator$max_run, 24 * 60 * 60)
+  expect_equal(estimator$input_mode, "File")
+  expect_equal(estimator$base_job_name, "neo")
+  expect_equal(estimator$output_path, "s3://place/output/neo")
+  expect_equal(estimator$output_kms_key, "")
+  expect_equal(estimator$hyperparameters()$training_steps, "100")
+  expect_equal(estimator$source_dir, "s3://some/sourcedir.tar.gz")
+  expect_equal(estimator$entry_point, "iris-dnn-classifier.py")
+  expect_equal(estimator$tags, LIST_TAGS_RESULT$Tags)
+})
+
+test_that("test attach old container", {
+  returned_job_description = list(
+    "AlgorithmSpecification"= list(
+      "TrainingInputMode"= "File",
+      "TrainingImage"= "1.dkr.ecr.us-west-2.amazonaws.com/sagemaker-mxnet-py2-cpu:1.0"),
+    "HyperParameters"= list(
+      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
+      "sagemaker_program"= 'iris-dnn-classifier.py',
+      "sagemaker_s3_uri_training"= 'sagemaker-3/integ-test-data/tf_iris',
+      "sagemaker_container_log_level"= 'INFO',
+      "sagemaker_job_name"= 'neo',
+      "training_steps"= "100",
+      "sagemaker_region"= 'us-west-2'),
+    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
+    "ResourceConfig"= list(
+      "VolumeSizeInGB"= 30,
+      "InstanceCount"= 1,
+      "InstanceType"= "ml.c4.xlarge"),
+    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
+    "TrainingJobName"= "neo",
+    "TrainingJobStatus"= "Completed",
+    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
+    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
+    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
+  )
+
+  sm <- sagemaker_session$clone()
+  sm$sagemaker$describe_training_job <- Mock$new()$return_value(returned_job_description)
+
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sm,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version
+  )
+
+  estimator = mx$attach(training_job_name="neo", sagemaker_session=sm)
+
+  expect_equal(estimator$latest_training_job, "neo")
+  expect_equal(estimator$py_version, "py2")
+  expect_equal(estimator$framework_version, "0.12")
+  expect_equal(estimator$role, "arn:aws:iam::366:role/SageMakerRole")
+  expect_equal(estimator$instance_count, 1)
+  expect_equal(estimator$max_run, 24 * 60 * 60)
+  expect_equal(estimator$input_mode, "File")
+  expect_equal(estimator$base_job_name, "neo")
+  expect_equal(estimator$output_path, "s3://place/output/neo")
+  expect_equal(estimator$output_kms_key, "")
+  expect_equal(estimator$hyperparameters()$training_steps, "100")
+  expect_equal(estimator$source_dir, "s3://some/sourcedir.tar.gz")
+  expect_equal(estimator$entry_point, "iris-dnn-classifier.py")
+})
+
+test_that("test attach wrong framework", {
+  rjd = list(
+    "AlgorithmSpecification"= list(
+      "TrainingInputMode"= "File",
+      "TrainingImage"= "1.dkr.ecr.us-west-2.amazonaws.com/sagemaker-tensorflow-py2-cpu:1.0.4"),
+    "HyperParameters"= list(
+      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
+      "checkpoint_path"= 's3://other/1508872349',
+      "sagemaker_program"= 'iris-dnn-classifier.py',
+      "sagemaker_container_log_level"= 'INFO',
+      "training_steps"= "100",
+      "sagemaker_region"= 'us-west-2'),
+    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
+    "ResourceConfig"= list(
+      "VolumeSizeInGB"= 30,
+      "InstanceCount"= 1,
+      "InstanceType"= "ml.c4.xlarge"),
+    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
+    "TrainingJobName"= "neo",
+    "TrainingJobStatus"= "Completed",
+    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
+    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
+    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
+    )
+
+  sm <- sagemaker_session$clone()
+  sm$sagemaker$describe_training_job <- Mock$new()$return_value(rjd)
+
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sm,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version
+  )
+
+  expect_error(mx$attach(training_job_name="neo", sagemaker_session=sm))
+})
+
+test_that("test attach custom image", {
+  training_image = "ubuntu:latest"
+  returned_job_description = list(
+    "AlgorithmSpecification"= list("TrainingInputMode"= "File", "TrainingImage"= training_image),
+    "HyperParameters"=list(
+      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
+      "sagemaker_program"= 'iris-dnn-classifier.py',
+      "sagemaker_s3_uri_training"= 'sagemaker-3/integ-test-data/tf_iris',
+      "sagemaker_container_log_level"= 'INFO',
+      "sagemaker_job_name"= 'neo',
+      "training_steps"= "100",
+      "sagemaker_region"= 'us-west-2'),
+    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
+    "ResourceConfig"= list(
+      "VolumeSizeInGB"= 30,
+      "InstanceCount"= 1,
+      "InstanceType"= "ml.c4.xlarge"),
+    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
+    "TrainingJobName"= "neo",
+    "TrainingJobStatus"= "Completed",
+    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
+    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
+    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
+  )
+
+  sm <- sagemaker_session$clone()
+  sm$sagemaker$describe_training_job <- Mock$new()$return_value(returned_job_description)
+
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sm,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version
+  )
+
+  estimator = mx$attach(training_job_name="neo", sagemaker_session=sm)
+  expect_equal(estimator$image_uri, training_image)
+  expect_equal(estimator$training_image_uri(), training_image)
+})
+
+test_that("test estimator script mode dont launch parameter server", {
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    framework_version="1.3.0",
+    py_version="py2",
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    distribution=list("parameter_server"= list("enabled"= FALSE))
+  )
+
+  expect_equal(mx$hyperparameters()[[mx$LAUNCH_MPI_ENV_NAME]], FALSE)
+})
+
+test_that("test estimator wrong version launch parameter server", {
+  expect_error(
+    MXNet$new(
+      entry_point=SCRIPT_PATH,
+      framework_version="1.2.1",
+      py_version="py2",
+      role=ROLE,
+      sagemaker_session=sagemaker_session,
+      instance_count=INSTANCE_COUNT,
+      instance_type=INSTANCE_TYPE,
+      distribution=LAUNCH_PS_DISTRIBUTION_DICT),
+    "The distribution option is valid for only versions 1.3 and higher")
+})
+
+test_that("test estimator py2 warning", {
+  estimator = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    framework_version="1.2.1",
+    py_version="py2",
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE
+    )
+
+  expect_equal(estimator$py_version, "py2")
+})
+
+test_that("test model py2 warning", {
+  model = MXNetModel$new(
+    MODEL_DATA,
+    role=ROLE,
+    entry_point=SCRIPT_PATH,
+    framework_version="1.2.1",
+    py_version="py2",
+    sagemaker_session=sagemaker_session
+  )
+
+  expect_equal(model$py_version, "py2")
+})
+
+test_that("test create model with custom hosting image", {
+  container_log_level = 'INFO'
+  custom_image = "mxnet:2.0"
+  custom_hosting_image = "mxnet_hosting:2.0"
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    framework_version="2.0",
+    py_version="py3",
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    image_uri=custom_image,
+    container_log_level=container_log_level,
+    base_job_name="job"
+  )
+
+  mx$fit(inputs="s3://mybucket/train", job_name="new_name")
+  model = mx$create_model(image_uri=custom_hosting_image)
+
+  expect_equal(model$image_uri, custom_hosting_image)
+})
+
+test_that("test mx enable sm metrics", {
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    enable_sagemaker_metrics=TRUE
+  )
+  expect_true(mx$enable_sagemaker_metrics)
+})
+
+test_that("test mx disable sm metrics", {
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    enable_sagemaker_metrics=FALSE
+  )
+  expect_false(mx$enable_sagemaker_metrics)
+})
+
+test_that("test mx enable sm metrics for version", {
+  mx_args = list(
+    entry_point=SCRIPT_PATH,
+    py_version=mxnet_inference_py_version,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE)
+
+  for (fw_version in c("1.4.0", "1.6.0")){
+    mx = do.call(MXNet$new, c(mx_args, framework_version = fw_version))
+
+    if(package_version(fw_version) >= package_version("1.6.0"))
+      expect_true(mx$enable_sagemaker_metrics)
+    else
+      expect_null(mx$enable_sagemaker_metrics)
+  }
+})
+
+test_that("test custom image estimator deploy", {
+  custom_image = "mycustomimage:latest"
+  mx = MXNet$new(
+    entry_point=SCRIPT_PATH,
+    framework_version=mxnet_inference_version,
+    py_version=mxnet_inference_py_version,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE
+  )
+
+  mx$fit(inputs="s3://mybucket/train", job_name="new_name")
+  model = mx$create_model(image_uri=custom_image)
+  expect_equal(model$image_uri, custom_image)
+})
