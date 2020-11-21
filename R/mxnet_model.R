@@ -1,24 +1,25 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/chainer/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/mxnet/estimator.py
+
+#' @include deprecations.R
+#' @include model.R
+#' @include fw_utils.R
+#' @include mxnet_default.R
+#' @include serializers.R
+#' @include utils.R
 
 #' @import R6
 #' @import logger
 
-#' @include session.R
-#' @include fw_utils.R
-#' @include chainer_default.R
-#' @include chainer_model.R
-#' @include vpc_utils.R
-#' @include utils.R
-
-#' @title A Predictor for inference against Chainer Endpoints.
-#' @description This is able to serialize Python lists, dictionaries, and numpy arrays to
-#'              multidimensional tensors for Chainer inference.
+#' @title MXNetPredictor Class
+#' @description A Predictor for inference against MXNet Endpoints.
+#'              This is able to serialize Python lists, dictionaries, and numpy arrays to
+#'              multidimensional tensors for MXNet inference.
 #' @export
-ChainerPredictor = R6Class("ChainerPredictor",
+MXNetPredictor = R6Class("MXNetPredictor",
   inherit = Predictor,
   public = list(
 
-    #' @description Initialize an ``ChainerPredictor``.
+    #' @description Initialize an ``MXNetPredictor``.
     #' @param endpoint_name (str): The name of the endpoint to perform inference
     #'              on.
     #' @param sagemaker_session (sagemaker.session.Session): Session object which
@@ -28,22 +29,25 @@ ChainerPredictor = R6Class("ChainerPredictor",
     initialize = function(endpoint_name,
                           sagemaker_session=NULL){
       super$initialize(
-        endpoint_name, sagemaker_session, NumpySerializer$new(), NumpyDeserializer$new()
+        endpoint_name, sagemaker_session, JSONSerializer$new(), JSONDeserializer$new()
       )
     }
   ),
   lock_objects = F
 )
 
-#' @title ChainerModel Class
-#' @description An Chainer SageMaker ``Model`` that can be deployed to a SageMaker
-#'              ``Endpoint``.
+#' @title MXNetModel Class
+#' @description An MXNet SageMaker ``Model`` that can be deployed to a SageMaker ``Endpoint``.
 #' @export
-ChainerModel = R6Class("ChainerModel",
+MXNetModel = R6Class("MXNetModel",
   inherit = FrameworkModel,
   public = list(
 
-    #' @description Initialize an ChainerModel.
+    #' @field .LOWEST_MMS_VERSION
+    #' Lowest Multi Model Server MXNet version that can be executed
+    .LOWEST_MMS_VERSION = "1.4.0",
+
+    #' @description Initialize an MXNetModel.
     #' @param model_data (str): The S3 location of a SageMaker model data
     #'              ``.tar.gz`` file.
     #' @param role (str): An AWS IAM role (either name or full ARN). The Amazon
@@ -55,16 +59,17 @@ ChainerModel = R6Class("ChainerModel",
     #'              file which should be executed as the entry point to model
     #'              hosting. If ``source_dir`` is specified, then ``entry_point``
     #'              must point to a file located at the root of ``source_dir``.
-    #' @param image_uri (str): A Docker image URI (default: None). If not specified, a
-    #'              default image for Chainer will be used. If ``framework_version``
-    #'              or ``py_version`` are ``None``, then ``image_uri`` is required. If
-    #'              also ``None``, then a ``ValueError`` will be raised.
-    #' @param framework_version (str): Chainer version you want to use for
-    #'              executing your model training code. Defaults to ``None``. Required
-    #'              unless ``image_uri`` is provided.
+    #' @param framework_version (str): MXNet version you want to use for executing
+    #'              your model training code. Defaults to ``None``. Required unless
+    #'              ``image_uri`` is provided.
     #' @param py_version (str): Python version you want to use for executing your
     #'              model training code. Defaults to ``None``. Required unless
     #'              ``image_uri`` is provided.
+    #' @param image_uri (str): A Docker image URI (default: None). If not specified, a
+    #'              default image for MXNet will be used.
+    #'              If ``framework_version`` or ``py_version`` are ``None``, then
+    #'              ``image_uri`` is required. If also ``None``, then a ``ValueError``
+    #'              will be raised.
     #' @param predictor_cls (callable[str, sagemaker.session.Session]): A function
     #'              to call to create a predictor with an endpoint name and
     #'              SageMaker ``Session``. If specified, ``deploy()`` returns the
@@ -72,15 +77,16 @@ ChainerModel = R6Class("ChainerModel",
     #' @param model_server_workers (int): Optional. The number of worker processes
     #'              used by the inference server. If None, server will use one
     #'              worker per vCPU.
-    #' @param ... : Keyword arguments passed to the
-    #'              :class:`~sagemaker.model.FrameworkModel` initializer.
+    #' @param ... : Keyword arguments passed to the superclass
+    #'              :class:`~sagemaker.model.FrameworkModel` and, subsequently, its
+    #'              superclass :class:`~sagemaker.model.Model`.
     initialize = function(model_data,
                           role,
                           entry_point,
-                          image_uri=NULL,
                           framework_version=NULL,
                           py_version=NULL,
-                          predictor_cls=ChainerPredictor,
+                          image_uri=NULL,
+                          predictor_cls=MXNetPredictor,
                           model_server_workers=NULL,
                           ...){
       validate_version_or_image_args(framework_version, py_version, image_uri)
@@ -92,14 +98,13 @@ ChainerModel = R6Class("ChainerModel",
         model_data, image_uri, role, entry_point, predictor_cls=predictor_cls, ...
       )
 
-      attr(self, "_framework_name") = "chainer"
+      self$model_server_workers = model_server_workers
+      attr(self, "_framework_name") = "mxnet"
 
       if (identical(py_version, "py2"))
         log_warn(
-          python_deprecation_warning(attr(self, "_framework_name"), CHAINER_LATEST_PY2_VERSION)
+          python_deprecation_warning(attr(self, "_framework_name"), MXNET_LATEST_PY2_VERSION)
         )
-
-      self$model_server_workers = model_server_workers
     },
 
     #' @description Return a container definition with framework configuration set in
@@ -117,23 +122,26 @@ ChainerModel = R6Class("ChainerModel",
       if (is.null(deploy_image)){
         if (is.null(instance_type))
           stop(
-            "Must supply either an instance type (for choosing CPU vs GPU) or an image URI."
-            ,call. = F)
+            "Must supply either an instance type (for choosing CPU vs GPU) or an image URI.",
+            call. = F)
+
+        region_name = self$sagemaker_session$paws_region_name
+        deploy_image = self$serving_image_uri(
+          region_name, instance_type, accelerator_type=accelerator_type)
       }
 
-      region_name = self$sagemaker_session$paws_region_name
-      deploy_image = self$serving_image_uri(
-        region_name, instance_type, accelerator_type=accelerator_type
-      )
-
       deploy_key_prefix = model_code_key_prefix(self$key_prefix, self$name, deploy_image)
-      private$.upload_code(deploy_key_prefix)
+      private$.upload_code(deploy_key_prefix, private$.is_mms_version())
       deploy_env = self$env
       deploy_env = c(deploy_env, private$.framework_env_vars())
 
       if (!islistempty(self$model_server_workers))
         deploy_env[[toupper(MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(self$model_server_workers)
-      return(container_def(deploy_image, self$model_data, deploy_env))
+      return (container_def(
+        deploy_image,
+        self$repacked_model_data %||% self$model_data,
+        deploy_env)
+      )
     },
 
     #' @description Create a URI for the serving image.
@@ -142,7 +150,7 @@ ChainerModel = R6Class("ChainerModel",
     #'              (cpu/gpu/family-specific optimized).
     #' @param accelerator_type (str): The Elastic Inference accelerator type to
     #'              deploy to the instance for loading and making inferences to the
-    #'              model. For example, 'ml.eia1.medium'.
+    #'              model (default: None). For example, 'ml.eia1.medium'.
     #' @return str: The appropriate image URI based on the given parameters.
     serving_image_uri = function(region_name,
                                  instance_type,
@@ -156,6 +164,18 @@ ChainerModel = R6Class("ChainerModel",
         accelerator_type=accelerator_type,
         image_scope="inference")
       )
+    }
+  ),
+  private = list(
+
+    # Whether the framework version corresponds to an inference image using
+    # the Multi-Model Server (https://github.com/awslabs/multi-model-server).
+    # Returns:
+    #   bool: If the framework version corresponds to an image using MMS.
+    .is_mms_version=function(){
+      lowest_mms_version = package_version(self$.LOWEST_MMS_VERSION)
+      framework_version = package_version(self$framework_version)
+      return (framework_version >= lowest_mms_version)
     }
   ),
   lock_objects = F

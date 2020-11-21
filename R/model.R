@@ -204,12 +204,11 @@ Model = R6Class("Model",
 
       if (!is.null(target_instance_family)){
         if (startsWith(target_instance_family,"ml_")){
-          self.image_uri = private$.compilation_image_uri(
+          self$image_uri = private$.compilation_image_uri(
             self$sagemaker_session$paws_region_name,
             target_instance_family,
             framework,
-            framework_version
-            )
+            framework_version)
         self$.is_compiled_model = TRUE
         } else {
           log_warn(paste(
@@ -495,7 +494,7 @@ Model = R6Class("Model",
                                        compile_max_run,
                                        job_name,
                                        framework,
-                                       tag,
+                                       tags,
                                        target_platform_os=NULL,
                                        target_platform_arch=NULL,
                                        target_platform_accelerator=NULL,
@@ -548,13 +547,21 @@ Model = R6Class("Model",
                                       target_instance_type,
                                       framework,
                                       framework_version){
-        framework_prefix = if (startsWith(target_instance_type, "ml_inf")) "inferentia-" else "neo-"
-        return(ImageUris$new()$retrieve(
-          sprintf("%s%s", framework_prefix, framework),
-          region,
-          instance_type=target_instance_type,
-          version=framework_version)
-        )
+      framework_prefix = ""
+      framework_suffix = ""
+
+      if (framework == "xgboost")
+        framework_suffix = "-neo"
+      else if (startsWith("ml_inf", target_instance_type))
+        framework_prefix = "inferentia-"
+      else
+        framework_prefix = "neo-"
+      return(ImageUris$new()$retrieve(
+        sprintf("%s%s", framework_prefix, framework),
+        region,
+        instance_type=target_instance_type,
+        version=framework_version,
+        py_version = self$py_version))
       }
     ),
   lock_objects = F
@@ -795,8 +802,8 @@ FrameworkModel = R6Class("FrameworkModel",
           kms_key=self$model_kms_key)
 
         self$repacked_model_data = repacked_model_data
-        UploadedCode$UserCode$s3_prefix=self$repacked_model_data
-        UploadedCode$UserCode$script_name=basename(self$entry_point)
+        UploadedCode$s3_prefix=self$repacked_model_data
+        UploadedCode$script_name=basename(self$entry_point)
 
         self$uploaded_code = UploadedCode
       }

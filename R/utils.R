@@ -293,18 +293,17 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
       startsWith(tolower(source_directory), "s3://")) {
     local_code_path = file.path(tmp, "local_code.tar.gz")
     s3_parts = split_s3_uri(source_directory)
-    s3 = paws::s3(config = sagemaker_session$paws_credentials$credentials)
-    obj = s3$get_object(Bucket = s3_parts$bucket, Key = s3_parts$key)
+    obj = sagemaker_session$s3$get_object(Bucket = s3_parts$bucket, Key = s3_parts$key)
     write_bin(obj$Body, local_code_path)
     untar(local_code_path, exdir = code_dir)
     on.exit(unlink(local_code_path, recursive = T))
   } else if (!is.null(source_directory)) {
     if (file.exists(code_dir)) {
       unlink(code_dir, recursive = TRUE)}
-    file.copy(source_directory, code_dir, recursive = TRUE)
+    suppressWarnings(file.copy(source_directory, code_dir, recursive = TRUE))
   } else {
     if (!file.exists(code_dir)) {
-      file.copy(inference_script, code_dir, recursive = TRUE)
+      suppressWarnings(file.copy(inference_script, code_dir, recursive = TRUE))
       if (!file.exists(file.path(code_dir, inference_script)))
         FALSE
     }
@@ -327,8 +326,7 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
   if(startsWith(tolower(model_uri), "s3://")){
     local_model_path = file.path(tmp, "tar_file")
     s3_parts = split_s3_uri(model_uri)
-    s3 = paws::s3(config = sagemaker_session$paws_credentials$credentials)
-    obj = s3$get_object(Bucket = s3_parts$bucket, Key = s3_parts$key)
+    obj = sagemaker_session$s3$get_object(Bucket = s3_parts$bucket, Key = s3_parts$key)
     write_bin(obj$Body, local_model_path)
     on.exit(unlink(local_model_path))
   } else{
@@ -337,22 +335,21 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
   return(tmp_model_dir)
 }
 
-.save_model <-
-  function(repacked_model_uri,
-           tmp_model_path,
-           sagemaker_session,
-           kms_key) {
-    if (startsWith(tolower(repacked_model_uri), "s3://")) {
+.save_model <- function(repacked_model_uri,
+                        tmp_model_path,
+                        sagemaker_session,
+                        kms_key) {
+  if (startsWith(tolower(repacked_model_uri), "s3://")) {
       s3_parts = split_s3_uri(repacked_model_uri)
       s3_parts$key = gsub(basename(s3_parts$key), basename(repacked_model_uri), s3_parts$key)
       s3 = paws::s3(config = sagemaker_session$paws_credentials$credentials)
       obj = readBin(tmp_model_path, "raw", n = file.size(tmp_model_path))
       if (!is.null(kms_key)) {
-        s3$put_object(Body = obj,
+        sagemaker_session$s3$put_object(Body = obj,
                       Bucket =  s3_parts$bucket,
                       Key =  s3_parts$bucket)
       } else {
-        s3$put_object(
+        sagemaker_session$s3$put_object(
           Body = obj,
           Bucket =  s3_parts$bucket,
           Key =  s3_parts$bucket,
@@ -361,7 +358,7 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
     } else {
       file.copy(tmp_model_path,
                 gsub("file://", "", repacked_model_uri), recursive = T)}
-  }
+}
 
 # tar function to use system tar
 tar_subdir <- function(tarfile, srdir, compress = "gzip", ...){

@@ -413,11 +413,11 @@ EstimatorBase = R6Class("EstimatorBase",
 
       model = self$create_model(...)
 
-      self$.compiled_models[["target_instance_family"]] = model$compile(
+      self$.compiled_models[[target_instance_family]] = model$compile(
         target_instance_family,
         input_shape,
         output_path,
-        self.role,
+        self$role,
         tags,
         private$.compilation_job_name(),
         compile_max_run,
@@ -428,7 +428,7 @@ EstimatorBase = R6Class("EstimatorBase",
         target_platform_accelerator=target_platform_accelerator,
         compiler_options=compiler_options)
 
-      return(self$.compiled_models$target_instance_family)
+      return(self$.compiled_models[[target_instance_family]])
     },
 
     #' @description Attach to an existing training job.
@@ -500,6 +500,16 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              deploy to an endpoint for prediction.
     #' @param instance_type (str): Type of EC2 instance to deploy to an endpoint
     #'              for prediction, for example, 'ml.c4.xlarge'.
+    #' @param serializer (:class:`~sagemaker.serializers.BaseSerializer`): A
+    #'              serializer object, used to encode data for an inference endpoint
+    #'              (default: None). If ``serializer`` is not None, then
+    #'              ``serializer`` will override the default serializer. The
+    #'              default serializer is set by the ``predictor_cls``.
+    #' @param deserializer (:class:`~sagemaker.deserializers.BaseDeserializer`): A
+    #'              deserializer object, used to decode data from an inference
+    #'              endpoint (default: None). If ``deserializer`` is not None, then
+    #'              ``deserializer`` will override the default deserializer. The
+    #'              default deserializer is set by the ``predictor_cls``.
     #' @param accelerator_type (str): Type of Elastic Inference accelerator to
     #'              attach to an endpoint for model loading and inference, for
     #'              example, 'ml.eia1.medium'. If not specified, no Elastic
@@ -511,21 +521,17 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              used.
     #' @param use_compiled_model (bool): Flag to select whether to use compiled
     #'              (optimized) model. Default: False.
-    #' @param update_endpoint (bool): Flag to update the model in an existing
-    #'              Amazon SageMaker endpoint. If True, this will deploy a new
-    #'              EndpointConfig to an already existing endpoint and delete
-    #'              resources corresponding to the previous EndpointConfig. Default:
-    #'              False
     #' @param wait (bool): Whether the call should wait until the deployment of
     #'              model completes (default: True).
     #' @param model_name (str): Name to use for creating an Amazon SageMaker
-    #'              model. If not specified, the name of the training job is used.
+    #'              model. If not specified, the estimator generates a default job name
+    #'              based on the training image name and current timestamp.
     #' @param kms_key (str): The ARN of the KMS key that is used to encrypt the
     #'              data on the storage volume attached to the instance hosting the
     #'              endpoint.
     #' @param data_capture_config (sagemaker.model_monitor.DataCaptureConfig): Specifies
     #'              configuration related to Endpoint data capture for use with
-    #'              Amazon SageMaker Model Monitoring. Default: NULL.
+    #'              Amazon SageMaker Model Monitoring. Default: None.
     #' @param tags (List[dict[str, str]]): Optional. The list of tags to attach to this specific
     #'              endpoint. Example:
     #'              >>> tags = [{'Key': 'tagname', 'Value': 'tagvalue'}]
@@ -534,17 +540,18 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              /api/latest/reference/services/sagemaker.html#SageMaker.Client.add_tags
     #' @param ... : Passed to invocation of ``create_model()``.
     #'              Implementations may customize ``create_model()`` to accept
-    #'              ``...`` to customize model creation during deploy.
+    #'              ``**kwargs`` to customize model creation during deploy.
     #'              For more, see the implementation docs.
     #' @return sagemaker.predictor.Predictor: A predictor that provides a ``predict()`` method,
     #'              which can be used to send requests to the Amazon SageMaker
     #'              endpoint and obtain inferences.
     deploy = function(initial_instance_count,
                       instance_type,
+                      serializer=NULL,
+                      deserializer=NULL,
                       accelerator_type=NULL,
                       endpoint_name=NULL,
                       use_compiled_model=FALSE,
-                      update_endpoint=FALSE,
                       wait=TRUE,
                       model_name=NULL,
                       kms_key=NULL,
@@ -563,9 +570,10 @@ EstimatorBase = R6Class("EstimatorBase",
 
       self$deploy_instance_type = instance_type
       if (use_compiled_model){
-        family = gsub("\\.", "_", instance_type)
-        if (!(family %in% self$.compiled_models)){
-          stop(sprintf("No compiled model for %s. ",family),
+        instance_type_split = split_str(instance_type, "\\.")
+        family = paste(instance_type_split[1:length(instance_type_split)-1], collapse = "_")
+        if (!(family %in% names(self$.compiled_models))){
+          stop(sprintf("No compiled model for %s. ", family),
                "Please compile one with compile_model before deploying.", call. = F)
           }
         model = self$.compiled_models[[family]]
@@ -576,15 +584,16 @@ EstimatorBase = R6Class("EstimatorBase",
       model$name = model_name
 
       return (model$deploy(
-                  instance_type=instance_type,
-                  initial_instance_count=initial_instance_count,
-                  accelerator_type=accelerator_type,
-                  endpoint_name=endpoint_name,
-                  update_endpoint=update_endpoint,
-                  tags=tags %||% self$tags,
-                  wait=wait,
-                  kms_key=kms_key,
-                  data_capture_config=data_capture_config))
+        instance_type=instance_type,
+        initial_instance_count=initial_instance_count,
+        serializer=serializer,
+        deserializer=deserializer,
+        accelerator_type=accelerator_type,
+        endpoint_name=endpoint_name,
+        tags=tags %||% self$tags,
+        wait=wait,
+        kms_key=kms_key,
+        data_capture_config=data_capture_config))
     },
 
     #' @description Create a SageMaker ``Model`` object that can be deployed to an

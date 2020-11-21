@@ -6,6 +6,18 @@
 
 UploadedCode <- list("s3_prefix" = NULL, "script_name" = NULL)
 
+PYTHON_2_DEPRECATION_WARNING <- paste(
+  "%s is the latest version of %s that supports",
+  "Python 2. Newer versions of %s will only be available for Python 3.",
+  "Please set the argument \"py_version='py3'\" to use the Python 3 %s image.")
+
+PARAMETER_SERVER_MULTI_GPU_WARNING <- paste(
+  "If you have selected a multi-GPU training instance type",
+  "and also enabled parameter server for distributed training,",
+  "distributed training with the default parameter server configuration will not",
+  "fully leverage all GPU cores; the parameter server will be configured to run",
+  "only one worker per host regardless of the number of GPUs.")
+
 DEBUGGER_UNSUPPORTED_REGIONS <- c("us-gov-west-1", "us-iso-east-1")
 SINGLE_GPU_INSTANCE_TYPES <- c("ml.p2.xlarge", "ml.p3.2xlarge")
 
@@ -131,7 +143,7 @@ framework_name_from_image <- function(image_uri){
   sagemaker_pattern = ECR_URI_PATTERN
   sagemaker_match = regmatches(image_uri,regexec(ECR_URI_PATTERN,image_uri))[[1]]
   sagemaker_match = sagemaker_match[length(sagemaker_match)]
-  if (is.na(sagemaker_match))
+  if (is.na(sagemaker_match) || length(sagemaker_match) == 0)
     return(list(NULL, NULL, NULL, NULL))
 
   # extract framework, python version and image tag
@@ -204,17 +216,48 @@ validate_version_or_image_args <- function(framework_version, py_version, image_
   if ((is.null(framework_version) || is.null(py_version)) && is.null(image_uri))
     stop(
       "`framework_version` or `py_version` was NULL, yet `image_uri` was also NULL.",
-      "Either specify both `framework_version` and `py_version`, or specify `image_uri`.",
+      " Either specify both `framework_version` and `py_version`, or specify `image_uri`.",
       call. = F
     )
 }
 
-PYTHON_2_DEPRECATION_WARNING <- paste(
-  "%s is the latest version of %s that supports",
-  "Python 2. Newer versions of %s will only be available for Python 3.",
-  "Please set the argument \"py_version='py3'\" to use the Python 3 %s image.")
+# Warn the user that training will not fully leverage all the GPU
+# cores if parameter server is enabled and a multi-GPU instance is selected.
+# Distributed training with the default parameter server setup doesn't
+# support multi-GPU instances.
+# Args:
+#     training_instance_type (str): A string representing the type of training instance selected.
+#     distribution (dict): A dictionary with information to enable distributed training.
+#         (Defaults to None if distributed training is not enabled.) For example:
+#         .. code:: python
+#             {
+#                 'parameter_server':
+#                 {
+#                     'enabled': True
+#                 }
+#             }
+warn_if_parameter_server_with_multi_gpu <- function(training_instance_type, distribution){
+  if (training_instance_type == "local" || is.null(distribution))
+    return(invisible(NULL))
+
+  is_multi_gpu_instance = (
+      (training_instance_type == "local_gpu" ||
+       startsWith(split_str(training_instance_type,  "\\.")[[2]],"p")) &&
+      !(training_instance_type %in% SINGLE_GPU_INSTANCE_TYPES)
+    )
+
+  ps_enabled = (
+    ("parameter_server" %in% names(distribution)) &&
+    distribution$parameter_server$enabled %||% FALSE
+  )
+
+  if (is_multi_gpu_instance && ps_enabled)
+    log_warn(PARAMETER_SERVER_MULTI_GPU_WARNING)
+}
 
 python_deprecation_warning <- function(framework, latest_supported_version){
   return(sprintf(PYTHON_2_DEPRECATION_WARNING,
                  latest_supported_version, framework, framework, framework))
 }
+
+

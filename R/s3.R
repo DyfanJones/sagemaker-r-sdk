@@ -4,21 +4,22 @@
 #' @include utils.R
 #'
 #' @import R6
+#' @importFrom urltools url_parse
 
 # validation check of s3 uri
 is.s3_uri <- function(x) {
   if(is.null(x) || !is.character(x)) return(FALSE)
-  regex <- '^s3://[a-z0-9][a-z0-9\\.-]+[a-z0-9](/(.*)?)?$'
+  regex <- '^s3://[a-z0-9\\.-]+(/(.*)?)?$'
   grepl(regex, x)
 }
 
 # split s3 uri
 split_s3_uri <- function(uri) {
   stopifnot(is.s3_uri(uri))
-  path <- gsub('^s3://', '', uri)
-  list(
-    bucket = gsub('/.*$', '', path),
-    key = gsub('^[a-z0-9][a-z0-9\\.-]+[a-z0-9]/', '', path)
+  parsed_s3 <- url_parse(uri)
+  return(list(
+    bucket = parsed_s3$domain,
+    key = parsed_s3$path)
   )
 }
 
