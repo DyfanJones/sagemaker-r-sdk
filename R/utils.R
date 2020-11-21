@@ -300,10 +300,10 @@ is.dir <- function(directory) {(file.exists(directory) && !file_test("-f", direc
   } else if (!is.null(source_directory)) {
     if (file.exists(code_dir)) {
       unlink(code_dir, recursive = TRUE)}
-    file.copy(source_directory, code_dir, recursive = TRUE)
+    suppressWarnings(file.copy(source_directory, code_dir, recursive = TRUE))
   } else {
     if (!file.exists(code_dir)) {
-      file.copy(inference_script, code_dir, recursive = TRUE)
+      suppressWarnings(file.copy(inference_script, code_dir, recursive = TRUE))
       if (!file.exists(file.path(code_dir, inference_script)))
         FALSE
     }
