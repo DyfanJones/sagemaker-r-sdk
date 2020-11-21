@@ -97,7 +97,7 @@ MXNet = R6Class("MXNet",
 
       kwargs = c(entry_point = entry_point,
                  source_dir = source_dir,
-                 hyperparameters = hyperparameters,
+                 hyperparameters = list(hyperparameters),
                  image_uri = image_uri,
                  kwargs)
 
@@ -206,13 +206,16 @@ MXNet = R6Class("MXNet",
       enabled = distribution$parameter_server$enabled %||% FALSE
       self$.hyperparameters[[self$LAUNCH_PS_ENV_NAME]] = enabled
 
-      mpi_dict = distribution$mpi
-      mpi_enabled = mpi_dict$enabled %||% FALSE
-      self$.hyperparameters[[self$LAUNCH_MPI_ENV_NAME]] = mpi_enabled
+      if(islistempty(distribution$mpi)){
+        mpi_dict = distribution$mpi
+        mpi_enabled = mpi_dict$enabled %||% FALSE
+        self$.hyperparameters[[self$LAUNCH_MPI_ENV_NAME]] = mpi_enabled
 
-      self$.hyperparameters[[self$MPI_NUM_PROCESSES_PER_HOST]] = mpi_dict$processes_per_host
-
-      self$.hyperparameters[[self$MPI_CUSTOM_MPI_OPTIONS]] = mpi_dict$custom_mpi_options %||% ""
+        if(!islistempty(mpi_dict$processes_per_host)){
+          self$.hyperparameters[[self$MPI_NUM_PROCESSES_PER_HOST]] = mpi_dict$processes_per_host
+          self$.hyperparameters[[self$MPI_CUSTOM_MPI_OPTIONS]] = mpi_dict$custom_mpi_options %||% ""
+        }
+      }
     },
 
     # Convert the job description to init params that can be handled by the
@@ -233,7 +236,8 @@ MXNet = R6Class("MXNet",
       init_params$image_uri = NULL
       img_split = framework_name_from_image(image_uri)
       names(img_split) = c("framework", "py_version", "tag", "scriptmode")
-      # framework, py_version, tag, _ = framework_name_from_image(image_uri)
+
+      init_params
 
       # We switched image tagging scheme from regular image version (e.g. '1.0') to more
       # expressive containing framework version, device type and python version
