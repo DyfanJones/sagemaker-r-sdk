@@ -143,7 +143,7 @@ framework_name_from_image <- function(image_uri){
   sagemaker_pattern = ECR_URI_PATTERN
   sagemaker_match = regmatches(image_uri,regexec(ECR_URI_PATTERN,image_uri))[[1]]
   sagemaker_match = sagemaker_match[length(sagemaker_match)]
-  if (is.na(sagemaker_match))
+  if (is.na(sagemaker_match) || length(sagemaker_match) == 0)
     return(list(NULL, NULL, NULL, NULL))
 
   # extract framework, python version and image tag
