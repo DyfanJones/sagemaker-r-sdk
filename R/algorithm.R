@@ -390,8 +390,7 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
      #' Printer.
      #' @param ... (ignored).
      print = function(...){
-        cat("<AlgorithmEstimator>")
-        invisible(self)
+        print_class(self)
      }
    ),
    private = list(

@@ -595,8 +595,7 @@ ModelMonitor = R6Class("ModelMonitor",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<ModelMonitor>")
-     invisible(self)
+      print_class(self)
    }
   ),
 
@@ -1386,8 +1385,7 @@ DefaultModelMonitor = R6Class("DefaultModelMonitor",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<DefaultModelMonitor>")
-      invisible(self)
+       print_class(self)
     }
   ),
   private = list(
@@ -1607,139 +1605,136 @@ BaseliningJob = R6Class("BaseliningJob",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<BaseliningJob>")
-      invisible(self)
+       print_class(self)
     }
   ),
   lock_objects = F
   )
 
-  #' @title MonitoringExecution Class
-  #' @description Provides functionality to retrieve monitoring-specific files output from monitoring
-  #'              executions
-  #' @export
-  MonitoringExecution = R6Class("MonitoringExecution",
-        inherit = ProcessingJob,
-        public = list(
-          #' @description Initializes a MonitoringExecution job that tracks a monitoring execution kicked off by
-          #'              an Amazon SageMaker Model Monitoring Schedule.
-          #' @param sagemaker_session (sagemaker.session.Session): Session object which
-          #'              manages interactions with Amazon SageMaker APIs and any other
-          #'              AWS services needed. If not specified, one is created using
-          #'              the default AWS configuration chain.
-          #' @param job_name (str): The name of the monitoring execution job.
-          #' @param inputs (list[:class:`~sagemaker.processing.ProcessingInput`]): A list of
-          #'              :class:`~sagemaker.processing.ProcessingInput` objects.
-          #' @param output (sagemaker.Processing.ProcessingOutput): The output associated with the
-          #'              monitoring execution.
-          #' @param output_kms_key (str): The output kms key associated with the job. Defaults to None
-          #'              if not provided.
-          initialize = function(sagemaker_session = NULL,
-                                job_name = NULL,
-                                inputs = NULL,
-                                output = NULL,
-                                output_kms_key=NULL){
-            self$output = output
-            super$initialize(
-              sagemaker_session=sagemaker_session,
-              job_name=job_name,
-              inputs=inputs,
-              outputs=list(output),
-              output_kms_key=output_kms_key)
-          },
+#' @title MonitoringExecution Class
+#' @description Provides functionality to retrieve monitoring-specific files output from monitoring
+#'              executions
+#' @export
+MonitoringExecution = R6Class("MonitoringExecution",
+   inherit = ProcessingJob,
+   public = list(
+    #' @description Initializes a MonitoringExecution job that tracks a monitoring execution kicked off by
+    #'              an Amazon SageMaker Model Monitoring Schedule.
+    #' @param sagemaker_session (sagemaker.session.Session): Session object which
+    #'              manages interactions with Amazon SageMaker APIs and any other
+    #'              AWS services needed. If not specified, one is created using
+    #'              the default AWS configuration chain.
+    #' @param job_name (str): The name of the monitoring execution job.
+    #' @param inputs (list[:class:`~sagemaker.processing.ProcessingInput`]): A list of
+    #'              :class:`~sagemaker.processing.ProcessingInput` objects.
+    #' @param output (sagemaker.Processing.ProcessingOutput): The output associated with the
+    #'              monitoring execution.
+    #' @param output_kms_key (str): The output kms key associated with the job. Defaults to None
+    #'              if not provided.
+    initialize = function(sagemaker_session = NULL,
+                          job_name = NULL,
+                          inputs = NULL,
+                          output = NULL,
+                          output_kms_key=NULL){
+      self$output = output
+      super$initialize(
+        sagemaker_session=sagemaker_session,
+        job_name=job_name,
+        inputs=inputs,
+        outputs=list(output),
+        output_kms_key=output_kms_key)
+    },
 
-          #' @description Initializes a Baselining job from a processing arn.
-          #' @param processing_job_arn (str): ARN of the processing job to create a MonitoringExecution
-          #'              out of.
-          #' @param sagemaker_session (sagemaker.session.Session): Session object which
-          #'              manages interactions with Amazon SageMaker APIs and any other
-          #'              AWS services needed. If not specified, one is created using
-          #'              the default AWS configuration chain.
-          #' @return sagemaker.processing.BaseliningJob: The instance of ProcessingJob created
-          #'              using the current job name.
-          from_processing_arn = function(sagemaker_session,
-                                         processing_job_arn){
-            processing_job_name = split_str(processing_job_arn,":")[6]
-            processing_job_name = substring(processing_job_name,  nchar("processing-job/"), nchar(processing_job_name))  # This is necessary while the API only vends an arn.
-            job_desc = sagemaker_session$describe_processing_job(job_name=processing_job_name)
+    #' @description Initializes a Baselining job from a processing arn.
+    #' @param processing_job_arn (str): ARN of the processing job to create a MonitoringExecution
+    #'              out of.
+    #' @param sagemaker_session (sagemaker.session.Session): Session object which
+    #'              manages interactions with Amazon SageMaker APIs and any other
+    #'              AWS services needed. If not specified, one is created using
+    #'              the default AWS configuration chain.
+    #' @return sagemaker.processing.BaseliningJob: The instance of ProcessingJob created
+    #'              using the current job name.
+    from_processing_arn = function(sagemaker_session,
+                                   processing_job_arn){
+      processing_job_name = split_str(processing_job_arn,":")[6]
+      processing_job_name = substring(processing_job_name,  nchar("processing-job/"), nchar(processing_job_name))  # This is necessary while the API only vends an arn.
+      job_desc = sagemaker_session$describe_processing_job(job_name=processing_job_name)
 
-            cls = self$clone()
-            cls$sagemaker_session=sagemaker_session
-            cls$job_name=processing_job_name
-            cls$inputs = lapply(job_desc$ProcessingInputs, function(processing_input){
-              ProcessingInput$new(source=processing_input$S3Input$S3Uri,
-                                  destination=processing_input$S3Input$LocalPath,
-                                  input_name=processing_input$InputName,
-                                  s3_data_type=processing_input$S3Input$S3DataType,
-                                  s3_input_mode=processing_input$S3Input$S3InputMode,
-                                  s3_data_distribution_type=processing_input$S3Input$S3DataDistributionType,
-                                  s3_compression_type=processing_input$S3Input$S3CompressionType)})
-            cls$output = ProcessingOutput$new(
-              source=job_desc$ProcessingOutputConfig$Outputs[[1]]$S3Output$LocalPath,
-              destination=job_desc$ProcessingOutputConfig$Outputs[[1]]$S3Output$S3Uri,
-              output_name=job_desc$ProcessingOutputConfig$Outputs[[0]]$OutputName)
-            cls$output_kms_key=job_desc$ProcessingOutputConfig$KmsKeyId
+      cls = self$clone()
+      cls$sagemaker_session=sagemaker_session
+      cls$job_name=processing_job_name
+      cls$inputs = lapply(job_desc$ProcessingInputs, function(processing_input){
+        ProcessingInput$new(source=processing_input$S3Input$S3Uri,
+                            destination=processing_input$S3Input$LocalPath,
+                            input_name=processing_input$InputName,
+                            s3_data_type=processing_input$S3Input$S3DataType,
+                            s3_input_mode=processing_input$S3Input$S3InputMode,
+                            s3_data_distribution_type=processing_input$S3Input$S3DataDistributionType,
+                            s3_compression_type=processing_input$S3Input$S3CompressionType)})
+      cls$output = ProcessingOutput$new(
+        source=job_desc$ProcessingOutputConfig$Outputs[[1]]$S3Output$LocalPath,
+        destination=job_desc$ProcessingOutputConfig$Outputs[[1]]$S3Output$S3Uri,
+        output_name=job_desc$ProcessingOutputConfig$Outputs[[0]]$OutputName)
+      cls$output_kms_key=job_desc$ProcessingOutputConfig$KmsKeyId
 
-            return(cls)
-          },
+      return(cls)
+    },
 
-          #' @description Returns a sagemaker.model_monitor.Statistics object representing the statistics
-          #'              JSON file generated by this monitoring execution.
-          #' @param file_name (str): The name of the json-formatted statistics file
-          #' @param kms_key (str): The kms key to use when retrieving the file.
-          #' @return sagemaker.model_monitor.Statistics: The Statistics object representing the file that
-          #'              was generated by the execution.
-          statistics = function(file_name=STATISTICS_JSON_DEFAULT_FILE_NAME,
-                                kms_key=NULL){
-            tryCatch({baselining_job_output_s3_path = self$outputs[[1]]$destination
-                      Statistics$new()$from_s3_uri(
-                        statistics_file_s3_uri=file.path(baselining_job_output_s3_path, file_name),
-                        kms_key=kms_key,
-                        sagemaker_session=self$sagemaker_session)},
-            error = function(e){
-              error_code = attributes(e)$error_response$`__type`
-              if(error_code == "NoSuchKey") {
-                status = self$sagemaker_session$describe_processing_job(job_name=self$job_name)$ProcessingJobStatus
-                if(status != "Completed"){
-                  stop("The underlying job is not in 'Completed' state. You may only ",
-                       "retrieve files for a job that has completed successfully.", call. = F)}
-              } else {stop(e$message, call. = F)}})
-          },
+    #' @description Returns a sagemaker.model_monitor.Statistics object representing the statistics
+    #'              JSON file generated by this monitoring execution.
+    #' @param file_name (str): The name of the json-formatted statistics file
+    #' @param kms_key (str): The kms key to use when retrieving the file.
+    #' @return sagemaker.model_monitor.Statistics: The Statistics object representing the file that
+    #'              was generated by the execution.
+    statistics = function(file_name=STATISTICS_JSON_DEFAULT_FILE_NAME,
+                          kms_key=NULL){
+      tryCatch({baselining_job_output_s3_path = self$outputs[[1]]$destination
+                Statistics$new()$from_s3_uri(
+                  statistics_file_s3_uri=file.path(baselining_job_output_s3_path, file_name),
+                  kms_key=kms_key,
+                  sagemaker_session=self$sagemaker_session)},
+      error = function(e){
+        error_code = attributes(e)$error_response$`__type`
+        if(error_code == "NoSuchKey") {
+          status = self$sagemaker_session$describe_processing_job(job_name=self$job_name)$ProcessingJobStatus
+          if(status != "Completed"){
+            stop("The underlying job is not in 'Completed' state. You may only ",
+                 "retrieve files for a job that has completed successfully.", call. = F)}
+        } else {stop(e$message, call. = F)}})
+    },
 
-          #' @description Returns a sagemaker.model_monitor.ConstraintViolations object representing the
-          #'              constraint violations JSON file generated by this monitoring execution.
-          #' @param file_name (str): The name of the json-formatted constraint violations file.
-          #' @param kms_key (str): The kms key to use when retrieving the file.
-          #' @return sagemaker.model_monitor.ConstraintViolations: The ConstraintViolations object
-          #'              representing the file that was generated by the monitoring execution.
-          constraint_violations = function(file_name=CONSTRAINT_VIOLATIONS_JSON_DEFAULT_FILE_NAME,
-                                           kms_key=NULL){
-            tryCatch({baselining_job_output_s3_path = self$outputs[[1]]$destination
-                      ConstraintViolations$new()$from_s3_uri(
-                        statistics_file_s3_uri=file.path(baselining_job_output_s3_path, file_name),
-                        kms_key=kms_key,
-                        sagemaker_session=self$sagemaker_session)},
-            error = function(e){
-              error_code = attributes(e)$error_response$`__type`
-              if(error_code == "NoSuchKey") {
-                status = self$sagemaker_session$describe_processing_job(job_name=self$job_name)$ProcessingJobStatus
-                if(status != "Completed"){
-                  stop("The underlying job is not in 'Completed' state. You may only ",
-                       "retrieve files for a job that has completed successfully.", call. = F)}
-              } else {stop(e$message, call. = F)}})
-          },
+    #' @description Returns a sagemaker.model_monitor.ConstraintViolations object representing the
+    #'              constraint violations JSON file generated by this monitoring execution.
+    #' @param file_name (str): The name of the json-formatted constraint violations file.
+    #' @param kms_key (str): The kms key to use when retrieving the file.
+    #' @return sagemaker.model_monitor.ConstraintViolations: The ConstraintViolations object
+    #'              representing the file that was generated by the monitoring execution.
+    constraint_violations = function(file_name=CONSTRAINT_VIOLATIONS_JSON_DEFAULT_FILE_NAME,
+                                     kms_key=NULL){
+      tryCatch({baselining_job_output_s3_path = self$outputs[[1]]$destination
+                ConstraintViolations$new()$from_s3_uri(
+                  statistics_file_s3_uri=file.path(baselining_job_output_s3_path, file_name),
+                  kms_key=kms_key,
+                  sagemaker_session=self$sagemaker_session)},
+      error = function(e){
+        error_code = attributes(e)$error_response$`__type`
+        if(error_code == "NoSuchKey") {
+          status = self$sagemaker_session$describe_processing_job(job_name=self$job_name)$ProcessingJobStatus
+          if(status != "Completed"){
+            stop("The underlying job is not in 'Completed' state. You may only ",
+                 "retrieve files for a job that has completed successfully.", call. = F)}
+        } else {stop(e$message, call. = F)}})
+    },
 
-          #' @description
-          #' Printer.
-          #' @param ... (ignored).
-          print = function(...){
-            cat("<MonitoringExecution>")
-            invisible(self)
-          }
-        ),
-        private = list(),
-        lock_objects = F
-  )
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+       print_class(self)
+    }
+   ),
+   lock_objects = F
+)
 
   #' @title EndpointInput
   #' @description Accepts parameters that specify an endpoint input for a monitoring execution and provides
@@ -1782,8 +1777,7 @@ BaseliningJob = R6Class("BaseliningJob",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<EndpointInput>")
-      invisible(self)
+       print_class(self)
     }
   ),
   lock_objects = F
@@ -1827,8 +1821,7 @@ EndpointOutput = R6Class("EndpointOutput",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<EndpointOutput>")
-     invisible(self)
+      print_class(self)
    }
   ),
   lock_objects = F

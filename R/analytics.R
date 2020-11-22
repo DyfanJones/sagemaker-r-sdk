@@ -52,9 +52,8 @@ AnalyticsMetricsBase = R6Class(
     #' @description
     #' Printer.
     #' @param ... (ignored).
-    print = function(...) {
-      cat("<AnalyticsMetricsBase>")
-      invisible(self)
+    print = function(...){
+      print_class(self)
     }
   ),
   private = list(
@@ -143,8 +142,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat(sprintf("<HyperparameterTuningJobAnalytics for %s>\n", self$name))
-      invisible(self)
+      print_class(self)
     },
 
     #' @description Clear the object of all local caches of API methods.
@@ -307,8 +305,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat(sprintf("<TrainingJobAnalytics for %s>\n", self$name))
-     invisible(self)
+     print_class(self)
    }
  ),
  private = list(
@@ -446,8 +443,7 @@ ExperimentAnalytics = R6Class("ExperimentAnalytics",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat(sprintf("<ExperimentAnalytics for %s>\n", self$name))
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(

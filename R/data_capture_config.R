@@ -89,20 +89,19 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
       self$capture_options = capture_options %||% c("REQUEST", "RESPONSE")
       self$csv_content_types = csv_content_types %||% "text/csv"
       self$json_content_types = json_content_types %||% "application/json"
-      },
+    },
 
     #' @description
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<DataCaptureConfig>")
-      invisible(self)
-      }
-    ),
+      print_class(self)
+    }
+  ),
   private = list(
     .MODEL_MONITOR_S3_PATH = "model-monitor",
     .DATA_CAPTURE_S3_PATH = "data-capture"
-    ),
+  ),
   active = list(
 
     #' @field to_request_list
@@ -127,4 +126,3 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
       }
     )
 )
-

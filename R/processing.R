@@ -204,8 +204,7 @@ Processor = R6Class("Processor",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<Processor>")
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(
@@ -436,8 +435,7 @@ ScriptProcessor = R6Class("ScriptProcessor",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<ScriptProcessor>")
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(
@@ -738,8 +736,7 @@ ProcessingJob = R6Class("ProcessingJob",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<ProcessingJob>")
-      invisible(self)
+      print_class(self)
     }
   ),
   private = list(
@@ -819,8 +816,7 @@ ProcessingInput = R6Class("ProcessingInput",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<ProcessingInput>")
-      invisible(self)
+      print_class(self)
     }
   ),
   lock_objects = F
@@ -872,8 +868,7 @@ ProcessingOutput = R6Class("ProcessingOutput",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<ProcessingOutput>")
-     invisible(self)
+     print_class(self)
    }
   ),
   lock_objects = F
