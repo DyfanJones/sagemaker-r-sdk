@@ -1,4 +1,5 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/tests/unit/test_mxnet.py
+context("MXNet")
 
 DATA_DIR = file.path(getwd(), "data")
 SCRIPT_NAME = "dummy_script.py"
