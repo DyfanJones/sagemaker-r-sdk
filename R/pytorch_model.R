@@ -135,12 +135,12 @@ PyTorchModel = R6Class("PyTorchModel",
 
       deploy_key_prefix = model_code_key_prefix(self$key_prefix, self$name, deploy_image)
       private$.upload_code(deploy_key_prefix, repack=private$.is_mms_version())
-      deploy_env = list(self$env)
+      deploy_env = self$env
       deploy_env = c(deploy_env, private$.framework_env_vars())
 
       if (!islistempty(self$model_server_workers))
         deploy_env[[toupper(MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(self$model_server_workers)
-      return(sagemaker.container_def(
+      return(container_def(
         deploy_image, self$repacked_model_data %||% self$model_data, deploy_env)
       )
     },
