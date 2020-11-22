@@ -79,9 +79,10 @@ PyTorch = R6Class("PyTorch",
       self$framework_version = framework_version
       self$py_version = py_version
 
-      if (!islistempty(kwargs$enable_sagemaker_metrics)){
+      if (islistempty(kwargs$enable_sagemaker_metrics)){
         # enable sagemaker metrics for PT v1.3 or greater:
-        if (self$framework_version && (package_version(self$framework_version) >= package_version("1.3")))
+        if (!is.null(self$framework_version) &&
+            (package_version(self$framework_version) >= package_version("1.3")))
           kwargs$enable_sagemaker_metrics = TRUE
       }
 
@@ -146,7 +147,7 @@ PyTorch = R6Class("PyTorch",
         entry_point=entry_point %||% private$.model_entry_point(),
         framework_version=self$framework_version,
         py_version=self$py_version,
-        source_dir=(source_dir %||% self._model_source_dir()),
+        source_dir=(source_dir %||% private$.model_source_dir()),
         container_log_level=self$container_log_level,
         code_location=self$code_location,
         model_server_workers=model_server_workers,
@@ -186,7 +187,7 @@ PyTorch = R6Class("PyTorch",
       init_params$framework_version = framework_version
       init_params$py_version = img_split$py_version
 
-      if (img_split$framework){
+      if (is.null(img_split$framework)){
         # If we were unable to parse the framework name from the image it is not one of our
         # officially supported images, in this case just add the image to the init params.
         init_params$image_uri = image_uri
