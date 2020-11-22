@@ -55,8 +55,7 @@ ModelMonitoringFile = R6Class("ModelMonitoringFile",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<ModelMonitoringFile>")
-      invisible(self)
+      print_class(self)
     }
   ),
   lock_objects = F
@@ -169,8 +168,7 @@ Statistics = R6Class("Statistics",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<Statistics>")
-     invisible(self)
+     print_class(self)
    }
   ),
   lock_objects = F
@@ -307,8 +305,7 @@ Constraints = R6Class("Constraints",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<Constraints>")
-      invisible(self)
+      print_class(self)
     }
   ),
   lock_objects = F
@@ -421,8 +418,7 @@ ConstraintViolations = R6Class("ConstraintViolations",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<ConstraintViolations>")
-     invisible(self)
+     print_class(self)
    }
   ),
   lock_objects = F

@@ -52,8 +52,7 @@ NetworkConfig = R6Class("NetworkConfig",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<NetworkConfig>")
-      invisible(self)
+      print_class(self)
     }
   ),
   lock_objects = F

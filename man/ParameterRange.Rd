@@ -28,6 +28,7 @@ Base class for representing parameter ranges. This is used to define what
 \item \href{#method-is_valid}{\code{ParameterRange$is_valid()}}
 \item \href{#method-cast_to_type}{\code{ParameterRange$cast_to_type()}}
 \item \href{#method-as_tuning_range}{\code{ParameterRange$as_tuning_range()}}
+\item \href{#method-print}{\code{ParameterRange$print()}}
 \item \href{#method-clone}{\code{ParameterRange$clone()}}
 }
 }
@@ -115,6 +116,23 @@ Represent the parameter range as a dicionary suitable for a request
 \subsection{Returns}{
 dict[str, str]: A dictionary that contains the name and values of
              the hyperparameter.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParameterRange$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

@@ -62,6 +62,13 @@ ParameterRange = R6Class("ParameterRange",
                    "MinValue"= as.character(self$min_value),
                    "MaxValue" = as.character(self$max_value),
                    "ScalingType"= self$scaling_type))
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+       print_class(self)
     }
   )
 )
@@ -95,8 +102,7 @@ ContinuousParameter = R6Class("ContinuousParameter",
     #' Printer.
     #' @param ... (ignored).
     print = function(...){
-      cat("<ContinuousParameter>")
-      invisible(self)
+       print_class(self)
     }
   )
 )
@@ -165,8 +171,7 @@ CategoricalParameter = R6Class("CategoricalParameter",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<CategoricalParameter>")
-     invisible(self)
+      print_class(self)
    }
   )
 )
@@ -206,9 +211,7 @@ IntegerParameter = R6Class("IntegerParameter",
    #' Printer.
    #' @param ... (ignored).
    print = function(...){
-     cat("<IntegerParameter>")
-     invisible(self)
+      print_class(self)
    }
   )
 )
-

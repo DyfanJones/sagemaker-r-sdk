@@ -420,7 +420,8 @@ RecordSet = R6Class("RecordSet",
     #' @description Return an unambiguous representation of this RecordSet
     print = function(){
       class_list = private$.str_list(RecordSet)
-      return(cat(paste("class <'RecordSet'>,", class_list), "\n"))
+      class_print = sprintf("<%s at %s>,", class(self)[1], data.table::address(self))
+      return(cat(paste(class_print, class_list), "\n"))
     }
   ),
   private = list(
@@ -488,7 +489,8 @@ FileSystemRecordSet = R6Class("FileSystemRecordSet",
     #' @description Return an unambiguous representation of this RecordSet
     print = function(){
       class_list = private$.str_list(RecordSet)
-      return(cat(paste("class <'FileSystemRecordSet'>,", class_list), "\n"))
+      class_print = sprintf("<%s at %s>,", class(self)[1], data.table::address(self))
+      return(cat(paste(class_print, class_list), "\n"))
     },
 
     #' @description Return a dictionary to represent the training data in a channel for use with ``fit()``
