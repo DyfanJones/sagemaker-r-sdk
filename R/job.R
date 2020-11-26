@@ -63,8 +63,7 @@
     print = function(...){
       return(print_class(self))
     }
-
-    ),
+  ),
   private = list(
     .load_config = function(inputs,
                            estimator,
@@ -83,8 +82,8 @@
         estimator$volume_kms_key)
 
       stop_condition = private$.prepare_stop_condition(
-        estimator$train_max_run,
-        estimator$train_max_wait)
+        estimator$max_run,
+        estimator$max_wait)
 
       vpc_config = estimator$get_vpc_config()
 
@@ -98,9 +97,8 @@
 
       if (!islistempty(model_channel)){
         input_config = if (islistempty(input_config)) list() else input_config
+        input_config = c(input_config, model_channel)
       }
-
-      input_config = c(input_config, model_channel)
 
       if (estimator$enable_network_isolation()){
         code_channel = private$.prepare_channel(input_config, estimator$code_uri, estimator$code_channel_name, validate_uri)
@@ -154,7 +152,7 @@
     .convert_input_to_channel = function(channel_name,
                                          channel_s3_input){
       channel_config = channel_s3_input$config
-      channel_config[["ChannelName"]] = channel_name
+      channel_config$ChannelName = channel_name
       return(channel_config)
     },
 
@@ -182,7 +180,7 @@
       }
       if (inherits(uri_input, "character") && validate_uri && startsWith(uri_input,"file://")){
         stop("local session is currently not supported") # TODO: create local session functionality.
-        return (ile_input(uri_input))}
+        return (file_input(uri_input))}
       if (inherits(uri_input, "character") && validate_uri)
         stop(sprintf('URI input %s must be a valid S3 or FILE URI: must start with "s3://" or "file://"',uri_input),
              call. = F)
@@ -233,16 +231,14 @@
       for (record in inputs){
         if (!inherits(record, c("RecordSet", "FileSystemRecordSet")))
           stop("List compatible only with RecordSets or FileSystemRecordSets.", call. = F)
+
+        if (record$channel %in% names(input_dict))
+          stop("Duplicate channels not allowed.", call. = F)
+        if (inherits(record, "RecordSet"))
+          input_dict[[record$channel]] = record$records_s3_input()
+        if (inherits(record, "FileSystemRecordSet"))
+          input_dict[[record$channel]] = record$file_system_input
       }
-
-      # TODO: RecordSet and FileSystemRecordSet classes
-      # if (record$channel in input_dict)
-      #   raise ValueError("Duplicate channels not allowed.")
-      # if isinstance(record, RecordSet):
-      #   input_dict[record.channel] = record.records_s3_input()
-      # if isinstance(record, FileSystemRecordSet):
-      #   input_dict[record.channel] = record.file_system_input
-
       return (input_dict)
     },
 
@@ -259,7 +255,6 @@
 
         return(resource_config)
     },
-
 
     .prepare_stop_condition = function(max_run,
                                        max_wait){
