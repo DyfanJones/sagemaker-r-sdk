@@ -4,10 +4,15 @@
 \alias{container_def}
 \title{Create a definition for executing a container as part of a SageMaker model.}
 \usage{
-container_def(image, model_data_url = NULL, env = NULL, container_mode = NULL)
+container_def(
+  image_uri,
+  model_data_url = NULL,
+  env = NULL,
+  container_mode = NULL
+)
 }
 \arguments{
-\item{image}{(str): Docker image to run for this container.}
+\item{image_uri}{(str): Docker image to run for this container.}
 
 \item{model_data_url}{(str): S3 URI of data required by this container,
 e.g. SageMaker training job model artifacts (default: None).}

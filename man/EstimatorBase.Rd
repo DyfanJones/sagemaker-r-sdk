@@ -77,7 +77,8 @@ Initialize an ``EstimatorBase`` instance.
   debugger_hook_config = NULL,
   tensorboard_output_config = NULL,
   enable_sagemaker_metrics = NULL,
-  enable_network_isolation = FALSE
+  enable_network_isolation = FALSE,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -227,6 +228,8 @@ run in network isolation mode (default: ``False``). Network
 isolation mode restricts the container access to outside networks
 (such as the Internet). The container does not make any inbound or
 outbound network calls. Also known as Internet-free mode.}
+
+\item{\code{...}}{: update any deprecated parameters passed into class.}
 }
 \if{html}{\out{</div>}}
 }

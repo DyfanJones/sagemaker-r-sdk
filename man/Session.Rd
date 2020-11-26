@@ -286,7 +286,7 @@ Create an Amazon SageMaker training job. Train the learner on a set of observati
   tags = NULL,
   metric_definitions = NULL,
   enable_network_isolation = FALSE,
-  image = NULL,
+  image_uri = NULL,
   algorithm_arn = NULL,
   encrypt_inter_container_traffic = FALSE,
   use_spot_instances = FALSE,
@@ -357,7 +357,7 @@ metric from the logs.}
 \item{\code{enable_network_isolation}}{(bool): Whether to request for the training job to run with
 network isolation or not.}
 
-\item{\code{image}}{(str): Docker image containing training code.}
+\item{\code{image_uri}}{(str): Docker image_uri containing training code.}
 
 \item{\code{algorithm_arn}}{(str): Algorithm Arn from Marketplace.}
 
@@ -1131,7 +1131,7 @@ Create an Amazon SageMaker hyperparameter tuning job
   tags,
   warm_start_config,
   enable_network_isolation = FALSE,
-  image = NULL,
+  image_uri = NULL,
   algorithm_arn = NULL,
   early_stopping_type = "Off",
   encrypt_inter_container_traffic = FALSE,
@@ -1210,7 +1210,7 @@ other required configurations.}
 \item{\code{enable_network_isolation}}{(bool): Specifies whether to isolate the training container
 (Default: \code{FALSE}).}
 
-\item{\code{image}}{(str): Docker image containing training code.}
+\item{\code{image_uri}}{(str): Docker image containing training code.}
 
 \item{\code{algorithm_arn}}{(str): Resource ARN for training algorithm created on or subscribed from
 AWS Marketplace (Default: \code{NULL}).}
@@ -1975,7 +1975,7 @@ Create an ``Endpoint`` using the results of a successful training job.
   deployment_image = NULL,
   name = NULL,
   role = NULL,
-  wait = True,
+  wait = TRUE,
   model_environment_vars = NULL,
   vpc_config_override = "VPC_CONFIG_DEFAULT",
   accelerator_type = NULL,
@@ -2046,7 +2046,7 @@ Create and deploy to an ``Endpoint`` using existing model data stored in S3.
   instance_type,
   name = NULL,
   role = NULL,
-  wait = True,
+  wait = TRUE,
   model_environment_vars = NULL,
   model_vpc_config = NULL,
   accelerator_type = NULL,
