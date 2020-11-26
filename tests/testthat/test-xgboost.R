@@ -48,7 +48,7 @@ sagemaker_session$sagemaker$describe_training_job <- Mock$new()$return_value(des
 sagemaker_session$sagemaker$describe_endpoint <- Mock$new()$return_value(ENDPOINT_DESC)
 sagemaker_session$sagemaker$describe_endpoint_config <- Mock$new()$return_value(ENDPOINT_CONFIG_DESC)
 sagemaker_session$sagemaker$sagemaker$list_tags <- Mock$new()$return_value(describe)
-sagemaker_session$default_bucket <- Mock$new()$return_value(BUCKET_NAME)
+sagemaker_session$default_bucket <- Mock$new()$return_value(BUCKET_NAME, .min_var = 0)
 sagemaker_session$expand_role <- Mock$new()$return_value(ROLE)
 sagemaker_session$create_model <- Mock$new()$return_value("sagemaker-xgboost")
 sagemaker_session$endpoint_from_production_variants <- Mock$new()$return_value("sagemaker-xgboost-endpoint")

@@ -52,7 +52,7 @@ sagemaker_session$sagemaker$describe_endpoint = Mock$new()$return_value(ENDPOINT
 sagemaker_session$sagemaker$describe_endpoint_config = Mock$new()$return_value(ENDPOINT_CONFIG_DESC)
 sagemaker_session$sagemaker$list_tags = Mock$new()$return_value(LIST_TAGS_RESULT)
 sagemaker_session$wait_for_compilation_job = Mock$new()$return_value(describe_compilation)
-sagemaker_session$default_bucket = Mock$new(name="default_bucket")$return_value(BUCKET_NAME)
+sagemaker_session$default_bucket = Mock$new(name="default_bucket")$return_value(BUCKET_NAME, .min_var = 0)
 sagemaker_session$expand_role = Mock$new(name="expand_role")$return_value(ROLE)
 sagemaker_session$wait_for_job = Mock$new()$return_value(NULL)
 sagemaker_session$train <- Mock$new()$return_value(list(TrainingJobArn = "sagemaker-chainer-dummy"))

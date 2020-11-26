@@ -32,7 +32,7 @@ sagemaker_session <- Mock$new(
   local_mode=FALSE,
   s3 = NULL)
 
-sagemaker_session$default_bucket <- Mock$new()$return_value(BUCKET_NAME)
+sagemaker_session$default_bucket <- Mock$new()$return_value(BUCKET_NAME, .min_var = 0)
 sagemaker_session$sagemaker$describe_training_job <- Mock$new()$return_value(DESCRIBE_TRAINING_JOB_RESULT)
 sagemaker_session$sagemaker$describe_endpoint <- Mock$new()$return_value(ENDPOINT_DESC)
 sagemaker_session$sagemaker$describe_endpoint_config <- Mock$new()$return_value(ENDPOINT_CONFIG_DESC)
