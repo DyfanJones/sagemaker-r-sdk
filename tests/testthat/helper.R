@@ -9,10 +9,11 @@ Mock <- R6::R6Class("Mock",
         self[[arg]] = args[[arg]]
       }
     },
-    return_value = function(value){
+    return_value = function(value, .min_var = 1){
       if(is.function(value))
         stop("`value` is a function, please use `side_effect`.", call. = FALSE)
       private$.value = value
+      private$.min_var = .min_var
       return(private$.return)
     },
 
@@ -33,7 +34,17 @@ Mock <- R6::R6Class("Mock",
   private = list(
     .value = NULL,
     .effect = NULL,
+    .min_var = NULL,
     .return = function(...){
+      args = list(...)
+
+      # capture arguments
+      if(length(args) > 0)
+        self$.call_args = args
+
+      if(private$.min_var >= 1 && length(args) == 0)
+        return(self)
+
       return(private$.value)
     }
   ),
