@@ -360,7 +360,7 @@ Return a ``Transformer`` that uses a SageMaker Model based on the
   model_server_workers = NULL,
   volume_kms_key = NULL,
   entry_point = NULL,
-  vpc_config_override = VPC_CONFIG_DEFAULT,
+  vpc_config_override = "VPC_CONFIG_DEFAULT",
   enable_network_isolation = NULL,
   model_name = NULL
 )}\if{html}{\out{</div>}}

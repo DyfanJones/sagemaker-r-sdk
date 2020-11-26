@@ -16,6 +16,7 @@ A class for handling creating and interacting with Amazon SageMaker
 \item \href{#method-wait}{\code{Transformer$wait()}}
 \item \href{#method-stop_transform_job}{\code{Transformer$stop_transform_job()}}
 \item \href{#method-attach}{\code{Transformer$attach()}}
+\item \href{#method-print}{\code{Transformer$print()}}
 \item \href{#method-clone}{\code{Transformer$clone()}}
 }
 }
@@ -261,6 +262,23 @@ the default AWS configuration chain.}
 \subsection{Returns}{
 Transformer (class): The Transformer instance with the
              specified transform job attached.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Transformer$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
