@@ -145,6 +145,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              isolation mode restricts the container access to outside networks
     #'              (such as the Internet). The container does not make any inbound or
     #'              outbound network calls. Also known as Internet-free mode.
+    #' @param ... : update any deprecated parameters passed into class.
     initialize = function(role,
                           instance_count,
                           instance_type,
@@ -171,7 +172,26 @@ EstimatorBase = R6Class("EstimatorBase",
                           debugger_hook_config = NULL,
                           tensorboard_output_config = NULL,
                           enable_sagemaker_metrics = NULL,
-                          enable_network_isolation = FALSE) {
+                          enable_network_isolation = FALSE,
+                          ...) {
+
+      kwargs = list(...)
+      instance_count = renamed_kwargs(
+        "train_instance_count", "instance_count", instance_count, kwargs
+      )
+      instance_type = renamed_kwargs(
+        "train_instance_type", "instance_type", instance_type, kwargs
+      )
+      max_run = renamed_kwargs("train_max_run", "max_run", max_run, kwargs)
+      use_spot_instances = renamed_kwargs(
+        "train_use_spot_instances", "use_spot_instances", use_spot_instances, kwargs
+      )
+      max_wait = renamed_kwargs("train_max_wait", "max_wait", max_wait, kwargs)
+      volume_size = renamed_kwargs("train_volume_size", "volume_size", volume_size, kwargs)
+      volume_kms_key = renamed_kwargs(
+        "train_volume_kms_key", "volume_kms_key", volume_kms_key, kwargs
+      )
+
       self$role = role
       self$instance_count = instance_count
       self$instance_type = instance_type
@@ -719,7 +739,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              security groups, or else validate and return an optional override value.
     #' @param vpc_config_override :
     get_vpc_config = function(vpc_config_override="VPC_CONFIG_DEFAULT"){
-      if (identical(vpc_config_override, "VPC_CONFIG_DEFAULT")){
+      if (identical(vpc_config_override, "VPC_CONFIG_DEFAULT")) {
         return(vpc_to_list(self$subnets, self$security_group_ids))}
       return (vpc_sanitize(vpc_config_override))
     },
@@ -756,7 +776,7 @@ EstimatorBase = R6Class("EstimatorBase",
     print = function(...){
       return(print_class(self))
     }
-    ),
+  ),
   private = list(
 
     # Set ``self.base_job_name`` if it is not set already.
@@ -869,6 +889,7 @@ EstimatorBase = R6Class("EstimatorBase",
     #  Dict: dict for `sagemaker.session.Session.train` method
     .get_train_args = function(inputs,
                                experiment_config) {
+
       local_mode = self$sagemaker_session$local_mode
       model_uri = self$model_uri
 
@@ -906,7 +927,7 @@ EstimatorBase = R6Class("EstimatorBase",
       if (inherits(self, "AlgorithmEstimator")){
         train_args[["algorithm_arn"]] = self$algorithm_arn
       } else {
-        train_args[["image"]] = self$training_image_uri()}
+        train_args[["image_uri"]] = self$training_image_uri()}
 
       if (!islistempty(self$debugger_rule_configs))
         train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
@@ -1334,26 +1355,6 @@ Estimator = R6Class("Estimator",
       return (do.call(Model$new, args))
     }
   ),
-
-  private = list(
-    # Convert the job description to init params that can be handled by the
-    # class constructor
-    # Args:
-    #   job_details: the returned job details from a describe_training_job
-    # API call.
-    # model_channel_name (str): Name of the channel where pre-trained
-    # model data will be downloaded
-    # Returns:
-    #   dictionary: The transformed init_params
-    .prepare_init_params_from_job_description = function(job_details, model_channel_name=NULL){
-      init_params = super$.prepare_init_params_from_job_description(
-        job_details, model_channel_name)
-
-      init_params$image_uri = init_params$image
-      init_params$image = NULL
-      return(init_params)
-    }
-  ),
   lock_objects = F
 )
 
@@ -1592,7 +1593,7 @@ Framework = R6Class("Framework",
       # if we are in local mode with local_code=True. We want the container to just
       # mount the source dir instead of uploading to S3.
       local_code = get_config_value("local.local_code", self$sagemaker_session$config)
-      if (self$sagemaker_session$local_mode && local_code){
+      if (self$sagemaker_session$local_mode && !is.null(local_code)){
         # if there is no source dir, use the directory containing the entry point.
         if (is.null(self$source_dir))
           self$source_dir = dirname(self$entry_point)
@@ -1758,7 +1759,7 @@ Framework = R6Class("Framework",
                            model_server_workers=NULL,
                            volume_kms_key=NULL,
                            entry_point=NULL,
-                           vpc_config_override=VPC_CONFIG_DEFAULT,
+                           vpc_config_override="VPC_CONFIG_DEFAULT",
                            enable_network_isolation=NULL,
                            model_name=NULL){
       role = role %||% self$role
