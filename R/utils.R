@@ -382,6 +382,6 @@ IsSubR6Class <- function(subclass, cls) {
 ECR_URI_PATTERN <- "^(\\d+)(\\.)dkr(\\.)ecr(\\.)(.+)(\\.)(.*)(/)(.*:.*)$"
 
 print_class <- function(self){
-  cat(sprintf("<%s at %s>\n", class(self)[1], data.table::address(self)))
+  cat(sprintf("<%s::%s at %s>\n", getPackageName(), class(self)[1], data.table::address(self)))
   invisible(self)
 }

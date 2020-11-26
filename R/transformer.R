@@ -255,6 +255,13 @@ Transformer = R6Class("Transformer",
       transformer$latest_transform_job = init_params$base_transform_job_name
 
       return(transformer)
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      return(print_class(self))
     }
   ),
   private = list(

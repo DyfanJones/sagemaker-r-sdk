@@ -261,7 +261,7 @@ Session = R6Class("Session",
     #'              metric from the logs.
     #' @param enable_network_isolation (bool): Whether to request for the training job to run with
     #'              network isolation or not.
-    #' @param image (str): Docker image containing training code.
+    #' @param image_uri (str): Docker image_uri containing training code.
     #' @param algorithm_arn (str): Algorithm Arn from Marketplace.
     #' @param encrypt_inter_container_traffic (bool): Specifies whether traffic between training
     #'              containers is encrypted for the training job (default: ``False``).
@@ -301,7 +301,7 @@ Session = R6Class("Session",
                      tags = NULL,
                      metric_definitions = NULL,
                      enable_network_isolation=FALSE,
-                     image=NULL,
+                     image_uri=NULL,
                      algorithm_arn=NULL,
                      encrypt_inter_container_traffic=FALSE,
                      use_spot_instances=FALSE,
@@ -320,16 +320,16 @@ Session = R6Class("Session",
         ResourceConfig = resource_config,
         RoleArn = role)
 
-      if(!is.null(image) && !is.null(algorithm_arn)) {
-        stop("image and algorithm_arn are mutually exclusive.",
-             sprintf("Both were provided: image: %s algorithm_arn: %s",image, algorithm_arn), call. = F)}
+      if(!is.null(image_uri) && !is.null(algorithm_arn)) {
+        stop("image_uri and algorithm_arn are mutually exclusive.",
+             sprintf("Both were provided: image_uri: %s algorithm_arn: %s",image_uri, algorithm_arn), call. = F)}
 
-      if(is.null(image) && is.null(algorithm_arn)){
-        stop("either image or algorithm_arn is required. None was provided.", call. = F)}
+      if(is.null(image_uri) && is.null(algorithm_arn)){
+        stop("either image_uri or algorithm_arn is required. None was provided.", call. = F)}
 
       train_request$InputDataConfig = input_config
 
-      train_request$AlgorithmSpecification$TrainingImage = image
+      train_request$AlgorithmSpecification$TrainingImage = image_uri
       train_request$AlgorithmSpecification$AlgorithmName = algorithm_arn
       train_request$AlgorithmSpecification$MetricDefinitions = metric_definitions
       train_request$AlgorithmSpecification$EnableSageMakerMetricsTimeSeries = enable_sagemaker_metrics
@@ -1026,7 +1026,7 @@ Session = R6Class("Session",
     #'              hyperparameters remain unchanged across all of the training jobs for the
     #'              hyperparameter tuning job. The hyperparameters are made accessible as a dictionary
     #'              for the training code on SageMaker.
-    #' @param image (str): Docker image containing training code.
+    #' @param image_uri (str): Docker image containing training code.
     #' @param algorithm_arn (str): Resource ARN for training algorithm created on or subscribed from
     #'              AWS Marketplace (Default: \code{NULL}).
     #' @param input_mode (str): The input mode that the algorithm supports. Valid modes:
@@ -1104,7 +1104,7 @@ Session = R6Class("Session",
                     tags,
                     warm_start_config,
                     enable_network_isolation=FALSE,
-                    image=NULL,
+                    image_uri=NULL,
                     algorithm_arn=NULL,
                     early_stopping_type="Off",
                     encrypt_inter_container_traffic=FALSE,
@@ -1129,7 +1129,7 @@ Session = R6Class("Session",
           static_hyperparameters=static_hyperparameters,
           role=role,
           input_mode=input_mode,
-          image=image,
+          image_uri=image_uri,
           algorithm_arn=algorithm_arn,
           metric_definitions=metric_definitions,
           input_config=input_config,
@@ -1790,7 +1790,7 @@ Session = R6Class("Session",
                                  deployment_image=NULL,
                                  name=NULL,
                                  role=NULL,
-                                 wait=True,
+                                 wait=TRUE,
                                  model_environment_vars=NULL,
                                  vpc_config_override="VPC_CONFIG_DEFAULT",
                                  accelerator_type=NULL,
@@ -1855,7 +1855,7 @@ Session = R6Class("Session",
                                         instance_type,
                                         name=NULL,
                                         role=NULL,
-                                        wait=True,
+                                        wait=TRUE,
                                         model_environment_vars=NULL,
                                         model_vpc_config=NULL,
                                         accelerator_type=NULL,
@@ -1869,7 +1869,7 @@ Session = R6Class("Session",
       }
 
       if (!.deployment_entity_exists(self$sagemaker$describe_model(ModelName=name))){
-        primary_container = container_def(image=deployment_image, model_data_url=model_s3_location, env=model_environment_vars)
+        primary_container = container_def(image_uri=deployment_image, model_data_url=model_s3_location, env=model_environment_vars)
       self$create_model(name=name, role=role, container_defs=primary_container, vpc_config=model_vpc_config)}
 
       data_capture_config_list = NULL
@@ -2230,7 +2230,7 @@ Session = R6Class("Session",
                                     stop_condition,
                                     input_config=NULL,
                                     metric_definitions=NULL,
-                                    image=NULL,
+                                    image_uri=NULL,
                                     algorithm_arn=NULL,
                                     vpc_config=NULL,
                                     enable_network_isolation=FALSE,
@@ -2253,35 +2253,35 @@ Session = R6Class("Session",
 
       algorithm_spec = list(TrainingInputMode = input_mode)
 
-      algorithm_spec[["MetricDefinitions"]] = metric_definitions
+      algorithm_spec$MetricDefinitions = metric_definitions
 
 
       if (!is.null(algorithm_arn)) {
-        algorithm_spec["AlgorithmName"] = algorithm_arn
+        algorithm_spec$AlgorithmName = algorithm_arn
         } else {
-        algorithm_spec["TrainingImage"] = image}
+        algorithm_spec$TrainingImage = image_uri}
 
-      training_job_definition[["AlgorithmSpecification"]] = algorithm_spec
+      training_job_definition$AlgorithmSpecification = algorithm_spec
 
-      training_job_definition[["InputDataConfig"]] = input_config
+      training_job_definition$InputDataConfig = input_config
 
-      training_job_definition[["VpcConfig"]] = vpc_config
+      training_job_definition$VpcConfig = vpc_config
 
-      if (enable_network_isolation) training_job_definition["EnableNetworkIsolation"] = TRUE
+      if (enable_network_isolation) training_job_definition$EnableNetworkIsolation = TRUE
 
-      if (encrypt_inter_container_traffic) training_job_definition["EnableInterContainerTrafficEncryption"] = TRUE
+      if (encrypt_inter_container_traffic) training_job_definition$EnableInterContainerTrafficEncryption = TRUE
 
-      if (use_spot_instances)  training_job_definition["EnableManagedSpotTraining"] = TRUE
+      if (use_spot_instances)  training_job_definition$EnableManagedSpotTraining = TRUE
 
 
       if (!is.null(checkpoint_s3_uri)){
         checkpoint_config = list()
         checkpoint_config = list(S3Uri = checkpoint_s3_uri)
         if (!is.null(checkpoint_local_path)){
-          checkpoint_config["LocalPath"] = checkpoint_local_path}
-        training_job_definition[["CheckpointConfig"]] = checkpoint_config}
+          checkpoint_config$LocalPath = checkpoint_local_path}
+        training_job_definition$CheckpointConfig = checkpoint_config}
 
-      training_job_definition["DefinitionName"] = estimator_name
+      training_job_definition$DefinitionName = estimator_name
 
       tuning_objective = NULL
 
@@ -2523,7 +2523,7 @@ Session = R6Class("Session",
 )
 
 #' @title Create a definition for executing a container as part of a SageMaker model.
-#' @param image (str): Docker image to run for this container.
+#' @param image_uri (str): Docker image to run for this container.
 #' @param model_data_url (str): S3 URI of data required by this container,
 #'              e.g. SageMaker training job model artifacts (default: None).
 #' @param env (dict[str, str]): Environment variables to set inside the container (default: None).
@@ -2535,12 +2535,12 @@ Session = R6Class("Session",
 #' @return dict[str, str]: A complete container definition object usable with the CreateModel API if
 #'              passed via `PrimaryContainers` field.
 #' @export
-container_def <- function(image,
+container_def <- function(image_uri,
                           model_data_url=NULL,
                           env=NULL,
                           container_mode=NULL){
   if(is.null(env)) env = list()
-  c_def = list("Image" = image, "Environment"= env)
+  c_def = list("Image" = image_uri, "Environment"= env)
 
   c_def$ModelDataUrl = model_data_url
   c_def$Mode = container_mode

@@ -200,7 +200,7 @@ sagemaker_session = Mock$new(
   local_mode=FALSE
 )
 
-sagemaker_session$default_bucket = Mock$new()$return_value(BUCKET_NAME)
+sagemaker_session$default_bucket = Mock$new()$return_value(BUCKET_NAME, .min_var = 0)
 sagemaker_session$upload_data = Mock$new()$return_value(DEFAULT_S3_INPUT_DATA)
 sagemaker_session$expand_role = Mock$new()$return_value(ROLE)
 sagemaker_session$describe_auto_ml_job = Mock$new()$side_effect(describe_auto_ml_job_mock)
