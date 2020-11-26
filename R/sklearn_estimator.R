@@ -100,11 +100,11 @@ SKLearn = R6Class("SKLearn",
                call. = F)
       }
 
+      kwargs$instance_count = 1
       kwargs = c(entry_point = entry_point,
                  source_dir = source_dir,
                  hyperparameters = list(hyperparameters),
                  image_uri = image_uri,
-                 instance_count = 1,
                  kwargs)
 
       do.call(super$initialize, kwargs)
@@ -158,17 +158,17 @@ SKLearn = R6Class("SKLearn",
       role = role %||% self$role
       kwargs$name = private$.get_or_create_name(kwargs$name)
 
-      if (!("image_uri" %in% kwargs))
+      if (!("image_uri" %in% names(kwargs)))
           kwargs$image_uri = self$image_uri
 
-      if (!("enable_network_isolation" %in% kwargs))
+      if (!("enable_network_isolation" %in% names(kwargs)))
         kwargs$enable_network_isolation = self$enable_network_isolation()
 
       kwargs = c(list(
         model_data = self$model_data,
         role = role,
         entry_point = entry_point %||% private$.model_entry_point(),
-        source_dir=(source_dir %||% self._model_source_dir()),
+        source_dir=(source_dir %||% private$.model_source_dir()),
         container_log_level=self$container_log_level,
         code_location=self$code_location,
         py_version=self$py_version,
@@ -215,7 +215,7 @@ SKLearn = R6Class("SKLearn",
         init_params$image_uri = image_uri
         return(init_params)}
 
-      if (!islistempty(img_split$framework) && framework != "scikit-learn")
+      if (!islistempty(img_split$framework) && img_split$framework != "scikit-learn")
         stop(sprintf(
           "Training job: %s didn't use image for requested framework",
           job_details$TrainingJobName),
