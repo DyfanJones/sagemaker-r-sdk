@@ -227,11 +227,7 @@ git_clone_repo <- function(git_config,
 # dest_dir: (str): Local path where the repo should be cloned into.
 .run_clone_command <-
   function(repo_url, dest_dir){
-  output <- system2('git', args = shQuote(c("clone", repo_url, dest_dir)), stdout = TRUE)
-  status <- attr(output, "status") %||% 0L
-  if (status != 0L) {
-    fmt <- "error in git command [status code %i]"
-    stop(sprintf(fmt, status), call. = F)}
+  sys_jupyter('git', args = shQuote(c("clone", repo_url, dest_dir)))
 }
 
 # Insert the token to the Git repo url, to make a component of the git
@@ -278,17 +274,9 @@ git_clone_repo <- function(git_config,
   setwd(dest_dir)
 
   if ("branch" %in% names(git_config)){
-    output <- system2('git', args = shQuote(c("checkout", git_config$branch)), stdout = TRUE)
-    status <- attr(output, "status") %||% 0L
-    if (status != 0L) {
-      fmt <- "error in git command [status code %i]"
-      stop(sprintf(fmt, status), call. = F)}
+    sys_jupyter('git', args = shQuote(c("checkout", git_config$branch)))
   }
   if ("commit" %in% names(git_config)){
-    output <- system2('git', args = shQuote(c("checkout", git_config$commit)), stdout = TRUE)
-    status <- attr(output, "status") %||% 0L
-    if (status != 0L) {
-      fmt <- "error in git command [status code %i]"
-      stop(sprintf(fmt, status), call. = F)}
+    sys_jupyter('git', args = shQuote(c("checkout", git_config$commit)))
   }
 }
