@@ -38,11 +38,11 @@ SparkMLPredictor = R6Class("SparkMLPredictor",
     #'              :class:`~sagemaker.Predictor` constructor.
     initialize = function(endpoint_name,
                           sagemaker_session=NULL,
-                          serializer=CSVSerializer(),
+                          serializer=CSVSerializer$new(),
                           ...){
       sagemaker_session = sagemaker_session %||% Session$new()
       super$initialize(
-        endpoint_name=endpoint_name,
+        endpoint_name,
         sagemaker_session=sagemaker_session,
         serializer=serializer,
         ...)

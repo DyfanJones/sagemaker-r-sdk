@@ -47,7 +47,7 @@ Initializes a SparkMLPredictor which should be used with SparkMLModel
 \if{html}{\out{<div class="r">}}\preformatted{SparkMLPredictor$new(
   endpoint_name,
   sagemaker_session = NULL,
-  serializer = CSVSerializer(),
+  serializer = CSVSerializer$new(),
   ...
 )}\if{html}{\out{</div>}}
 }
