@@ -23,9 +23,6 @@
      #' @description Initialize a ``_SparkProcessorBase`` instance.
      #'              The _SparkProcessorBase handles Amazon SageMaker processing tasks for
      #'              jobs using SageMaker Spark.
-     #' @param framework_version (str): The version of SageMaker PySpark.
-     #' @param py_version (str): The version of python.
-     #' @param container_version (str): The version of spark container.
      #' @param role (str): An AWS IAM role name or ARN. The Amazon SageMaker training jobs
      #'              and APIs that create Amazon SageMaker endpoints use this role
      #'              to access training data and model artifacts. After the endpoint
@@ -35,6 +32,10 @@
      #'              processing, for example, 'ml.c4.xlarge'.
      #' @param instance_count (int): The number of instances to run
      #'              the Processing job with. Defaults to 1.
+     #' @param framework_version (str): The version of SageMaker PySpark.
+     #' @param py_version (str): The version of python.
+     #' @param container_version (str): The version of spark container.
+     #' @param image_uri (str): The container image to use for training.
      #' @param volume_size_in_gb (int): Size in GB of the EBS volume to
      #'              use for storing data during processing (default: 30).
      #' @param volume_kms_key (str): A KMS key for the processing
@@ -53,6 +54,9 @@
      #' @param env (dict): Environment variables to be passed to the processing job.
      #' @param tags ([dict]): List of tags to be passed to the processing job.
      #'              network_config (sagemaker.network.NetworkConfig): A NetworkConfig
+     #'              object that configures network isolation, encryption of
+     #'              inter-container traffic, security group IDs, and subnets.
+     #' @param network_config (sagemaker.network.NetworkConfig): A NetworkConfig
      #'              object that configures network isolation, encryption of
      #'              inter-container traffic, security group IDs, and subnets.
      initialize = function(role,
@@ -200,7 +204,7 @@
        "local file paths, and/or local directory paths"),
      # history server vars
      .history_server_port = "15050",
-     .history_server_url_suffix = sprintf("/proxy/%s", private$.history_server_port),
+     .history_server_url_suffix = sprintf("/proxy/%s", "15050"),
      .spark_event_log_default_local_path = "/opt/ml/processing/spark-events/",
 
      # Extends processing job args such as inputs.
@@ -560,9 +564,6 @@ PySparkProcessor = R6Class("PySparkProcessor",
       #' @description Initialize an ``PySparkProcessor`` instance.
       #'              The PySparkProcessor handles Amazon SageMaker processing tasks for jobs
       #'              using SageMaker PySpark.
-      #' @param framework_version (str): The version of SageMaker PySpark.
-      #' @param py_version (str): The version of python.
-      #' @param container_version (str): The version of spark container.
       #' @param role (str): An AWS IAM role name or ARN. The Amazon SageMaker training jobs
       #'              and APIs that create Amazon SageMaker endpoints use this role
       #'              to access training data and model artifacts. After the endpoint
@@ -572,6 +573,10 @@ PySparkProcessor = R6Class("PySparkProcessor",
       #'              processing, for example, 'ml.c4.xlarge'.
       #' @param instance_count (int): The number of instances to run
       #'              the Processing job with. Defaults to 1.
+      #' @param framework_version (str): The version of SageMaker PySpark.
+      #' @param py_version (str): The version of python.
+      #' @param container_version (str): The version of spark container.
+      #' @param image_uri (str): The container image to use for training.
       #' @param volume_size_in_gb (int): Size in GB of the EBS volume to
       #'              use for storing data during processing (default: 30).
       #' @param volume_kms_key (str): A KMS key for the processing
@@ -738,9 +743,6 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
       #' @description Initialize a ``SparkJarProcessor`` instance.
       #'              The SparkProcessor handles Amazon SageMaker processing tasks for jobs
       #'              using SageMaker Spark.
-      #' @param framework_version (str): The version of SageMaker PySpark.
-      #' @param py_version (str): The version of python.
-      #' @param container_version (str): The version of spark container.
       #' @param role (str): An AWS IAM role name or ARN. The Amazon SageMaker training jobs
       #'              and APIs that create Amazon SageMaker endpoints use this role
       #'              to access training data and model artifacts. After the endpoint
@@ -750,6 +752,10 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
       #'              processing, for example, 'ml.c4.xlarge'.
       #' @param instance_count (int): The number of instances to run
       #'              the Processing job with. Defaults to 1.
+      #' @param framework_version (str): The version of SageMaker PySpark.
+      #' @param py_version (str): The version of python.
+      #' @param container_version (str): The version of spark container.
+      #' @param image_uri (str): The container image to use for training.
       #' @param volume_size_in_gb (int): Size in GB of the EBS volume to
       #'              use for storing data during processing (default: 30).
       #' @param volume_kms_key (str): A KMS key for the processing

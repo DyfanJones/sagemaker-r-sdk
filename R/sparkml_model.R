@@ -27,7 +27,7 @@ SparkMLPredictor = R6Class("SparkMLPredictor",
     #'              to perform predictions against SparkML models serialized via MLeap. The
     #'              response is returned in text/csv format which is the default response
     #'              format for SparkML Serving container.
-    #' @param endpoint (str): The name of the endpoint to perform inference on.
+    #' @param endpoint_name (str): The name of the endpoint to perform inference on.
     #' @param sagemaker_session (sagemaker.session.Session): Session object which
     #'              manages interactions with Amazon SageMaker APIs and any other
     #'              AWS services needed. If not specified, the estimator creates one

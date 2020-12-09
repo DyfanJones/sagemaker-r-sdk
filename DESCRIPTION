@@ -91,6 +91,8 @@ Collate:
     'sklearn_model.R'
     'sklearn_estimator.R'
     'sklearn_processing.R'
+    'spark_processing.R'
+    'sparkml_model.R'
     'tuner.R'
     'xgboost_default.R'
     'xgboost_model.R'
