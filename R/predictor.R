@@ -20,9 +20,9 @@
 Predictor = R6Class("Predictor",
   public = list(
 
-    #' @field endpoint
+    #' @field endpoint_name
     #'        Name of the Amazon SageMaker endpoint
-    endpoint = NULL,
+    endpoint_name = NULL,
 
     #' @field sagemaker_session
     #'        A SageMaker Session object
@@ -58,7 +58,7 @@ Predictor = R6Class("Predictor",
     #'              specified, a sequence of bytes is expected and the API sends it in the
     #'              request body without modifications. In response, the API returns the
     #'              sequence of bytes from the prediction result without any modifications.
-    #' @param endpoint (str): Name of the Amazon SageMaker endpoint to which
+    #' @param endpoint_name (str): Name of the Amazon SageMaker endpoint_name to which
     #'              requests are sent.
     #' @param sagemaker_session (sagemaker.session.Session): A SageMaker Session
     #'              object, used for SageMaker interactions (default: NULL). If not
@@ -74,14 +74,14 @@ Predictor = R6Class("Predictor",
     #'              may provide a ``content_type`` attribute that defines the
     #'              endpoint response's "Accept" content type. If not specified, a
     #'              sequence of bytes is expected for the data. (default: ``csv_deserializer``)
-    initialize = function(endpoint,
+    initialize = function(endpoint_name,
                           sagemaker_session=NULL,
                           serializer=csv_serializer,
                           deserializer=csv_deserializer){
 
-      self$endpoint = endpoint
+      self$endpoint_name = endpoint_name
       self$sagemaker_session = sagemaker_session %||% Session$new()
-      self$serializer = if(inherits(serializer, "BaseSerializer") || is.null(serializer)) serializer else stop("Please use a R6 Serializer Class.", call. = F)
+      self$serializer = if(inherits(serializer, "BaseSerializer") || is.null(serializer)) serializer else stop("Please use a R6 BaseSerializer Class.", call. = F)
       self$deserializer = if(inherits(deserializer, "BaseDeserializer") || is.null(deserializer)) deserializer else stop("Please use a R6 Deserializer Class.", call. = F)
       self$content_type = serializer$CONTENT_TYPE
       self$accept = deserializer$ACCEPT
@@ -136,7 +136,7 @@ Predictor = R6Class("Predictor",
       if(delete_endpoint_config)
         private$.delete_endpoint_config()
 
-      self$sagemaker_session$delete_endpoint(self$endpoint)
+      self$sagemaker_session$delete_endpoint(self$endpoint_name)
     },
 
     #' @description Deletes the Amazon SageMaker models backing this predictor.
@@ -180,9 +180,9 @@ Predictor = R6Class("Predictor",
     #'              DataCaptureConfig to update the predictor's endpoint to use.
     update_data_capture_config = function(data_capture_config = NULL){
       endpoint_desc = self$sagemaker_session$sagemaker$describe_endpoint(
-                        EndpointName=self$endpoint)
+                        EndpointName=self$endpoint_name)
 
-      new_config_name = name_from_base(base=self$endpoint)
+      new_config_name = name_from_base(base=self$endpoint_name)
 
       data_capture_config_dict = NULL
       if (!is.null(data_capture_config))
@@ -194,7 +194,7 @@ Predictor = R6Class("Predictor",
               new_data_capture_config_dict=data_capture_config_dict)
 
       self$sagemaker_session$update_endpoint(
-                  endpoint_name=self$endpoint, endpoint_config_name=new_config_name)
+                  endpoint_name=self$endpoint_name, endpoint_config_name=new_config_name)
     },
 
     #' @description Generates ModelMonitor objects (or DefaultModelMonitors) based on the schedule(s)
@@ -203,9 +203,9 @@ Predictor = R6Class("Predictor",
     #'              ModelMonitor (or DefaultModelMonitor) objects.
     list_monitor = function(){
       monitoring_schedules_list = self$sagemaker_session$list_monitoring_schedules(
-        endpoint_name=self$endpoint)
+        endpoint_name=self$endpoint_name)
       if (islistempty(monitoring_schedules_list$MonitoringScheduleSummaries)){
-        writeLines(sprintf("No monitors found for endpoint. endpoint: %s",self$endpoint))
+        writeLines(sprintf("No monitors found for endpoint. endpoint: %s",self$endpoint_name))
         return(list())}
 
       monitors = list()
@@ -248,7 +248,7 @@ Predictor = R6Class("Predictor",
     .create_request_args = function(data, initial_args=NULL, target_model=NULL, target_variant=NULL){
       args = if (!islistempty(initial_args)) initial_args else list()
       if (!("EndpointName" %in% names(args))){
-        args$EndpointName = self$endpoint}
+        args$EndpointName = self$endpoint_name}
 
       if (!("ContentType" %in% names(args))){
         args$ContentType = self$content_type %||% self$serializer$CONTENT_TYPE}
@@ -277,7 +277,7 @@ Predictor = R6Class("Predictor",
 
     .get_endpoint_config_name = function(){
       endpoint_desc = self$sagemaker_session$sagemaker$describe_endpoint(
-            EndpointName=self$endpoint)
+            EndpointName=self$endpoint_name)
       endpoint_config_name = endpoint_desc$EndpointConfigName
       return(endpoint_config_name)
     },

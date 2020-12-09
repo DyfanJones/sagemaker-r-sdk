@@ -9,7 +9,7 @@ Make prediction requests to an Amazon SageMaker endpoint.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{endpoint}}{Name of the Amazon SageMaker endpoint}
+\item{\code{endpoint_name}}{Name of the Amazon SageMaker endpoint}
 
 \item{\code{sagemaker_session}}{A SageMaker Session object}
 
@@ -54,7 +54,7 @@ Initialize a ``Predictor``.
              sequence of bytes from the prediction result without any modifications.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Predictor$new(
-  endpoint,
+  endpoint_name,
   sagemaker_session = NULL,
   serializer = csv_serializer,
   deserializer = csv_deserializer
@@ -64,7 +64,7 @@ Initialize a ``Predictor``.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{endpoint}}{(str): Name of the Amazon SageMaker endpoint to which
+\item{\code{endpoint_name}}{(str): Name of the Amazon SageMaker endpoint_name to which
 requests are sent.}
 
 \item{\code{sagemaker_session}}{(sagemaker.session.Session): A SageMaker Session
