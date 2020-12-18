@@ -75,6 +75,13 @@ S3Uploader = R6Class("S3Uploader",
        key_prefix=s3_parts$key, kms_key=kms_key)
 
      return(desired_s3_uri)
+   },
+
+   #' @description
+   #' Printer.
+   #' @param ... (ignored).
+   print = function(...){
+      return(print_class(self))
    }
   )
 )
@@ -136,6 +143,13 @@ S3Downloader = R6Class("S3Downloader",
 
      file_keys = sagemaker_session$list_s3_files(bucket=s3_parts$bucket, key_prefix=s3_parts$key)
      return(lapply(file_keys, function(file_key) sprintf("s3://%s/%s", s3_parts$bucket, file_key)))
+   },
+
+   #' @description
+   #' Printer.
+   #' @param ... (ignored).
+   print = function(...){
+      return(print_class(self))
    }
   )
 )
