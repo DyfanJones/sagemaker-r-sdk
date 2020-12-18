@@ -80,9 +80,71 @@ Model = R6Class("Model",
       self$vpc_config = vpc_config
       self$sagemaker_session = sagemaker_session %||% Session$new()
       self$endpoint_name = NULL
-      self$.is_compiled_model = FALSE
+      private$.is_compiled_model = FALSE
+      private$.compilation_job_name = NULL
+      private$.is_edge_packaged_model = FALSE
       self$.enable_network_isolation = enable_network_isolation
       self$model_kms_key = model_kms_key
+    },
+
+    #' @description Creates a model package for creating SageMaker models or listing on Marketplace.
+    #' @param content_types (list): The supported MIME types for the input data (default: None).
+    #' @param response_types (list): The supported MIME types for the output data (default: None).
+    #' @param inference_instances (list): A list of the instance types that are used to
+    #'              generate inferences in real-time (default: None).
+    #' @param transform_instances (list): A list of the instance types on which a transformation
+    #'              job can be run or on which an endpoint can be deployed (default: None).
+    #' @param model_package_name (str): Model Package name, exclusive to `model_package_group_name`,
+    #'              using `model_package_name` makes the Model Package un-versioned (default: None).
+    #' @param model_package_group_name (str): Model Package Group name, exclusive to
+    #'              `model_package_name`, using `model_package_group_name` makes the Model Package
+    #'              versioned (default: None).
+    #' @param image_uri (str): Inference image uri for the container. Model class' self.image will
+    #'              be used if it is None (default: None).
+    #' @param model_metrics (ModelMetrics): ModelMetrics object (default: None).
+    #' @param metadata_properties (MetadataProperties): MetadataProperties object (default: None).
+    #' @param marketplace_cert (bool): A boolean value indicating if the Model Package is certified
+    #'              for AWS Marketplace (default: False).
+    #' @param approval_status (str): Model Approval Status, values can be "Approved", "Rejected",
+    #'              or "PendingManualApproval" (default: "PendingManualApproval").
+    #' @param description (str): Model Package description (default: None).
+    #' @return str: A string of SageMaker Model Package ARN.
+    register = function(content_types,
+                        response_types,
+                        inference_instances,
+                        transform_instances,
+                        model_package_name=NULL,
+                        model_package_group_name=NULL,
+                        image_uri=NULL,
+                        model_metrics=NULL,
+                        metadata_properties=NULL,
+                        marketplace_cert=FALSE,
+                        approval_status=NULL,
+                        description=NULL){
+      if (is.null(self$model_data))
+        stop("SageMaker Model Package cannot be created without model data.", call. = F)
+
+      model_pkg_args = private$.get_model_package_args(
+        content_types,
+        response_types,
+        inference_instances,
+        transform_instances,
+        model_package_name,
+        model_package_group_name,
+        image_uri,
+        model_metrics,
+        metadata_properties,
+        marketplace_cert,
+        approval_status,
+        description)
+
+      model_package = do.call(self$sagemaker_session$create_model_package_from_containers, model_pkg_args)
+
+      return(ModelPackage$new(
+        role=self$role,
+        model_data=self$model_data,
+        model_package_arn=model_package$ModelPackageArn)
+        )
     },
 
     #' @description Return a dict created by ``sagemaker.container_def()`` for deploying
@@ -113,6 +175,53 @@ Model = R6Class("Model",
     check_neo_region = function(region){
       if(region %in% names(NEO_IMAGE_ACCOUNT)) return(TRUE)
       return(FALSE)
+    },
+
+    #' @description Package this ``Model`` with SageMaker Edge.
+    #'              Creates a new EdgePackagingJob and wait for it to finish.
+    #'              model_data will now point to the packaged artifacts.
+    #' @param output_path (str): Specifies where to store the packaged model
+    #' @param role (str): Execution role
+    #' @param model_name (str): the name to attach to the model metadata
+    #' @param model_version (str): the version to attach to the model metadata
+    #' @param job_name (str): The name of the edge packaging job
+    #' @param resource_key (str): the kms key to encrypt the disk with
+    #' @param s3_kms_key (str): the kms key to encrypt the output with
+    #' @param tags (list[dict]): List of tags for labeling an edge packaging job. For
+    #'              more, see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
+    #' @return sagemaker.model.Model: A SageMaker ``Model`` object. See
+    #'              :func:`~sagemaker.model.Model` for full details.
+    package_for_edge = function(output_path,
+                                model_name,
+                                model_version,
+                                role=NULL,
+                                job_name=NULL,
+                                resource_key=NULL,
+                                s3_kms_key=NULL,
+                                tags=NULL){
+      if (is.null(private$.compilation_job_name))
+        stop("You must first compile this model", call. = F)
+      if (is.null(job_name))
+        job_name = sprintf("packaging%s", substr(private$.compilation_job_name, 12, nchar(private$.compilation_job_name)))
+      if (is.null(role))
+        role = self$sagemaker_session$expand_role(role)
+      private$.init_sagemaker_session_if_does_not_exist(NULL)
+      config = private$.edge_packaging_job_config(
+            output_path,
+            role,
+            model_name,
+            model_version,
+            job_name,
+            self._compilation_job_name,
+            resource_key,
+            s3_kms_key,
+            tags)
+      do.call(self$sagemaker_session.package_model_for_edge, config)
+      job_status = self$sagemaker_session$wait_for_edge_packaging_job(job_name)
+      self$model_data = job_status$ModelArtifact
+      private$.is_edge_packaged_model = TRUE
+      return(self)
     },
 
     #' @description Compile this ``Model`` with SageMaker Neo.
@@ -209,7 +318,7 @@ Model = R6Class("Model",
             target_instance_family,
             framework,
             framework_version)
-        self$.is_compiled_model = TRUE
+        private$.is_compiled_model = TRUE
         } else {
           log_warn(paste(
             "The instance type %s is not supported for deployment via SageMaker.",
@@ -290,14 +399,14 @@ Model = R6Class("Model",
       if(is.null(self$role))
         stop("Role can not be null for deploying a model", call. = F)
 
-      if (startsWith(instance_type,"ml.inf") && !self$.is_compiled_model)
+      if (startsWith(instance_type,"ml.inf") && !private$.is_compiled_model)
         log_warn("Your model is not compiled. Please compile your model before using Inferentia.")
 
       compiled_model_suffix = paste0(split_str(instance_type, "\\."), collapse = "-")
-      if (self$.is_compiled_model){
+      if (private$.is_compiled_model){
         private$.ensure_base_name_if_needed(self$image_uri)
         if(!is.null(self$.base_name))
-          self$.base_name = paste(self$.base_name, compiled_model_suffix, sep = "-")
+          self$.base_name = paste(self$.base_name, compiled_model_suffix, sep = "-", collapse = "-")
       }
 
       self$.create_sagemaker_model(instance_type, accelerator_type, tags)
@@ -308,7 +417,7 @@ Model = R6Class("Model",
         self$endpoint_name = endpoint_name
       } else{
         base_endpoint_name = self$.base_name %||% base_from_name(self$name)
-        if (self$.is_compiled_model && !endsWith(self$endpoint_name, compiled_model_suffix))
+        if (private$.is_compiled_model && !endsWith(self$endpoint_name, compiled_model_suffix))
           base_endpoint_name = paste(self$endpoint_name, compiled_model_suffix, sep = "-")
         self$endpoint_name = name_from_base(base_endpoint_name)
       }
@@ -451,6 +560,66 @@ Model = R6Class("Model",
     }
   ),
   private = list(
+    .is_compiled_model = NULL,
+    .compilation_job_name = NULL,
+    .is_edge_packaged_model = NULL,
+
+    # Get arguments for session.create_model_package method.
+    # Args:
+    #   content_types (list): The supported MIME types for the input data.
+    # response_types (list): The supported MIME types for the output data.
+    # inference_instances (list): A list of the instance types that are used to
+    # generate inferences in real-time.
+    # transform_instances (list): A list of the instance types on which a transformation
+    # job can be run or on which an endpoint can be deployed.
+    # model_package_name (str): Model Package name, exclusive to `model_package_group_name`,
+    # using `model_package_name` makes the Model Package un-versioned (default: None).
+    # model_package_group_name (str): Model Package Group name, exclusive to
+    # `model_package_name`, using `model_package_group_name` makes the Model Package
+    # versioned (default: None).
+    # image_uri (str): Inference image uri for the container. Model class' self.image will
+    #     be used if it is None (default: None).
+    # model_metrics (ModelMetrics): ModelMetrics object (default: None).
+    # metadata_properties (MetadataProperties): MetadataProperties object (default: None).
+    # marketplace_cert (bool): A boolean value indicating if the Model Package is certified
+    #     for AWS Marketplace (default: False).
+    # approval_status (str): Model Approval Status, values can be "Approved", "Rejected",
+    #     or "PendingManualApproval" (default: "PendingManualApproval").
+    # description (str): Model Package description (default: None).
+    # Returns:
+    # dict: A dictionary of method argument names and values.
+    .get_model_package_args = function(content_types,
+                                       response_types,
+                                       inference_instances,
+                                       transform_instances,
+                                       model_package_name=NULL,
+                                       model_package_group_name=NULL,
+                                       image_uri=NULL,
+                                       model_metrics=NULL,
+                                       metadata_properties=NULL,
+                                       marketplace_cert=FALSE,
+                                       approval_status=NULL,
+                                       description=NULL){
+      if (is.null(image_uri))
+        self$image_uri = image_uri
+      container = list(
+          "Image"= self$image_uri,
+          "ModelDataUrl"= self$model_data)
+      model_package_args = list(
+          "containers"= list(container),
+          "content_types"= content_types,
+          "response_types"= response_types,
+          "inference_instances"= inference_instances,
+          "transform_instances"= transform_instances,
+          "marketplace_cert"= marketplace_cert)
+      model_package_args$model_package_name = model_package_name
+      model_package_args$model_package_group_name = model_package_group_name
+      model_package_args$model_metrics = model_metrics$to_request_list()
+      model_package_args$metadata_properties = metadata_properties$to_request_list()
+      model_package_args$approval_status = approval_status
+      model_package_args$description = description
+      return(model_package_args)
+    },
 
     # Set ``self.sagemaker_session`` to be a ``LocalSession`` or
     # ``Session`` if it is not already. The type of session object is
@@ -461,6 +630,7 @@ Model = R6Class("Model",
         # TODO: local sagemaker session
         log_error("Currently LocalSession has not been implemented")
         stop(sprintf("instance_type %s is currently not supported", call. =F))
+        # TODO: LocalSession class
         self$sagemaker_session = LocalSession$new()
       } else {
           self$sagemaker_session = Session$new()}
@@ -482,10 +652,46 @@ Model = R6Class("Model",
       return(attr(self, "_framework_name"))
       },
 
-    # TODO: review this private method
     .get_framework_version = function(obj){
-      return(attr(self, "framework_version"))
+      return(self$framework_version)
       },
+
+    # Creates a request object for a packaging job.
+    # Args:
+    #   output_path (str): where in S3 to store the output of the job
+    # role (str): what role to use when executing the job
+    # packaging_job_name (str): what to name the packaging job
+    # compilation_job_name (str): what compilation job to source the model from
+    # resource_key (str): the kms key to encrypt the disk with
+    # s3_kms_key (str): the kms key to encrypt the output with
+    # tags (list[dict]): List of tags for labeling an edge packaging job. For
+    # more, see
+    # https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
+    # Returns:
+    #   dict: the request object to use when creating a packaging job
+    .edge_packaging_job_config = function(output_path,
+                                          role,
+                                          model_name,
+                                          model_version,
+                                          packaging_job_name,
+                                          compilation_job_name,
+                                          resource_key,
+                                          s3_kms_key,
+                                          tags){
+      output_model_config = list(
+        "S3OutputLocation"= output_path)
+      output_model_config$KmsKeyId = s3_kms_key
+      return(list(
+        "output_model_config"= output_model_config,
+          "role"= role,
+          "tags"= tags,
+          "model_name"= model_name,
+          "model_version"= model_version,
+          "job_name"= packaging_job_name,
+          "compilation_job_name"= compilation_job_name,
+          "resource_key"= resource_key)
+      )
+    },
 
     .compilation_job_config = function(target_instance_type,
                                        input_shape,
@@ -761,7 +967,7 @@ FrameworkModel = R6Class("FrameworkModel",
    #'              model. For example, 'ml.eia1.medium'.
    #' @return dict[str, str]: A container definition object usable with the
    #'              CreateModel API.
-   prepare_container = function(instance_type=NULL,
+   prepare_container_def = function(instance_type=NULL,
                                  accelerator_type=NULL){
      deploy_key_prefix = model_code_key_prefix(
        self$key_prefix, self$name, self$image_uri
@@ -925,14 +1131,8 @@ ModelPackage = R6Class("ModelPackage",
        container_def,
        vpc_config=self$vpc_config,
        enable_network_isolation=self$enable_network_isolation())
-   },
-
-   #' @description Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<ModelPackage>")
-     invisible(self)
    }
+
   ),
   private = list(
    .is_marketplace = function(){
@@ -972,4 +1172,3 @@ ModelPackage = R6Class("ModelPackage",
   ),
   lock_objects =  F
 )
-
