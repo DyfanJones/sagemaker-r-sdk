@@ -1438,6 +1438,66 @@ Session = R6Class("Session",
         })
     },
 
+    #' @description Get request dictionary for CreateModelPackage API.
+    #' @param containers (list): A list of inference containers that can be used for inference
+    #'              specifications of Model Package (default: None).
+    #' @param content_types (list): The supported MIME types for the input data (default: None).
+    #' @param response_types (list): The supported MIME types for the output data (default: None).
+    #' @param inference_instances (list): A list of the instance types that are used to
+    #'              generate inferences in real-time (default: None).
+    #' @param transform_instances (list): A list of the instance types on which a transformation
+    #'              job can be run or on which an endpoint can be deployed (default: None).
+    #' @param model_package_name (str): Model Package name, exclusive to `model_package_group_name`,
+    #'              using `model_package_name` makes the Model Package un-versioned (default: None).
+    #' @param model_package_group_name (str): Model Package Group name, exclusive to
+    #'              `model_package_name`, using `model_package_group_name` makes the Model Package
+    #'              versioned (default: None).
+    #' @param model_metrics (ModelMetrics): ModelMetrics object (default: None).
+    #' @param metadata_properties (MetadataProperties): MetadataProperties object (default: None)
+    #' @param marketplace_cert (bool): A boolean value indicating if the Model Package is certified
+    #'              for AWS Marketplace (default: False).
+    #' @param approval_status (str): Model Approval Status, values can be "Approved", "Rejected",
+    #'              or "PendingManualApproval" (default: "PendingManualApproval").
+    #' @param description (str): Model Package description (default: None).
+    create_model_package_from_containers = function(containers=NULL,
+                                                    content_types=NULL,
+                                                    response_types=NULL,
+                                                    inference_instances=NULL,
+                                                    transform_instances=NULL,
+                                                    model_package_name=NULL,
+                                                    model_package_group_name=NULL,
+                                                    model_metrics=NULL,
+                                                    metadata_properties=NULL,
+                                                    marketplace_cert=FALSE,
+                                                    approval_status="PendingManualApproval",
+                                                    description=NULL){
+      request = private$.get_create_model_package_request(
+        model_package_name,
+        model_package_group_name,
+        containers,
+        content_types,
+        response_types,
+        inference_instances,
+        transform_instances,
+        model_metrics,
+        metadata_properties,
+        marketplace_cert,
+        approval_status,
+        description)
+
+      return (self$sagemaker$create_model_package(
+        ModelPackageName = request$ModelPackageName,
+        # ModelPackageGroupName = request$ModelPackageGroupName, # Currently not implemented in
+        ModelPackageDescription= request$ModelPackageDescription,
+        # ModelMetrics= request$ModelMetrics, # Currently not implemented in
+        # MetadataProperties= request$MetadataProperties, # Currently not implemented in
+        InferenceSpecification= request$InferenceSpecification,
+        CertifyForMarketplace = request$CertifyForMarketplace
+        # ModelApprovalStatus= request$ModelApprovalStatus # Currently not implemented in
+        )
+      )
+    },
+
     #' @description Wait for an Amazon SageMaker endpoint deployment to complete.
     #' @param model_package_name (str): Name of the ``Endpoint`` to wait for.
     #' @param poll (int): Polling interval in seconds (default: 5).
@@ -1683,6 +1743,16 @@ Session = R6Class("Session",
                                         poll=5){
       desc = private$.wait_until(private$.compilation_job_status(job), poll)
       private$.check_job_status(job, desc, "CompilationJobStatus")
+      return(desc)
+    },
+
+    #' @description Wait for an Amazon SageMaker Edge packaging job to complete.
+    #' @param job (str): Name of the edge packaging job to wait for.
+    #' @param poll (int): Polling interval in seconds (default: 5).
+    #' @return (dict): Return value from the ``DescribeEdgePackagingJob`` API.
+    wait_for_edge_packaging_job = function(job, poll=5){
+      desc =  private$.wait_until(private$.edge_packaging_job_status(job), poll)
+      private$.check_job_status(job, desc, "EdgePackagingJobStatus")
       return(desc)
     },
 
@@ -2437,6 +2507,33 @@ Session = R6Class("Session",
       return(desc)
     },
 
+    # Process the current status of a packaging job
+    # Args:
+    #   sagemaker_client (boto3.client.sagemaker): a sagemaker client
+    # job_name (str): the name of the job to inspec
+    # Returns:
+    #   Dict: the status of the edge packaging job
+    .edge_packaging_job_status = function(job_name){
+      package_status_codes = list(
+        "Completed"= "!",
+        "InProgress"= ".",
+        "Failed"= "*",
+        "Stopped"= "s",
+        "Stopping"= "_")
+      in_progress_statuses = c("InProgress", "Stopping", "Starting")
+
+      desc = self$sagemaker$describe_edge_packaging_job(EdgePackagingJobName=job_name)
+      status = desc$EdgePackagingJobStatus
+
+      status = .STATUS_CODE_TABLE[[toupper(status)]] %||% status
+      writeLines((package_status_codes[[status]] %||% "?"), sep = "")
+      flush(stdout())
+
+      if (status %in% in_progress_statuses) return(NULL)
+
+      return(desc)
+    },
+
     .tuning_job_status = function(job_name){
       tuning_status_codes = list(
         "Completed"= "!",
@@ -2512,6 +2609,72 @@ Session = R6Class("Session",
       if (status %in% in_progress_statuses) return(NULL)
 
       return (desc)
+    },
+
+    # Get request dictionary for CreateModelPackage API.
+    # Args:
+    #   model_package_name (str): Model Package name, exclusive to `model_package_group_name`,
+    # using `model_package_name` makes the Model Package un-versioned (default: None).
+    # model_package_group_name (str): Model Package Group name, exclusive to
+    # `model_package_name`, using `model_package_group_name` makes the Model Package
+    # versioned (default: None).
+    # containers (list): A list of inference containers that can be used for inference
+    # specifications of Model Package (default: None).
+    # content_types (list): The supported MIME types for the input data (default: None).
+    # response_types (list): The supported MIME types for the output data (default: None).
+    # inference_instances (list): A list of the instance types that are used to
+    # generate inferences in real-time (default: None).
+    # transform_instances (list): A list of the instance types on which a transformation
+    # job can be run or on which an endpoint can be deployed (default: None).
+    # model_metrics (ModelMetrics): ModelMetrics object (default: None).
+    # metadata_properties (MetadataProperties): MetadataProperties object (default: None).
+    # marketplace_cert (bool): A boolean value indicating if the Model Package is certified
+    # for AWS Marketplace (default: False).
+    # approval_status (str): Model Approval Status, values can be "Approved", "Rejected",
+    # or "PendingManualApproval" (default: "PendingManualApproval").
+    # description (str): Model Package description (default: None).
+    .get_create_model_package_request = function(model_package_name=NULL,
+                                                 model_package_group_name=NULL,
+                                                 containers=NULL,
+                                                 content_types=NULL,
+                                                 response_types=NULL,
+                                                 inference_instances=NULL,
+                                                 transform_instances=NULL,
+                                                 model_metrics=NULL,
+                                                 metadata_properties=NULL,
+                                                 marketplace_cert=FALSE,
+                                                 approval_status="PendingManualApproval",
+                                                 description=NULL){
+      if (!is.null(model_package_name) && !is.null(model_package_group_name))
+        stop("model_package_name and model_package_group_name cannot be present at the ",
+             "same time.", call. = F)
+
+      request_dict = list()
+      request_dict$ModelPackageName = model_package_name
+      request_dict$ModelPackageGroupName = model_package_group_name
+      request_dict$ModelPackageDescription = description
+      request_dict$ModelMetrics = model_metrics
+      request_dict$MetadataProperties = metadata_properties
+      if (!is.null(containers)){
+        if (!(!is.null(content_types) && !is.null(response_types) &&
+              !is.null(inference_instances) && !is.null(transform_instances)))
+          stop(
+            "content_types, response_types, inference_inferences and transform_instances ",
+            "must be provided if containers is present.", call. = F
+            )
+        inference_specification = list(
+          "Containers"= containers,
+          "SupportedContentTypes"= content_types,
+          "SupportedResponseMIMETypes"= response_types,
+          "SupportedRealtimeInferenceInstanceTypes"= inference_instances,
+          "SupportedTransformInstanceTypes"= transform_instances)
+        request_dict$InferenceSpecification = inference_specification
+      }
+
+      request_dict$CertifyForMarketplace = marketplace_cert
+      request_dict$ModelApprovalStatus = approval_status
+
+      return(request_dict)
     }
   ),
   active = list(
