@@ -21,6 +21,13 @@ PARAMETER_SERVER_MULTI_GPU_WARNING <- paste(
 DEBUGGER_UNSUPPORTED_REGIONS <- c("us-gov-west-1", "us-iso-east-1")
 SINGLE_GPU_INSTANCE_TYPES <- c("ml.p2.xlarge", "ml.p3.2xlarge")
 
+SM_DATAPARALLEL_SUPPORTED_FRAMEWORK_VERSIONS <- list(
+  "tensorflow"= c("2.3.0", "2.3.1"),
+  "pytorch"= "1.6.0"
+)
+
+SMDISTRIBUTED_SUPPORTED_STRATEGIES <- c("dataparallel", "modelparallel")
+
 # Validate that the source directory exists and it contains the user script
 # Args:
 #   script (str): Script filename.
@@ -35,6 +42,88 @@ validate_source_dir <- function(script, directory){
     }
   }
   return(TRUE)
+}
+
+# Get the model parallelism parameters provided by the user.
+# Args:
+#   distribution: distribution dictionary defined by the user.
+# Returns:
+#   params: dictionary containing model parallelism parameters
+# used for training.
+get_mp_parameters <- function(distribution){
+  mp_dict = distribution$smdistributed$modelparallel %||% list()
+  if (isTRUE(mp_dict$enabled %||% FALSE)) {
+    params = mp_dict$parameters %||% list()
+    validate_mp_config(params)
+    return(params)
+  }
+  return(NULL)
+}
+
+# Validate the configuration dictionary for model parallelism.
+# Args:
+#   config (dict): Dictionary holding configuration keys and values.
+# Raises:
+#   ValueError: If any of the keys have incorrect values.
+validate_mp_config <- function(config){
+  if (!("partitions" %in% names(config)))
+    stop("'partitions' is a required parameter.", call. = F)
+
+  validate_positive <- function(key){
+    if (!inherits(config[[key]], c("integer", "numeric")) || config[key] < 1)
+      stop(sprintf("The number of %s must be a positive integer.",key), call. = F)
+  }
+
+  validate_in <- function(key, vals){
+    if (!(config[[key]] %in% vals))
+      stop(sprintf("%s must be a value in: [%s].",
+             key, paste(vals, collapse = ", ")),
+           call. = F)
+  }
+
+  validate_bool <- function(keys){
+    validate_in(keys, c(TRUE, FALSE))
+  }
+
+  validate_in("pipeline", c("simple", "interleaved", "_only_forward"))
+  validate_in("placement_strategy", c("spread", "cluster"))
+  validate_in("optimize", c("speed", "memory"))
+
+  for (key in c("microbatches", "partitions"))
+    validate_positive(key)
+
+  for (key in c("auto_partition", "contiguous", "load_partition", "horovod", "ddp"))
+    validate_bool(key)
+
+  if ("partition_file" %in% names(config) &&
+      !inherits(config$partition_file, "character"))
+    stop("'partition_file' must be a character.", call. = F)
+
+  if (!isTRUE(config$auto_partition) && !("default_partition" %in% names(config)))
+    stop("default_partition must be supplied if auto_partition is set to `FALSE`!", call. = F)
+
+  if ("default_partition" %in% names(config) && config$default_partition >= config$partitions)
+    stop("default_partition must be less than the number of partitions!", call. = F)
+
+  if ("memory_weight" %in% names(config) && (
+    config$memory_weight > 1 || config$memory_weight < 0))
+    stop("memory_weight must be between 0.0 and 1.0!", call. = F)
+
+  if ("ddp_port" %in% names(config) && "ddp" %in% names(config))
+    stop("`ddp_port` needs `ddp` to be set as well", call. = F)
+
+  if ("ddp_dist_backend" %in% names(config) && !("ddp" %in% names(config)))
+    stop("`ddp_dist_backend` needs `ddp` to be set as well", call. = F)
+
+  if ("ddp_port" %in% names(config)){
+    if (!inherits(config$ddp_port, "integer") || config$ddp_port < 0){
+      value = config$ddp_port
+      stop(sprintf("Invalid port number %s.", value) , call. = F)
+    }
+  }
+
+  if ((config$horovod %||% FALSE) && (config$ddp %||% FALSE))
+    stop("'ddp' and 'horovod' cannot be simultaneously enabled.", call. = F)
 }
 
 # Package source files and upload a compress tar file to S3. The S3
@@ -254,6 +343,142 @@ warn_if_parameter_server_with_multi_gpu <- function(training_instance_type, dist
   if (is_multi_gpu_instance && ps_enabled)
     log_warn(PARAMETER_SERVER_MULTI_GPU_WARNING)
 }
+
+# Check if smdistributed strategy is correctly invoked by the user.
+# Currently, two strategies are supported: `dataparallel` or `modelparallel`.
+# Validate if the user requested strategy is supported.
+# Currently, only one strategy can be specified at a time. Validate if the user has requested
+# more than one strategy simultaneously.
+# Validate if the smdistributed dict arg is syntactically correct.
+# Additionally, perform strategy-specific validations.
+# Args:
+#   instance_type (str): A string representing the type of training instance selected.
+# framework_name (str): A string representing the name of framework selected.
+# framework_version (str): A string representing the framework version selected.
+# py_version (str): A string representing the python version selected.
+# distribution (dict): A dictionary with information to enable distributed training.
+# (Defaults to None if distributed training is not enabled.) For example:
+#   .. code:: python
+# {
+#   "smdistributed": {
+#     "dataparallel": {
+#       "enabled": True
+#     }
+#   }
+# }
+# image_uri (str): A string representing a Docker image URI.
+# Raises:
+#   ValueError: if distribution dictionary isn't correctly formatted or
+#             multiple strategies are requested simultaneously or
+#             an unsupported strategy is requested or
+#             strategy-specific inputs are incorrect/unsupported
+validate_smdistributed <- function(instance_type, framework_name, framework_version, py_version, distribution, image_uri=NULL){
+  if (!("smdistributed" %in% names(distribution))){
+    # Distribution strategy other than smdistributed is selected
+    return(NULL)
+  }
+
+  # distribution contains smdistributed
+  smdistributed = distribution$smdistributed
+  if (!inherits(smdistributed, "list"))
+    stop("smdistributed strategy requires a dictionary", call. = F)
+
+  if (length(smdistributed) > 1){
+    # more than 1 smdistributed strategy requested by the user
+    err_msg = paste(
+      "Cannot use more than 1 smdistributed strategy.\n",
+      "Choose one of the following supported strategies:",
+      paste(SMDISTRIBUTED_SUPPORTED_STRATEGIES, collapse = ", "))
+    stop(err_msg, call. = F)
+  }
+
+  # validate if smdistributed strategy is supported
+  # currently this for loop essentially checks for only 1 key
+  for (strategy in smdistributed){
+    if (!(names(strategy) %in% SMDISTRIBUTED_SUPPORTED_STRATEGIES)){
+      err_msg = paste(
+        sprintf("Invalid smdistributed strategy provided: %s\n", strategy),
+        sprintf("Supported strategies: %s", paste(SMDISTRIBUTED_SUPPORTED_STRATEGIES, collapse = ", "))
+        )
+      stop(err_msg, call. = F)
+    }
+  }
+
+  # smdataparallel-specific input validation
+  if ("dataparallel" %in% names(smdistributed)){
+    .validate_smdataparallel_args(
+      instance_type, framework_name, framework_version, py_version, distribution, image_uri
+    )
+  }
+}
+
+# Check if request is using unsupported arguments.
+# Validate if user specifies a supported instance type, framework version, and python
+# version.
+# Args:
+#   instance_type (str): A string representing the type of training instance selected. Ex: `ml.p3.16xlarge`
+# framework_name (str): A string representing the name of framework selected. Ex: `tensorflow`
+# framework_version (str): A string representing the framework version selected. Ex: `2.3.1`
+# py_version (str): A string representing the python version selected. Ex: `py3`
+# distribution (dict): A dictionary with information to enable distributed training.
+# (Defaults to None if distributed training is not enabled.) Ex:
+#   .. code:: python
+# {
+#   "smdistributed": {
+#     "dataparallel": {
+#       "enabled": True
+#     }
+#   }
+# }
+# image_uri (str): A string representing a Docker image URI.
+# Raises:
+#   ValueError: if
+# (`instance_type` is not in SM_DATAPARALLEL_SUPPORTED_INSTANCE_TYPES or
+#  `py_version` is not python3 or
+#  `framework_version` is not in SM_DATAPARALLEL_SUPPORTED_FRAMEWORK_VERSION
+.validate_smdataparallel_args <- function(instance_type,
+                                          framework_name,
+                                          framework_version,
+                                          py_version,
+                                          distribution,
+                                          image_uri=NULL){
+  smdataparallel_enabled = distribution$smdistributed$dataparallel$enabled %||% FALSE
+
+  if (!smdataparallel_enabled)
+    return(NULL)
+
+  is_instance_type_supported = instance_type %in% SM_DATAPARALLEL_SUPPORTED_INSTANCE_TYPES
+
+  err_msg = ""
+
+  if (!is_instance_type_supported){
+    # instance_type is required
+    err_msg = paste0(err_msg,
+                sprintf("Provided instance_type %s is not supported by smdataparallel.\n",instance_type),
+                sprintf("Please specify one of the supported instance types: %s\n",
+                        paste(SMDISTRIBUTED_SUPPORTED_STRATEGIES, collapse = ", ")))
+  }
+
+  if (is.null(image_uri)){
+    # ignore framework_version & py_version if image_uri is set
+    # in case image_uri is not set, then both are mandatory
+    supported = SM_DATAPARALLEL_SUPPORTED_FRAMEWORK_VERSIONS[[framework_name]]
+    if (!(framework_version %in% supported)){
+      err_msg = paste0(err_msg,
+        sprintf("Provided framework_version %s is not supported by", framework_version),
+        " smdataparallel.\n",
+        sprintf("Please specify one of the supported framework versions: %s \n", paste(supported, collapse = ", ")))
+    }
+    if (!("py3" %in% py_version)){
+      err_msg = paste0(err_msg,
+        sprintf("Provided py_version %s is not supported by smdataparallel.\n", py_version),
+        "Please specify py_version=py3")
+    }
+  }
+  if (length(err_msg) > 0)
+    stop(err_msg, call. = F)
+}
+
 
 python_deprecation_warning <- function(framework, latest_supported_version){
   return(sprintf(PYTHON_2_DEPRECATION_WARNING,
