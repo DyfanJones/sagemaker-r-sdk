@@ -14,7 +14,7 @@ This class hosts user-defined code in S3 and sets code location and
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{FrameworkModel$new()}}
-\item \href{#method-prepare_container}{\code{FrameworkModel$prepare_container()}}
+\item \href{#method-prepare_container_def}{\code{FrameworkModel$prepare_container_def()}}
 \item \href{#method-clone}{\code{FrameworkModel$clone()}}
 }
 }
@@ -27,8 +27,9 @@ This class hosts user-defined code in S3 and sets code location and
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="delete_model">}\href{../../R6sagemaker/html/Model.html#method-delete_model}{\code{R6sagemaker::Model$delete_model()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker/html/Model.html#method-deploy}{\code{R6sagemaker::Model$deploy()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker::Model$enable_network_isolation()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="prepare_container_def">}\href{../../R6sagemaker/html/Model.html#method-prepare_container_def}{\code{R6sagemaker::Model$prepare_container_def()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="package_for_edge">}\href{../../R6sagemaker/html/Model.html#method-package_for_edge}{\code{R6sagemaker::Model$package_for_edge()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="register">}\href{../../R6sagemaker/html/Model.html#method-register}{\code{R6sagemaker::Model$register()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
 }
 \out{</details>}
@@ -188,14 +189,17 @@ credential storage for authentication.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-prepare_container"></a>}}
-\if{latex}{\out{\hypertarget{method-prepare_container}{}}}
-\subsection{Method \code{prepare_container()}}{
+\if{html}{\out{<a id="method-prepare_container_def"></a>}}
+\if{latex}{\out{\hypertarget{method-prepare_container_def}{}}}
+\subsection{Method \code{prepare_container_def()}}{
 Return a container definition with framework configuration set in
              model environment variables.
              This also uploads user-supplied code to S3.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$prepare_container(instance_type = NULL, accelerator_type = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FrameworkModel$prepare_container_def(
+  instance_type = NULL,
+  accelerator_type = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

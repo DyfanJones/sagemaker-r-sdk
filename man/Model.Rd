@@ -10,9 +10,11 @@ A SageMaker ``Model`` that can be deployed to an ``Endpoint``.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{Model$new()}}
+\item \href{#method-register}{\code{Model$register()}}
 \item \href{#method-prepare_container_def}{\code{Model$prepare_container_def()}}
 \item \href{#method-enable_network_isolation}{\code{Model$enable_network_isolation()}}
 \item \href{#method-check_neo_region}{\code{Model$check_neo_region()}}
+\item \href{#method-package_for_edge}{\code{Model$package_for_edge()}}
 \item \href{#method-compile}{\code{Model$compile()}}
 \item \href{#method-deploy}{\code{Model$deploy()}}
 \item \href{#method-transformer}{\code{Model$transformer()}}
@@ -93,6 +95,69 @@ model archive file if the model is repacked}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-register"></a>}}
+\if{latex}{\out{\hypertarget{method-register}{}}}
+\subsection{Method \code{register()}}{
+Creates a model package for creating SageMaker models or listing on Marketplace.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Model$register(
+  content_types,
+  response_types,
+  inference_instances,
+  transform_instances,
+  model_package_name = NULL,
+  model_package_group_name = NULL,
+  image_uri = NULL,
+  model_metrics = NULL,
+  metadata_properties = NULL,
+  marketplace_cert = FALSE,
+  approval_status = NULL,
+  description = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{content_types}}{(list): The supported MIME types for the input data (default: None).}
+
+\item{\code{response_types}}{(list): The supported MIME types for the output data (default: None).}
+
+\item{\code{inference_instances}}{(list): A list of the instance types that are used to
+generate inferences in real-time (default: None).}
+
+\item{\code{transform_instances}}{(list): A list of the instance types on which a transformation
+job can be run or on which an endpoint can be deployed (default: None).}
+
+\item{\code{model_package_name}}{(str): Model Package name, exclusive to `model_package_group_name`,
+using `model_package_name` makes the Model Package un-versioned (default: None).}
+
+\item{\code{model_package_group_name}}{(str): Model Package Group name, exclusive to
+`model_package_name`, using `model_package_group_name` makes the Model Package
+versioned (default: None).}
+
+\item{\code{image_uri}}{(str): Inference image uri for the container. Model class' self.image will
+be used if it is None (default: None).}
+
+\item{\code{model_metrics}}{(ModelMetrics): ModelMetrics object (default: None).}
+
+\item{\code{metadata_properties}}{(MetadataProperties): MetadataProperties object (default: None).}
+
+\item{\code{marketplace_cert}}{(bool): A boolean value indicating if the Model Package is certified
+for AWS Marketplace (default: False).}
+
+\item{\code{approval_status}}{(str): Model Approval Status, values can be "Approved", "Rejected",
+or "PendingManualApproval" (default: "PendingManualApproval").}
+
+\item{\code{description}}{(str): Model Package description (default: None).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: A string of SageMaker Model Package ARN.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-prepare_container_def"></a>}}
 \if{latex}{\out{\hypertarget{method-prepare_container_def}{}}}
 \subsection{Method \code{prepare_container_def()}}{
@@ -152,6 +217,54 @@ Check if this ``Model`` in the available region where neo support.
 \subsection{Returns}{
 bool: boolean value whether if neo is available in the specified
              region
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-package_for_edge"></a>}}
+\if{latex}{\out{\hypertarget{method-package_for_edge}{}}}
+\subsection{Method \code{package_for_edge()}}{
+Package this ``Model`` with SageMaker Edge.
+             Creates a new EdgePackagingJob and wait for it to finish.
+             model_data will now point to the packaged artifacts.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Model$package_for_edge(
+  output_path,
+  model_name,
+  model_version,
+  role = NULL,
+  job_name = NULL,
+  resource_key = NULL,
+  s3_kms_key = NULL,
+  tags = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{output_path}}{(str): Specifies where to store the packaged model}
+
+\item{\code{model_name}}{(str): the name to attach to the model metadata}
+
+\item{\code{model_version}}{(str): the version to attach to the model metadata}
+
+\item{\code{role}}{(str): Execution role}
+
+\item{\code{job_name}}{(str): The name of the edge packaging job}
+
+\item{\code{resource_key}}{(str): the kms key to encrypt the disk with}
+
+\item{\code{s3_kms_key}}{(str): the kms key to encrypt the output with}
+
+\item{\code{tags}}{(list[dict]): List of tags for labeling an edge packaging job. For
+more, see
+https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+sagemaker.model.Model: A SageMaker ``Model`` object. See
+             :func:`~sagemaker.model.Model` for full details.
 }
 }
 \if{html}{\out{<hr>}}

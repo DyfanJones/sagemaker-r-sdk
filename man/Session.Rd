@@ -58,6 +58,7 @@ bucket based on a naming convention which includes the current AWS account ID.
 \item \href{#method-create_model}{\code{Session$create_model()}}
 \item \href{#method-create_model_from_job}{\code{Session$create_model_from_job()}}
 \item \href{#method-create_model_package_from_algorithm}{\code{Session$create_model_package_from_algorithm()}}
+\item \href{#method-create_model_package_from_containers}{\code{Session$create_model_package_from_containers()}}
 \item \href{#method-wait_for_model_package}{\code{Session$wait_for_model_package()}}
 \item \href{#method-create_endpoint_config}{\code{Session$create_endpoint_config()}}
 \item \href{#method-create_endpoint_config_from_existing}{\code{Session$create_endpoint_config_from_existing()}}
@@ -70,6 +71,7 @@ bucket based on a naming convention which includes the current AWS account ID.
 \item \href{#method-wait_for_job}{\code{Session$wait_for_job()}}
 \item \href{#method-wait_for_processing_job}{\code{Session$wait_for_processing_job()}}
 \item \href{#method-wait_for_compilation_job}{\code{Session$wait_for_compilation_job()}}
+\item \href{#method-wait_for_edge_packaging_job}{\code{Session$wait_for_edge_packaging_job()}}
 \item \href{#method-wait_for_tuning_job}{\code{Session$wait_for_tuning_job()}}
 \item \href{#method-describe_transform_job}{\code{Session$describe_transform_job()}}
 \item \href{#method-wait_for_transform_job}{\code{Session$wait_for_transform_job()}}
@@ -1533,6 +1535,66 @@ Create a SageMaker Model Package from the results of training with an Algorithm 
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-create_model_package_from_containers"></a>}}
+\if{latex}{\out{\hypertarget{method-create_model_package_from_containers}{}}}
+\subsection{Method \code{create_model_package_from_containers()}}{
+Get request dictionary for CreateModelPackage API.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$create_model_package_from_containers(
+  containers = NULL,
+  content_types = NULL,
+  response_types = NULL,
+  inference_instances = NULL,
+  transform_instances = NULL,
+  model_package_name = NULL,
+  model_package_group_name = NULL,
+  model_metrics = NULL,
+  metadata_properties = NULL,
+  marketplace_cert = FALSE,
+  approval_status = "PendingManualApproval",
+  description = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{containers}}{(list): A list of inference containers that can be used for inference
+specifications of Model Package (default: None).}
+
+\item{\code{content_types}}{(list): The supported MIME types for the input data (default: None).}
+
+\item{\code{response_types}}{(list): The supported MIME types for the output data (default: None).}
+
+\item{\code{inference_instances}}{(list): A list of the instance types that are used to
+generate inferences in real-time (default: None).}
+
+\item{\code{transform_instances}}{(list): A list of the instance types on which a transformation
+job can be run or on which an endpoint can be deployed (default: None).}
+
+\item{\code{model_package_name}}{(str): Model Package name, exclusive to `model_package_group_name`,
+using `model_package_name` makes the Model Package un-versioned (default: None).}
+
+\item{\code{model_package_group_name}}{(str): Model Package Group name, exclusive to
+`model_package_name`, using `model_package_group_name` makes the Model Package
+versioned (default: None).}
+
+\item{\code{model_metrics}}{(ModelMetrics): ModelMetrics object (default: None).}
+
+\item{\code{metadata_properties}}{(MetadataProperties): MetadataProperties object (default: None)}
+
+\item{\code{marketplace_cert}}{(bool): A boolean value indicating if the Model Package is certified
+for AWS Marketplace (default: False).}
+
+\item{\code{approval_status}}{(str): Model Approval Status, values can be "Approved", "Rejected",
+or "PendingManualApproval" (default: "PendingManualApproval").}
+
+\item{\code{description}}{(str): Model Package description (default: None).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-wait_for_model_package"></a>}}
 \if{latex}{\out{\hypertarget{method-wait_for_model_package}{}}}
 \subsection{Method \code{wait_for_model_package()}}{
@@ -1850,6 +1912,28 @@ Wait for an Amazon SageMaker Neo compilation job to complete.
 }
 \subsection{Returns}{
 (dict): Return value from the ``DescribeCompilationJob`` API.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-wait_for_edge_packaging_job"></a>}}
+\if{latex}{\out{\hypertarget{method-wait_for_edge_packaging_job}{}}}
+\subsection{Method \code{wait_for_edge_packaging_job()}}{
+Wait for an Amazon SageMaker Edge packaging job to complete.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Session$wait_for_edge_packaging_job(job, poll = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{job}}{(str): Name of the edge packaging job to wait for.}
+
+\item{\code{poll}}{(int): Polling interval in seconds (default: 5).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(dict): Return value from the ``DescribeEdgePackagingJob`` API.
 }
 }
 \if{html}{\out{<hr>}}
