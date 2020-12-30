@@ -130,7 +130,7 @@ TensorFlow = R6Class("TensorFlow",
 
       if (identical(py_version, "py2"))
         log_warn(
-          python_deprecation_warning(attr(self, "_framework_name"), defaults.LATEST_PY2_VERSION)
+          python_deprecation_warning(attr(self, "_framework_name"), TENSORFLOW_LATEST_PY2_VERSION)
         )
 
       private$.validate_args(py_version=py_version)
@@ -179,7 +179,7 @@ TensorFlow = R6Class("TensorFlow",
                  container_log_level=self$container_log_level,
                  framework_version=self$framework_version,
                  sagemaker_session=self$sagemaker_session,
-                 vpc_config=self$get_vpc_config(vpc_config_override),
+                 vpc_config=list(self$get_vpc_config(vpc_config_override)),
                  entry_point=entry_point,
                  source_dir=source_dir,
                  dependencies=dependencies,
@@ -351,7 +351,7 @@ TensorFlow = R6Class("TensorFlow",
 
     .validate_args = function(py_version){
 
-      if (py_version == "py2" && private$.only_python_3_supported()){
+      if (identical(py_version, "py2") && private$.only_python_3_supported()){
         msg = paste0(
           sprintf("Python 2 containers are only available with %s and lower versions. ", TENSORFLOW_LATEST_PY2_VERSION),
           "Please use a Python 3 container.")
@@ -392,8 +392,7 @@ TensorFlow = R6Class("TensorFlow",
     .prepare_init_params_from_job_description = function(job_details,
                                                          model_channel_name=NULL){
       init_params = super$.prepare_init_params_from_job_description(
-        job_details, model_channel_name
-      )
+        job_details, model_channel_name)
 
       image_uri = init_params$image_uri
       init_params$image_uri = NULL
@@ -428,10 +427,11 @@ TensorFlow = R6Class("TensorFlow",
         init_params$image_uri = image_uri
 
       if (img_split$framework != attr(self, "_framework_name"))
-        stop(
-          sprintf("Training job: %s didn't use image for requested framework",
-                  job_details$TrainingJobName),
-          call. = F)
+        stop(sprintf("Training job: %s didn't use image for requested framework",
+                     job_details$TrainingJobName),
+             call. = F)
+
+      return(init_params)
     },
 
     .default_s3_path = function(directory,
