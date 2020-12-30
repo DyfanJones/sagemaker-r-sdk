@@ -505,7 +505,7 @@ Model = R6Class("Model",
                   max_payload=max_payload,
                   env=env,
                   tags=tags,
-                  base_transform_job_name=self.name,
+                  base_transform_job_name=self$name,
                   volume_kms_key=volume_kms_key,
                   sagemaker_session=self$sagemaker_session))
 
