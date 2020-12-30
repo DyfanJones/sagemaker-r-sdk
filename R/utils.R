@@ -58,7 +58,7 @@ base_from_name <- function(name){
 
 base_name_from_image <- function(image){
   m <- grepl("^(.+/)?([^:/]+)(:[^:]+)?$", image)
-  algo_name = if(m) gsub(".*/|:.*", "", image) else image
+  algo_name = if(!is.null(m)) gsub(".*/|:.*", "", image) else image
   return(algo_name)
 }
 
@@ -388,19 +388,19 @@ print_class <- function(self){
 
 # Wrapper sys::exec_internal to return errors to jupyter:
 # https://github.com/DyfanJones/sagemaker-r-sdk/issues/41
-sys_jupyter <- function(cmd, args = NULL, timeout = 0){ 
+sys_jupyter <- function(cmd, args = NULL, timeout = 0){
   output <- sys::exec_internal(
     cmd, args, error = FALSE, timeout = timeout)
   # raise error
   if(!identical(output$status, 0L)){
     # rebuild sys::exec_internal initial error message
     msg <- sprintf("Executing '%s' failed with status: %d\n", cmd[1], output$status)
-    
+
     # added any warning messages from terminal
     if (length(output$stdout) > 0){
       stdout <- paste0(sys::as_text(output$stdout), "\n")
       warning(stdout, call. = F)}
-    
+
     # added returning error from terminal
     stderr <- paste0(sys::as_text(output$stderr), "\n")
     stop(msg, stderr, call. = F)
