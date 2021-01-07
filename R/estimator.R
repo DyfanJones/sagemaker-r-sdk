@@ -904,68 +904,73 @@ EstimatorBase = R6Class("EstimatorBase",
         hyperparameters = self$hyperparameters()}
 
       train_args = config
-      train_args[["input_mode"]] = self$input_mode
-      train_args[["job_name"]] = self$.current_job_name
-      train_args[["hyperparameters"]] = hyperparameters
-      train_args[["tags"]] = self$tags
-      train_args[["metric_definitions"]] = self$metric_definitions
-      train_args[["experiment_config"]] = experiment_config
+      train_args$input_mode = self$input_mode
+      train_args$job_name = self$.current_job_name
+      train_args$hyperparameters = hyperparameters
+      train_args$tags = self$tags
+      train_args$metric_definitions = self$metric_definitions
+      train_args$experiment_config = experiment_config
 
-      if (inherits(inputs, c("TrainingInputs"))){
-        if ("InputMode" %in% inputs$config){
+      if (inherits(inputs, "TrainingInputs")){
+        if ("InputMode" %in% names(inputs$config)){
           log_debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
                     inputs$config$InputMode)
-          train_args[["input_mode"]] = inputs$config$InputMod}
+          train_args$input_mode = inputs$config$InputMode}
       }
 
-      if (self$enable_network_isolation()){
-        train_args[["enable_network_isolation"]] = TRUE}
+      if (self$enable_network_isolation())
+        train_args$enable_network_isolation = TRUE
 
-      if (self$encrypt_inter_container_traffic){
-        train_args[["encrypt_inter_container_traffic"]] = TRUE}
+      if (self$encrypt_inter_container_traffic)
+        train_args$encrypt_inter_container_traffic = TRUE
 
       if (inherits(self, "AlgorithmEstimator")){
-        train_args[["algorithm_arn"]] = self$algorithm_arn
+        train_args$algorithm_arn = self$algorithm_arn
       } else {
-        train_args[["image_uri"]] = self$training_image_uri()}
+        train_args$image_uri = self$training_image_uri()}
 
       if (!islistempty(self$debugger_rule_configs))
-        train_args[["debugger_rule_configs"]] = self$debugger_rule_configs
+        train_args$debugger_rule_configs = self$debugger_rule_configs
 
       if (!islistempty(self$debugger_hook_config)){
-        self$debugger_hook_config[["collection_configs"]] = self$collection_configs
-        train_args[["debugger_hook_config"]] = self$debugger_hook_config$to_request_list()}
+        self$debugger_hook_config$collection_configs = self$collection_configs
+        train_args$debugger_hook_config = self$debugger_hook_config$to_request_list()}
 
       if (!islistempty(self$tensorboard_output_config))
-        train_args[["tensorboard_output_config"]] = self$tensorboard_output_config$to_request_list()
+        train_args$tensorboard_output_config = self$tensorboard_output_config$to_request_list()
 
-      train_args = c(train_args, private$.add_spot_checkpoint_args(local_mode, train_args))
+      train_args = private$.add_spot_checkpoint_args(local_mode, train_args)
 
       if (!islistempty(self$enable_sagemaker_metrics))
-        train_args[["enable_sagemaker_metrics"]] = self$enable_sagemaker_metrics
+        train_args$enable_sagemaker_metrics = self$enable_sagemaker_metrics
+
+      if (!islistempty(self$profiler_rule_configs))
+        train_args$profiler_rule_configs = self$profiler_rule_configs
+
+      if (!islistempty(self$profiler_config))
+        train_args$profiler_config = self$profiler_config$to_request_list()
 
       return(train_args)
     },
 
     .add_spot_checkpoint_args = function(local_mode,
                                          train_args){
-      train_args = list()
       if (self$use_spot_instances){
-        if (local_mode){
-          stop("Spot training is not supported in local mode.", call. = F)}
-        train_args[["use_spot_instances"]] = TRUE
+        if (local_mode)
+          stop("Spot training is not supported in local mode.", call. = F)
+        train_args$use_spot_instances = TRUE
       }
 
       if (!islistempty(self$checkpoint_s3_uri)){
-        if (local_mode){
-          stop("Setting checkpoint_s3_uri is not supported in local mode.", call. = F)}
-        train_args[["checkpoint_s3_uri"]] = self$checkpoint_s3_uri
+        if (local_mode)
+          stop("Setting checkpoint_s3_uri is not supported in local mode.", call. = F)
+        train_args$checkpoint_s3_uri = self$checkpoint_s3_uri
       }
 
       if (!islistempty(self$checkpoint_local_path)){
-        if (local_mode){
-        stop("Setting checkpoint_local_path is not supported in local mode.", call. = F)}
-        train_args[["checkpoint_local_path"]] = self$checkpoint_local_path
+        if (local_mode)
+          stop("Setting checkpoint_local_path is not supported in local mode.", call. = F)
+        train_args$checkpoint_local_path = self$checkpoint_local_path
       }
       return(train_args)
     },
