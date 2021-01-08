@@ -33,6 +33,7 @@ Collate:
     'deserializers.R'
     'serializers.R'
     'utils.R'
+    'studio.R'
     'vpc_utils.R'
     'set_credentials.R'
     'logs.R'
