@@ -145,6 +145,16 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              isolation mode restricts the container access to outside networks
     #'              (such as the Internet). The container does not make any inbound or
     #'              outbound network calls. Also known as Internet-free mode.
+    #' @param profiler_config (:class:`~sagemaker.debugger.ProfilerConfig`):
+    #'              Configuration for how SageMaker Debugger collects
+    #'              monitoring and profiling information from your training job.
+    #'              If not specified, a default configuration is created using
+    #'              the estimator's ``output_path``, unless the region does not
+    #'              support SageMaker Debugger. To disable SageMaker Debugger
+    #'              monitoring and profiling, set the
+    #'              ``disable_profiler`` parameter to ``True``.
+    #' @param disable_profiler (bool): Specifies whether Debugger monitoring and profiling
+    #'              will be disabled (default: ``False``).
     #' @param ... : update any deprecated parameters passed into class.
     initialize = function(role,
                           instance_count,
@@ -173,6 +183,8 @@ EstimatorBase = R6Class("EstimatorBase",
                           tensorboard_output_config = NULL,
                           enable_sagemaker_metrics = NULL,
                           enable_network_isolation = FALSE,
+                          profiler_config=NULL,
+                          disable_profiler=FALSE,
                           ...) {
 
       kwargs = list(...)
@@ -192,6 +204,9 @@ EstimatorBase = R6Class("EstimatorBase",
         "train_volume_kms_key", "volume_kms_key", volume_kms_key, kwargs
       )
 
+      if(is.null(instance_count) || is.null(instance_type))
+        stop("Both instance_count and instance_type are required.", call.= F)
+
       self$role = role
       self$instance_count = instance_count
       self$instance_type = instance_type
@@ -207,17 +222,18 @@ EstimatorBase = R6Class("EstimatorBase",
       self$code_channel_name = "code"
 
       if (self$instance_type %in% c("local", "local_gpu")) {
-        if (self$instance_type == "local_gpu" && self$instance_count > 1) stop("Distributed Training in Local GPU is not supported", call. = FALSE)
+        if (self$instance_type == "local_gpu" && self$instance_count > 1)
+          stop("Distributed Training in Local GPU is not supported", call. = FALSE)
         stop("Currently don't support local sagemaker", call. = F)
-        self$sagemaker_session = sagemaker_session #  LocalSession()
-        if (!inherist(self$sagemaker_session, "Session")) stop("instance_type local or local_gpu is only supported with an instance of LocalSession", call. = FALSE)
-      } else  {self$sagemaker_session = sagemaker_session %||% Session$new()}
-
+        self$sagemaker_session = sagemaker_session #%||%  LocalSession()
+        if (!inherist(self$sagemaker_session, c("Session", "LocalSession")))
+          stop("instance_type local or local_gpu is only supported with an instance of LocalSession", call. = FALSE)
+      } else {self$sagemaker_session = sagemaker_session %||% Session$new()}
 
       self$base_job_name = base_job_name
       self$.current_job_name = NULL
 
-      if (inherits(self$sagemaker_session, "Session") # need to change this part to local mode :S
+      if (self$sagemaker_session$local_mode
         && !is.null(output_path)
         && startsWith(output_path, "file://")) {
         stop("file:// output paths are only supported in Local Mode", call. = F)}
@@ -249,6 +265,13 @@ EstimatorBase = R6Class("EstimatorBase",
 
       self$enable_sagemaker_metrics = enable_sagemaker_metrics
       self$.enable_network_isolation = enable_network_isolation
+
+      self$profiler_config = profiler_config
+      self$disable_profiler = disable_profiler
+
+      self$profiler_rule_configs = NULL
+      self$profiler_rules = NULL
+      self$debugger_rules = NULL
     },
 
     #' @description Return the Docker image to use for training.

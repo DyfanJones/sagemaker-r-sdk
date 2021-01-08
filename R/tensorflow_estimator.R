@@ -81,7 +81,6 @@ TensorFlow = R6Class("TensorFlow",
     #'              }
     #'              }
     #' @param ... : Additional kwargs passed to the Framework constructor.
-
     initialize = function(py_version=NULL,
                           framework_version=NULL,
                           model_dir=NULL,

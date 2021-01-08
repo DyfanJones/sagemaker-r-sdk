@@ -62,14 +62,29 @@ base_name_from_image <- function(image){
   return(algo_name)
 }
 
-# Return a timestamp that is relatively short in length
-sagemaker_short_timestamp <- function() return(format(Sys.time(), "%y%m%d-%H%M"))
-
 # Return a timestamp with millisecond precision.
 sagemaker_timestamp <- function(){
   moment = Sys.time()
   moment_ms = split_str(format(as.numeric(moment,3), nsmall = 3), "\\.")[2]
   paste0(format(Sys.time(),"%Y-%m-%d-%H-%M-%S-",tz="GMT"), moment_ms)
+}
+
+# Return a timestamp that is relatively short in length
+sagemaker_short_timestamp <- function() return(format(Sys.time(), "%y%m%d-%H%M"))
+
+# Return a dict of key and value pair if value is not None, otherwise return an empty dict.
+# Args:
+#   key (str): input key
+# value (str): input value
+# Returns:
+#   dict: dict of key and value or an empty dict.
+build_dict <- function(key, value = NULL){
+  if (!is.null(value)) {
+    dict = list(value)
+    names(dict) = key
+    return(dict)
+  }
+  return(list())
 }
 
 get_config_value <- function(key_path, config = NULL){

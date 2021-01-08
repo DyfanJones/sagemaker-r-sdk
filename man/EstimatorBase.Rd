@@ -78,6 +78,8 @@ Initialize an ``EstimatorBase`` instance.
   tensorboard_output_config = NULL,
   enable_sagemaker_metrics = NULL,
   enable_network_isolation = FALSE,
+  profiler_config = NULL,
+  disable_profiler = FALSE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -228,6 +230,18 @@ run in network isolation mode (default: ``False``). Network
 isolation mode restricts the container access to outside networks
 (such as the Internet). The container does not make any inbound or
 outbound network calls. Also known as Internet-free mode.}
+
+\item{\code{profiler_config}}{(:class:`~sagemaker.debugger.ProfilerConfig`):
+Configuration for how SageMaker Debugger collects
+monitoring and profiling information from your training job.
+If not specified, a default configuration is created using
+the estimator's ``output_path``, unless the region does not
+support SageMaker Debugger. To disable SageMaker Debugger
+monitoring and profiling, set the
+``disable_profiler`` parameter to ``True``.}
+
+\item{\code{disable_profiler}}{(bool): Specifies whether Debugger monitoring and profiling
+will be disabled (default: ``False``).}
 
 \item{\code{...}}{: update any deprecated parameters passed into class.}
 }

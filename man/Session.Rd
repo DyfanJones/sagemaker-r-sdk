@@ -298,7 +298,9 @@ Create an Amazon SageMaker training job. Train the learner on a set of observati
   debugger_rule_configs = NULL,
   debugger_hook_config = NULL,
   tensorboard_output_config = NULL,
-  enable_sagemaker_metrics = NULL
+  enable_sagemaker_metrics = NULL,
+  profiler_rule_configs = NULL,
+  profiler_config = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -394,6 +396,11 @@ three optional keys, 'ExperimentName', 'TrialName', and 'TrialComponentDisplayNa
 Series. For more information see:
 https://docs.aws.amazon.com/sagemaker/latest/dg/API_AlgorithmSpecification.html#SageMaker-Type-AlgorithmSpecification-EnableSageMakerMetricsTimeSeries
 (Default: \code{NULL}).}
+
+\item{\code{profiler_rule_configs}}{(list[dict]): A list of profiler rule configurations.}
+
+\item{\code{profiler_config}}{(dict): Configuration for how profiling information is emitted
+with SageMaker Profiler. (default: ``None``).}
 }
 \if{html}{\out{</div>}}
 }
