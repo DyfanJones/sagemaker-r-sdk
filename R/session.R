@@ -365,8 +365,6 @@ Session = R6Class("Session",
       log_info("Creating training-job with name: %s", job_name)
       log_debug("train request: %s", toJSON(train_request, pretty = T, auto_unbox = T))
 
-      # TODO: paws sdk is out of sync with boto3  i.e. [ProfilerRuleConfigurations, ProfilerConfig] parameters don't exist in `create_training_job` function.
-      # paws - ticket: https://github.com/paws-r/paws/issues/357
       self$sagemaker$create_training_job(TrainingJobName = train_request$TrainingJobName,
                              HyperParameters = train_request$HyperParameters,
                              AlgorithmSpecification = train_request$AlgorithmSpecification,
@@ -384,9 +382,9 @@ Session = R6Class("Session",
                              DebugHookConfig = train_request$DebugHookConfig,
                              DebugRuleConfigurations = train_request$DebugRuleConfigurations,
                              TensorBoardOutputConfig = train_request$TensorBoardOutputConfig,
-                             ExperimentConfig = train_request$ExperimentConfig)
-                             # ProfilerRuleConfigurations = train_request$ProfilerRuleConfigurations,
-                             # ProfilerConfig = train_request$ProfilerConfig)
+                             ExperimentConfig = train_request$ExperimentConfig,
+                             ProfilerRuleConfigurations = train_request$ProfilerRuleConfigurations,
+                             ProfilerConfig = train_request$ProfilerConfig)
     },
 
     #' @description Create an Amazon SageMaker processing job.
