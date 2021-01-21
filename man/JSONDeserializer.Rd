@@ -4,17 +4,10 @@
 \alias{JSONDeserializer}
 \title{JSONDeserializer Class}
 \description{
-Use json format to deserialize raw data stream
+Deserialize JSON data from an inference endpoint into a R object.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{JSONDeserializer}
-}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{encoding}}{string encoding to be used}
-}
-\if{html}{\out{</div>}}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{\link[R6sagemaker:SimpleBaseDeserializer]{R6sagemaker::SimpleBaseDeserializer}} -> \code{JSONDeserializer}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -35,17 +28,25 @@ Use json format to deserialize raw data stream
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize StringBaseDeserializer Class
+Initialize a ``JSONDeserializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{JSONDeserializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{JSONDeserializer$new(accept = "application/json")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{accept}}{(union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+is expected from the inference endpoint (default: "application/json").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-deserialize"></a>}}
 \if{latex}{\out{\hypertarget{method-deserialize}{}}}
 \subsection{Method \code{deserialize()}}{
-Takes raw data stream and deserializes it.
+Deserialize JSON data from an inference endpoint into a Python object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{JSONDeserializer$deserialize(stream, content_type)}\if{html}{\out{</div>}}
 }
@@ -53,11 +54,14 @@ Takes raw data stream and deserializes it.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{stream}}{raw data to be deserialize}
+\item{\code{stream}}{(botocore.response.StreamingBody): Data to be deserialized.}
 
 \item{\code{content_type}}{(str): The MIME type of the data.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+object: The JSON-formatted data deserialized into a R object.
 }
 }
 \if{html}{\out{<hr>}}

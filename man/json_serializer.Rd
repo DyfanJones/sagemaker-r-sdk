@@ -5,7 +5,7 @@
 \alias{json_serializer}
 \title{S3 method to call JsonSerializer class}
 \format{
-An object of class \code{JSONSerializer} (inherits from \code{BaseSerializer}, \code{R6}) of length 6.
+An object of class \code{JSONSerializer} (inherits from \code{SimpleBaseSerializer}, \code{BaseSerializer}, \code{R6}) of length 7.
 }
 \usage{
 json_serializer

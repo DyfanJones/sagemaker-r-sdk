@@ -5,7 +5,7 @@
 \alias{csv_serializer}
 \title{S3 method to call CSVSerializer class}
 \format{
-An object of class \code{CSVSerializer} (inherits from \code{BaseSerializer}, \code{R6}) of length 6.
+An object of class \code{CSVSerializer} (inherits from \code{SimpleBaseSerializer}, \code{BaseSerializer}, \code{R6}) of length 7.
 }
 \usage{
 csv_serializer

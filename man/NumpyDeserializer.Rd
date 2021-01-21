@@ -4,17 +4,19 @@
 \alias{NumpyDeserializer}
 \title{NumpySerializer Class}
 \description{
-Deserialize a stream of data in the .npy format.
+Deserialize a stream of data in the .npy or UTF-8 CSV/JSON format.
              This serializer class uses python numpy package to deserialize,
-             R objects through the use of the `reticualte` package.
+             R objects through the use of the `reticulate` package.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{NumpyDeserializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{\link[R6sagemaker:SimpleBaseDeserializer]{R6sagemaker::SimpleBaseDeserializer}} -> \code{NumpyDeserializer}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{np}}{Python Numpy package}
+
+\item{\code{dtype}}{The dtype of the data}
 
 \item{\code{allow_pickle}}{Allow loading pickled object arrays}
 }
@@ -39,16 +41,22 @@ Deserialize a stream of data in the .npy format.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize the dtype and allow_pickle arguments.
+Initialize a ``NumpyDeserializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NumpyDeserializer$new(accept = "application/x-npy", allow_pickle = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{NumpyDeserializer$new(
+  dtype = NULL,
+  accept = "application/x-npy",
+  allow_pickle = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{accept}}{(str): The MIME type that is expected from the inference
-endpoint (default: "application/x-npy").}
+\item{\code{dtype}}{(str): The dtype of the data (default: None).}
+
+\item{\code{accept}}{(union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+is expected from the inference endpoint (default: "application/x-npy").}
 
 \item{\code{allow_pickle}}{(bool): Allow loading pickled object arrays (default: True).}
 }

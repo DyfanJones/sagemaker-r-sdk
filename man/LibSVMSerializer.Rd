@@ -10,8 +10,8 @@ Serialize data of various formats to a LibSVM-formatted string.
              It is suitable for sparse datasets since it does not store zero-valued
              features.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{LibSVMSerializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{\link[R6sagemaker:SimpleBaseSerializer]{R6sagemaker::SimpleBaseSerializer}} -> \code{LibSVMSerializer}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -32,11 +32,19 @@ Serialize data of various formats to a LibSVM-formatted string.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize LibSVMSerializer class
+Initialize a ``LibSVMSerializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibSVMSerializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LibSVMSerializer$new(content_type = "text/libsvm")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{content_type}}{(str): The MIME type to signal to the inference endpoint when sending
+request data (default: "text/libsvm").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-serialize"></a>}}

@@ -8,13 +8,15 @@ Serialize data of various formats to a numpy npy file format.
              This serializer class uses python numpy package to serialize,
              R objects through the use of the `reticualte` package.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{NumpySerializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{\link[R6sagemaker:SimpleBaseSerializer]{R6sagemaker::SimpleBaseSerializer}} -> \code{NumpySerializer}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{np}}{Python Numpy package}
+
+\item{\code{dtype}}{The dtype of the data}
 }
 \if{html}{\out{</div>}}
 }
@@ -37,17 +39,27 @@ Serialize data of various formats to a numpy npy file format.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize NumpySerializer class
+Initialize a ``NumpySerializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NumpySerializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{NumpySerializer$new(dtype = NULL, content_type = "application/x-npy")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dtype}}{(str): The dtype of the data.}
+
+\item{\code{content_type}}{(str): The MIME type to signal to the inference endpoint when sending
+request data (default: "application/x-npy").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-serialize"></a>}}
 \if{latex}{\out{\hypertarget{method-serialize}{}}}
 \subsection{Method \code{serialize()}}{
-Serialize data of various formats to a Numpy file.
+Serialize data to a buffer using the .npy format.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{NumpySerializer$serialize(data)}\if{html}{\out{</div>}}
 }
@@ -55,13 +67,13 @@ Serialize data of various formats to a Numpy file.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data}}{(object): Data to be serialized. Can be a string or a
-file-like object.}
+\item{\code{data}}{(object): Data to be serialized. Can be a NumPy array, list,
+file, or buffer.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-str: The data serialized as a LibSVM-formatted string.
+(raw): A buffer containing data serialzied in the .npy format.
 }
 }
 \if{html}{\out{<hr>}}

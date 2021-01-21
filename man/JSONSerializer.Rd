@@ -4,15 +4,14 @@
 \alias{JSONSerializer}
 \title{JSONSerializer Class}
 \description{
-Make Raw data using json format
+Serialize data to a JSON formatted string.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{JSONSerializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{\link[R6sagemaker:SimpleBaseSerializer]{R6sagemaker::SimpleBaseSerializer}} -> \code{JSONSerializer}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{JSONSerializer$new()}}
 \item \href{#method-serialize}{\code{JSONSerializer$serialize()}}
 \item \href{#method-clone}{\code{JSONSerializer$clone()}}
 }
@@ -21,24 +20,15 @@ Make Raw data using json format
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseSerializer" data-id="print">}\href{../../R6sagemaker/html/BaseSerializer.html#method-print}{\code{R6sagemaker::BaseSerializer$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="SimpleBaseSerializer" data-id="initialize">}\href{../../R6sagemaker/html/SimpleBaseSerializer.html#method-initialize}{\code{R6sagemaker::SimpleBaseSerializer$initialize()}}\out{</span>}
 }
 \out{</details>}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
-\subsection{Method \code{new()}}{
-Initialize JSONSerializer
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{JSONSerializer$new()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-serialize"></a>}}
 \if{latex}{\out{\hypertarget{method-serialize}{}}}
 \subsection{Method \code{serialize()}}{
-Take data of various data formats and serialize them into CSV.
+Serialize data of various formats to a JSON formatted string.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{JSONSerializer$serialize(data)}\if{html}{\out{</div>}}
 }
@@ -49,6 +39,9 @@ Take data of various data formats and serialize them into CSV.
 \item{\code{data}}{(object): Data to be serialized.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(raw): The data serialized as a JSON string.
 }
 }
 \if{html}{\out{<hr>}}
