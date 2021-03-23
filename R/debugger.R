@@ -2,9 +2,9 @@
 
 # TODO: Build other python class in debugger
 
-#' @import R6
-#' @import utils
+#' @include utils.R
 
+#' @import R6
 
 # **NOTE:** rule_configs object comes from https://github.com/awslabs/sagemaker-debugger-rulesconfig/tree/master
 # Not sure to include this or not
