@@ -93,10 +93,6 @@ CSVSerializer = R6Class("CSVSerializer",
   )
 )
 
-#' @title S3 method to call CSVSerializer class
-#' @export
-csv_serializer <- CSVSerializer$new()
-
 #' @title NumpySerializer Class
 #' @description Serialize data of various formats to a numpy npy file format.
 #'              This serializer class uses python numpy package to serialize,
@@ -178,10 +174,6 @@ JSONSerializer = R6Class("JSONSerializer",
    )
 )
 
-#' @title S3 method to call JsonSerializer class
-#' @export
-json_serializer <- JSONSerializer$new()
-
 #' @title Serialize data by returning data without modification.
 #' @description This serializer may be useful if, for example, you're sending raw bytes such as from an image
 #'              file's .read() method.
@@ -194,7 +186,7 @@ IdentitySerializer = R6Class("IdentitySerializer",
     #' @param content_type (str): The MIME type to signal to the inference endpoint when sending
     #'              request data (default: "application/octet-stream").
     initialize = function(content_type="application/octet-stream"){
-      super$intialize(content_type = content_type)
+      super$initialize(content_type = content_type)
     },
 
     #' @description Return data without modification.
