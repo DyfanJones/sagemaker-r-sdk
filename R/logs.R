@@ -3,8 +3,8 @@
 #' @import logger
 
 sagemaker_logging_format <- function(){
-  log_formatter(formatter = logger::formatter_sprintf)
-  log_layout(layout_sagemaker_colour)
+  logger::log_formatter(formatter = logger::formatter_sprintf)
+  logger::log_layout(layout_sagemaker_colour)
 }
 
 layout_sagemaker_colour <- structure(function(level, msg, namespace = NA_character_,
