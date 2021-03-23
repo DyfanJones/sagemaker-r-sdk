@@ -48,19 +48,30 @@ Session = R6Class("Session",
     #'              Initialize a SageMaker \code{Session}.
     #'
     #' @param paws_credentials (PawsCredentials): The underlying AWS credentails passed to paws SDK.
+    #' @param sagemaker_client (paws::sagemaker): Client which makes Amazon SageMaker service
+    #'              calls other than ``InvokeEndpoint`` (default: None). Estimators created using this
+    #'              ``Session`` use this client. If not provided, one will be created using this
+    #'              instance's ``paws session``.
+    #' @param sagemaker_runtime_client (paws::sagemakerruntime): Client which makes
+    #'              ``InvokeEndpoint`` calls to Amazon SageMaker (default: None). Predictors created
+    #'              using this ``Session`` use this client. If not provided, one will be created using
+    #'              this instance's ``paws session``.
     #' @param default_bucket (str): The default Amazon S3 bucket to be used by this session.
     #'              This will be created the next time an Amazon S3 bucket is needed (by calling
     #'              :func:\code{default_bucket}).
     #'              If not provided, a default bucket will be created based on the following format:
     #'              "sagemaker-{region}-{aws-account-id}". Example: "sagemaker-my-custom-bucket".
     initialize = function(paws_credentials = NULL,
+                          sagemaker_client = NULL,
+                          sagemaker_runtime_client = NULL,
                           default_bucket = NULL) {
       self$paws_credentials  <- if(inherits(paws_credentials, "PawsCredentials")) paws_credentials else PawsCredentials$new()
 
       private$.default_bucket_name_override = default_bucket
       self$config = NULL
       # get sagemaker object from paws
-      self$sagemaker = paws::sagemaker(config = self$paws_credentials$credentials)
+      self$sagemaker = sagemaker %||% paws::sagemaker(config = self$paws_credentials$credentials)
+      self$sagemaker_runtime = sagemaker_runtime %||% paws::sagemakerruntime(config = self$paws_credentials$credentials)
       self$s3 = paws::s3(config = self$paws_credentials$credentials)
       self$local_mode = FALSE
     },
@@ -2867,14 +2878,29 @@ pipeline_container_def <- function(models, instance_type=NULL){
   return(c_defs)
 }
 
+# Create a production variant description suitable for use in a ``ProductionVariant`` list.
+# This is also part of a ``CreateEndpointConfig`` request.
+# Args:
+#   model_name (str): The name of the SageMaker model this production variant references.
+# instance_type (str): The EC2 instance type for this production variant. For example,
+# 'ml.c4.8xlarge'.
+# initial_instance_count (int): The initial instance count for this production variant
+# (default: 1).
+# variant_name (string): The ``VariantName`` of this production variant
+# (default: 'AllTraffic').
+# initial_weight (int): The relative ``InitialVariantWeight`` of this production variant
+# (default: 1).
+# accelerator_type (str): Type of Elastic Inference accelerator for this production variant.
+# For example, 'ml.eia1.medium'.
+# For more information: https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html
+# Returns:
+#   dict[str, str]: An SageMaker ``ProductionVariant`` description
 production_variant <- function(model_name,
-                               instance_type = c("ml.t2.medium","ml.t2.large","ml.t2.xlarge","ml.t2.2xlarge","ml.m4.xlarge","ml.m4.2xlarge","ml.m4.4xlarge","ml.m4.10xlarge","ml.m4.16xlarge","ml.m5.large","ml.m5.xlarge","ml.m5.2xlarge","ml.m5.4xlarge","ml.m5.12xlarge","ml.m5.24xlarge","ml.m5d.large","ml.m5d.xlarge","ml.m5d.2xlarge","ml.m5d.4xlarge","ml.m5d.12xlarge","ml.m5d.24xlarge","ml.c4.large","ml.c4.xlarge","ml.c4.2xlarge","ml.c4.4xlarge","ml.c4.8xlarge","ml.p2.xlarge","ml.p2.8xlarge","ml.p2.16xlarge","ml.p3.2xlarge","ml.p3.8xlarge","ml.p3.16xlarge","ml.c5.large","ml.c5.xlarge","ml.c5.2xlarge","ml.c5.4xlarge","ml.c5.9xlarge","ml.c5.18xlarge","ml.c5d.large","ml.c5d.xlarge","ml.c5d.2xlarge","ml.c5d.4xlarge","ml.c5d.9xlarge","ml.c5d.18xlarge","ml.g4dn.xlarge","ml.g4dn.2xlarge","ml.g4dn.4xlarge","ml.g4dn.8xlarge","ml.g4dn.12xlarge","ml.g4dn.16xlarge","ml.r5.large","ml.r5.xlarge","ml.r5.2xlarge","ml.r5.4xlarge","ml.r5.12xlarge","ml.r5.24xlarge","ml.r5d.large","ml.r5d.xlarge","ml.r5d.2xlarge","ml.r5d.4xlarge","ml.r5d.12xlarge","ml.r5d.24xlarge","ml.inf1.xlarge","ml.inf1.2xlarge","ml.inf1.6xlarge","ml.inf1.24xlarge"),
+                               instance_type,
                                initial_instance_count=1,
                                variant_name="AllTraffic",
                                initial_weight=1,
                                accelerator_type=NULL){
-
-  instance_type = match.arg(instance_type)
 
   production_variant_configuration = list(
     ModelName = model_name,
