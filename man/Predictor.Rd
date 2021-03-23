@@ -16,14 +16,17 @@ Make prediction requests to an Amazon SageMaker endpoint.
 \item{\code{serializer}}{Class to convert data into raw to send to endpoint}
 
 \item{\code{deserializer}}{Class to convert raw data back from the endpoint}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{content_type}}{The MIME type of the data sent to the inference endpoint.}
 
-\item{\code{content_type}}{Format to of data to send endpoint}
+\item{\code{accept}}{The content type(s) that are expected from the inference endpoint.}
 
-\item{\code{accept}}{Format returning from endpoint}
-
-\item{\code{.endpoint_config_name}}{Endpoint configuration name}
-
-\item{\code{.model_names}}{Model names being used at endpoint}
+\item{\code{endpoint}}{Deprecated attribute. Please use endpoint_name.}
 }
 \if{html}{\out{</div>}}
 }
@@ -32,12 +35,14 @@ Make prediction requests to an Amazon SageMaker endpoint.
 \itemize{
 \item \href{#method-new}{\code{Predictor$new()}}
 \item \href{#method-predict}{\code{Predictor$predict()}}
+\item \href{#method-update_endpoint}{\code{Predictor$update_endpoint()}}
 \item \href{#method-delete_endpoint}{\code{Predictor$delete_endpoint()}}
 \item \href{#method-delete_model}{\code{Predictor$delete_model()}}
 \item \href{#method-enable_data_capture}{\code{Predictor$enable_data_capture()}}
 \item \href{#method-disable_data_capture}{\code{Predictor$disable_data_capture()}}
 \item \href{#method-update_data_capture_config}{\code{Predictor$update_data_capture_config()}}
-\item \href{#method-list_monitor}{\code{Predictor$list_monitor()}}
+\item \href{#method-list_monitors}{\code{Predictor$list_monitors()}}
+\item \href{#method-endpoint_context}{\code{Predictor$endpoint_context()}}
 \item \href{#method-print}{\code{Predictor$print()}}
 \item \href{#method-clone}{\code{Predictor$clone()}}
 }
@@ -56,8 +61,9 @@ Initialize a ``Predictor``.
 \if{html}{\out{<div class="r">}}\preformatted{Predictor$new(
   endpoint_name,
   sagemaker_session = NULL,
-  serializer = csv_serializer,
-  deserializer = csv_deserializer
+  serializer = IdentitySerializer$new(),
+  deserializer = BytesDeserializer$new(),
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -76,13 +82,15 @@ chain.}
 and returns a sequence of bytes. It may provide a
 ``content_type`` attribute that defines the endpoint request
 content type. If not specified, a sequence of bytes is expected
-for the data. (default: ``csv_serializer``)}
+for the data. (default: ``IdentitySerializer``)}
 
 \item{\code{deserializer}}{(callable): Accepts two arguments, the result data and
 the response content type, and returns a sequence of bytes. It
 may provide a ``content_type`` attribute that defines the
 endpoint response's "Accept" content type. If not specified, a
-sequence of bytes is expected for the data. (default: ``csv_deserializer``)}
+sequence of bytes is expected for the data. (default: ``BytesDeserializer``)}
+
+\item{\code{...}}{Any other parameters, including and deprecate parameters from sagemaker v-1.}
 }
 \if{html}{\out{</div>}}
 }
@@ -97,7 +105,8 @@ Return the inference from the specified endpoint.
   data,
   initial_args = NULL,
   target_model = NULL,
-  target_variant = NULL
+  target_variant = NULL,
+  inference_id = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -120,7 +129,10 @@ single model (Default: NULL)}
 
 \item{\code{target_variant}}{(str): The name of the production variant to run an inference
 request on (Default: NULL). Note that the ProductionVariant identifies the model
-you want to host and the resources you want to deploy for hosting it. Currently not implemented.}
+you want to host and the resources you want to deploy for hosting it.}
+
+\item{\code{inference_id}}{(str): If you provide a value, it is added to the captured data
+when you enable data capture on the endpoint (Default: None).}
 }
 \if{html}{\out{</div>}}
 }
@@ -129,6 +141,70 @@ object: Inference for the given input. If a deserializer was specified when crea
              the Predictor, the result of the deserializer is
              returned. Otherwise the response returns the sequence of bytes
              as is.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-update_endpoint"></a>}}
+\if{latex}{\out{\hypertarget{method-update_endpoint}{}}}
+\subsection{Method \code{update_endpoint()}}{
+Update the existing endpoint with the provided attributes.
+             This creates a new EndpointConfig in the process. If ``initial_instance_count``,
+             ``instance_type``, ``accelerator_type``, or ``model_name`` is specified, then a new
+             ProductionVariant configuration is created; values from the existing configuration
+             are not preserved if any of those parameters are specified.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Predictor$update_endpoint(
+  initial_instance_count = NULL,
+  instance_type = NULL,
+  accelerator_type = NULL,
+  model_name = NULL,
+  tags = NULL,
+  kms_key = NULL,
+  data_capture_config_dict = NULL,
+  wait = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{initial_instance_count}}{(int): The initial number of instances to run in the endpoint.
+             This is required if ``instance_type``, ``accelerator_type``, or ``model_name`` is
+specified. Otherwise, the values from the existing endpoint configuration's
+             ProductionVariants are used.}
+
+\item{\code{instance_type}}{(str): The EC2 instance type to deploy the endpoint to.
+This is required if ``initial_instance_count`` or ``accelerator_type`` is specified.
+Otherwise, the values from the existing endpoint configuration's
+``ProductionVariants`` are used.}
+
+\item{\code{accelerator_type}}{(str): The type of Elastic Inference accelerator to attach to
+             the endpoint, e.g. "ml.eia1.medium". If not specified, and
+             ``initial_instance_count``, ``instance_type``, and ``model_name`` are also ``None``,
+the values from the existing endpoint configuration's ``ProductionVariants`` are
+             used. Otherwise, no Elastic Inference accelerator is attached to the endpoint.}
+
+\item{\code{model_name}}{(str): The name of the model to be associated with the endpoint.
+This is required if ``initial_instance_count``, ``instance_type``, or
+``accelerator_type`` is specified and if there is more than one model associated
+with the endpoint. Otherwise, the existing model for the endpoint is used.}
+
+\item{\code{tags}}{(list[dict[str, str]]): The list of tags to add to the endpoint
+config. If not specified, the tags of the existing endpoint configuration are used.
+If any of the existing tags are reserved AWS ones (i.e. begin with "aws"),
+they are not carried over to the new endpoint configuration.}
+
+\item{\code{kms_key}}{(str): The KMS key that is used to encrypt the data on the storage volume
+attached to the instance hosting the endpoint If not specified,
+the KMS key of the existing endpoint configuration is used.}
+
+\item{\code{data_capture_config_dict}}{(dict): The endpoint data capture configuration
+for use with Amazon SageMaker Model Monitoring. If not specified,
+the data capture configuration of the existing endpoint configuration is used.}
+
+\item{\code{wait}}{(boolean): Waits for endpoint to update.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -207,18 +283,32 @@ DataCaptureConfig to update the predictor's endpoint to use.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-list_monitor"></a>}}
-\if{latex}{\out{\hypertarget{method-list_monitor}{}}}
-\subsection{Method \code{list_monitor()}}{
-Generates ModelMonitor objects (or DefaultModelMonitors) based on the schedule(s)
-             associated with the endpoint that this predictor refers to.
+\if{html}{\out{<a id="method-list_monitors"></a>}}
+\if{latex}{\out{\hypertarget{method-list_monitors}{}}}
+\subsection{Method \code{list_monitors()}}{
+Generates ModelMonitor objects (or DefaultModelMonitors).
+             Objects are generated based on the schedule(s) associated with the endpoint
+             that this predictor refers to.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Predictor$list_monitor()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Predictor$list_monitors()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 [sagemaker.model_monitor.model_monitoring.ModelMonitor]: A list of
              ModelMonitor (or DefaultModelMonitor) objects.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-endpoint_context"></a>}}
+\if{latex}{\out{\hypertarget{method-endpoint_context}{}}}
+\subsection{Method \code{endpoint_context()}}{
+Retrieves the lineage context object representing the endpoint.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Predictor$endpoint_context()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+ContextEndpoint: The context for the endpoint.
 }
 }
 \if{html}{\out{<hr>}}

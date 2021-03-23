@@ -96,13 +96,28 @@ bucket based on a naming convention which includes the current AWS account ID.
 Creates a new instance of this [R6][R6::R6Class] class.
              Initialize a SageMaker \code{Session}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$new(paws_credentials = NULL, default_bucket = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$new(
+  paws_credentials = NULL,
+  sagemaker_client = NULL,
+  sagemaker_runtime_client = NULL,
+  default_bucket = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{paws_credentials}}{(PawsCredentials): The underlying AWS credentails passed to paws SDK.}
+
+\item{\code{sagemaker_client}}{(paws::sagemaker): Client which makes Amazon SageMaker service
+calls other than ``InvokeEndpoint`` (default: None). Estimators created using this
+``Session`` use this client. If not provided, one will be created using this
+instance's ``paws session``.}
+
+\item{\code{sagemaker_runtime_client}}{(paws::sagemakerruntime): Client which makes
+``InvokeEndpoint`` calls to Amazon SageMaker (default: None). Predictors created
+using this ``Session`` use this client. If not provided, one will be created using
+this instance's ``paws session``.}
 
 \item{\code{default_bucket}}{(str): The default Amazon S3 bucket to be used by this session.
 This will be created the next time an Amazon S3 bucket is needed (by calling
