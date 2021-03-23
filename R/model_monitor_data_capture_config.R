@@ -1,4 +1,8 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/session.py
+
+#' @include s3.R
+#' @include session.R
+
 #' @import R6
 
 #' @title DataCaptureConfig Class
@@ -91,27 +95,14 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
       self$json_content_types = json_content_types %||% "application/json"
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
-    }
-  ),
-  private = list(
-    .MODEL_MONITOR_S3_PATH = "model-monitor",
-    .DATA_CAPTURE_S3_PATH = "data-capture"
-  ),
-  active = list(
-
-    #' @field to_request_list
-    #' Generates a request named list using the parameters provided to the class.
+    #' @description Generates a request named list using the parameters provided to the class.
     to_request_list = function(){
       request_list = list(
         "EnableCapture"= self$enable_capture,
         "InitialSamplingPercentage"= self$sampling_percentage,
         "DestinationS3Uri"= self$destination_s3_uri,
-        "CaptureOptions"= lapply(capture_options, function(x) list("CaptureMode"= self$API_MAPPING[[toupper(x)]])) #  Convert to API values or pass value directly through if unable to convert.
+        #  Convert to API values or pass value directly through if unable to convert.
+        "CaptureOptions"= lapply(capture_options, function(x) list("CaptureMode"= self$API_MAPPING[[toupper(x)]]))
       )
 
       request_list["KmsKeyId"] = self$kms_key_id
@@ -123,6 +114,17 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
         request_list[["CaptureContentTypeHeader"]][["JsonContentTypes"]] = list(self$json_content_types)
 
       return(request_list)
-      }
-    )
+    },
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...){
+      print_class(self)
+    }
+  ),
+  private = list(
+    .MODEL_MONITOR_S3_PATH = "model-monitor",
+    .DATA_CAPTURE_S3_PATH = "data-capture"
+  )
 )
