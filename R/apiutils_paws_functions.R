@@ -2,7 +2,7 @@
 
 #' @include utils.R
 
-#' @importfrom tools toTitleCase
+#' @importFrom tools toTitleCase
 
 PawsFunctions = R6Class("PawsFunctions",
   public = list(

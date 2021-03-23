@@ -116,6 +116,11 @@ Record = R6Class("Record",
   public = list(
 
     #' @description Init Record.
+    #' @param sagemaker_session (sagemaker.session.Session): Session object which
+    #'              manages interactions with Amazon SageMaker APIs and any other
+    #'              AWS services needed. If not specified, the estimator creates one
+    #'              using the default AWS configuration chain.
+    #' @param ... parameters passed to `R6` class `ApiObject`
     initialize = function(sagemaker_session=NULL, ...){
       self$sagemaker_session = sagemaker_session
       super$initialize(...)

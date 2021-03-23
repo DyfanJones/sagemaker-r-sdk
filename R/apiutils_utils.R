@@ -16,7 +16,7 @@ ApiUtils = R6Class("ApiUtils",
     # Generate a new name with the specified prefix.
     name = function(prefix){
       return(paste(prefix, self$suffix(), sep = "-"))
-    }
+    },
 
     # Create a default session.
     default_session = function(){
