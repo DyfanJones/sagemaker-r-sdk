@@ -143,10 +143,6 @@ CSVDeserializer = R6Class("CSVDeserializer",
   )
 )
 
-#' @title S3 method to call CSVDeserializer class
-#' @export
-csv_deserializer <- CSVDeserializer$new()
-
 #' @title NumpySerializer Class
 #' @description Deserialize a stream of data in the .npy or UTF-8 CSV/JSON format.
 #'              This serializer class uses python numpy package to deserialize,
@@ -289,7 +285,8 @@ DataTableDeserializer = R6Class("DataTableDeserializer",
     #' @param encoding (str): The string encoding to use (default: "UTF-8").
     #' @param accept (union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
     #'              is expected from the inference endpoint (default: ("text/csv","application/json")).
-    initialize = function(encoding = "UTF-8", accept=c("text/csv", "application/json")){
+    initialize = function(encoding = "UTF-8",
+                          accept=c("text/csv", "application/json")){
       super$initialize(accept = accept)
       self$encoding = encoding
     },
