@@ -118,7 +118,7 @@ write_matrix_to_dense_tensor <- function(file, array, labels = NULL){
     resolved_label_type = .resolve_type(labels[1])
   }
   resolved_type = .resolve_type(array[1])
-  record = Record()
+  record = Record_pb()
   # Write each vector in array into a Record in the file object
   for(index in 1:nrow(array)){
     vector = array[index,]
@@ -158,7 +158,7 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
   dim_array = dim(csr_array)
 
   for (row_idx in seq_len(dim_array[1])){
-    record = Record()
+    record = Record_pb()
     row = csr_array[row_idx,, drop = F] # keep row in RsparseMatrix format
 
     # Write values
