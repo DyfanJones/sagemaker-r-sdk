@@ -66,3 +66,18 @@ removed_kwargs <- function(name,
   if (name %in% names(kwargs))
     removed_warning(name)
 }
+
+# Wrap a function with a deprecation warning.
+# Args:
+#   func: Function to wrap in a deprecation warning.
+# name: The name that has been deprecated.
+# Returns:
+#   The modified function
+deprecated_function <- function(func, name){
+  deprecate <- function(...){
+    renamed_warning(sprintf("The %s", name))
+    return(do.call(func, list(...)))
+  }
+  return(deprecate)
+}
+
