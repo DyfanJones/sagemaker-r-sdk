@@ -3,6 +3,9 @@
 #' @importFrom stats runif
 #' @importFrom utils tar
 
+
+DEFAULT_SLEEP_TIME_SECONDS <- 10
+
 `%||%` <- function(x, y) if (is.null(x)) return(y) else return(x)
 
 get_aws_env <- function(x) {
@@ -422,3 +425,26 @@ sys_jupyter <- function(cmd, args = NULL, timeout = 0){
   }
   return(sys::as_text(rawConnectionValue(outcon)))
 }
+
+# Retries until max retry count is reached.
+# Args:
+#   max_retry_count (int): The retry count.
+# exception_message_prefix (str): The message to include in the exception on failure.
+# seconds_to_sleep (int): The number of seconds to sleep between executions.
+retries <- function(max_retry_count,
+                    exception_message_prefix,
+                    seconds_to_sleep = 2) {
+  value <- 0
+  function() {
+    value <<- value + 1
+    if (value <= max_retry_count){
+      Sys.sleep(seconds_to_sleep)
+      return(TRUE)
+    } else {
+      SagemakerError$new(
+        sprintf("'%s' has reached the maximum retry count of %s",
+                exception_message_prefix, max_retry_count))
+    }
+  }
+}
+
