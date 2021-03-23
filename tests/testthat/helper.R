@@ -5,9 +5,8 @@ Mock <- R6::R6Class("Mock",
     initialize = function(name, ...){
       if(!missing(name)) class(self) <- append(name, class(self))
       args = list(...)
-      for(arg in names(args)){
-        self[[arg]] = args[[arg]]
-      }
+      # dynamically assign public methods
+      sapply(names(args), function(i) self[[i]] = args[[i]])
     },
     return_value = function(value, .min_var = 1){
       if(is.function(value))
