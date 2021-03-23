@@ -730,13 +730,6 @@ ProcessingJob = R6Class("ProcessingJob",
     #' @description the processing job.
     stop = function(){
       return(self$sagemaker_session$stop_processing_job(self$name))
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
     }
   ),
   private = list(
