@@ -70,8 +70,8 @@ Session = R6Class("Session",
       private$.default_bucket_name_override = default_bucket
       self$config = NULL
       # get sagemaker object from paws
-      self$sagemaker = sagemaker %||% paws::sagemaker(config = self$paws_credentials$credentials)
-      self$sagemaker_runtime = sagemaker_runtime %||% paws::sagemakerruntime(config = self$paws_credentials$credentials)
+      self$sagemaker = sagemaker_client %||% paws::sagemaker(config = self$paws_credentials$credentials)
+      self$sagemaker_runtime = sagemaker_runtime_client %||% paws::sagemakerruntime(config = self$paws_credentials$credentials)
       self$s3 = paws::s3(config = self$paws_credentials$credentials)
       self$local_mode = FALSE
     },
