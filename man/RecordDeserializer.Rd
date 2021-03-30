@@ -6,8 +6,8 @@
 \description{
 Deserialize RecordIO Protobuf data from an inference endpoint.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{RecordDeserializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{\link[R6sagemaker:SimpleBaseDeserializer]{R6sagemaker::SimpleBaseDeserializer}} -> \code{RecordDeserializer}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -29,11 +29,20 @@ Deserialize RecordIO Protobuf data from an inference endpoint.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-intialize RecordDeserializer class
+Intialize RecordDeserializer class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RecordDeserializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RecordDeserializer$new(accept = "application/x-recordio-protobuf")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{accept}}{(union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+is expected from the inference endpoint (default:
+"application/x-recordio-protobuf").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-deserializer"></a>}}

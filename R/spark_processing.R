@@ -7,7 +7,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @importFrom jsonlite toJSON fromJSON
 #' @importFrom urltools url_parse
 #' @importFrom httr GET
@@ -151,7 +151,7 @@
      start_history = function(spark_event_logs_s3_uri=NULL){
        # TODO: .ecr_login_if_needed function
        if (.ecr_login_if_needed(self$sagemaker_session$paws_session, self$image_uri)){
-         log_info("Pulling spark history server image...")
+         LOGGER$info("Pulling spark history server image...")
          # TODO: .pull_image function
          .pull_image(self$image_uri)}
 
@@ -169,7 +169,7 @@
      #' @description Terminates the Spark history server.
      terminate_history_server = function(){
        if (!islistempty(self$history_server)){
-         log_info("History server is running, terminating history server")
+         LOGGER$info("History server is running, terminating history server")
          self$history_server$down()
          self$history_server = NULL}
      }
@@ -238,7 +238,7 @@
        }
        return(list("Inputs" = inputs, "Outputs" = outputs))
    },
-   
+
    # Builds an image URI.
    .retrieve_image_uri = function(image_uri = NULL,
                                   framework_version = NULL,
@@ -251,10 +251,10 @@
             stop(
                "Both or neither of py_version and container_version should be set",
                call. = F)
-      
+
          if (!is.null(container_version))
             container_version = sprintf("v%s", container_version)
-            
+
             return(ImageUris$new()$retrieve(
                "spark",
                region,
@@ -266,7 +266,7 @@
       }
       return(image_uri)
    },
-   
+
    # Validates the user-provided Hadoop/Spark/Hive configuration.
    # This ensures that the list or dictionary the user provides will serialize to
    # JSON matching the schema of EMR's application configuration:
@@ -278,7 +278,7 @@
             stop("Missing one or more required keys in configuration dictionary ",
                  sprintf("%s Please see %s for more information", configuration, emr_configure_apps_url),
                  call. = F)
-         
+
          for (key in keys){
             if (!(key %in% private$.valid_configuration_keys))
                stop(sprintf("Invalid key: %s. Must be one of %s. ", key, toJSON(private$.valid_configuration_keys, auto_unbox = T)),
@@ -291,38 +291,38 @@
                        call. = F)
          }
       }
-      
+
       # if list is unnamed check components
       if (is.null(names(configuration))){
          for(item in configuration)
             private$.validate_configuration(item)
       }
    },
-   
+
    # Serializes and uploads the user-provided EMR application configuration to S3.
    # This method prepares an input channel.
    # Args:
    #    configuration (Dict): the configuration dict for the EMR application configuration.
    .stage_configuration = function(configuration){
       serialized_configuration = toJSON(configuration, auto_unbox = T)
-      s3_uri = sprintf("s3://%s/%s/input/%s/%s", 
-                       self$sagemaker_session$default_bucket(), 
+      s3_uri = sprintf("s3://%s/%s/input/%s/%s",
+                       self$sagemaker_session$default_bucket(),
                        self$.current_job_name,
                        private$.conf_container_input_name,
                        private$.conf_file_name)
-      
+
       S3Uploader$new()$upload_string_as_file_body(
          body=serialized_configuration,
          desired_s3_uri=s3_uri,
          sagemaker_session=self$sagemaker_session)
-      
+
       conf_input = ProcessingInput$new(
          source=s3_uri,
          destination=sprintf("%s%s", private$.conf_container_base_path, private$.conf_container_input_name),
          input_name=private$.conf_container_input_name)
       return(conf_input)
    },
-   
+
    # Prepares a list of paths to jars, py-files, or files dependencies.
    # This prepared list of paths is provided as `spark-submit` options.
    # The submit_deps list may include a combination of S3 URIs and local paths.
@@ -343,14 +343,14 @@
               call. = F)
       if (is.null(input_channel_name))
          stop("input_channel_name value may not be empty.", call.= F)
-      
+
       input_channel_s3_uri = sprintf("s3://%s/%s/input/%s", self$sagemaker_session$default_bucket(), self$.current_job_name, input_channel_name)
-      
+
       use_input_channel = FALSE
       spark_opt_s3_uris = list()
-      
+
       tmpdir = tempdir()
-      
+
       for (dep_path in submit_deps){
          dep_url = url_parse(dep_path)
          # S3 URIs are included as-is in the spark-submit argument
@@ -361,7 +361,7 @@
             if (!file_test("-f", dep_path)){
                stop(sprintf("submit_deps path %s is not a valid local file. %s", dep_path, private$.submit_deps_error_message),
                     call. = F)
-            log_info("Copying dependency from local path %s to tmpdir %s", dep_path, tmpdir)
+            LOGGER$info("Copying dependency from local path %s to tmpdir %s", dep_path, tmpdir)
             file.copy(dep_path, tmpdir)
             }
          } else {
@@ -370,16 +370,16 @@
             )
          }
       }
-      
+
       # If any local files were found and copied, upload the temp directory to S3
       if (!islistempty(list.dirs(tmpdir)))
-         log_info("Uploading dependencies from tmpdir %s to S3 %s", tmpdir, input_channel_s3_uri)
+         LOGGER$info("Uploading dependencies from tmpdir %s to S3 %s", tmpdir, input_channel_s3_uri)
          S3Uploader$new()$upload(
             local_path=tmpdir,
             desired_s3_uri=input_channel_s3_uri,
             sagemaker_session=self$sagemaker_session)
          use_input_channel = TRUE
-         
+
       # If any local files were uploaded, construct a ProcessingInput to provide
       # them to the Spark container  and form the spark-submit option from a
       # combination of S3 URIs and container's local input path
@@ -394,23 +394,23 @@
          input_channel = NULL
          spark_opt = paste(spark_opt_s3_uris, collapse = ",")
       }
-      
+
       return(list("InputChannel" = input_channel, "SparkOpt" = spark_opt))
    },
-   
+
    # Runs container with different network config based on different env.
    .get_network_config = function(){
       if (private$.is_notebook_instance())
          return ("--network host")
-      
+
       return(sprintf("-p 80:80 -p %s:%s", private$.history_server_port, private$.history_server_port))
    },
-   
+
    # Gets all parameters required to run history server.
    .prepare_history_server_env_variables = function(spark_event_logs_s3_uri = NULL){
       # prepare env varibles
       history_server_env_variables = list()
-      
+
       if (!is.null(spark_event_logs_s3_uri)){
          history_server_env_variables[[
             .HistoryServer$new()$arg_event_logs_s3_uri
@@ -426,33 +426,33 @@
             "either in run() or start_history_server()",
             call. = F)
       }
-         
+
       history_server_env_variables = c(history_server_env_variables, private$.config_aws_credentials())
       region = self$sagemaker_session$paws_region_name
       history_server_env_variables[["AWS_REGION"]] = region
-      
+
       if (private$.is_notebook_instance())
          history_server_env_variables[[
             .HistoryServer$new()$arg_remote_domain_name
             ]] = private$.get_notebook_instance_domain()
-      
+
       return(history_server_env_variables)
    },
-   
+
    # Determine whether it is a notebook instance.
    .is_notebook_instance = function(){
       return (file_test("-f","/opt/ml/metadata/resource-metadata.json"))
    },
 
-   # Get the instance's domain.   
+   # Get the instance's domain.
    .get_notebook_instance_domain = function(){
       region = self$sagemaker_session$paws_region_name
       data = fromJSON("/opt/ml/metadata/resource-metadata.json")
       notebook_name = data$ResourceName
-      
+
       return(sprintf("https://%s.notebook.%s.sagemaker.aws", notebook_name, region))
    },
-   
+
    # Print message indicating the status of history server.
    # Pings port 15050 to check whether the history server is up.
    # Times out after `ping_timeout`.
@@ -461,30 +461,30 @@
    .check_history_server = function(ping_timeout = 40){
       # ping port 15050 to check history server is up
       timeout = Sys.time() + ping_timeout
-      
+
       while(TRUE){
          if (private$.is_history_server_started()){
             if (private$.is_notebook_instance()){
-               log_info(
+               LOGGER$info(
                   "History server is up on %s%s",
                   private$.get_notebook_instance_domain(),
                   private$.history_server_url_suffix,
                )
             } else {
-               log_info(
+               LOGGER$info(
                   "History server is up on http://0.0.0.0%s", private$.history_server_url_suffix)
             }
             break
          }
          if (Sys.time() > timeout){
-            log_error(
+            LOGGER$error(
                "History server failed to start. Please run 'docker logs history_server' to see logs")
             break
          }
          Sys.sleep(1)
       }
    },
-   
+
    # Check if history server is started.
    .is_history_server_started = function(){
       tryCatch({response = httr::GET(sprintf("http://localhost:%s", private$.history_server_port))
@@ -493,7 +493,7 @@
          return(FALSE)}
       )
    },
-   
+
    # TODO (note from sagemaker-v2): method only checks urlparse scheme, need to perform deep s3 validation
    # Validate whether the URI uses an S3 scheme.
    # In the future, this validation will perform deeper S3 validation.
@@ -513,7 +513,7 @@
          access_key = creds$aws_access_key_id
          secret_key = creds$aws_secret_access_key
          token = creds$aws_session_token
-         
+
          return(list("AWS_ACCESS_KEY_ID"= access_key,
             "AWS_SECRET_ACCESS_KEY"= secret_key,
             "AWS_SESSION_TOKEN" = token))},
@@ -521,33 +521,33 @@
             return(list())
          })
    },
-   
+
    # Handle script dependencies
    # The method extends inputs and command based on input files and file_type
    .handle_script_dependencies = function(inputs,
                                           submit_files = NULL,
                                           file_type){
-      
+
       if (is.null(submit_files))
          return(inputs)
-      
+
       input_channel_name_dict = list(
          private$.submit_jars_input_channel_name,
          private$.submit_py_files_input_channel_name,
          private$.submit_files_input_channel_name)
-      
+
       spark_files  = private$.stage_submit_deps(
          submit_files, input_channel_name_dict[[file_type]]
       )
-      
+
       inputs = inputs %||% list()
-      
+
       if (!islistempty(spark_files$InputChannel))
          inputs = c(inputs, spark_files$InputChannel)
-      
+
       if (!islistempty(spark_files$SparkOpt))
          self$command = c(self$command, c(sprintf("--%s", input_channel_name_dict[[file_type]]), spark_files$SparkOpt))
-      
+
       return(inputs)
    }
    ),
@@ -560,7 +560,7 @@
 PySparkProcessor = R6Class("PySparkProcessor",
    inherit = .SparkProcessorBase,
    public = list(
-      
+
       #' @description Initialize an ``PySparkProcessor`` instance.
       #'              The PySparkProcessor handles Amazon SageMaker processing tasks for jobs
       #'              using SageMaker PySpark.
@@ -631,7 +631,7 @@ PySparkProcessor = R6Class("PySparkProcessor",
             tags=tags,
             network_config=network_config)
       },
-      
+
       #' @description Runs a processing job.
       #' @param submit_app (str): Path (local or S3) to Python file to submit to Spark
       #'              as the primary application
@@ -680,10 +680,10 @@ PySparkProcessor = R6Class("PySparkProcessor",
                      kms_key=NULL){
          self$.current_job_name = private$.generate_current_job_name(job_name=job_name)
          self$command = list(.SparkProcessorBase$private_fields$.default_command)
-         
+
          if (missing(submit_app))
             stop("submit_app is required", call. = F)
-         
+
          extended_args = private$.extend_processing_args(
             inputs,
             outputs,
@@ -693,7 +693,7 @@ PySparkProcessor = R6Class("PySparkProcessor",
             configuration=configuration,
             spark_event_logs_s3_uri=spark_event_logs_s3_uri
          )
-         
+
          super$run(
             submit_app=submit_app,
             inputs=extended_args$Inputs,
@@ -707,7 +707,7 @@ PySparkProcessor = R6Class("PySparkProcessor",
       }
    ),
    private = list(
-      
+
       # Extends inputs and outputs.
       # Args:
       #    inputs: Processing inputs.
@@ -726,7 +726,7 @@ PySparkProcessor = R6Class("PySparkProcessor",
          extended_inputs = private$.handle_script_dependencies(
             extended_inputs, kwargs$submit_files, FileType$new()$FILE
          )
-         
+
          return(super$.extend_processing_args(extended_inputs, outputs, ...))
       }
    ),
@@ -739,7 +739,7 @@ PySparkProcessor = R6Class("PySparkProcessor",
 SparkJarProcessor = R6Class("SparkJarProcessor",
    inherit = .SparkProcessorBase,
    public = list(
-      
+
       #' @description Initialize a ``SparkJarProcessor`` instance.
       #'              The SparkProcessor handles Amazon SageMaker processing tasks for jobs
       #'              using SageMaker Spark.
@@ -810,7 +810,7 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
             tags=tags,
             network_config=network_config)
       },
-      
+
       #' @description Runs a processing job.
       #' @param submit_app (str): Path (local or S3) to Jar file to submit to Spark as
       #'              the primary application
@@ -859,10 +859,10 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
                      kms_key=NULL){
          self$.current_job_name = private$.generate_current_job_name(job_name=job_name)
          self$command = list(.SparkProcessorBase$private_fields$.default_command)
-         
+
          if (missing(submit_app))
             stop("submit_app is required", call. = F)
-         
+
          extended_args = private$.extend_processing_args(
             inputs,
             outputs,
@@ -871,7 +871,7 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
             submit_files=submit_files,
             configuration=configuration,
             spark_event_logs_s3_uri=spark_event_logs_s3_uri)
-         
+
          super$run(
             submit_app=submit_app,
             inputs=extended_args$Inputs,
@@ -893,14 +893,14 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
             self$command = c(self$command, c("--class", kwargs$submit_class))
          else
             stop("submit_class is required", call. = F)
-         
+
          extended_inputs = private$.handle_script_dependencies(
             inputs, kwargs$submit_jars, FileType$new()$JAR
          )
          extended_inputs = private$.handle_script_dependencies(
             extended_inputs, kwargs$submit_files, FileType$new()$FILE
          )
-         
+
          return(super$.extend_processing_args(extended_inputs, outputs, ...))
       }
    ),
@@ -918,20 +918,20 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
          self$network_config = network_config
          self$run_history_server_command = private$.get_run_history_server_cmd()
       },
-      
+
       # Runs the history server.
       run = function(){
          self$down()
-         log_info("Starting history server...")
+         LOGGER$info("Starting history server...")
          cmd <- split_str(self$run_history_server_command, " ")
          exec_background(cmd[1], cmd[-1], std_out = TRUE, std_err = TRUE)
       },
-      
+
       # Stops and removes the container.
       down = function(){
          sys_jupyter("docker", c("stop", private$.container_name))
          sys_jupyter("docker", c("rm", private$.container_name))
-         log_info("History server terminated")
+         LOGGER$info("History server terminated")
       }
    ),
    private = list(
@@ -943,7 +943,7 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
       .history_server_args_format_map = list(
          "event_logs_s3_uri"= "--event-logs-s3-uri %s ",
          "remote_domain_name"= "--remote-domain-name %s "),
-      
+
       # Gets the history server command.
       .get_run_history_server_cmd = function(){
          env_options = ""
@@ -956,7 +956,7 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
             else
                env_options = paste0(env_options, sprintf("--env %s=%s ", key, value))
          }
-         
+
          cmd = paste(
             sprintf("docker run %s --name %s", env_options, private$.container_name),
             sprintf("%s --entrypoint %s %s", self$network_config, private$.entry_point, self$image_uri),

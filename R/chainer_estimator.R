@@ -1,7 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/chainer/estimator.py
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @include session.R
 #' @include fw_utils.R
@@ -121,7 +121,7 @@ Chainer = R6Class("Chainer",
       attr(self, "_framework_name") = "chainer"
 
       if (identical(py_version, "py2"))
-        log_warn(
+        LOGGER$warn(
           python_deprecation_warning(attr(self, "_framework_name"), CHAINER_LATEST_PY2_VERSION)
         )
 

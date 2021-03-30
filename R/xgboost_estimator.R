@@ -11,7 +11,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title XGBoost Class
 #' @description Handle end-to-end training and deployment of XGBoost booster training or training using

@@ -2,6 +2,8 @@
 
 #' @include utils.R
 
+#' @import lgr
+
 .TAR_SOURCE_FILENAME <- ".tar.gz"
 
 UploadedCode <- list("s3_prefix" = NULL, "script_name" = NULL)
@@ -341,7 +343,7 @@ warn_if_parameter_server_with_multi_gpu <- function(training_instance_type, dist
   )
 
   if (is_multi_gpu_instance && ps_enabled)
-    log_warn(PARAMETER_SERVER_MULTI_GPU_WARNING)
+    LOGGER$warn(PARAMETER_SERVER_MULTI_GPU_WARNING)
 }
 
 # Check if smdistributed strategy is correctly invoked by the user.

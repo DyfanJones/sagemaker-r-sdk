@@ -8,7 +8,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @importFrom urltools url_parse
 
 #' @title Performs predictions against an MLeap serialized SparkML model.

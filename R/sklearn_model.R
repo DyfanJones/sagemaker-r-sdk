@@ -9,7 +9,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title A Predictor for inference against Scikit-learn Endpoints.
 #' @description This is able to serialize Python lists, dictionaries, and numpy arrays to

@@ -4,7 +4,7 @@
 #' @include lineage_association.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 # Creates a dataframe containing the lineage associations of a SageMaker object.
 LineageTableVisualizer = R6Class("LineageTableVisualizer",
@@ -116,7 +116,7 @@ LineageTableVisualizer = R6Class("LineageTableVisualizer",
       if (!islistempty(trial_components)){
         start_arn = trial_components[[1]][["TrialComponentArn"]]
       } else {
-        log_warn("No trial components found for %s", job_arn)
+        LOGGER$warn("No trial components found for %s", job_arn)
       }
       return(start_arn)
     },
@@ -169,7 +169,7 @@ LineageTableVisualizer = R6Class("LineageTableVisualizer",
       if (!islistempty(artifacts)){
         artifact_arn = artifacts[[1]][["ArtifactArn"]]
       } else{
-        log_debug("No artifacts found for %s.", model_package_arn)
+        LOGGER$debug("No artifacts found for %s.", model_package_arn)
       }
       return(artifact_arn)
     },
@@ -186,7 +186,7 @@ LineageTableVisualizer = R6Class("LineageTableVisualizer",
       if (!islistempty(contexts)){
         context_arn = contexts[[1]][["ContextArn"]]
       } else {
-        log_debug("No contexts found for %s.", endpoint_arn)
+        LOGGER$debug("No contexts found for %s.", endpoint_arn)
       }
       return(context_arn)
     },

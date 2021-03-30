@@ -10,7 +10,7 @@ Imports:
     R6,
     paws,
     jsonlite,
-    logger,
+    lgr,
     urltools,
     data.table,
     uuid,

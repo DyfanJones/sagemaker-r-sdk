@@ -4,7 +4,7 @@
 
 #' @import jsonlite
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @import paws
 #' @import data.table
 
@@ -171,7 +171,7 @@ ImageUris = R6Class("ImageUris",
       if(is.null(tag)) {
         # get latest tag if not provided
         tag = image_meta[1, imageTags]
-        log_info("Defaulting to latest version of framework: %s.", repo_name)
+        LOGGER$info("Defaulting to latest version of framework: %s.", repo_name)
       }
 
       paste(repos$repositoryUri, tag, sep = ":")
@@ -201,7 +201,7 @@ ImageUris = R6Class("ImageUris",
         private$.validate_accelerator_type(accelerator_type)
 
         if (!(is.null(image_scope) || image_scope %in% c("eia", "inference")))
-          log_warn(
+          LOGGER$warn(
             "Elastic inference is for inference only. Ignoring image scope: %s.", image_scope
             )
         image_scope = "eia"
@@ -210,7 +210,7 @@ ImageUris = R6Class("ImageUris",
       available_scopes = if(!islistempty(config$scope)) config$scope else names(config)
       if (length(available_scopes) == 1){
         if (!islistempty(image_scope) && image_scope != available_scopes[[1]])
-          log_warn(
+          LOGGER$warn(
             "Defaulting to only supported image scope: %s. Ignoring image scope: %s.",
             available_scopes[1],
             image_scope
@@ -219,7 +219,7 @@ ImageUris = R6Class("ImageUris",
       }
 
       if(islistempty(image_scope) && "scope" %in% names(config) && any(unique(available_scopes) %in% list("training", "inference"))){
-        log_info(
+        LOGGER$info(
           "Same images used for training and inference. Defaulting to image scope: %s.",
           available_scopes[[1]]
         )
@@ -249,9 +249,9 @@ ImageUris = R6Class("ImageUris",
       if (length(available_versions) == 1 && !(version %in% aliased_versions)){
         log_message = sprintf("Defaulting to the only supported framework/algorithm version: %s.", available_versions[[1]])
         if (!is.na(version) && version != available_versions[[1]])
-          log_warn("%s Ignoring framework/algorithm version: %s.", log_message, version)
+          LOGGER$warn("%s Ignoring framework/algorithm version: %s.", log_message, version)
         if (is.na(version))
-          log_info(log_message)
+          LOGGER$info(log_message)
 
         return(available_versions[[1]])
       }
@@ -281,12 +281,12 @@ ImageUris = R6Class("ImageUris",
     .processor = function(instance_type = NULL,
                           available_processors = NULL){
       if (is.null(available_processors)){
-        log_info("Ignoring unnecessary instance type: %s.", instance_type)
+        LOGGER$info("Ignoring unnecessary instance type: %s.", instance_type)
         return(NULL)
       }
 
       if (length(available_processors) == 1 && is.null(instance_type)){
-        log_info("Defaulting to only supported image scope: %s.", available_processors[[1]])
+        LOGGER$info("Defaulting to only supported image scope: %s.", available_processors[[1]])
         return(available_processors[[1]])
       }
 
@@ -336,12 +336,12 @@ ImageUris = R6Class("ImageUris",
 
       if (islistempty(available_versions)){
         if(!is.null(py_version))
-          log_info("Ignoring unnecessary Python version: %s.", py_version)
+          LOGGER$info("Ignoring unnecessary Python version: %s.", py_version)
         return(NULL)
       }
 
       if (is.null(py_version) && length(available_versions) == 1){
-        log_info("Defaulting to only available Python version: %s", available_versions[[1]])
+        LOGGER$info("Defaulting to only available Python version: %s", available_versions[[1]])
         return(available_versions[[1]])
       }
 

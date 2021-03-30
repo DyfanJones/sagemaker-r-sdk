@@ -11,12 +11,14 @@
 #' @description Serialize a matrices and array for an inference request.
 #' @export
 RecordSerializer = R6Class("RecordSerializer",
-  inherit = BaseSerializer,
+  inherit = SimpleBaseSerializer,
   public = list(
 
-    #' @description intialize RecordSerializer class
-    initialize = function(){
-      self$CONTENT_TYPE = "application/x-recordio-protobuf"
+    #' @description Intialize RecordSerializer class
+    #' @param content_type (str): The MIME type to signal to the inference endpoint when sending
+    #'              request data (default: "application/x-recordio-protobuf").
+    initialize = function(content_type="application/x-recordio-protobuf"){
+      super$initialize(content_type=content_type)
       initProtoBuf()
     },
 
@@ -45,12 +47,15 @@ RecordSerializer = R6Class("RecordSerializer",
 #' @description Deserialize RecordIO Protobuf data from an inference endpoint.
 #' @export
 RecordDeserializer = R6Class("RecordDeserializer",
-  inherit = BaseDeserializer,
+  inherit = SimpleBaseDeserializer,
   public = list(
 
-    #' @description intialize RecordDeserializer class
-    initialize = function(){
-      self$ACCEPT = "application/x-recordio-protobuf"
+    #' @description Intialize RecordDeserializer class
+    #' @param accept (union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+    #'              is expected from the inference endpoint (default:
+    #'              "application/x-recordio-protobuf").
+    initialize = function(accept="application/x-recordio-protobuf"){
+      super$initialize(accept=accept)
       initProtoBuf()
     },
 

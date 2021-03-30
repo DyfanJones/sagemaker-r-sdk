@@ -7,6 +7,7 @@
 #' @include image_uris.R
 
 #' @import R6
+#' @import lgr
 #' @importFrom urltools url_parse
 #' @import jsonlite
 #' @import uuid
@@ -1001,7 +1002,7 @@ ModelMonitor = R6Class("ModelMonitor",
              sprintf("Current encrypt_inter_container_traffic value: %s",
                      self$network_config$encrypt_inter_container_traffic), sep = "\n")
 
-       log_info(msg)
+       LOGGER$info(msg)
        ValueError$new(msg)
      }
    },
@@ -1017,7 +1018,7 @@ ModelMonitor = R6Class("ModelMonitor",
                                                               job_definition_name,
                                                               schedule_cron_expression=NULL){
       message = sprintf("Creating Monitoring Schedule with name: %s", monitor_schedule_name)
-      log_info(message)
+      LOGGER$info(message)
 
       monitoring_schedule_config = list(
          "MonitoringJobDefinitionName"=job_definition_name,
@@ -1073,7 +1074,7 @@ ModelMonitor = R6Class("ModelMonitor",
                                           schedule_cron_expression=NULL){
       if (is.null(self.job_definition_name) || is.null(self.monitoring_schedule_name)){
          message = "Nothing to update, please create a schedule first."
-         log_error(message)
+         LOGGER$error(message)
          ValueError$new(message)
       }
       monitoring_schedule_config = list(
@@ -1323,7 +1324,7 @@ DefaultModelMonitor = R6Class("DefaultModelMonitor",
           "It seems that this object was already used to create an Amazon Model",
           "Monitoring Schedule. To create another, first delete the existing one",
           "using my_monitor.delete_monitoring_schedule().")
-        log_error(msg)
+        LOGGER$error(msg)
         ValueError$new(msg)
       }
 
@@ -1369,14 +1370,14 @@ DefaultModelMonitor = R6Class("DefaultModelMonitor",
          self$monitoring_schedule_name = monitor_schedule_name
          },
          error = function(e){
-            log_error("Failed to create_monitoring schedule.")
+            LOGGER$error("Failed to create_monitoring schedule.")
 
             tryCatch(
                self$sagemaker_session$sagemaker$delete_data_quality_job_definition(
                   JobDefinitionName=new_job_definition_name),
                error = function(ee){
                   message = sprintf("Failed to delete job definition %s.",new_job_definition_name)
-                  log_error(message)
+                  LOGGER$error(message)
                   stop(ee)
                })
          })
@@ -1558,7 +1559,7 @@ DefaultModelMonitor = R6Class("DefaultModelMonitor",
           message = sprintf("Deleting Data Quality Job Definition with name: %s",
              self$job_definition_name
           )
-          log_info(message)
+          LOGGER$info(message)
           self$sagemaker_session$sagemaker$delete_data_quality_job_definition(
              JobDefinitionName=self$job_definition_name
           )
@@ -1822,14 +1823,14 @@ DefaultModelMonitor = R6Class("DefaultModelMonitor",
              self$network_config = network_config
           },
        error=function(e){
-          log_error("Failed to update monitoring schedule.")
+          LOGGER$error("Failed to update monitoring schedule.")
           # noinspection PyBroadException
           tryCatch(
              self$sagemaker_session$sagemaker$delete_data_quality_job_definition(
                 JobDefinitionName=new_job_definition_name),
              error = function(ee){
                 message = sprintf("Failed to delete job definition %s.", new_job_definition_name)
-                log_error(message)
+                LOGGER$error(message)
                 stop(ee)
             })
          })
@@ -2307,7 +2308,7 @@ ModelQualityMonitor = R6Class("ModelQualityMonitor",
                "It seems that this object was already used to create an Amazon Model",
                "Monitoring Schedule. To create another, first delete the existing one",
                "using my_monitor.delete_monitoring_schedule().")
-            log_error(message)
+            LOGGER$error(message)
             ValueError$new(message)
          }
          # create job definition
@@ -2353,7 +2354,7 @@ ModelQualityMonitor = R6Class("ModelQualityMonitor",
             self$job_definition_name = new_job_definition_name
             self$monitoring_schedule_name = monitor_schedule_name},
             error = function(e){
-               log_error("Failed to create monitoring schedule.")
+               LOGGER$error("Failed to create monitoring schedule.")
                tryCatch(
                   self$sagemaker_session$sagemaker$delete_model_quality_job_definition(
                      JobDefinitionName=new_job_definition_name),
@@ -2361,7 +2362,7 @@ ModelQualityMonitor = R6Class("ModelQualityMonitor",
                      message = sprintf(
                         "Failed to delete job definition %s",
                         new_job_definition_name)
-                     log_error(message)
+                     LOGGER$error(message)
                      stop(ee)
             })
          })
@@ -2490,14 +2491,14 @@ ModelQualityMonitor = R6Class("ModelQualityMonitor",
                self$network_config = network_config
          },
          error = function(e){
-            log_error("Failed to update monitoring schedule.")
+            LOGGER$error("Failed to update monitoring schedule.")
             # noinspection PyBroadException
             tryCatch(
                self$sagemaker_session$sagemaker$delete_model_quality_job_definition(
                   JobDefinitionName=new_job_definition_name),
                error = function(ee){
                   message = sprintf("Failed to delete job definition %s.", new_job_definition_name)
-                  log_error(message)
+                  LOGGER$error(message)
                   stop(ee)
                })
          })
@@ -2509,7 +2510,7 @@ ModelQualityMonitor = R6Class("ModelQualityMonitor",
          # Delete job definition.
          message = sprintf("Deleting Model Quality Job Definition with name: %s",
             self$job_definition_name)
-         log_info(message)
+         LOGGER$info(message)
          self$sagemaker_session$sagemaker$delete_model_quality_job_definition(
             JobDefinitionName=self$job_definition_name)
          self$job_definition_name = NULL

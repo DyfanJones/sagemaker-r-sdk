@@ -335,6 +335,8 @@ Predictor = R6Class("Predictor",
   ),
   private = list(
     .endpoint_config_name = NULL,
+    .model_names = NULL,
+    .context = NULL,
 
     # Placeholder docstring
     .handle_response = function(response){

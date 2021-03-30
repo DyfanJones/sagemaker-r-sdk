@@ -13,7 +13,7 @@
 #' @import paws
 #' @import jsonlite
 #' @import R6
-#' @import logger
+#' @import lgr
 
 
 NEO_ALLOWED_FRAMEWORKS <- list("mxnet", "tensorflow", "keras", "pytorch", "onnx", "xgboost", "tflite")
@@ -320,14 +320,14 @@ Model = R6Class("Model",
             framework_version)
         private$.is_compiled_model = TRUE
         } else {
-          log_warn(paste(
+          LOGGER$warn(paste(
             "The instance type %s is not supported for deployment via SageMaker.",
             "Please deploy the model manually.", sep = "\n"),
             target_instance_family
           )
         }
       } else {
-          log_warn(paste(
+          LOGGER$warn(paste(
             "Devices described by Target Platform OS, Architecture and Accelerator are not",
             "supported for deployment via SageMaker. Please deploy the model manually.", sep = "\n")
           )
@@ -400,7 +400,7 @@ Model = R6Class("Model",
         stop("Role can not be null for deploying a model", call. = F)
 
       if (startsWith(instance_type,"ml.inf") && !private$.is_compiled_model)
-        log_warn("Your model is not compiled. Please compile your model before using Inferentia.")
+        LOGGER$warn("Your model is not compiled. Please compile your model before using Inferentia.")
 
       compiled_model_suffix = paste0(split_str(instance_type, "\\."), collapse = "-")
       if (private$.is_compiled_model){
@@ -628,7 +628,7 @@ Model = R6Class("Model",
       if (!is.null(self$sagemaker_session)) return(invisible(NULL))
       if (instance_type %in% c("local", "local_gpu")){
         # TODO: local sagemaker session
-        log_error("Currently LocalSession has not been implemented")
+        LOGGER$error("Currently LocalSession has not been implemented")
         stop(sprintf("instance_type %s is currently not supported", call. =F))
         # TODO: LocalSession class
         self$sagemaker_session = LocalSession$new()

@@ -9,7 +9,7 @@
 #' @import paws
 #' @import jsonlite
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @import utils
 
 NOTEBOOK_METADATA_FILE <- "/opt/ml/metadata/resource-metadata.json"
@@ -373,8 +373,8 @@ Session = R6Class("Session",
         profiler_rule_configs=profiler_rule_configs,
         profiler_config=profiler_config)
 
-      log_info("Creating training-job with name: %s", job_name)
-      log_debug("train request: %s", toJSON(train_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating training-job with name: %s", job_name)
+      LOGGER$debug("train request: %s", toJSON(train_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_training_job(TrainingJobName = train_request$TrainingJobName,
                              HyperParameters = train_request$HyperParameters,
@@ -454,8 +454,8 @@ Session = R6Class("Session",
       process_request$Tags = tags
       process_request$ExperimentConfig = experiment_config
 
-      log_info("Creating processing-job with name %s", job_name)
-      log_debug("process request: %s", toJSON(process_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating processing-job with name %s", job_name)
+      LOGGER$debug("process request: %s", toJSON(process_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_processing_job(ProcessingInputs = process_request$ProcessingInputs,
                                ProcessingOutputConfig = process_request$ProcessingOutputConfig,
@@ -568,8 +568,8 @@ Session = R6Class("Session",
 
       monitoring_schedule_request$Tags = tags
 
-      log_info("Creating monitoring schedule name %s", monitoring_schedule_name)
-      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating monitoring schedule name %s", monitoring_schedule_name)
+      LOGGER$debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_monitoring_schedule(MonitoringScheduleName = monitoring_schedule_request$MonitoringScheduleName,
                                     MonitoringScheduleConfig = monitoring_schedule_request$MonitoringScheduleConfig,
@@ -727,8 +727,8 @@ Session = R6Class("Session",
           monitoring_schedule_request$MonitoringScheduleConfig$MonitoringJobDefinition$NetworkConfig = network_config %||% existing_network_config
       }
 
-      log_info("Updating monitoring schedule with name: %s", monitoring_schedule_name)
-      log_debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Updating monitoring schedule with name: %s", monitoring_schedule_name)
+      LOGGER$debug("monitoring_schedule_request= %s", toJSON(monitoring_schedule_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$update_monitoring_schedule(monitoring_schedule_request$MonitoringScheduleName,
                                                 monitoring_schedule_request$MonitoringScheduleConfig)
@@ -1021,7 +1021,7 @@ Session = R6Class("Session",
                              stop_condition,
                              tags){
 
-        log_info("Creating compilation-job with name: %s", job_name)
+        LOGGER$info("Creating compilation-job with name: %s", job_name)
         self$sagemaker$create_compilation_job(CompilationJobName = job_name,
                                               RoleArn = role,
                                               InputConfig = input_model_config,
@@ -1166,8 +1166,8 @@ Session = R6Class("Session",
       tune_request$WarmStartConfig = warm_start_config
       tune_request$Tags = tags
 
-      log_info("Creating hyperparameter tuning job with name: %s", job_name)
-      log_debug("tune request: %s", toJSON(tune_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating hyperparameter tuning job with name: %s", job_name)
+      LOGGER$debug("tune request: %s", toJSON(tune_request, pretty = T, auto_unbox = T))
       self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = tune_request$HyperParameterTuningJobName,
                                                        HyperParameterTuningJobConfig = tune_request$HyperParameterTuningJobConfig,
                                                        TrainingJobDefinition = tune_request$TrainingJobDefinition,
@@ -1212,8 +1212,8 @@ Session = R6Class("Session",
       tune_request$Tags = tags
       tune_request$WarmStartConfig = warm_start_config
 
-      log_info("Creating hyperparameter tuning job with name: %s", job_name)
-      log_debug("tune request: %s", toJSON(tune_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating hyperparameter tuning job with name: %s", job_name)
+      LOGGER$debug("tune request: %s", toJSON(tune_request, pretty = T, auto_unbox = T))
 
       self$sagemaker$create_hyper_parameter_tuning_job(HyperParameterTuningJobName = tune_request$HyperParameterTuningJobName,
                                                        HyperParameterTuningJobConfig = tune_request$HyperParameterTuningJobConfig,
@@ -1236,12 +1236,12 @@ Session = R6Class("Session",
     #' @description Stop the Amazon SageMaker hyperparameter tuning job with the specified name.
     #' @param name (str): Name of the Amazon SageMaker hyperparameter tuning job.
     stop_tuning_job = function(name){
-      log_info("Stopping tuning job: %s", name)
+      LOGGER$info("Stopping tuning job: %s", name)
       tryCatch(self$sagemaker$stop_hyper_parameter_tuning_job(HyperParameterTuningJobName=name),
                error = function(e) {
                  error_code = attributes(e)$error_response$`__type`
-                 if(error_code == "ValidationException") {log_info("Tuning job: %s is alread stopped or not running.", name)
-                 } else {log_error("Error occurred while attempting to stop tuning job: %s. Please try again.", name)}
+                 if(error_code == "ValidationException") {LOGGER$info("Tuning job: %s is alread stopped or not running.", name)
+                 } else {LOGGER$error("Error occurred while attempting to stop tuning job: %s. Please try again.", name)}
                  stop(e$message, call. = F)
                })
     },
@@ -1282,8 +1282,8 @@ Session = R6Class("Session",
       request_list = list(job_name, model_name, max_concurrent_transforms, max_payload,strategy,
                           env, input_config, output_config, resource_config, data_processing,
                           tags, experiment_config)
-      log_info("Creating transform job with name: %s", job_name)
-      log_debug("Transform request: %s", toJSON(request_list, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating transform job with name: %s", job_name)
+      LOGGER$debug("Transform request: %s", toJSON(request_list, pretty = T, auto_unbox = T))
       self$sagemaker$create_transform_job(TransformJobName = job_name,
                                           ModelName = model_name,
                                           MaxConcurrentTransforms = max_concurrent_transforms,
@@ -1364,8 +1364,8 @@ Session = R6Class("Session",
       create_model_request$VpcConfig = vpc_config
       create_model_request$EnableNetworkIsolation = enable_network_isolation
 
-      log_info("Creating model with name: %s", name)
-      log_debug("CreateModel request: %s", toJSON(create_model_request, pretty = T, auto_unbox = T))
+      LOGGER$info("Creating model with name: %s", name)
+      LOGGER$debug("CreateModel request: %s", toJSON(create_model_request, pretty = T, auto_unbox = T))
 
       tryCatch({self$sagemaker$create_model(ModelName = create_model_request$ModelName,
                                             PrimaryContainer = create_model_request$PrimaryContainer,
@@ -1378,7 +1378,7 @@ Session = R6Class("Session",
                  error_code = attributes(e)$error_response$`__type`
                  if (error_code == "ValidationException"
                    && grepl("Cannot create already existing model", e$message)){
-                   log_warn("Using already existing model: %s", name)
+                   LOGGER$warn("Using already existing model: %s", name)
                    } else {stop(e$message, call. = F)}
                  }
                )
@@ -1441,7 +1441,7 @@ Session = R6Class("Session",
 
       SourceAlgorithmSpecification = list(SourceAlgorithms = list(list(ModelDataUrl = model_data, AlgorithmName = algorithm_arn)))
 
-      log_info("Creating model package with name: %s", name)
+      LOGGER$info("Creating model package with name: %s", name)
 
       tryCatch(
         self$sagemaker$create_model_package(ModelPackageName = name,
@@ -1451,7 +1451,7 @@ Session = R6Class("Session",
           error_code = attributes(e)$error_response$`__type`
           if (error_code == "ValidationException"
               && grepl("ModelPackage already exists", e$message)) {
-            log_warn("Using already existing model package: %s", name)
+            LOGGER$warn("Using already existing model package: %s", name)
           } else {stop(e$message, call. = F)}
         })
     },
@@ -1565,7 +1565,7 @@ Session = R6Class("Session",
                                       tags=NULL,
                                       kms_key=NULL,
                                       data_capture_config_dict=NULL){
-      log_info("Creating endpoint-config with name %s", name)
+      LOGGER$info("Creating endpoint-config with name %s", name)
 
       ProductionVariants = list(production_variant(
         model_name,
@@ -1608,7 +1608,7 @@ Session = R6Class("Session",
                                                     new_kms_key=NULL,
                                                     new_data_capture_config_dict=NULL){
 
-      log_info("Creating endpoint-config with name ", new_config_name)
+      LOGGER$info("Creating endpoint-config with name ", new_config_name)
 
       existing_endpoint_config_desc = self$sagemaker$describe_endpoint_config(
         EndpointConfigName=existing_config_name
@@ -1639,7 +1639,7 @@ Session = R6Class("Session",
                                tags=NULL,
                                wait=TRUE){
 
-      log_info("Creating endpoint with name %s", endpoint_name)
+      LOGGER$info("Creating endpoint with name %s", endpoint_name)
 
       self$sagemaker$create_endpoint(EndpointName=endpoint_name,
                                      EndpointConfigName=config_name,
@@ -1672,21 +1672,21 @@ Session = R6Class("Session",
     #' @description Delete an Amazon SageMaker ``Endpoint``.
     #' @param endpoint_name (str): Name of the Amazon SageMaker ``Endpoint`` to delete.
     delete_endpoint = function(endpoint_name){
-      log_info("Deleting endpoint with name: %s", endpoint_name)
+      LOGGER$info("Deleting endpoint with name: %s", endpoint_name)
       self$sagemaker$delete_endpoint(EndpointName=endpoint_name)
     },
     #' @description Delete an Amazon SageMaker endpoint configuration.
     #' @param endpoint_config_name (str): Name of the Amazon SageMaker endpoint configuration to
     #'              delete.
     delete_endpoint_config = function(endpoint_config_name){
-      log_info("Deleting endpoint configuration with name: %s", endpoint_config_name)
+      LOGGER$info("Deleting endpoint configuration with name: %s", endpoint_config_name)
       self$sagemaker$delete_endpoint_config(EndpointConfigName=endpoint_config_name)
     },
 
     #' @description Delete an Amazon SageMaker Model.
     #' @param model_name (str): Name of the Amazon SageMaker model to delete.
     delete_model= function(model_name){
-      log_info("Deleting model with name: %s", model_name)
+      LOGGER$info("Deleting model with name: %s", model_name)
       self$sagemaker$delete_model(ModelName=model_name)
     },
 
@@ -1719,7 +1719,7 @@ Session = R6Class("Session",
         return(non_aws_tags)
       },
       error = function(e){
-        log_error("Error retrieving tags. resource_arn: %s",resource_arn)
+        LOGGER$error("Error retrieving tags. resource_arn: %s",resource_arn)
         return(e)
       })
     },
@@ -1805,15 +1805,15 @@ Session = R6Class("Session",
     #' @description Stop the Amazon SageMaker hyperparameter tuning job with the specified name.
     #' @param name (str): Name of the Amazon SageMaker batch transform job.
     stop_transform_job = function(name){
-      log_info("Stopping transform job: %s", name)
+      LOGGER$info("Stopping transform job: %s", name)
       tryCatch(self$sagemaker$stop_transform_job(TransformJobName=name),
                error = function(e){
                  error_code = attributes(e)$error_response$`__type`
                  # allow to pass if the job already stopped
                  if (error_code == "ValidationException"){
-                   log_info("Transform job: %s is already stopped or not running.", name)
+                   LOGGER$info("Transform job: %s is already stopped or not running.", name)
                  } else{
-                   log_error("Error occurred while attempting to stop transform job: %s", name)
+                   LOGGER$error("Error occurred while attempting to stop transform job: %s", name)
                    stop(e$message, call. = F)}
                })
     },
@@ -2041,7 +2041,7 @@ Session = R6Class("Session",
       role_name = gsub(".*/","", role)
 
       tryCatch({role = paws::iam(config = self$paws_credentials$credentials)$get_role(RoleName = role_name)$Role$Arn},
-               error = function(e) log_warn("Couldn't call 'get_role' to get Role ARN from role name %s to get Role path.", role_name))
+               error = function(e) LOGGER$warn("Couldn't call 'get_role' to get Role ARN from role name %s to get Role path.", role_name))
 
       return(role)
     },
@@ -2263,7 +2263,7 @@ Session = R6Class("Session",
           self$s3$create_bucket(
             Bucket = bucket_name,
             CreateBucketConfiguration = list(LocationConstraint = region))
-          log_info("Created S3 bucket: %s", bucket_name)},
+          LOGGER$info("Created S3 bucket: %s", bucket_name)},
           error = function(e) {
             code = attributes(e)$error_response$Code
             message = attributes(e)$error_response$Message

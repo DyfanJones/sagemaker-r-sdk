@@ -9,7 +9,7 @@
 #' @include serializers.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title TensorFlowPredictor Class
 #' @description A ``Predictor`` implementation for inference against TensorFlow

@@ -6,7 +6,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title SKLearnProcessor Class
 #' @description Handles Amazon SageMaker processing tasks for jobs using scikit-learn.

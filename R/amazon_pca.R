@@ -12,7 +12,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title An unsupervised machine learning algorithm to reduce feature dimensionality.
 #' @description As a result, number of features within a dataset is reduced but the dataset still

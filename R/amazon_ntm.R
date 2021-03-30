@@ -12,7 +12,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title An unsupervised learning algorithm used to organize a corpus of documents into topics
 #' @description The resulting topics contain word groupings based on their statistical distribution.

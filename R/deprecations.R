@@ -1,13 +1,13 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/deprecations.py
 
-#' @import logger
+#' @import lgr
 
 V2_URL = "https://sagemaker.readthedocs.io/en/stable/v2.html"
 
 .warn <- function(msg){
   full_msg = sprintf("%s to align with python sagemaker>=2.\nSee: %s for details.", msg, V2_URL)
   warning(full_msg, call. = F)
-  log_warn(full_msg)
+  LOGGER$warn(full_msg)
 }
 
 # Raise a warning for a no-op in sagemaker>=2

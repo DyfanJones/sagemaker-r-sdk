@@ -13,7 +13,7 @@
 #' @include vpc_utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title TensorFlow Class
 #' @description Handle end-to-end training and deployment of user-provided TensorFlow code.
@@ -128,7 +128,7 @@ TensorFlow = R6Class("TensorFlow",
       )
 
       if (identical(py_version, "py2"))
-        log_warn(
+        LOGGER$warn(
           python_deprecation_warning(attr(self, "_framework_name"), TENSORFLOW_LATEST_PY2_VERSION)
         )
 
@@ -296,7 +296,7 @@ TensorFlow = R6Class("TensorFlow",
       model_name = private$.get_or_create_name(model_name)
 
       if (is.null(self$latest_training_job)) {
-        log_warn(paste(
+        LOGGER$warn(paste(
           "No finished training job found associated with this estimator. Please make sure",
           "this estimator is only used for building workflow config"))
         return (Transformer$new(
@@ -452,7 +452,7 @@ TensorFlow = R6Class("TensorFlow",
       ps_enabled = "parameter_server" %in% names(self$distribution) && (self$distribution$parameter_server$enabled %||% FALSE)
       if (ps_enabled){
         if (!islistempty(self$debugger_hook_config) %||% !islistempty(self$debugger_rule_configs)){
-          log_info(paste(
+          LOGGER$info(paste(
             "Amazon SageMaker Debugger does not currently support",
             "Parameter Server distribution"))
         }

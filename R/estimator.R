@@ -12,7 +12,7 @@
 #' @import paws
 #' @import jsonlite
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @import utils
 #' @importFrom urltools url_parse
 #' @import uuid
@@ -721,7 +721,7 @@ EstimatorBase = R6Class("EstimatorBase",
       model_name = private$.get_or_create_name(model_name)
 
       if (is.null(self$latest_training_job)){
-        log_warn(paste("No finished training job found associated with this estimator. Please make sure",
+        LOGGER$warn(paste("No finished training job found associated with this estimator. Please make sure",
                 "this estimator is only used for building workflow config"))
       } else {
         if (is.null(enable_network_isolation))
@@ -936,7 +936,7 @@ EstimatorBase = R6Class("EstimatorBase",
 
       if (inherits(inputs, "TrainingInputs")){
         if ("InputMode" %in% names(inputs$config)){
-          log_debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
+          LOGGER$debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
                     inputs$config$InputMode)
           train_args$input_mode = inputs$config$InputMode}
       }
@@ -1081,7 +1081,7 @@ EstimatorBase = R6Class("EstimatorBase",
         model_uri = self$sagemaker_session$sagemaker$describe_training_job(
           TrainingJobName=self$latest_training_job)$ModelArtifacts$S3ModelArtifacts
       } else {
-        log_warn(paste(
+        LOGGER$warn(paste(
           "No finished training job found associated with this estimator.",
           "Please make sure this estimator is only used for building workflow config"))
         model_uri = file.path(self$output_path, self$.current_job_name, "output", "model.tar.gz")
@@ -1812,7 +1812,7 @@ Framework = R6Class("Framework",
         if (!islistempty(env))
           transform_env = c(transform_env, env)
       } else {
-        log_warn(paste0(
+        LOGGER$warn(paste0(
           "No finished training job found associated with this estimator. Please make sure ",
           "this estimator is only used for building workflow config"))
         model_name = model_name %||% self$.current_job_name

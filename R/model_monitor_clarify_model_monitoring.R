@@ -8,7 +8,7 @@
 #' @include error.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @import uuid
 #' @import jsonlite
 
@@ -156,7 +156,7 @@ ClarifyModelMonitor = R6Class("ClarifyModelMonitor",
         UUIDgenerate(),
         "analysis_config.json")
 
-      log_info("Uploading analysis config to %s.", s3_uri)
+      LOGGER$info("Uploading analysis config to %s.", s3_uri)
       return (S3Uploader$new()$upload_string_as_file_body(
         toJSON(analysis_config, auto_unbox = T),
         desired_s3_uri=s3_uri,
@@ -474,7 +474,7 @@ ModelBiasMonitor = R6Class("ModelBiasMonitor",
         message = c("It seems that this object was already used to create an Amazon Model ",
                    "Monitoring Schedule. To create another, first delete the existing one ",
                    "using my_monitor.delete_monitoring_schedule().")
-        log_error(message)
+        LOGGER$error(message)
         ValueError$new(message)
       }
 
@@ -527,14 +527,14 @@ ModelBiasMonitor = R6Class("ModelBiasMonitor",
         self$job_definition_name = new_job_definition_name
         self$monitoring_schedule_name = monitor_schedule_name},
         error = function(e){
-         log_error("Failed to create monitoring schedule.")
+         LOGGER$error("Failed to create monitoring schedule.")
           # noinspection PyBroadException
           tryCatch({
             self$sagemaker_session$sagemaker_client$delete_model_bias_job_definition(
               JobDefinitionName=new_job_definition_name)},
             error = function(e){
               message = sprintf("Failed to delete job definition %s.", new_job_definition_name)
-              log_error(message)
+              LOGGER$error(message)
               stop(e)
             })
         })
@@ -655,7 +655,7 @@ ModelBiasMonitor = R6Class("ModelBiasMonitor",
         self$network_config = network_config
         },
       error = function(e){
-        log_error("Failed to update monitoring schedule.")
+        LOGGER$error("Failed to update monitoring schedule.")
 
         tryCatch({
           self$sagemaker_session$sagemaker$delete_model_bias_job_definition(
@@ -663,7 +663,7 @@ ModelBiasMonitor = R6Class("ModelBiasMonitor",
           },
           error = function(ee){
             message = sprintf("Failed to delete job definition %s.", new_job_definition_name)
-            log_error(message)
+            LOGGER$error(message)
             stop(ee)
           })
       })
@@ -675,7 +675,7 @@ ModelBiasMonitor = R6Class("ModelBiasMonitor",
       # Delete job definition.
       message = sprintf("Deleting Model Bias Job Definition with name: %s",
                         self$job_definition_name)
-      log_info(message)
+      LOGGER$info(message)
       self$sagemaker_session$sagemaker$delete_model_bias_job_definition(
         JobDefinitionName=self$job_definition_name)
       self$job_definition_name = NULL
@@ -859,7 +859,7 @@ ModelExplainabilityMonitor = R6Class("ModelExplainabilityMonitor",
           "Monitoring Schedule. To create another, first delete the existing one",
           "using my_monitor.delete_monitoring_schedule()."
         )
-        log_error(message)
+        LOGGER$error(message)
         ValueError$new(message)
       }
 
@@ -904,7 +904,7 @@ ModelExplainabilityMonitor = R6Class("ModelExplainabilityMonitor",
         self$monitoring_schedule_name = monitor_schedule_name
       },
       error = function(e){
-        log_error("Failed to create monitoring schedule.")
+        LOGGER$error("Failed to create monitoring schedule.")
         # noinspection PyBroadException
         tryCatch({
           self$sagemaker_session$sagemaker$delete_model_explainability_job_definition(
@@ -913,7 +913,7 @@ ModelExplainabilityMonitor = R6Class("ModelExplainabilityMonitor",
         },
         error = function(ee){
           message = sprintf("Failed to delete job definition %s.",new_job_definition_name)
-          log_error(message)
+          LOGGER$error(message)
           stop(ee)
         })
       })
@@ -1031,7 +1031,7 @@ ModelExplainabilityMonitor = R6Class("ModelExplainabilityMonitor",
           self$network_config = network_config
       },
       error = function(e){
-        log_error("Failed to update monitoring schedule.")
+        LOGGER$error("Failed to update monitoring schedule.")
         # noinspection PyBroadException
         tyCatch({
           self$sagemaker_session$sagemaker$delete_model_explainability_job_definition(
@@ -1039,7 +1039,7 @@ ModelExplainabilityMonitor = R6Class("ModelExplainabilityMonitor",
         },
         error = function(ee){
           message = sprintf("Failed to delete job definition %s.", new_job_definition_name)
-          log_error(message)
+          LOGGER$error(message)
           stop(ee)
         })
       })
@@ -1051,7 +1051,7 @@ ModelExplainabilityMonitor = R6Class("ModelExplainabilityMonitor",
       # Delete job definition.
       message = sprintf("Deleting Model Explainability Job Definition with name: %s",
         self$job_definition_name)
-      log_info(message)
+      LOGGER$info(message)
       self$sagemaker_session$sagemaker$delete_model_explainability_job_definition(
         JobDefinitionName=self$job_definition_name)
       self$job_definition_name = NULL

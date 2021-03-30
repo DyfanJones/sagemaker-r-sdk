@@ -12,7 +12,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title A general-purpose neural embedding algorithm that is highly customizable.
 #' @description It can learn low-dimensional dense embeddings of high-dimensional objects. The embeddings

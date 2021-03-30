@@ -8,7 +8,7 @@
 #' @include vpc_utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title MXNet Class
 #' @description Handle end-to-end training and deployment of custom MXNet code.
@@ -106,7 +106,7 @@ MXNet = R6Class("MXNet",
       attr(self, "_framework_name") = "mxnet"
 
       if (identical(py_version, "py2"))
-        log_warn(
+        LOGGER$warn(
           python_deprecation_warning(attr(self, "_framework_name"), MXNET_LATEST_PY2_VERSION)
         )
 

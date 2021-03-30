@@ -2,6 +2,8 @@
 
 #' @include utils.R
 
+#' @import lgr
+
 STUDIO_PROJECT_CONFIG = ".sagemaker-code-config"
 
 # Appends the project tag to the list of tags, if it exists.
@@ -47,7 +49,7 @@ STUDIO_PROJECT_CONFIG = ".sagemaker-code-config"
     return(path)
   },
   error = function(e){
-    log_debug("Could not find the studio project config. %s", e)}
+    LOGGER$debug("Could not find the studio project config. %s", e)}
   )
 }
 
@@ -58,13 +60,13 @@ STUDIO_PROJECT_CONFIG = ".sagemaker-code-config"
 #   Project config Json, or None if it does not exist.
 .load_config <- function(path){
   if(!file.exists(path)){
-    log_debug("Could not load project config. No such file or directory: %s", path)
+    LOGGER$debug("Could not load project config. No such file or directory: %s", path)
     return(NULL)}
   tryCatch({
     config = jsonlite::read_json(path)
     return(config)},
     error = function(e){
-      log_debug("Could not load project config. %s", e)
+      LOGGER$debug("Could not load project config. %s", e)
     }
   )
 }
@@ -81,7 +83,7 @@ STUDIO_PROJECT_CONFIG = ".sagemaker-code-config"
       list("Key"= "sagemaker:project-name", "Value"= config$sagemakerProjectName))
     )
   else {
-    log_debug("Could not parse project config.")
+    LOGGER$debug("Could not parse project config.")
     return(NULL)
   }
 }

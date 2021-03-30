@@ -5,6 +5,7 @@
 #' @include s3.R
 
 #' @import R6
+#' @import lgr
 #' @import jsonlite
 #' @import uuid
 
@@ -100,7 +101,7 @@ Statistics = R6Class("Statistics",
                           sagemaker_session=NULL){
      tryCatch({body = S3Downloader$new()$read_file(s3_uri=statistics_file_s3_uri, sagemaker_session=sagemaker_session)},
               error = function(e) {
-                log_error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
+                LOGGER$error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
                                   "To manually retrieve Statistics object from a given uri, ",
                                   "use 'my_model_monitor.statistics(my_s3_uri)' or ",
                                   "'Statistics.from_s3_uri(my_s3_uri)'") , statistics_file_s3_uri)
@@ -207,7 +208,7 @@ Constraints = R6Class("Constraints",
                            sagemaker_session=NULL){
       tryCatch({body = S3Downloader$new()$read_file(s3_uri=constraints_file_s3_uri, sagemaker_session=sagemaker_session)},
                error = function(e) {
-                 log_error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
+                 LOGGER$error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
                                    "To manually retrieve Statistics object from a given uri, ",
                                    "use 'my_model_monitor.statistics(my_s3_uri)' or ",
                                    "'Statistics.from_s3_uri(my_s3_uri)'") , constraints_file_s3_uri)
@@ -336,7 +337,7 @@ ConstraintViolations = R6Class("ConstraintViolations",
                           sagemaker_session=NULL){
      tryCatch({body = S3Downloader$new()$read_file(s3_uri=constraint_violations_file_s3_uri, sagemaker_session=sagemaker_session)},
               error = function(e) {
-                log_error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
+                LOGGER$error(paste0("\nCould not retrieve statistics file at location '%s'. ",
                                   "To manually retrieve Statistics object from a given uri, ",
                                   "use 'my_model_monitor.statistics(my_s3_uri)' or ",
                                   "'Statistics.from_s3_uri(my_s3_uri)'") , constraints_file_s3_uri)
