@@ -1,6 +1,10 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/tests/unit/test_automl.py
 context("automl")
 
+library(lgr)
+
+lg <- get_logger("R6sagemaker")
+
 MODEL_DATA = "s3://bucket/model.tar.gz"
 MODEL_IMAGE = "mi"
 ENTRY_POINT = "blah.py"
@@ -274,8 +278,12 @@ test_that("test auto ml fit set logs to false", {
 
   inputs = DEFAULT_S3_INPUT_DATA
 
-  expect_output(auto_ml$fit(inputs, job_name=JOB_NAME, wait=FALSE, logs=TRUE),
-                "Setting `logs` to FALSE. `logs` is only meaningful when `wait` is TRUE.")
+  auto_ml$fit(inputs, job_name=JOB_NAME, wait=FALSE, logs=TRUE)
+
+  expect_equal(
+    lg$last_event$msg,
+    "Setting `logs` to FALSE. `logs` is only meaningful when `wait` is TRUE."
+  )
 })
 
 test_that("test auto ml additional optional params", {
