@@ -61,3 +61,6 @@ UnexpectedStatusError = R6Class("UnexpectedStatusError", inherit = ValueError,
     }
   )
 )
+
+#' @rdname SagemakerError
+RuntimeError = R6Class("RuntimeError", inherit = SagemakerError)
