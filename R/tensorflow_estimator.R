@@ -458,8 +458,9 @@ TensorFlow = R6Class("TensorFlow",
         }
         self$debugger_hook_config = NULL
         self$debugger_rule_configs = NULL
-      } else if (is.null(self$debugger_hook_config) &&
-                 .region_supports_debugger(self$sagemaker_session$paws_region_name)){
+      } else if (
+        is.null(self$debugger_hook_config) &&
+        .region_supports_debugger(self$sagemaker_session$paws_region_name)){
         # Set defaults for debugging.
         self$debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)
       }
