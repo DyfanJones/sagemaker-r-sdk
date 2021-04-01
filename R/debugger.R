@@ -404,7 +404,6 @@ get_rule_container_image_uri <- function(region){
 get_default_profiler_rule <- function(){
   default_rule = ProfilerReport$new()
   custom_name = sprintf("%s-%s", default_rule$rule_name, as.integer(Sys.time()))
-  # TODO: ProfilerRule class
   return(ProfilerRule$new()$sagemaker(default_rule, name=custom_name))
 }
 
@@ -956,11 +955,15 @@ DebuggerHookConfig = R6Class("DebuggerHookConfig",
       debugger_hook_config_request = list("S3OutputPath"= self$s3_output_path)
       debugger_hook_config_request[["LocalPath"]] = self$container_local_output_path
       debugger_hook_config_request[["HookParameters"]] = self$hook_parameters
-      if(!is.null(self$collection_configs)) {
-        collection_config_request = list("CollectionName"= as.list(self$collection_configs$name))
-        if(!is.null(self$collection_configs$parameters)){
-          collection_config_request[["CollectionParameters"]] = as.list(self$collection_configs$parameters)}
-        debugger_hook_config_request[["CollectionConfigurations"]] = collection_config_request}
+
+
+
+      if(!is.null(self$collection_configs))
+        debugger_hook_config_request[[
+          "CollectionConfigurations"
+        ]] = lapply(self$collection_configs, function(collection_config)
+          collection_config$to_request_list()
+        )
       return(debugger_hook_config_request)
     },
 
@@ -1041,7 +1044,7 @@ CollectionConfig = R6Class("CollectionConfig",
     #' @return dict: A portion of an API request as a dictionary.
     to_request_list = function(){
       collection_config_request = list("CollectionName"= self$name)
-      collection_config_request$CollectionParameters = self$parameters
+      collection_config_request[["CollectionParameters"]] = self$parameters
       return(collection_config_request)
     },
 
