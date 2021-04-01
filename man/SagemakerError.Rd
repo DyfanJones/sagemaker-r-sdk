@@ -6,6 +6,7 @@
 \alias{ValueError}
 \alias{TypeError}
 \alias{UnexpectedStatusError}
+\alias{RuntimeError}
 \title{SagemakerError}
 \description{
 Create Sagemaker error format.
@@ -199,6 +200,40 @@ Initialize UnexpectedStatusError class
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{UnexpectedStatusError$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}
+\section{Super class}{
+\code{\link[R6sagemaker:SagemakerError]{R6sagemaker::SagemakerError}} -> \code{RuntimeError}
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-clone}{\code{RuntimeError$clone()}}
+}
+}
+\if{html}{
+\out{<details open ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="SagemakerError" data-id="initialize">}\href{../../R6sagemaker/html/SagemakerError.html#method-initialize}{\code{R6sagemaker::SagemakerError$initialize()}}\out{</span>}
+}
+\out{</details>}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RuntimeError$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

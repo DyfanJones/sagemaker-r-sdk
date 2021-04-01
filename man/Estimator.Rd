@@ -29,15 +29,20 @@ A generic Estimator to train using any supplied algorithm. This class is
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="compile_model">}\href{../../R6sagemaker/html/EstimatorBase.html#method-compile_model}{\code{R6sagemaker::EstimatorBase$compile_model()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="delete_endpoint">}\href{../../R6sagemaker/html/EstimatorBase.html#method-delete_endpoint}{\code{R6sagemaker::EstimatorBase$delete_endpoint()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="deploy">}\href{../../R6sagemaker/html/EstimatorBase.html#method-deploy}{\code{R6sagemaker::EstimatorBase$deploy()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="disable_profiling">}\href{../../R6sagemaker/html/EstimatorBase.html#method-disable_profiling}{\code{R6sagemaker::EstimatorBase$disable_profiling()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_default_profiling">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_default_profiling}{\code{R6sagemaker::EstimatorBase$enable_default_profiling()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_network_isolation}{\code{R6sagemaker::EstimatorBase$enable_network_isolation()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="fit">}\href{../../R6sagemaker/html/EstimatorBase.html#method-fit}{\code{R6sagemaker::EstimatorBase$fit()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker::EstimatorBase$get_vpc_config()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_profiler_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_profiler_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_profiler_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker/html/EstimatorBase.html#method-logs}{\code{R6sagemaker::EstimatorBase$logs()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="print">}\href{../../R6sagemaker/html/EstimatorBase.html#method-print}{\code{R6sagemaker::EstimatorBase$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="register">}\href{../../R6sagemaker/html/EstimatorBase.html#method-register}{\code{R6sagemaker::EstimatorBase$register()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transformer">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transformer}{\code{R6sagemaker::EstimatorBase$transformer()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="update_profiler">}\href{../../R6sagemaker/html/EstimatorBase.html#method-update_profiler}{\code{R6sagemaker::EstimatorBase$update_profiler()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
 }
 \out{</details>}
@@ -77,7 +82,10 @@ Initialize an ``Estimator`` instance.
   rules = NULL,
   debugger_hook_config = NULL,
   tensorboard_output_config = NULL,
-  enable_sagemaker_metrics = NULL
+  enable_sagemaker_metrics = NULL,
+  profiler_config = NULL,
+  disable_profiler = FALSE,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -230,6 +238,21 @@ https://sagemaker.readthedocs.io/en/stable/amazon_sagemaker_debugger.html#captur
 Series. For more information see:
 https://docs.aws.amazon.com/sagemaker/latest/dg/API_AlgorithmSpecification.html#SageMaker-Type-AlgorithmSpecification-EnableSageMakerMetricsTimeSeries
 (default: ``NULL``).}
+
+\item{\code{profiler_config}}{(:class:`~sagemaker.debugger.ProfilerConfig`):
+Configuration for how SageMaker Debugger collects
+monitoring and profiling information from your training job.
+If not specified, Debugger will be configured with
+a default configuration and will save system and framework metrics
+the estimator's default ``output_path`` in Amazon S3.
+Use :class:`~sagemaker.debugger.ProfilerConfig` to configure this parameter.
+To disable SageMaker Debugger monitoring and profiling, set the
+``disable_profiler`` parameter to ``True``.}
+
+\item{\code{disable_profiler}}{(bool): Specifies whether Debugger monitoring and profiling
+will be disabled (default: ``False``).}
+
+\item{\code{...}}{: additional arguements for parent class `EstimatorBase`.}
 }
 \if{html}{\out{</div>}}
 }
@@ -288,10 +311,6 @@ Create a model to deploy.
   role = NULL,
   image_uri = NULL,
   predictor_cls = NULL,
-  serializer = NULL,
-  deserializer = NULL,
-  content_type = NULL,
-  accept = NULL,
   vpc_config_override = "VPC_CONFIG_DEFAULT",
   ...
 )}\if{html}{\out{</div>}}
@@ -309,21 +328,6 @@ Defaults to the image used for training.}
 
 \item{\code{predictor_cls}}{(Predictor): The predictor class to use when
 deploying the model.}
-
-\item{\code{serializer}}{(callable): Should accept a single argument, the input
-data, and return a sequence of bytes. May provide a content_type
-attribute that defines the endpoint request content type}
-
-\item{\code{deserializer}}{(callable): Should accept two arguments, the result
-data and the response content type, and return a sequence of
-bytes. May provide a content_type attribute that defines th
-endpoint response Accept content type.}
-
-\item{\code{content_type}}{(str): The invocation ContentType, overriding any
-content_type from the serializer}
-
-\item{\code{accept}}{(str): The invocation Accept, overriding any accept from the
-deserializer.}
 
 \item{\code{vpc_config_override}}{(dict[str, list[str]]): Optional override for VpcConfig set on
 the model.
