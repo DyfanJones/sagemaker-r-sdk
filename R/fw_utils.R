@@ -21,6 +21,7 @@ PARAMETER_SERVER_MULTI_GPU_WARNING <- paste(
   "only one worker per host regardless of the number of GPUs.")
 
 DEBUGGER_UNSUPPORTED_REGIONS <- c("us-gov-west-1", "us-iso-east-1")
+PROFILER_UNSUPPORTED_REGIONS = c("us-iso-east-1")
 SINGLE_GPU_INSTANCE_TYPES <- c("ml.p2.xlarge", "ml.p3.2xlarge")
 
 SM_DATAPARALLEL_SUPPORTED_FRAMEWORK_VERSIONS <- list(
@@ -292,6 +293,15 @@ model_code_key_prefix <- function(code_location_key_prefix, model_name, image){
 #   bool: Whether or not the region supports Amazon SageMaker Debugger.
 .region_supports_debugger <- function(region_name){
   return (!(tolower(region_name) %in% DEBUGGER_UNSUPPORTED_REGIONS))
+}
+
+# Returns bool indicating whether region supports Amazon SageMaker Debugger profiling feature.
+# Args:
+#   region_name (str): Name of the region to check against.
+# Returns:
+#   bool: Whether or not the region supports Amazon SageMaker Debugger profiling feature.
+.region_supports_profiler <- function(region_name){
+  return(!(tolower(region_name) %in% PROFILER_UNSUPPORTED_REGIONS))
 }
 
 # Checks if version or image arguments are specified.
