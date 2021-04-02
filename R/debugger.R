@@ -343,7 +343,7 @@ ProfilerReport = R6Class("ProfilerReport",
       invalid_rule_error = "%s is an invalid rule name! Accepted rule names (case insensitive) are: %s"
       invalid_param_error = "%s is an invalid parameter name! Accepted parameter names for %s are: %s"
 
-      rule_classes_by_name = list(
+      rule_classes = list(
         BatchSize,
         CPUBottleneck,
         Dataloader,
@@ -356,7 +356,7 @@ ProfilerReport = R6Class("ProfilerReport",
         StepOutlier)
 
       rule_names = lapply(rule_classes, function(x) x$classname)
-      names(rule_classes_by_name) = tolower(rule_names)
+      names(rule_classes) = tolower(rule_names)
 
       for (i in seq_along(rule_parameters)){
         key = names(rule_parameters)[i]
@@ -366,9 +366,9 @@ ProfilerReport = R6Class("ProfilerReport",
         splits = split_str(key, "_")
         rule_name = tolower(splits[1])
         parameter_name = paste0(tolower(splits[-1]), collapse = "_")
-        if(!(rule_name %in% names(rule_classes_by_name)))
+        if(!(rule_name %in% names(rule_classes)))
           stop(sprintf(invalid_rule_error, rule_name, paste(rule_names, collapse =", ")), call.=F)
-        rule_class = rule_classes_by_name[[rule_name]]
+        rule_class = rule_classes[[rule_name]]
         init_params = list(val)
         names(init_params) = parameter_name
         tryCatch({
@@ -816,15 +816,16 @@ ProfilerRule = R6Class("ProfilerRule",
                          name=NULL,
                          container_local_output_path=NULL,
                          s3_output_path=NULL){
-      return(self$initialize(
-        name=name %||% base_config$rule_name,
-        image_uri="DEFAULT_RULE_EVALUATOR_IMAGE",
-        instance_type=NULL,
-        container_local_output_path=container_local_output_path,
-        s3_output_path=s3_output_path,
-        volume_size_in_gb=NULL,
-        rule_parameters=base_config$rule_parameters)
+      self$initialize(
+        name = name %||% base_config$rule_name,
+        image_uri = "DEFAULT_RULE_EVALUATOR_IMAGE",
+        instance_type = NULL,
+        container_local_output_path = container_local_output_path,
+        s3_output_path = s3_output_path,
+        volume_size_in_gb = NULL,
+        rule_parameters = base_config$rule_parameters
       )
+      return(self)
     },
 
     #' @description Initialize a ``ProfilerRule`` object for a *custom* profiling rule.
@@ -863,15 +864,16 @@ ProfilerRule = R6Class("ProfilerRule",
                       rule_parameters=NULL){
       merged_rule_params = super$.set_rule_parameters(source, rule_to_invoke, rule_parameters)
 
-      return (self$intialize(
-        name=name,
-        image_uri=image_uri,
-        instance_type=instance_type,
-        container_local_output_path=container_local_output_path,
-        s3_output_path=s3_output_path,
-        volume_size_in_gb=volume_size_in_gb,
-        rule_parameters=merged_rule_params)
+      self$initialize(
+        name = name,
+        image_uri = image_uri,
+        instance_type = instance_type,
+        container_local_output_path = container_local_output_path,
+        s3_output_path = s3_output_path,
+        volume_size_in_gb = volume_size_in_gb,
+        rule_parameters = merged_rule_params
       )
+      return(self)
     },
 
     #' @description Generates a request dictionary using the parameters provided when initializing object.
@@ -884,30 +886,28 @@ ProfilerRule = R6Class("ProfilerRule",
       profiler_rule_config_request = c(profiler_rule_config_request, build_dict("VolumeSizeInGB", self$volume_size_in_gb))
       profiler_rule_config_request = c(profiler_rule_config_request,
         build_dict("LocalPath", self$container_local_output_path))
-      profiler_rule_config_request = c(profiler_rule_config_request, build_dict("S3OutputPath", self.s3_output_path))
+      profiler_rule_config_request = c(profiler_rule_config_request, build_dict("S3OutputPath", self$s3_output_path))
 
       if (!islistempty(self$rule_parameters)){
-        profiler_rule_config_request[["RuleParameters"]] = self.rule_parameters
+        profiler_rule_config_request[["RuleParameters"]] = self$rule_parameters
         for (i in seq_along(profiler_rule_config_request[["RuleParameters"]])){
           k = names(profiler_rule_config_request[["RuleParameters"]])[i]
           v = profiler_rule_config_request[["RuleParameters"]][[i]]
           profiler_rule_config_request[["RuleParameters"]][[k]] = as.character(v)
         }
       }
-
       return(profiler_rule_config_request)
     }
   ),
   lock_objects = F
 )
 
-
 #' @title Create a Debugger hook configuration object to save the tensor for debugging.
 #' @description DebuggerHookConfig provides options to customize how debugging
 #'              information is emitted and saved. This high-level DebuggerHookConfig class
 #'              runs based on the `smdebug.SaveConfig
-#'              <https://github.com/awslabs/sagemaker-debugger/blob/master/docs/
-#'              api.md#saveconfig>`_ class.
+#'              <https://github.com/awslabs/sagemaker-debugger/blob/master/docs/api.md#saveconfig>`
+#'              class.
 #' @export
 DebuggerHookConfig = R6Class("DebuggerHookConfig",
   public = list(
