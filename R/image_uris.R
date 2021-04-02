@@ -82,12 +82,15 @@ ImageUris = R6Class("ImageUris",
 
       repo = version_config[["repository"]]
 
+      avialable_processors = (config[["processors"]] %||% version_config[["processors"]])
       processor = private$.processor(
-        instance_type, config[["processors"]] %||% version_config[["processors"]])
+        instance_type=instance_type,
+        available_processors=avialable_processors
+      )
 
       if(framework == private$HUGGING_FACE_FRAMEWORK){
         m = gregexpr("^(pytorch|tensorflow)(.*)$", base_framework_version)
-        pt_or_tf_version = regmatches(base_framework_version, m)[[1]]
+        pt_or_tf_version = unlist(regmatches(base_framework_version, m))
         tag_prefix = sprintf("%s-transformers%s", pt_or_tf_version, original_version)
       } else {
         tag_prefix = version_config[["tag_prefix"]] %||% version
@@ -119,7 +122,7 @@ ImageUris = R6Class("ImageUris",
       }
 
       if(!is.null(tag))
-        repo = sprint("%s:%s", repo, tag)
+        repo = sprintf("%s:%s", repo, tag)
 
       return(sprintf(private$ECR_URI_TEMPLATE, registry, hostname, repo))
     },
@@ -265,8 +268,7 @@ ImageUris = R6Class("ImageUris",
       if(islistempty(image_scope) && "scope" %in% names(config) && any(unique(available_scopes) %in% list("training", "inference"))){
         LOGGER$info(
           "Same images used for training and inference. Defaulting to image scope: %s.",
-          available_scopes[[1]]
-        )
+          available_scopes[[1]])
         image_scope = available_scopes[[1]]
       }
 
@@ -278,8 +280,7 @@ ImageUris = R6Class("ImageUris",
     .validate_accelerator_type = function(accelerator_type){
       if (!startsWith(accelerator_type, "ml.eia") && accelerator_type != "local_sagemaker_notebook")
         ValueError$new(sprintf("Invalid SageMaker Elastic Inference accelerator type: %s. ",accelerator_type),
-          "See https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html", call. = F
-          )
+          "See https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html")
     },
 
     # Checks if the framework/algorithm version is one of the supported versions.
@@ -294,8 +295,8 @@ ImageUris = R6Class("ImageUris",
         log_message = sprintf("Defaulting to the only supported framework/algorithm version: %s.", available_versions[[1]])
         if (!is.na(version) && version != available_versions[[1]])
           LOGGER$warn("%s Ignoring framework/algorithm version: %s.", log_message, version)
-        if (is.na(version))
-          LOGGER$info(log_message)
+        if (is.na(version)){
+          LOGGER$info(log_message)}
 
         return(available_versions[[1]])
       }
@@ -325,7 +326,8 @@ ImageUris = R6Class("ImageUris",
     .processor = function(instance_type = NULL,
                           available_processors = NULL){
       if (is.null(available_processors)){
-        LOGGER$info("Ignoring unnecessary instance type: %s.", instance_type)
+        if(!is.null(instance_type))
+          LOGGER$info("Ignoring unnecessary instance type: %s.", instance_type)
         return(NULL)
       }
 
@@ -344,8 +346,8 @@ ImageUris = R6Class("ImageUris",
         processor = if(instance_type == "local") "cpu" else "gpu"
       } else {
         # looks for either "ml.<family>.<size>" or "ml_<family>"
-        match = regmatches(instance_type,regexec("^ml[\\._]([a-z0-9]+)\\.?\\w*$",instance_type))[[1]][2]
-        if (!is.na(match)){
+        match = unlist(regmatches(instance_type,regexec("^ml[\\._]([a-z0-9]+)\\.?\\w*$",instance_type)))[2]
+        if (length(match) != 0){
           family = match
 
           # For some frameworks, we have optimized images for specific families, e.g c5 or p3.
@@ -375,9 +377,9 @@ ImageUris = R6Class("ImageUris",
       if (!is.null(instance_type)){
         # looks for either "ml.<family>.<size>" or "ml_<family>"
         m = regexpr("^ml[\\._]([a-z\\d]+)\\.?\\w*$", instance_type)
-        match = regmatches(instance_type, m)[[1]]
-        if (!is.na(match)){
-          family = match[[2]]
+        match = unlist(regmatches(instance_type, m))
+        if (length(match) != 0){
+          family = match[2]
           p4d = (family == "p4d")
         }
       }
@@ -399,8 +401,8 @@ ImageUris = R6Class("ImageUris",
       }
 
       if (islistempty(available_versions)){
-        if(!is.null(py_version))
-          LOGGER$info("Ignoring unnecessary Python version: %s.", py_version)
+        if(!is.null(py_version)){
+          LOGGER$info("Ignoring unnecessary Python version: %s.", py_version)}
         return(NULL)
       }
 
@@ -430,8 +432,9 @@ ImageUris = R6Class("ImageUris",
     # Creates a tag for the image URI.
     .format_tag = function(tag_prefix,
                           processor,
-                          py_version){
-      tag_list = list(tag_prefix, processor, py_version)
+                          py_version,
+                          container_version){
+      tag_list = list(tag_prefix, processor, py_version,container_version)
       tag_list = Filter(Negate(is.null), tag_list)
       return (paste(tag_list, collapse = "-"))
     }
