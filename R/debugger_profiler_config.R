@@ -44,8 +44,8 @@ ProfilerConfig = R6Class("ProfilerConfig",
     initialize = function(s3_output_path=NULL,
                           system_monitor_interval_millis=NULL,
                           framework_profile_params=NULL){
-      if(!is.null(framework_profile_params) || !inherits(framework_profile_params, "FrameworkProfile"))
-        stop("framework_profile_params must be of type FrameworkProfile if specified.", call. = F)
+      if(!is.null(framework_profile_params) && !inherits(framework_profile_params, "FrameworkProfile"))
+        ValueError$new("framework_profile_params must be of type FrameworkProfile if specified.")
 
 
       self$s3_output_path = s3_output_path
