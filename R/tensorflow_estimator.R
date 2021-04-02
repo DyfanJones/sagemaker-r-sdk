@@ -98,10 +98,19 @@ TensorFlow = R6Class("TensorFlow",
       self$py_version = py_version
       self$instance_type = instance_type
 
-      if (!is.null(distribution))
+      if (!is.null(distribution)){
         warn_if_parameter_server_with_multi_gpu(
           training_instance_type=instance_type, distribution=distribution
         )
+
+        validate_smdistributed(
+          instance_type=instance_type,
+          framework_name=self._framework_name,
+          framework_version=framework_version,
+          py_version=py_version,
+          distribution=distribution,
+          image_uri=image_uri)
+      }
 
       if (!("enable_sagemaker_metrics" %in% names(kwargs))){
         # enable sagemaker metrics for TF v1.15 or greater:
@@ -117,15 +126,6 @@ TensorFlow = R6Class("TensorFlow",
       self$distribution = distribution %||% list()
 
       attr(self, "_framework_name") = "tensorflow"
-
-      validate_smdistributed(
-        instance_type=instance_type,
-        framework_name=attr(self, "_framework_name"),
-        framework_version=framework_version,
-        py_version=py_version,
-        distribution=distribution,
-        image_uri=image_uri
-      )
 
       if (identical(py_version, "py2"))
         LOGGER$warn(
@@ -187,38 +187,14 @@ TensorFlow = R6Class("TensorFlow",
     },
 
     #' @description Return hyperparameters used by your custom TensorFlow code during model training.
-    hyperparameter = function(){
+    hyperparameters = function(){
       hyperparameters = super$hyperparameters()
-      additional_hyperparameters = list()
+      additional_hyperparameters = private$.distribution_configuration(self$distribution)
 
-      if ("parameter_server" %in% names(self$distribution)){
-        ps_enabled = self$distribution$parameter_server$enabled %||% FALSE
-        additional_hyperparameters[[self$LAUNCH_PS_ENV_NAME]] = ps_enabled
-      }
-
-      mpi_enabled = FALSE
-      if ("mpi" %in% names(self$distribution)){
-        mpi_dict = self$distribution["mpi"]
-        mpi_enabled = mpi_dict$enabled %||% FALSE
-        additional_hyperparameters[[self$LAUNCH_MPI_ENV_NAME]] = mpi_enabled
-        additional_hyperparameters[[self$MPI_NUM_PROCESSES_PER_HOST]] = mpi_dict$processes_per_host
-        additional_hyperparameters[[self$MPI_CUSTOM_MPI_OPTIONS]] = mpi_dict$custom_mpi_options %||% ""
-        if (!islistempty(get_mp_parameters(self$distribution)))
-          additional_hyperparameters$mp_parameters = get_mp_parameters(self.distribution)
-      } else if ("modelparallel" %in% names(self$distribution$smdistributed %||% list())) {
-        stop("Cannot use Model Parallelism without MPI enabled!", call. = F)
-      }
-
-      if ("smdistributed" %in% names(self$distribution)) {
-        # smdistributed strategy selected
-        smdistributed = self$distribution$smdistributed
-        smdataparallel_enabled = smdistributed$dataparallel$enabled %||% FALSE
-        additional_hyperparameters[[self$LAUNCH_SM_DDP_ENV_NAME]] = smdataparallel_enabled
-        additional_hyperparameters[[self$INSTANCE_TYPE]] = self$instance_type
-      }
-
-      if (isTRUE(self$model_dir)) {
-        self$model_dir = self$model_dir %||% private$.default_s3_path("model", mpi=mpi_enabled)
+      if (!isFALSE(self$model_dir)) {
+        self$model_dir = self$model_dir %||% private$.default_s3_path(
+          "model", mpi=(additional_hyperparameters[[self$LAUNCH_MPI_ENV_NAME]] %||% FALSE)
+        )
         additional_hyperparameters$model_dir = self$model_dir
       }
 
@@ -354,7 +330,7 @@ TensorFlow = R6Class("TensorFlow",
         msg = paste0(
           sprintf("Python 2 containers are only available with %s and lower versions. ", TENSORFLOW_LATEST_PY2_VERSION),
           "Please use a Python 3 container.")
-        stop(msg, call. = F)
+        AttributeError$new(msg)
       }
 
       if (is.null(self$image_uri) && private$.only_legacy_mode_supported()){
@@ -371,7 +347,7 @@ TensorFlow = R6Class("TensorFlow",
           "(training_steps, evaluation_steps, checkpoint_path, requirements_file), ",
           "make sure to pass them directly as hyperparameters instead. For more, see ",
           "https://sagemaker.readthedocs.io/en/v2.0.0.rc0/frameworks/tensorflow/upgrade_from_legacy.html.")
-        stop(msg, call. = F)
+        ValueError$new(msg)
       }
     },
 
@@ -426,9 +402,8 @@ TensorFlow = R6Class("TensorFlow",
         init_params$image_uri = image_uri
 
       if (img_split$framework != attr(self, "_framework_name"))
-        stop(sprintf("Training job: %s didn't use image for requested framework",
-                     job_details$TrainingJobName),
-             call. = F)
+        ValueError$new(sprintf("Training job: %s didn't use image for requested framework",
+                     job_details$TrainingJobName))
 
       return(init_params)
     },
