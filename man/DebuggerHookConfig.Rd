@@ -7,8 +7,8 @@
 DebuggerHookConfig provides options to customize how debugging
              information is emitted and saved. This high-level DebuggerHookConfig class
              runs based on the `smdebug.SaveConfig
-             <https://github.com/awslabs/sagemaker-debugger/blob/master/docs/
-             api.md#saveconfig>`_ class.
+             <https://github.com/awslabs/sagemaker-debugger/blob/master/docs/api.md#saveconfig>`
+             class.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

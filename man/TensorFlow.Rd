@@ -14,7 +14,7 @@ Handle end-to-end training and deployment of user-provided TensorFlow code.
 \itemize{
 \item \href{#method-new}{\code{TensorFlow$new()}}
 \item \href{#method-create_model}{\code{TensorFlow$create_model()}}
-\item \href{#method-hyperparameter}{\code{TensorFlow$hyperparameter()}}
+\item \href{#method-hyperparameters}{\code{TensorFlow$hyperparameters()}}
 \item \href{#method-transformer}{\code{TensorFlow$transformer()}}
 \item \href{#method-clone}{\code{TensorFlow$clone()}}
 }
@@ -41,7 +41,6 @@ Handle end-to-end training and deployment of user-provided TensorFlow code.
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id=".prepare_for_training">}\href{../../R6sagemaker/html/Framework.html#method-.prepare_for_training}{\code{R6sagemaker::Framework$.prepare_for_training()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id="attach">}\href{../../R6sagemaker/html/Framework.html#method-attach}{\code{R6sagemaker::Framework$attach()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id="hyperparameters">}\href{../../R6sagemaker/html/Framework.html#method-hyperparameters}{\code{R6sagemaker::Framework$hyperparameters()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id="training_image_uri">}\href{../../R6sagemaker/html/Framework.html#method-training_image_uri}{\code{R6sagemaker::Framework$training_image_uri()}}\out{</span>}
 }
 \out{</details>}
@@ -185,12 +184,12 @@ sagemaker.tensorflow.model.TensorFlowModel: A ``TensorFlowModel`` object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-hyperparameter"></a>}}
-\if{latex}{\out{\hypertarget{method-hyperparameter}{}}}
-\subsection{Method \code{hyperparameter()}}{
+\if{html}{\out{<a id="method-hyperparameters"></a>}}
+\if{latex}{\out{\hypertarget{method-hyperparameters}{}}}
+\subsection{Method \code{hyperparameters()}}{
 Return hyperparameters used by your custom TensorFlow code during model training.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TensorFlow$hyperparameter()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TensorFlow$hyperparameters()}\if{html}{\out{</div>}}
 }
 
 }
