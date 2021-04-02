@@ -1044,7 +1044,7 @@ EstimatorBase = R6Class("EstimatorBase",
         for (rule in self$rules){
           if (inherits(rule, "Rule")){
             self$debugger_rules = c(self$debugger_rules, rule)
-          } else if (inherits("ProfilerRule")){
+          } else if (inherits(rule, "ProfilerRule")){
             self$profiler_rules = c(self$profiler_rules, rule)
           } else {
             RuntimeError$new(
@@ -1103,14 +1103,14 @@ EstimatorBase = R6Class("EstimatorBase",
     #     1. user doesn't specify any rules, i.e., rules=None; or
     # 2. user only specify debugger rules, i.e., rules=[Rule.sagemaker(...)]
     .prepare_profiler_for_training = function(){
-      if (!is.null(self$disable_profiler)){
+      if (self$disable_profiler){
         if (!is.null(self$profiler_config))
           RuntimeError$new("profiler_config cannot be set when disable_profiler is True.")
         if (!is.null(self$profiler_rules))
           RuntimeError$new("ProfilerRule cannot be set when disable_profiler is True.")
       } else if (.region_supports_profiler(self$sagemaker_session$paws_region_name)){
         if (is.null(self$profiler_config))
-          self$profiler_config = ProfilerConfig(s3_output_path=self.output_path)
+          self$profiler_config = ProfilerConfig$new(s3_output_path=self$output_path)
         if (is.null(self$rules) || (!is.null(self$rules) && is.null(self$profiler_rules)))
             self$profiler_rules = list(get_default_profiler_rule())
       }
@@ -1124,7 +1124,7 @@ EstimatorBase = R6Class("EstimatorBase",
     # Set any necessary values in profiler rules, if they are provided.
     .prepare_profiler_rules = function(){
       profiler_rule_configs = list()
-      if (!is.null(self.profiler_rules)){
+      if (!islistempty(self$profiler_rules)){
         for (rule in self$profiler_rules){
           private$.set_default_rule_config(rule)
           private$.set_source_s3_uri(rule)
@@ -1138,7 +1138,7 @@ EstimatorBase = R6Class("EstimatorBase",
     # Args:
     #   rule (:class:`~sagemaker.debugger.RuleBase`): Any rule object that derives from RuleBase
     .set_default_rule_config = function(rule){
-      if (rule$image_uri == "DEFAULT_RULE_EVALUATOR_IMAGE"){
+      if (!is.null(rule$image_uri) || rule$image_uri == "DEFAULT_RULE_EVALUATOR_IMAGE"){
         rule$image_uri = get_rule_container_image_uri(self$sagemaker_session$paws_region_name)
         rule$instance_type = NULL
         rule$volume_size_in_gb = NULL
