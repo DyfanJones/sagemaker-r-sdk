@@ -383,7 +383,6 @@ EstimatorBase = R6Class("EstimatorBase",
                    logs = "All",
                    job_name=NULL,
                    experiment_config=NULL){
-
       self$.prepare_for_training(job_name=job_name)
 
       # return job only
@@ -393,6 +392,8 @@ EstimatorBase = R6Class("EstimatorBase",
 
       if (wait){
         self$wait(logs = logs)}
+
+      return(invisible(NULL))
     },
 
     #' @description Wait for an Amazon SageMaker job to complete.
