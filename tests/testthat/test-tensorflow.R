@@ -30,8 +30,15 @@ REGRESS_INPUT = list(
 )
 
 
-JOB_NAME = sprintf("%s", IMAGE_URI)
+JOB_NAME = "sagemaker-tensorflow-scriptmode-.*"
 IMAGE_URI_FORMAT_STRING = "520713654638.dkr.ecr.%s.amazonaws.com/sagemaker-tensorflow-scriptmode:%s-cpu-%s"
+
+DISTRIBUTION_PS_ENABLED = list("parameter_server"=list("enabled"=TRUE))
+DISTRIBUTION_MPI_ENABLED = list(
+  "mpi"=list("enabled"=TRUE, "custom_mpi_options"="options", "processes_per_host"=2)
+)
+DISTRIBUTION_SM_DDP_ENABLED = list("smdistributed"=list("dataparallel"=list("enabled"=TRUE)))
+
 ROLE = "Dummy"
 REGION = "us-west-2"
 GPU = "ml.p2.xlarge"
@@ -118,6 +125,7 @@ sagemaker_session$call_args("compile_model")
         "DataSource"= list(
           "S3DataSource"= list(
             "S3DataType"= "S3Prefix",
+            "S3Uri" = NULL,
             "S3DataDistributionType"= "FullyReplicated"
             )
         ),
@@ -133,19 +141,8 @@ sagemaker_session$call_args("compile_model")
     "stop_condition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
     "vpc_config"= NULL,
     "input_mode"= "File",
-    "job_name"= JOB_NAME,
     "hyperparameters"= .hyperparameters(horovod, smdataparallel),
-    "image_uri"= .image_uri(tf_version, py_version),
-    "profiler_rule_configs"= list(
-      list(
-        "RuleConfigurationName"= "ProfilerReport-1510006209",
-        "RuleEvaluatorImage"= "895741380848.dkr.ecr.us-west-2.amazonaws.com/sagemaker-debugger-rules:latest",
-        "RuleParameters"= list("rule_to_invoke"= "ProfilerReport")
-        )
-      ),
-    "profiler_config"= list(
-      "S3OutputPath"= sprintf("s3://%s/",BUCKET_NAME)
-    )
+    "image_uri"= .image_uri(tf_version, py_version)
   )
 
   if (!ps)
@@ -153,9 +150,20 @@ sagemaker_session$call_args("compile_model")
       "S3OutputPath"= sprintf("s3://%s/", BUCKET_NAME),
       "CollectionConfigurations"= list()
     )
+
+  profiler_rule_configs = list(
+    list(
+      "RuleConfigurationName"= "ProfilerReport-.*",
+      "RuleEvaluatorImage"= "895741380848.dkr.ecr.us-west-2.amazonaws.com/sagemaker-debugger-rules:latest",
+      "RuleParameters"= list("rule_to_invoke"= "ProfilerReport")
+      )
+    )
+  profiler_config = list("S3OutputPath"= sprintf("s3://%s/",BUCKET_NAME))
+
+  conf[["profiler_rule_configs"]] = profiler_rule_configs
+  conf[["profiler_config"]] = profiler_config
   return(conf)
 }
-
 # ===== test estimator init ====
 
 test_that("test estimator py2 deprecation warning", {
@@ -496,9 +504,6 @@ test_that("test create model with custom image", {
   expect_equal(model$image_uri, custom_image)
 })
 
-
-
-###### Up to here!!!!!
 test_that("test fit", {
   tf = TensorFlow$new(
     entry_point=SCRIPT_FILE,
@@ -517,284 +522,150 @@ test_that("test fit", {
   expected_train_args$input_config[[1]]$DataSource$S3DataSource$S3Uri = inputs
 
   actual_train_args = sagemaker_session$train()$.call_args
+  actual_train_args$job_name = NULL
 
+  # check if keys are identical
+  expect_equal(names(actual_train_args), names(expected_train_args))
 
+  # check if hyperparameters are created correctly
+  expected_hyperparameters = expected_train_args$hyperparameters
+  actual_hyperparameters = actual_train_args$hyperparameters
+  expected_train_args$hyperparameters = NULL
+  actual_train_args$hyperparameters = NULL
+  for (i in names(expected_hyperparameters)){
+    expect_true(grepl(expected_hyperparameters[[i]], actual_hyperparameters[[i]]))
+  }
 
+  # check if rule configuration name is created correctly
+  expected_RuleConfigurationName = expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  actual_RuleConfigurationName= actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  expect_true(grepl(expected_RuleConfigurationName, actual_RuleConfigurationName))
+
+  # check if list of parameters is created correctly
+  expect_equal(expected_train_args,actual_train_args)
 })
 
-test_that("test sklearn", {
-  sklearn = SKLearn$new(
-    entry_point=SCRIPT_PATH,
+test_that("test fit ps", {
+  tf = TensorFlow$new(
+    entry_point=SCRIPT_FILE,
+    framework_version="1.11",
+    py_version="py2",
     role=ROLE,
     sagemaker_session=sagemaker_session,
     instance_type=INSTANCE_TYPE,
-    py_version=PYTHON_VERSION,
-    framework_version=sklearn_version
-  )
+    instance_count=1,
+    source_dir=DATA_DIR,
+    distribution=DISTRIBUTION_PS_ENABLED)
 
   inputs = "s3://mybucket/train"
+  tf$fit(inputs=inputs)
 
-  sklearn$fit(inputs=inputs, experiment_config=EXPERIMENT_CONFIG)
-
-  expected_train_args = .create_train_job(sklearn_version)
+  expected_train_args = .create_train_job("1.11", ps=TRUE, py_version="py2")
   expected_train_args$input_config[[1]]$DataSource$S3DataSource$S3Uri = inputs
-  expected_train_args$experiment_config = EXPERIMENT_CONFIG
-  expected_train_args$debugger_hook_config = NULL
+  expected_train_args[["hyperparameters"]][[Framework$public_fields$LAUNCH_PS_ENV_NAME]] = TRUE
 
   actual_train_args = sagemaker_session$train()$.call_args
-  expect_equal(actual_train_args[-c(8,9)], expected_train_args[-c(8,9)])
+  actual_train_args$job_name = NULL
 
-  # match job name pattern
-  expect_true(grepl(expected_train_args$job_name, actual_train_args$job_name))
+  # check if keys are identical
+  expect_equal(names(actual_train_args), names(expected_train_args))
 
-  for (hp in names(expected_train_args$hyperparameters)){
-    if(hp %in% c("sagemaker_submit_directory", "sagemaker_job_name"))
-      expect_true(grepl(expected_train_args$hyperparameters[[hp]], actual_train_args$hyperparameters[[hp]]))
-    else
-      expect_equal(expected_train_args$hyperparameters[[hp]], actual_train_args$hyperparameters[[hp]])
+  # check if hyperparameters are created correctly
+  expected_hyperparameters = expected_train_args$hyperparameters
+  actual_hyperparameters = actual_train_args$hyperparameters
+  expected_train_args$hyperparameters = NULL
+  actual_train_args$hyperparameters = NULL
+  for (i in names(expected_hyperparameters)){
+    expect_true(grepl(expected_hyperparameters[[i]], actual_hyperparameters[[i]]))
   }
 
-  model = sklearn$create_model()
+  # check if rule configuration name is created correctly
+  expected_RuleConfigurationName = expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  actual_RuleConfigurationName= actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  expect_true(grepl(expected_RuleConfigurationName, actual_RuleConfigurationName))
 
-  expected_image_base = "246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-scikit-learn:%s-cpu-%s"
-  ll = model$prepare_container_def(CPU)
-  expected_ll = list(
-    "Image"= sprintf(expected_image_base,sklearn_version, PYTHON_VERSION),
-    "Environment"= list(
-      "SAGEMAKER_PROGRAM"= "dummy_script.py",
-      "SAGEMAKER_SUBMIT_DIRECTORY"= "s3://mybucket/sagemaker-scikit-learn[0-9-]+/source/sourcedir.tar.gz",
-      "SAGEMAKER_CONTAINER_LOG_LEVEL"= "20",
-      "SAGEMAKER_REGION"= "us-west-2"),
-    "ModelDataUrl"= "s3://m/m.tar.gz")
-
-  expect_equal(ll[-2], expected_ll[-2])
-  for (i in seq_along(ll$Environment)){
-    if(names(ll$Environment[i]) == "SAGEMAKER_SUBMIT_DIRECTORY")
-      expect_true(grepl(expected_ll$Environment[[i]], ll$Environment[[i]]))
-    else expect_equal(ll$Environment[i], expected_ll$Environment[i])
-  }
-
-  predictor = sklearn$deploy(1, CPU)
-  expect_true(inherits(predictor, "SKLearnPredictor"))
+  # check if list of parameters is created correctly
+  expect_equal(expected_train_args,actual_train_args)
 })
 
-test_that("test transform multiple values for entry point issue", {
-  sklearn = SKLearn$new(
-    entry_point=SCRIPT_PATH,
+test_that("test fit mpi", {
+  tf = TensorFlow$new(
+    entry_point=SCRIPT_FILE,
+    framework_version="1.11",
+    py_version="py2",
     role=ROLE,
     sagemaker_session=sagemaker_session,
     instance_type=INSTANCE_TYPE,
-    py_version=PYTHON_VERSION,
-    framework_version=sklearn_version)
+    instance_count=1,
+    source_dir=DATA_DIR,
+    distribution=DISTRIBUTION_MPI_ENABLED)
 
   inputs = "s3://mybucket/train"
+  tf$fit(inputs=inputs)
 
-  sklearn$fit(inputs=inputs)
+  expected_train_args = .create_train_job("1.11", horovod=TRUE, py_version="py2")
+  expected_train_args$input_config[[1]]$DataSource$S3DataSource$S3Uri = inputs
+  expected_train_args[["hyperparameters"]][[Framework$public_fields$LAUNCH_MPI_ENV_NAME]] = TRUE
+  expected_train_args[["hyperparameters"]][[Framework$public_fields$MPI_NUM_PROCESSES_PER_HOST]] = "2"
+  expected_train_args[["hyperparameters"]][[Framework$public_fields$MPI_CUSTOM_MPI_OPTIONS]] = "options"
 
-  transformer = sklearn$transformer(instance_count=1, instance_type="ml.m4.xlarge")
-  # if we got here, we didn't get a "multiple values" error
-  expect_false(is.null(transformer))
-  expect_true(inherits(transformer, "Transformer"))
+  actual_train_args = sagemaker_session$train()$.call_args
+  actual_train_args$job_name = NULL
+
+  # check if keys are identical
+  expect_equal(names(actual_train_args), names(expected_train_args))
+
+  # check if hyperparameters are created correctly
+  expected_hyperparameters = expected_train_args$hyperparameters
+  actual_hyperparameters = actual_train_args$hyperparameters
+  expected_train_args$hyperparameters = NULL
+  actual_train_args$hyperparameters = NULL
+  for (i in names(expected_hyperparameters)){
+    expect_true(grepl(expected_hyperparameters[[i]], actual_hyperparameters[[i]]))
+  }
+
+  # check if rule configuration name is created correctly
+  expected_RuleConfigurationName = expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  actual_RuleConfigurationName= actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  expect_true(grepl(expected_RuleConfigurationName, actual_RuleConfigurationName))
+
+  # check if list of parameters is created correctly
+  expect_equal(expected_train_args,actual_train_args)
 })
 
-test_that("test fail distributed training", {
-  expect_error(
-    SKLearn$new(
-      entry_point=SCRIPT_PATH,
-      role=ROLE,
-      sagemaker_session=sagemaker_session,
-      instance_count=2,
-      instance_type=INSTANCE_TYPE,
-      py_version=PYTHON_VERSION,
-      framework_version=sklearn_version)
-  )
-})
-
-test_that("test fail gpu training", {
-  expect_error(
-    SKLearn$new(
-      entry_point=SCRIPT_PATH,
-      role=ROLE,
-      sagemaker_session=sagemaker_session,
-      instance_type=GPU_INSTANCE_TYPE,
-      py_version=PYTHON_VERSION,
-      framework_version=sklearn_version)
-  )
-})
-
-test_that("test model", {
-  model = SKLearnModel$new(
-    "s3://some/data.tar.gz",
-    role=ROLE,
+test_that("test hyperparameters no model dir",{
+  tf = TensorFlow$new(
     entry_point=SCRIPT_PATH,
-    framework_version=sklearn_version,
-    sagemaker_session=sagemaker_session)
-
-  predictor = model$deploy(1, CPU)
-
-  expect_true(inherits(predictor, "SKLearnPredictor"))
-})
-
-test_that("test attach", {
-  training_image = sprintf("1.dkr.ecr.us-west-2.amazonaws.com/sagemaker-scikit-learn:%s-cpu-%s",
-                           sklearn_version, PYTHON_VERSION)
-  returned_job_description = list(
-    "AlgorithmSpecification"= list("TrainingInputMode"= "File", "TrainingImage"= training_image),
-    "HyperParameters"= list(
-      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
-      "sagemaker_program"= 'iris-dnn-classifier.py',
-      "sagemaker_s3_uri_training"= 'sagemaker-3/integ-test-data/tf_iris',
-      "sagemaker_container_log_level"= 'INFO',
-      "sagemaker_job_name"= 'neo',
-      "training_steps"= "100",
-      "sagemaker_region"= 'us-west-2'),
-    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
-    "ResourceConfig"= list(
-      "VolumeSizeInGB"= 30,
-      "InstanceCount"= 1,
-      "InstanceType"= "ml.c4.xlarge"),
-    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
-    "TrainingJobName"= "neo",
-    "TrainingJobStatus"= "Completed",
-    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
-    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
-    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
-  )
-
-  sm <- sagemaker_session$clone()
-  sm$sagemaker$describe_training_job <- Mock$new()$return_value(returned_job_description)
-
-  sklearn = SKLearn$new(
-    entry_point=SCRIPT_PATH,
+    framework_version="1.15.2",
+    py_version="py3",
     role=ROLE,
-    sagemaker_session=sm,
+    sagemaker_session=sagemaker_session,
     instance_count=INSTANCE_COUNT,
     instance_type=INSTANCE_TYPE,
-    framework_version=sklearn_version,
-    py_version=PYTHON_VERSION)
+    base_job_name=NULL,
+    image_uri="tensorflow:latest",
+    model_dir=FALSE)
 
-  estimator = sklearn$attach(training_job_name="describe_training_job", sagemaker_session=sm)
+  hyperparameters = tf$hyperparameters()
 
-  expect_equal(estimator$.current_job_name, "neo")
-  expect_equal(estimator$latest_training_job, "neo")
-  expect_equal(estimator$py_version, PYTHON_VERSION)
-  expect_equal(estimator$framework_version, sklearn_version)
-  expect_equal(estimator$role, "arn:aws:iam::366:role/SageMakerRole")
-  expect_equal(estimator$instance_count, 1)
-  expect_equal(estimator$max_run, 24 * 60 * 60)
-  expect_equal(estimator$input_mode, "File")
-  expect_equal(estimator$base_job_name, "neo")
-  expect_equal(estimator$output_path, "s3://place/output/neo")
-  expect_equal(estimator$output_kms_key, "")
-  expect_equal(estimator$hyperparameters()$training_steps, "100")
-  expect_equal(estimator$source_dir, "s3://some/sourcedir.tar.gz")
-  expect_equal(estimator$entry_point, "iris-dnn-classifier.py")
+  expect_false("model_dir" %in% names(hyperparameters))
 })
 
-test_that("test attach wrong framework", {
-  rjd = list(
-    "AlgorithmSpecification"= list(
-      "TrainingInputMode"= "File",
-      "TrainingImage"= "1.dkr.ecr.us-west-2.amazonaws.com/sagemaker-mxnet-py3-cpu:1.0.4"),
-    "HyperParameters"= list(
-      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
-      "checkpoint_path"= 's3://other/1508872349',
-      "sagemaker_program"= 'iris-dnn-classifier.py',
-      "sagemaker_container_log_level"= 'INFO',
-      "training_steps"= "100",
-      "sagemaker_region"= 'us-west-2'),
-    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
-    "ResourceConfig"= list(
-      "VolumeSizeInGB"= 30,
-      "InstanceCount"= 1,
-      "InstanceType"= "ml.c4.xlarge"),
-    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
-    "TrainingJobName"= "neo",
-    "TrainingJobStatus"= "Completed",
-    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
-    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
-    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
-  )
-
-  sm <- sagemaker_session$clone()
-  sm$sagemaker$describe_training_job <- Mock$new()$return_value(rjd)
-
-  sklearn = SKLearn$new(
+test_that("test hyperparameters no model dir",{
+  custom_image = "tensorflow:latest"
+  tf = TensorFlow$new(
     entry_point=SCRIPT_PATH,
     role=ROLE,
-    sagemaker_session=sm,
+    sagemaker_session=sagemaker_session,
     instance_count=INSTANCE_COUNT,
     instance_type=INSTANCE_TYPE,
-    framework_version=sklearn_version,
-    py_version=PYTHON_VERSION)
+    image_uri=custom_image)
 
-  expect_error(sklearn$attach(training_job_name="neo", sagemaker_session=sm))
-})
-
-test_that("test attach custom image", {
-  training_image = "1.dkr.ecr.us-west-2.amazonaws.com/my_custom_sklearn_image:latest"
-  returned_job_description = list(
-    "AlgorithmSpecification"= list("TrainingInputMode"= "File", "TrainingImage"= training_image),
-    "HyperParameters"= list(
-      "sagemaker_submit_directory"= 's3://some/sourcedir.tar.gz',
-      "sagemaker_program"= 'iris-dnn-classifier.py',
-      "sagemaker_s3_uri_training"= 'sagemaker-3/integ-test-data/tf_iris',
-      "sagemaker_container_log_level"= 'INFO',
-      "sagemaker_job_name"= 'neo',
-      "training_steps"= "100",
-      "sagemaker_region"= 'us-west-2'),
-    "RoleArn"= "arn:aws:iam::366:role/SageMakerRole",
-    "ResourceConfig"= list(
-      "VolumeSizeInGB"= 30,
-      "InstanceCount"= 1,
-      "InstanceType"= "ml.c4.xlarge"),
-    "StoppingCondition"= list("MaxRuntimeInSeconds"= 24 * 60 * 60),
-    "TrainingJobName"= "neo",
-    "TrainingJobStatus"= "Completed",
-    "TrainingJobArn"= "arn:aws:sagemaker:us-west-2:336:training-job/neo",
-    "OutputDataConfig"= list("KmsKeyId"= "", "S3OutputPath"= "s3://place/output/neo"),
-    "TrainingJobOutput"= list("S3TrainingJobOutput"= "s3://here/output.tar.gz")
-  )
-
-  sm <- sagemaker_session$clone()
-  sm$sagemaker$describe_training_job <- Mock$new()$return_value(returned_job_description)
-
-  sklearn = SKLearn$new(
-    entry_point=SCRIPT_PATH,
-    role=ROLE,
-    sagemaker_session=sm,
-    instance_count=INSTANCE_COUNT,
-    instance_type=INSTANCE_TYPE,
-    framework_version=sklearn_version,
-    py_version=PYTHON_VERSION)
-
-  estimator = sklearn$attach(training_job_name="neo", sagemaker_session=sm)
-  expect_equal(estimator$latest_training_job, "neo")
-  expect_equal(estimator$image_uri, training_image)
-  expect_equal(estimator$training_image_uri(), training_image)
-})
-
-test_that("test estimator py2 warning", {
-  expect_error(
-    SKLearn$new(
-      entry_point=SCRIPT_PATH,
-      role=ROLE,
-      sagemaker_session=sagemaker_session,
-      instance_count=INSTANCE_COUNT,
-      instance_type=INSTANCE_TYPE,
-      framework_version=sklearn_version,
-      py_version="py2")
-  )
-})
-
-test_that("test model py2 warning", {
-  expect_error(
-    SKLearnModel$new(
-      model_data=source_dir,
-      role=ROLE,
-      entry_point=SCRIPT_PATH,
-      sagemaker_session=sagemaker_session,
-      framework_version=sklearn_version,
-      py_version="py2")
-  )
+  expect_equal(custom_image, tf$training_image_uri())
 })
