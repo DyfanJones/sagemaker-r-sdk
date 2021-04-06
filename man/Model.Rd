@@ -40,7 +40,8 @@ Creates a new instance of this [R6][R6::R6Class] class.
   vpc_config = NULL,
   sagemaker_session = NULL,
   enable_network_isolation = FALSE,
-  model_kms_key = NULL
+  model_kms_key = NULL,
+  image_config = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -90,6 +91,11 @@ or from the model container.}
 
 \item{\code{model_kms_key}}{(str): KMS key ARN used to encrypt the repacked
 model archive file if the model is repacked}
+
+\item{\code{image_config}}{(dict[str, str]): Specifies whether the image of
+model container is pulled from ECR, or private registry in your
+VPC. By default it is set to pull model container image from
+ECR. (default: None).}
 }
 \if{html}{\out{</div>}}
 }
