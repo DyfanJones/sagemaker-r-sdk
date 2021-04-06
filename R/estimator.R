@@ -1129,7 +1129,7 @@ EstimatorBase = R6Class("EstimatorBase",
         for (rule in self$profiler_rules){
           private$.set_default_rule_config(rule)
           private$.set_source_s3_uri(rule)
-          profiler_rule_configs = c(profiler_rule_configs, rule$to_profiler_rule_config_dict())
+          profiler_rule_configs = c(profiler_rule_configs, list(rule$to_profiler_rule_config_dict()))
         }
       }
       return(profiler_rule_configs)
@@ -1212,14 +1212,19 @@ EstimatorBase = R6Class("EstimatorBase",
 
       # Allow file:// input only in local mode
       if (private$.is_local_channel(inputs) || private$.is_local_channel(model_uri)){
-        if (!local_mode) stop("File URIs are supported in local mode only. Please use a S3 URI instead.", call. = F)
+        if (!local_mode)
+          ValueError$new("File URIs are supported in local mode only. Please use a S3 URI instead.")
       }
 
       config = .Job$new()$.__enclos_env__$private$.load_config(inputs, self)
 
-      if (!islistempty(self$hyperparameters())){
-        hyperparameters = self$hyperparameters()}
+      current_hyperparameters = self$hyperparameters()
 
+      if (!islistempty(current_hyperparameters)){
+        hyperparameters=lapply(current_hyperparameters, function(v) {
+          if(inherits(v, c("Parameter", "Expression", "Properties","logical")))
+            v else as.character(v)})
+      }
       train_args = config
       train_args$input_mode = self$input_mode
       train_args$job_name = self$.current_job_name
@@ -1244,8 +1249,8 @@ EstimatorBase = R6Class("EstimatorBase",
       if (inherits(self, "AlgorithmEstimator")){
         train_args$algorithm_arn = self$algorithm_arn
       } else {
-        train_args$image_uri = self$training_image_uri()}
-
+        train_args$image_uri = self$training_image_uri()
+      }
       if (!islistempty(self$debugger_rule_configs))
         train_args$debugger_rule_configs = self$debugger_rule_configs
 
@@ -2335,7 +2340,7 @@ Framework = R6Class("Framework",
           distribution_config[[self$MPI_NUM_PROCESSES_PER_HOST]] = mpi_dict[[
             "processes_per_host"]]
 
-        distribution_config[[self.MPI_CUSTOM_MPI_OPTIONS]] = mpi_dict[[
+        distribution_config[[self$MPI_CUSTOM_MPI_OPTIONS]] = mpi_dict[[
           "custom_mpi_options"]] %||% ""
 
         if (!islistempty(get_mp_parameters(distribution)))
