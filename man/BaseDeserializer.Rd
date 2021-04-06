@@ -7,37 +7,26 @@
 All BaseDeserializer are children of this class. If a custom
               BaseDeserializer is desired, inherit this class.
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{ACCEPT}}{format ACCEPTed by BaseDeserializer}
+\item{\code{ACCEPT}}{The content types that are expected from the inference endpoint.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{BaseDeserializer$new()}}
 \item \href{#method-deserialize}{\code{BaseDeserializer$deserialize()}}
 \item \href{#method-print}{\code{BaseDeserializer$print()}}
 \item \href{#method-clone}{\code{BaseDeserializer$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
-\subsection{Method \code{new()}}{
-Initialize Serializer Class
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BaseDeserializer$new()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-deserialize"></a>}}
 \if{latex}{\out{\hypertarget{method-deserialize}{}}}
 \subsection{Method \code{deserialize()}}{
-Takes raw data stream and deserializes it.
+Deserialize data received from an inference endpoint.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseDeserializer$deserialize(stream, content_type)}\if{html}{\out{</div>}}
 }
@@ -45,11 +34,14 @@ Takes raw data stream and deserializes it.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{stream}}{raw data to be deserialize}
+\item{\code{stream}}{(botocore.response.StreamingBody): Data to be deserialized.}
 
 \item{\code{content_type}}{(str): The MIME type of the data.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+object: The data deserialized into an object.
 }
 }
 \if{html}{\out{<hr>}}

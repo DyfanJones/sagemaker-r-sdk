@@ -3,6 +3,9 @@
 #' @importFrom stats runif
 #' @importFrom utils tar
 
+
+DEFAULT_SLEEP_TIME_SECONDS <- 10
+
 `%||%` <- function(x, y) if (is.null(x)) return(y) else return(x)
 
 get_aws_env <- function(x) {
@@ -58,18 +61,33 @@ base_from_name <- function(name){
 
 base_name_from_image <- function(image){
   m <- grepl("^(.+/)?([^:/]+)(:[^:]+)?$", image)
-  algo_name = if(m) gsub(".*/|:.*", "", image) else image
+  algo_name = if(!is.null(m)) gsub(".*/|:.*", "", image) else image
   return(algo_name)
 }
-
-# Return a timestamp that is relatively short in length
-sagemaker_short_timestamp <- function() return(format(Sys.time(), "%y%m%d-%H%M"))
 
 # Return a timestamp with millisecond precision.
 sagemaker_timestamp <- function(){
   moment = Sys.time()
   moment_ms = split_str(format(as.numeric(moment,3), nsmall = 3), "\\.")[2]
   paste0(format(Sys.time(),"%Y-%m-%d-%H-%M-%S-",tz="GMT"), moment_ms)
+}
+
+# Return a timestamp that is relatively short in length
+sagemaker_short_timestamp <- function() return(format(Sys.time(), "%y%m%d-%H%M"))
+
+# Return a dict of key and value pair if value is not None, otherwise return an empty dict.
+# Args:
+#   key (str): input key
+# value (str): input value
+# Returns:
+#   dict: dict of key and value or an empty dict.
+build_dict <- function(key, value = NULL){
+  if (!is.null(value)) {
+    dict = list(value)
+    names(dict) = key
+    return(dict)
+  }
+  return(list())
 }
 
 get_config_value <- function(key_path, config = NULL){
@@ -81,6 +99,16 @@ get_config_value <- function(key_path, config = NULL){
     else return(NULL)
   }
   return(NULL)
+}
+
+# Return short version in the format of x.x
+# Args:
+#   framework_version: The version string to be shortened.
+# Returns:
+#   str: The short version string
+get_short_version = function(framework_version){
+  fm_vs = split_str(framework_version, "\\.")
+  return(paste(fm_vs[1:min(3,length(fm_vs))], collapse = "."))
 }
 
 # Write large raw connections in chunks
@@ -388,22 +416,45 @@ print_class <- function(self){
 
 # Wrapper sys::exec_internal to return errors to jupyter:
 # https://github.com/DyfanJones/sagemaker-r-sdk/issues/41
-sys_jupyter <- function(cmd, args = NULL, timeout = 0){ 
+sys_jupyter <- function(cmd, args = NULL, timeout = 0){
   output <- sys::exec_internal(
     cmd, args, error = FALSE, timeout = timeout)
   # raise error
   if(!identical(output$status, 0L)){
     # rebuild sys::exec_internal initial error message
     msg <- sprintf("Executing '%s' failed with status: %d\n", cmd[1], output$status)
-    
+
     # added any warning messages from terminal
     if (length(output$stdout) > 0){
       stdout <- paste0(sys::as_text(output$stdout), "\n")
       warning(stdout, call. = F)}
-    
+
     # added returning error from terminal
     stderr <- paste0(sys::as_text(output$stderr), "\n")
     stop(msg, stderr, call. = F)
   }
   return(sys::as_text(rawConnectionValue(outcon)))
 }
+
+# Retries until max retry count is reached.
+# Args:
+#   max_retry_count (int): The retry count.
+# exception_message_prefix (str): The message to include in the exception on failure.
+# seconds_to_sleep (int): The number of seconds to sleep between executions.
+retries <- function(max_retry_count,
+                    exception_message_prefix,
+                    seconds_to_sleep = 2) {
+  value <- 0
+  function() {
+    value <<- value + 1
+    if (value <= max_retry_count){
+      Sys.sleep(seconds_to_sleep)
+      return(TRUE)
+    } else {
+      SagemakerError$new(
+        sprintf("'%s' has reached the maximum retry count of %s",
+                exception_message_prefix, max_retry_count))
+    }
+  }
+}
+

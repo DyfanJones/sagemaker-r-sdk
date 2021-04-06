@@ -12,7 +12,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title An unsupervised learning algorithm attempting to describe data as distinct categories.
 #' @description LDA is most commonly used to discover a
@@ -102,7 +102,7 @@ LDA = R6Class("LDA",
 
       # this algorithm only supports single instance training
       if ("instance_count" %in% names(args) && args$instance_count != 1){
-        log_info("LDA only supports single instance training. Defaulting to 1 %s.",
+        LOGGER$info("LDA only supports single instance training. Defaulting to 1 %s.",
             instance_type)
         args$instance_count = NULL
       }

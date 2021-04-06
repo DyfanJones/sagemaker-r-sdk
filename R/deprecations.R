@@ -1,13 +1,13 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/deprecations.py
 
-#' @import logger
+#' @import lgr
 
 V2_URL = "https://sagemaker.readthedocs.io/en/stable/v2.html"
 
 .warn <- function(msg){
   full_msg = sprintf("%s to align with python sagemaker>=2.\nSee: %s for details.", msg, V2_URL)
   warning(full_msg, call. = F)
-  log_warn(full_msg)
+  LOGGER$warn(full_msg)
 }
 
 # Raise a warning for a no-op in sagemaker>=2
@@ -66,3 +66,18 @@ removed_kwargs <- function(name,
   if (name %in% names(kwargs))
     removed_warning(name)
 }
+
+# Wrap a function with a deprecation warning.
+# Args:
+#   func: Function to wrap in a deprecation warning.
+# name: The name that has been deprecated.
+# Returns:
+#   The modified function
+deprecated_function <- function(func, name){
+  deprecate <- function(...){
+    renamed_warning(sprintf("The %s", name))
+    return(do.call(func, list(...)))
+  }
+  return(deprecate)
+}
+

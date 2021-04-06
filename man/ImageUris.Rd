@@ -59,7 +59,10 @@ Retrieves the ECR URI for the Docker image matching the given arguments of inbui
   py_version = NULL,
   instance_type = NULL,
   accelerator_type = NULL,
-  image_scope = NULL
+  image_scope = NULL,
+  container_version = NULL,
+  distribution = NULL,
+  base_framework_version = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -86,6 +89,13 @@ https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html.}
 \item{\code{image_scope}}{(str): The image type, i.e. what it is used for.
 Valid values: "training", "inference", "eia". If ``accelerator_type`` is set,
 ``image_scope`` is ignored.}
+
+\item{\code{container_version}}{(str): the version of docker image}
+
+\item{\code{distribution}}{(dict): A dictionary with information on how to run distributed training
+(default: None).}
+
+\item{\code{base_framework_version}}{(str):}
 }
 \if{html}{\out{</div>}}
 }

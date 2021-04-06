@@ -12,6 +12,7 @@ Contains static methods for downloading directories or files from S3.
 \item \href{#method-download}{\code{S3Downloader$download()}}
 \item \href{#method-read_file}{\code{S3Downloader$read_file()}}
 \item \href{#method-list_s3_uri}{\code{S3Downloader$list_s3_uri()}}
+\item \href{#method-print}{\code{S3Downloader$print()}}
 \item \href{#method-clone}{\code{S3Downloader$clone()}}
 }
 }
@@ -90,6 +91,23 @@ generates one if not provided.}
 }
 \subsection{Returns}{
 [str]: The list of S3 URIs in the given S3 base uri.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Printer.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{S3Downloader$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{(ignored).}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

@@ -3,7 +3,7 @@
 #' @include session.R
 #' @include utils.R
 
-#' @import logger
+#' @import lgr
 #' @import R6
 #' @import paws
 #' @import data.table
@@ -127,7 +127,7 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
          NextToken = next_args$NextToken)
        new_output = raw_result$TrainingJobSummaries
        output = c(output, new_output)
-       log_debug("Got %d more TrainingJobs. Total so far: %d",
+       LOGGER$debug("Got %d more TrainingJobs. Total so far: %d",
                  length(new_output), length(output))
        if (!length(raw_result$NextToken) == 0 && length(new_output) > 0)
          next_args$NextToken = raw_result$NextToken
@@ -344,7 +344,7 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
           Period= self$.period,
           Statistics= list("Average"))$Datapoints
      if (islistempty(raw_cwm_data)){
-       log_warn("Warning: No metrics called %s found", metric_name)
+       LOGGER$warn("Warning: No metrics called %s found", metric_name)
        return(NULL)}
      # Process data: normalize to starting time, and sort.
      base_time = min(sapply(raw_cwm_data, function(x) x$Timestamp))

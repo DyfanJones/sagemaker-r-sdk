@@ -11,12 +11,14 @@
 #' @description Serialize a matrices and array for an inference request.
 #' @export
 RecordSerializer = R6Class("RecordSerializer",
-  inherit = BaseSerializer,
+  inherit = SimpleBaseSerializer,
   public = list(
 
-    #' @description intialize RecordSerializer class
-    initialize = function(){
-      self$CONTENT_TYPE = "application/x-recordio-protobuf"
+    #' @description Intialize RecordSerializer class
+    #' @param content_type (str): The MIME type to signal to the inference endpoint when sending
+    #'              request data (default: "application/x-recordio-protobuf").
+    initialize = function(content_type="application/x-recordio-protobuf"){
+      super$initialize(content_type=content_type)
       initProtoBuf()
     },
 
@@ -45,12 +47,15 @@ RecordSerializer = R6Class("RecordSerializer",
 #' @description Deserialize RecordIO Protobuf data from an inference endpoint.
 #' @export
 RecordDeserializer = R6Class("RecordDeserializer",
-  inherit = BaseDeserializer,
+  inherit = SimpleBaseDeserializer,
   public = list(
 
-    #' @description intialize RecordDeserializer class
-    initialize = function(){
-      self$ACCEPT = "application/x-recordio-protobuf"
+    #' @description Intialize RecordDeserializer class
+    #' @param accept (union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+    #'              is expected from the inference endpoint (default:
+    #'              "application/x-recordio-protobuf").
+    initialize = function(accept="application/x-recordio-protobuf"){
+      super$initialize(accept=accept)
       initProtoBuf()
     },
 
@@ -118,7 +123,7 @@ write_matrix_to_dense_tensor <- function(file, array, labels = NULL){
     resolved_label_type = .resolve_type(labels[1])
   }
   resolved_type = .resolve_type(array[1])
-  record = Record()
+  record = Record_pb()
   # Write each vector in array into a Record in the file object
   for(index in 1:nrow(array)){
     vector = array[index,]
@@ -158,7 +163,7 @@ write_spmatrix_to_sparse_tensor <- function(file, array, labels=NULL){
   dim_array = dim(csr_array)
 
   for (row_idx in seq_len(dim_array[1])){
-    record = Record()
+    record = Record_pb()
     row = csr_array[row_idx,, drop = F] # keep row in RsparseMatrix format
 
     # Write values

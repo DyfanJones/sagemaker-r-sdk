@@ -13,12 +13,12 @@
 .RECORD <- function() RProtoBuf::P("aialgs.data.Record")
 
 # Create message
-Float32Tensor <- function() .FLOAT32TENSOR()$new()
-Float64Tensor <- function() .FLOAT64TENSOR()$new()
-Int32Tensor <- function() .INT32TENSOR()$new()
-Bytes <- function() .BYTES()$new()
-Value <- function() .VALUE()$new()
-Record <- function() .RECORD()$new()
+Float32Tensor_pb <- function() .FLOAT32TENSOR()$new()
+Float64Tensor_pb <- function() .FLOAT64TENSOR()$new()
+Int32Tensor_pb <- function() .INT32TENSOR()$new()
+Bytes_pb <- function() .BYTES()$new()
+Value_pb <- function() .VALUE()$new()
+Record_pb <- function() .RECORD()$new()
 
 # initialise ProtoBuf when required
 initProtoBuf <- function(){

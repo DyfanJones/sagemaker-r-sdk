@@ -101,7 +101,14 @@ sagemaker_session$call_args("compile_model")
     "image_uri"= .get_full_cpu_image_uri(version),
     "debugger_hook_config"= list(
       "CollectionConfigurations"= list(),
-      "S3OutputPath"= sprintf("s3://%s/",BUCKET_NAME))
+      "S3OutputPath"= sprintf("s3://%s/",BUCKET_NAME)),
+    "profiler_rule_configs"=list(list(
+        "RuleConfigurationName"="ProfilerReport-[0-9]+",
+        "RuleEvaluatorImage"="895741380848.dkr.ecr.us-west-2.amazonaws.com/sagemaker-debugger-rules:latest",
+        "RuleParameters"=list("rule_to_invoke"="ProfilerReport"))
+        ),
+    "profiler_config"=list(
+      "S3OutputPath"=sprintf("s3://%s/",BUCKET_NAME))
     )
   )
 }
@@ -281,17 +288,32 @@ test_that("test sklearn", {
   expected_train_args$debugger_hook_config = NULL
 
   actual_train_args = sagemaker_session$train()$.call_args
-  expect_equal(actual_train_args[-c(8,9)], expected_train_args[-c(8,9)])
 
-  # match job name pattern
+  # check if keys are identical
+  expect_equal(names(actual_train_args), names(expected_train_args))
+
+  # check if hyperparameters are created correctly
+  expected_hyperparameters = expected_train_args$hyperparameters
+  actual_hyperparameters = actual_train_args$hyperparameters
+  expected_train_args$hyperparameters = NULL
+  actual_train_args$hyperparameters = NULL
+  for (i in names(expected_hyperparameters)){
+    expect_true(grepl(expected_hyperparameters[[i]], actual_hyperparameters[[i]]))
+  }
+
+  # check if rule configuration name is created correctly
+  expected_RuleConfigurationName = expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  actual_RuleConfigurationName= actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName
+  expected_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  actual_train_args$profiler_rule_configs[[1]]$RuleConfigurationName = NULL
+  expect_true(grepl(expected_RuleConfigurationName, actual_RuleConfigurationName))
+
   expect_true(grepl(expected_train_args$job_name, actual_train_args$job_name))
 
-  for (hp in names(expected_train_args$hyperparameters)){
-    if(hp %in% c("sagemaker_submit_directory", "sagemaker_job_name"))
-      expect_true(grepl(expected_train_args$hyperparameters[[hp]], actual_train_args$hyperparameters[[hp]]))
-    else
-      expect_equal(expected_train_args$hyperparameters[[hp]], actual_train_args$hyperparameters[[hp]])
-  }
+  expected_train_args$job_name=NULL
+  actual_train_args$job_name=NULL
+  # check if list of parameters is created correctly
+  expect_equal(expected_train_args,actual_train_args)
 
   model = sklearn$create_model()
 

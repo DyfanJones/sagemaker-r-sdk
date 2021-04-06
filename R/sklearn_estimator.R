@@ -9,7 +9,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title Scikit-learn Class
 #' @description Handle end-to-end training and deployment of custom Scikit-learn code.

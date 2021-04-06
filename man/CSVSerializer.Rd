@@ -6,8 +6,8 @@
 \description{
 Make Raw data using text/csv format
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{CSVSerializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{\link[R6sagemaker:SimpleBaseSerializer]{R6sagemaker::SimpleBaseSerializer}} -> \code{CSVSerializer}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -28,11 +28,19 @@ Make Raw data using text/csv format
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize CSVSerializer Class
+Initialize a ``CSVSerializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CSVSerializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CSVSerializer$new(content_type = "text/csv")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{content_type}}{(str): The MIME type to signal to the inference endpoint when sending
+request data (default: "text/csv").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-serialize"></a>}}

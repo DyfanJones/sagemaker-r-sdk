@@ -10,6 +10,7 @@
 #' @include image_uris.R
 
 #' @import R6
+#' @import lgr
 #' @importFrom urltools url_parse
 #' @import paws
 #' @import jsonlite
@@ -166,11 +167,11 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
       key_prefix = parsed_s3_url$path
       key_prefix = paste0(key_prefix, sprintf("%s-%s/", class(self)[1], sagemaker_timestamp()))
       key_prefix = trimws(key_prefix, "left", "/")
-      log_debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
+      LOGGER$debug("Uploading to bucket %s and key_prefix %s", bucket, key_prefix)
       manifest_s3_file = upload_matrix_to_s3_shards(
         self$instance_count, self$sagemaker_session$s3, bucket, key_prefix, train, labels, encrypt
       )
-      log_debug("Created manifest file %s", manifest_s3_file)
+      LOGGER$debug("Created manifest file %s", manifest_s3_file)
       return(RecordSet$new(
         manifest_s3_file,
         num_records=dim(train)[1],
@@ -335,7 +336,7 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
 
       if (inherits(inputs, "TrainingInput")){
         if ("InputMode" %in% inputs$config){
-          log_debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
+          LOGGER$debug("Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
                     inputs$config$InputMode)
           train_args[["input_mode"]] = inputs$config$InputMod}
       }
@@ -571,7 +572,7 @@ upload_matrix_to_s3_shards = function(num_shards,
       shard_index_string = formatC(shard_index, width = nchar(nrow(shards[[shard_index]])), format = "d", flag = "0")
       file_name = sprintf("matrix_%s.pbr", shard_index_string)
       key = paste0(key_prefix, file_name)
-      log_debug("Creating object %s in bucket %s", key, bucket)
+      LOGGER$debug("Creating object %s in bucket %s", key, bucket)
       # Upload shard to s3
       s3$put_object(Bucket = bucket, Key = key, Body = obj, ServerSideEncryption = extra_put_kwargs$extra_put_kwargs)
       # update uploaded files

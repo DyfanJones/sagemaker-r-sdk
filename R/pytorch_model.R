@@ -12,7 +12,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title A Predictor for inference against PyTorch Endpoints.
 #' @description This is able to serialize Python lists, dictionaries, and numpy arrays to
@@ -103,7 +103,7 @@ PyTorchModel = R6Class("PyTorchModel",
       attr(self, "_framework_name") = "pytorch"
 
       if (identical(py_version, "py2"))
-        log_warn(
+        LOGGER$warn(
           python_deprecation_warning(attr(self, "_framework_name"), PYTORCH_LATEST_PY2_VERSION)
         )
 

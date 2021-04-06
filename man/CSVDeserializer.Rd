@@ -2,12 +2,21 @@
 % Please edit documentation in R/deserializers.R
 \name{CSVDeserializer}
 \alias{CSVDeserializer}
-\title{CSVDeserializer Class}
+\title{Deserialize a stream of bytes into a list of lists.}
 \description{
-Use csv format to deserialize raw data stream
+Consider using :class:~`sagemaker.deserializers.NumpyDeserializer` or
+             :class:~`sagemaker.deserializers.PandasDeserializer` instead, if you'd like to convert text/csv
+             responses directly into other data types.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{CSVDeserializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{\link[R6sagemaker:SimpleBaseDeserializer]{R6sagemaker::SimpleBaseDeserializer}} -> \code{CSVDeserializer}
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{encoding}}{string encoding to be used}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -28,11 +37,21 @@ Use csv format to deserialize raw data stream
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize CsvSerializer Class
+Initialize a ``CSVDeserializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CSVDeserializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CSVDeserializer$new(encoding = "UTF-8", accept = "text/csv")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{encoding}}{(str): The string encoding to use (default: "UTF-8").}
+
+\item{\code{accept}}{(union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+is expected from the inference endpoint (default: "text/csv").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-deserialize"></a>}}

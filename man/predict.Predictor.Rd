@@ -7,8 +7,8 @@
 \method{predict}{Predictor}(
   object,
   newdata,
-  serializer = csv_serializer,
-  deserializer = csv_deserializer,
+  serializer = CSVSerializer$new(),
+  deserializer = CSVDeserializer$new(),
   ...
 )
 }

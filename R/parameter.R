@@ -1,6 +1,5 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/parameter.py
 
-
 #' @import R6
 
 #' @title ParameterRange Class

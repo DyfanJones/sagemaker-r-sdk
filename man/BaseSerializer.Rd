@@ -7,37 +7,19 @@
 All serializer are children of this class. If a custom
               serializer is desired, inherit this class.
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{CONTENT_TYPE}}{Method in how data is going to be seperated}
+\item{\code{CONTENT_TYPE}}{The MIME type of the data sent to the inference endpoint.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{BaseSerializer$new()}}
 \item \href{#method-serialize}{\code{BaseSerializer$serialize()}}
 \item \href{#method-print}{\code{BaseSerializer$print()}}
 \item \href{#method-clone}{\code{BaseSerializer$clone()}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
-\subsection{Method \code{new()}}{
-Take data of various data formats and serialize them
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BaseSerializer$new()}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{data}}{(object): Data to be serialized.}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -55,6 +37,9 @@ Take data of various data formats and serialize them into CSV.
 \item{\code{data}}{(object): Data to be serialized}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+object: Serialized data used for a request.
 }
 }
 \if{html}{\out{<hr>}}

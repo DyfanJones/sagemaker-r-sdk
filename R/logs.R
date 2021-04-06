@@ -1,36 +1,15 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/logs.py
 
-#' @import logger
+#' @import lgr
 
-sagemaker_logging_format <- function(){
-  log_formatter(formatter = logger::formatter_sprintf)
-  log_layout(layout_sagemaker_colour)
-}
+# set format for SageMaker
+sagemaker_log_layout <- lgr::LayoutFormat$new(
+  fmt = "%L[%t] %m",
+  timestamp_fmt = "%Y-%m-%d %H:%M:%OS",
+  colors = getOption("lgr.colors", list())
+)
 
-layout_sagemaker_colour <- structure(function(level, msg, namespace = NA_character_,
-                                              .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
-  sprintf('[%s:%s] %s', paste0("\033[3m", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\033[23m"), sagemaker_log_colour(attr(level,'level'), level), msg, level)
-}, generator = quote(layout_simple()))
-
-layout_sagemaker <- structure(function(level, msg, namespace = NA_character_,
-                                       .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
-  sprintf('[%s:%s] %s', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), attr(level,'level'), msg, level)
-}, generator = quote(layout_simple()))
-
-sagemaker_log_colour <- function (msg, level) {
-  color <- switch(attr(level, "level"),
-                  FATAL =  sprintf("\033[38;5;%sm%s\033[39m", 196, msg),
-                  ERROR = sprintf("\033[38;5;%sm%s\033[39m", 124, msg),
-                  WARN = sprintf("\033[38;5;%sm%s\033[39m", 214, msg),
-                  SUCCESS = sprintf("\033[38;5;%sm%s\033[39m", 34, msg),
-                  INFO = sprintf("\x1b[%sm%s\x1b[0m", 34, msg),
-                  DEBUG = sprintf("\033[38;5;%sm%s\033[39m", 31, msg),
-                  TRACE = sprintf("\033[38;5;%sm%s\033[39m", 25, msg),
-                  stop("Unknown log level"))
-  color
-}
-
-# format logs
+# format logs from cloud watch
 sagemaker_colour_wrapper <- function(logs){
   ifelse(grepl("^\\[.*FATAL.*\\].*|^FATAL:.*",logs),
          sprintf("\033[38;5;%sm%s\033[39m", 196, logs),
@@ -58,9 +37,14 @@ multi_stream_iter <- function(cloudwatchlogs, log_group, streams, positions= NUL
     sm_env$positions = positions}
 
   # Get all logs and remove 1 list level
-  events = lapply(streams, function(s) log_stream(cloudwatchlogs, log_group, s,
-                                                                    positions[[s]]$timestamp, positions[[s]]$skip))
-  events
+  events = lapply(streams, function(s)
+    log_stream(
+      cloudwatchlogs,
+      log_group,
+      s,
+      positions[[s]]$timestamp,
+      positions[[s]]$skip))
+  return(events)
 }
 
 
@@ -97,6 +81,6 @@ log_stream <- function(cloudwatchlogs,
       events = list()
     }
   }
-  events
+  return(events)
 }
 

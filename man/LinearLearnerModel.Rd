@@ -26,8 +26,10 @@ Calling :meth:`~sagemaker.model.Model.deploy` creates an Endpoint and returns a
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="delete_model">}\href{../../R6sagemaker/html/Model.html#method-delete_model}{\code{R6sagemaker::Model$delete_model()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker/html/Model.html#method-deploy}{\code{R6sagemaker::Model$deploy()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker::Model$enable_network_isolation()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="package_for_edge">}\href{../../R6sagemaker/html/Model.html#method-package_for_edge}{\code{R6sagemaker::Model$package_for_edge()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="prepare_container_def">}\href{../../R6sagemaker/html/Model.html#method-prepare_container_def}{\code{R6sagemaker::Model$prepare_container_def()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="register">}\href{../../R6sagemaker/html/Model.html#method-register}{\code{R6sagemaker::Model$register()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
 }
 \out{</details>}

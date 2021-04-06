@@ -6,8 +6,8 @@
 \description{
 Deserialize raw data stream into a character string
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{StringBaseDeserializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseDeserializer]{R6sagemaker::BaseDeserializer}} -> \code{\link[R6sagemaker:SimpleBaseDeserializer]{R6sagemaker::SimpleBaseDeserializer}} -> \code{StringBaseDeserializer}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -35,11 +35,21 @@ Deserialize raw data stream into a character string
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize StringBaseDeserializer Class
+Initialize a ``StringDeserializer`` instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{StringDeserializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{StringDeserializer$new(encoding = "UTF-8", accept = "application/json")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{encoding}}{(str): The string encoding to use (default: UTF-8).}
+
+\item{\code{accept}}{(union[str, tuple[str]]): The MIME type (or tuple of allowable MIME types) that
+is expected from the inference endpoint (default: "application/json").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-deserialize"></a>}}

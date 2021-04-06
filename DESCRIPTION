@@ -7,17 +7,19 @@ Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("
 Description: A library for training and deploying machine learning models on 
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports: 
-    R6,
-    paws,
-    jsonlite,
-    logger,
-    urltools,
     data.table,
-    uuid,
+    fs,
+    jsonlite,
+    lgr,
+    methods,
+    paws,
+    R6,
     stats,
     sys,
+    tools,
+    urltools,
     utils,
-    methods
+    uuid
 Suggests: 
     testthat,
     RProtoBuf,
@@ -30,15 +32,25 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Collate: 
+    'error.R'
+    'utils.R'
+    'apiutils_paws_functions.R'
+    'apiutils_base_types.R'
+    'lineage_api_types.R'
+    'lineage_association.R'
+    'lineage_utils.R'
+    'lineage_context.R'
     'deserializers.R'
     'serializers.R'
-    'utils.R'
+    'image_uris.R'
+    'studio.R'
     'vpc_utils.R'
     'set_credentials.R'
     'logs.R'
     'session.R'
+    's3.R'
+    'model_monitor_model_monitoring.R'
     'analytics.R'
-    'image_uris.R'
     'git_utils.R'
     'transformer.R'
     'fw_utils.R'
@@ -53,7 +65,6 @@ Collate:
     'amazon_common.R'
     'amazon_validation.R'
     'amazon_hyperparameter.R'
-    's3.R'
     'fw_registry.R'
     'amazon_estimator.R'
     'amazon_factorization_machines.R'
@@ -66,24 +77,37 @@ Collate:
     'amazon_object2vec.R'
     'amazon_pca.R'
     'amazon_randomcutforest.R'
+    'apiutils_utils.R'
     'automl_candidate_estimator.R'
     'pipeline.R'
     'automl_automl.R'
     'chainer_default.R'
     'chainer_model.R'
     'chainer_estimator.R'
-    'data_capture_config.R'
+    'processing.R'
+    'clarify.R'
     'debugger.R'
+    'debugger_utils.R'
+    'debugger_profiler_constants.R'
+    'debugger_metrics_config.R'
+    'debugger_framework_profile.R'
+    'debugger_profiler_config.R'
     'deprecations.R'
-    'model_monitoring.R'
-    'monitoring_files.R'
+    'lineage_action.R'
+    'lineage_artifact.R'
+    'lineage_visualizer.R'
+    'model_metrics.R'
+    'model_monitor_clarify_model_monitoring.R'
+    'model_monitor_cron_expression_generator.R'
+    'model_monitor_data_capture_config.R'
+    'model_monitor_dataset_format.R'
+    'model_monitor_monitoring_files.R'
     'multidatamodel.R'
     'mxnet_default.R'
     'mxnet_model.R'
     'mxnet_estimator.R'
     'network.R'
     'pkg_variables.R'
-    'processing.R'
     'pytorch_defaults.R'
     'pytorch_model.R'
     'pytorch_estimator.R'
@@ -93,6 +117,9 @@ Collate:
     'sklearn_processing.R'
     'spark_processing.R'
     'sparkml_model.R'
+    'tensorflow_defaults.R'
+    'tensorflow_model.R'
+    'tensorflow_estimator.R'
     'tuner.R'
     'xgboost_default.R'
     'xgboost_model.R'

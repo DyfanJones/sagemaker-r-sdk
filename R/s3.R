@@ -5,6 +5,7 @@
 #'
 #' @import R6
 #' @importFrom urltools url_parse
+#' @importFrom fs path_join
 
 # validation check of s3 uri
 is.s3_uri <- function(x) {
@@ -21,6 +22,23 @@ split_s3_uri <- function(uri) {
     bucket = parsed_s3$domain,
     key = parsed_s3$path)
   )
+}
+
+#' @title Creates S3 uri paths
+#' @description Returns the arguments joined by a slash ("/"), similarly to ``file.path()`` (on Unix).
+#'              If the first argument is "s3://", then that is preserved.
+#' @param ... : The strings to join with a slash.
+#' @return charater: The joined string.
+#' @return
+s3_path_join = function(...){
+   args=list(...)
+   if(grepl("^s3://", args[[1]])){
+      path = trimws(args[2:length(args)], "left", "/")
+      path = fs::path_join(c(args[[1]], path))
+      return(gsub("s3:/", "s3://", path))
+   }
+
+   return(trimws(fs::path_join(args), "left", "/"))
 }
 
 #' @title S3Uploader Class
@@ -75,6 +93,13 @@ S3Uploader = R6Class("S3Uploader",
        key_prefix=s3_parts$key, kms_key=kms_key)
 
      return(desired_s3_uri)
+   },
+
+   #' @description
+   #' Printer.
+   #' @param ... (ignored).
+   print = function(...){
+      return(print_class(self))
    }
   )
 )
@@ -135,7 +160,14 @@ S3Downloader = R6Class("S3Downloader",
      s3_parts = split_s3_uri(desired_s3_uri)
 
      file_keys = sagemaker_session$list_s3_files(bucket=s3_parts$bucket, key_prefix=s3_parts$key)
-     return(lapply(file_keys, function(file_key) sprintf("s3://%s/%s", s3_parts$bucket, file_key)))
+     return(lapply(file_keys, function(file_key) s3_path_join("s3://", s3_parts$bucket, file_key)))
+   },
+
+   #' @description
+   #' Printer.
+   #' @param ... (ignored).
+   print = function(...){
+      return(print_class(self))
    }
   )
 )

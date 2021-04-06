@@ -8,7 +8,7 @@
 #' @include fw_utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title XGBoostPredictor Class
 #' @description Predictor for inference against XGBoost Endpoints.

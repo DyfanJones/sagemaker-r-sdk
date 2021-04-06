@@ -13,8 +13,7 @@
 #' @import paws
 #' @import jsonlite
 #' @import R6
-#' @import logger
-
+#' @import lgr
 
 NEO_ALLOWED_FRAMEWORKS <- list("mxnet", "tensorflow", "keras", "pytorch", "onnx", "xgboost", "tflite")
 
@@ -59,6 +58,10 @@ Model = R6Class("Model",
     #'              or from the model container.
     #' @param model_kms_key (str): KMS key ARN used to encrypt the repacked
     #'              model archive file if the model is repacked
+    #' @param image_config (dict[str, str]): Specifies whether the image of
+    #'              model container is pulled from ECR, or private registry in your
+    #'              VPC. By default it is set to pull model container image from
+    #'              ECR. (default: None).
     initialize = function(image_uri,
                           model_data=NULL,
                           role=NULL,
@@ -68,7 +71,8 @@ Model = R6Class("Model",
                           vpc_config=NULL,
                           sagemaker_session=NULL,
                           enable_network_isolation=FALSE,
-                          model_kms_key=NULL){
+                          model_kms_key=NULL,
+                          image_config=NULL){
 
       self$model_data = model_data
       self$image_uri = image_uri
@@ -80,9 +84,72 @@ Model = R6Class("Model",
       self$vpc_config = vpc_config
       self$sagemaker_session = sagemaker_session %||% Session$new()
       self$endpoint_name = NULL
-      self$.is_compiled_model = FALSE
+      private$.is_compiled_model = FALSE
+      private$.compilation_job_name = NULL
+      private$.is_edge_packaged_model = FALSE
       self$.enable_network_isolation = enable_network_isolation
       self$model_kms_key = model_kms_key
+      self$image_config = image_config
+    },
+
+    #' @description Creates a model package for creating SageMaker models or listing on Marketplace.
+    #' @param content_types (list): The supported MIME types for the input data (default: None).
+    #' @param response_types (list): The supported MIME types for the output data (default: None).
+    #' @param inference_instances (list): A list of the instance types that are used to
+    #'              generate inferences in real-time (default: None).
+    #' @param transform_instances (list): A list of the instance types on which a transformation
+    #'              job can be run or on which an endpoint can be deployed (default: None).
+    #' @param model_package_name (str): Model Package name, exclusive to `model_package_group_name`,
+    #'              using `model_package_name` makes the Model Package un-versioned (default: None).
+    #' @param model_package_group_name (str): Model Package Group name, exclusive to
+    #'              `model_package_name`, using `model_package_group_name` makes the Model Package
+    #'              versioned (default: None).
+    #' @param image_uri (str): Inference image uri for the container. Model class' self.image will
+    #'              be used if it is None (default: None).
+    #' @param model_metrics (ModelMetrics): ModelMetrics object (default: None).
+    #' @param metadata_properties (MetadataProperties): MetadataProperties object (default: None).
+    #' @param marketplace_cert (bool): A boolean value indicating if the Model Package is certified
+    #'              for AWS Marketplace (default: False).
+    #' @param approval_status (str): Model Approval Status, values can be "Approved", "Rejected",
+    #'              or "PendingManualApproval" (default: "PendingManualApproval").
+    #' @param description (str): Model Package description (default: None).
+    #' @return str: A string of SageMaker Model Package ARN.
+    register = function(content_types,
+                        response_types,
+                        inference_instances,
+                        transform_instances,
+                        model_package_name=NULL,
+                        model_package_group_name=NULL,
+                        image_uri=NULL,
+                        model_metrics=NULL,
+                        metadata_properties=NULL,
+                        marketplace_cert=FALSE,
+                        approval_status=NULL,
+                        description=NULL){
+      if (is.null(self$model_data))
+        ValueError$new("SageMaker Model Package cannot be created without model data.")
+
+      model_pkg_args = private$.get_model_package_args(
+        content_types,
+        response_types,
+        inference_instances,
+        transform_instances,
+        model_package_name,
+        model_package_group_name,
+        image_uri,
+        model_metrics,
+        metadata_properties,
+        marketplace_cert,
+        approval_status,
+        description)
+
+      model_package = do.call(self$sagemaker_session$create_model_package_from_containers, model_pkg_args)
+
+      return(ModelPackage$new(
+        role=self$role,
+        model_data=self$model_data,
+        model_package_arn=model_package$ModelPackageArn)
+        )
     },
 
     #' @description Return a dict created by ``sagemaker.container_def()`` for deploying
@@ -97,7 +164,7 @@ Model = R6Class("Model",
     #' @return dict: A container definition object usable with the CreateModel API.
     prepare_container_def = function(instance_type,
                                      accelerator_type=NULL){
-      return (container_def(self$image_uri, self$model_data, self$env))
+      return(container_def(self$image_uri, self$model_data, self$env, image_config=self$image_config))
     },
 
     #' @description Whether to enable network isolation when creating this Model
@@ -113,6 +180,56 @@ Model = R6Class("Model",
     check_neo_region = function(region){
       if(region %in% names(NEO_IMAGE_ACCOUNT)) return(TRUE)
       return(FALSE)
+    },
+
+    #' @description Package this ``Model`` with SageMaker Edge.
+    #'              Creates a new EdgePackagingJob and wait for it to finish.
+    #'              model_data will now point to the packaged artifacts.
+    #' @param output_path (str): Specifies where to store the packaged model
+    #' @param role (str): Execution role
+    #' @param model_name (str): the name to attach to the model metadata
+    #' @param model_version (str): the version to attach to the model metadata
+    #' @param job_name (str): The name of the edge packaging job
+    #' @param resource_key (str): the kms key to encrypt the disk with
+    #' @param s3_kms_key (str): the kms key to encrypt the output with
+    #' @param tags (list[dict]): List of tags for labeling an edge packaging job. For
+    #'              more, see
+    #'              https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
+    #' @return sagemaker.model.Model: A SageMaker ``Model`` object. See
+    #'              :func:`~sagemaker.model.Model` for full details.
+    package_for_edge = function(output_path,
+                                model_name,
+                                model_version,
+                                role=NULL,
+                                job_name=NULL,
+                                resource_key=NULL,
+                                s3_kms_key=NULL,
+                                tags=NULL){
+      if (is.null(private$.compilation_job_name))
+        ValueError$new("You must first compile this model")
+      if (is.null(job_name))
+        job_name = sprintf("packaging%s", substr(private$.compilation_job_name, 12, nchar(private$.compilation_job_name)))
+      if (is.null(role))
+        role = self$sagemaker_session$expand_role(role)
+
+      private$.init_sagemaker_session_if_does_not_exist(NULL)
+      config = private$.edge_packaging_job_config(
+            output_path,
+            role,
+            model_name,
+            model_version,
+            job_name,
+            self._compilation_job_name,
+            resource_key,
+            s3_kms_key,
+            tags
+      )
+      do.call(self$sagemaker_session.package_model_for_edge, config)
+      job_status = self$sagemaker_session$wait_for_edge_packaging_job(job_name)
+      self$model_data = job_status$ModelArtifact
+      private$.is_edge_packaged_model = TRUE
+
+      return(self)
     },
 
     #' @description Compile this ``Model`` with SageMaker Neo.
@@ -171,15 +288,17 @@ Model = R6Class("Model",
       framework = framework %||% private$.framework()
 
       if (is.null(framework))
-        stop(sprintf("You must specify framework, allowed values %s",
-                     paste0(NEO_ALLOWED_FRAMEWORKS, collapse = ", ")), call. = F)
+        ValueError$new(
+          sprintf("You must specify framework, allowed values %s",
+                  paste0(NEO_ALLOWED_FRAMEWORKS, collapse = ", ")))
       if (!(framework %in% NEO_ALLOWED_FRAMEWORKS))
-        stop(sprintf("You must provide valid framework, allowed values %s",
-          paste0(NEO_ALLOWED_FRAMEWORKS, collapse = ", ")), call. = F)
+        ValueError$new(
+          sprintf("You must provide valid framework, allowed values %s",
+          paste0(NEO_ALLOWED_FRAMEWORKS, collapse = ", ")))
       if(is.null(job_name))
-        stop("You must provide a compilation job name", call. = F)
+        ValueError$new("You must provide a compilation job name")
       if (is.null(self$model_data))
-        stop("You must provide an S3 path to the compressed model artifacts.", call. = F)
+        ValueError$new("You must provide an S3 path to the compressed model artifacts.")
 
       framework_version = framework_version %||% private$.get_framework_version()
 
@@ -196,33 +315,38 @@ Model = R6Class("Model",
         target_platform_os,
         target_platform_arch,
         target_platform_accelerator,
-        compiler_options
+        compiler_options,
+        framework_version
       )
+
       do.call(self$sagemaker_session$compile_model, config)
       job_status = self$sagemaker_session$wait_for_compilation_job(job_name)
-      self$model_data = job_status$ModelArtifacts$S3ModelArtifacts
+      self$model_data = job_status[["ModelArtifacts"]][["S3ModelArtifacts"]]
 
       if (!is.null(target_instance_family)){
-        if (startsWith(target_instance_family,"ml_")){
+        if(target_instance_family == "ml_eia2"){
+          return(NULL)
+        } else if (grepl("^ml_", target_instance_family)){
           self$image_uri = private$.compilation_image_uri(
             self$sagemaker_session$paws_region_name,
             target_instance_family,
             framework,
             framework_version)
-        self$.is_compiled_model = TRUE
+          private$.is_compiled_model = TRUE
         } else {
-          log_warn(paste(
+          LOGGER$warn(paste(
             "The instance type %s is not supported for deployment via SageMaker.",
             "Please deploy the model manually.", sep = "\n"),
-            target_instance_family
-          )
+            target_instance_family)
         }
       } else {
-          log_warn(paste(
-            "Devices described by Target Platform OS, Architecture and Accelerator are not",
-            "supported for deployment via SageMaker. Please deploy the model manually.", sep = "\n")
-          )
+        LOGGER$warn(paste(
+          "Devices described by Target Platform OS, Architecture and Accelerator are not",
+          "supported for deployment via SageMaker. Please deploy the model manually.", sep = "\n"))
       }
+
+      private$.compilation_job_name = job_name
+
       return(self)
     },
 
@@ -288,16 +412,16 @@ Model = R6Class("Model",
       private$.init_sagemaker_session_if_does_not_exist(instance_type)
 
       if(is.null(self$role))
-        stop("Role can not be null for deploying a model", call. = F)
+        ValueError$new("Role can not be null for deploying a model")
 
-      if (startsWith(instance_type,"ml.inf") && !self$.is_compiled_model)
-        log_warn("Your model is not compiled. Please compile your model before using Inferentia.")
+      if (startsWith(instance_type,"ml.inf") && !private$.is_compiled_model)
+        LOGGER$warn("Your model is not compiled. Please compile your model before using Inferentia.")
 
       compiled_model_suffix = paste0(split_str(instance_type, "\\."), collapse = "-")
-      if (self$.is_compiled_model){
+      if (private$.is_compiled_model){
         private$.ensure_base_name_if_needed(self$image_uri)
         if(!is.null(self$.base_name))
-          self$.base_name = paste(self$.base_name, compiled_model_suffix, sep = "-")
+          self$.base_name = paste(self$.base_name, compiled_model_suffix, sep = "-", collapse = "-")
       }
 
       self$.create_sagemaker_model(instance_type, accelerator_type, tags)
@@ -306,16 +430,15 @@ Model = R6Class("Model",
       )
       if (!is.null(endpoint_name)) {
         self$endpoint_name = endpoint_name
-      } else{
+      } else {
         base_endpoint_name = self$.base_name %||% base_from_name(self$name)
-        if (self$.is_compiled_model && !endsWith(self$endpoint_name, compiled_model_suffix))
-          base_endpoint_name = paste(self$endpoint_name, compiled_model_suffix, sep = "-")
+        if (!is.null(private$.is_compiled_model) && !endsWith(base_endpoint_name, compiled_model_suffix))
+          base_endpoint_name = paste(self$endpoint_name, compiled_model_suffix, sep = "-", collapse = "-")
         self$endpoint_name = name_from_base(base_endpoint_name)
       }
-
       data_capture_config_list = NULL
       if (!is.null(data_capture_config))
-        data_capture_config_list = data_capture_config$to_request_list
+        data_capture_config_list = data_capture_config$to_request_list()
 
       self$sagemaker_session$endpoint_from_production_variants(
         name=self$endpoint_name,
@@ -396,19 +519,18 @@ Model = R6Class("Model",
                   max_payload=max_payload,
                   env=env,
                   tags=tags,
-                  base_transform_job_name=self.name,
+                  base_transform_job_name=self$name,
                   volume_kms_key=volume_kms_key,
-                  sagemaker_session=self$sagemaker_session))
-
+                  sagemaker_session=self$sagemaker_session)
+      )
     },
 
     #' @description Delete an Amazon SageMaker Model.
     delete_model = function(){
       if(is.null(self$name))
-        stop("The SageMaker model must be created first before attempting to delete.", call. = F)
+        ValueError$new("The SageMaker model must be created first before attempting to delete.")
 
       self$sagemaker_session$delete_model(self$name)
-
     },
 
     #' @description Create a SageMaker Model Entity
@@ -451,16 +573,81 @@ Model = R6Class("Model",
     }
   ),
   private = list(
+    .is_compiled_model = NULL,
+    .compilation_job_name = NULL,
+    .is_edge_packaged_model = NULL,
+
+    # Get arguments for session.create_model_package method.
+    # Args:
+    #   content_types (list): The supported MIME types for the input data.
+    # response_types (list): The supported MIME types for the output data.
+    # inference_instances (list): A list of the instance types that are used to
+    # generate inferences in real-time.
+    # transform_instances (list): A list of the instance types on which a transformation
+    # job can be run or on which an endpoint can be deployed.
+    # model_package_name (str): Model Package name, exclusive to `model_package_group_name`,
+    # using `model_package_name` makes the Model Package un-versioned (default: None).
+    # model_package_group_name (str): Model Package Group name, exclusive to
+    # `model_package_name`, using `model_package_group_name` makes the Model Package
+    # versioned (default: None).
+    # image_uri (str): Inference image uri for the container. Model class' self.image will
+    #     be used if it is None (default: None).
+    # model_metrics (ModelMetrics): ModelMetrics object (default: None).
+    # metadata_properties (MetadataProperties): MetadataProperties object (default: None).
+    # marketplace_cert (bool): A boolean value indicating if the Model Package is certified
+    #     for AWS Marketplace (default: False).
+    # approval_status (str): Model Approval Status, values can be "Approved", "Rejected",
+    #     or "PendingManualApproval" (default: "PendingManualApproval").
+    # description (str): Model Package description (default: None).
+    # Returns:
+    # dict: A dictionary of method argument names and values.
+    .get_model_package_args = function(content_types,
+                                       response_types,
+                                       inference_instances,
+                                       transform_instances,
+                                       model_package_name=NULL,
+                                       model_package_group_name=NULL,
+                                       image_uri=NULL,
+                                       model_metrics=NULL,
+                                       metadata_properties=NULL,
+                                       marketplace_cert=FALSE,
+                                       approval_status=NULL,
+                                       description=NULL){
+      if (is.null(image_uri))
+        self$image_uri = image_uri
+      container = list(
+          "Image"= self$image_uri,
+          "ModelDataUrl"= self$model_data
+      )
+      model_package_args = list(
+          "containers"= list(container),
+          "content_types"= content_types,
+          "response_types"= response_types,
+          "inference_instances"= inference_instances,
+          "transform_instances"= transform_instances,
+          "marketplace_cert"= marketplace_cert
+      )
+      model_package_args$model_package_name = model_package_name
+      model_package_args$model_package_group_name = model_package_group_name
+      model_package_args$model_metrics = model_metrics$to_request_list()
+      model_package_args$metadata_properties = metadata_properties$to_request_list()
+      model_package_args$approval_status = approval_status
+      model_package_args$description = description
+      return(model_package_args)
+    },
 
     # Set ``self.sagemaker_session`` to be a ``LocalSession`` or
     # ``Session`` if it is not already. The type of session object is
     # determined by the instance type.
     .init_sagemaker_session_if_does_not_exist = function(instance_type){
-      if (!is.null(self$sagemaker_session)) return(invisible(NULL))
+      if (!is.null(self$sagemaker_session))
+        return(invisible(NULL))
+
       if (instance_type %in% c("local", "local_gpu")){
-        # TODO: local sagemaker session
-        log_error("Currently LocalSession has not been implemented")
-        stop(sprintf("instance_type %s is currently not supported", call. =F))
+        LOGGER$error("Currently LocalSession has not been implemented")
+
+        # TODO: LocalSession class
+        NotImplementedError$new(sprintf("instance_type %s is currently not supported", instance_type))
         self$sagemaker_session = LocalSession$new()
       } else {
           self$sagemaker_session = Session$new()}
@@ -482,10 +669,46 @@ Model = R6Class("Model",
       return(attr(self, "_framework_name"))
       },
 
-    # TODO: review this private method
     .get_framework_version = function(obj){
-      return(attr(self, "framework_version"))
+      return(self$framework_version)
       },
+
+    # Creates a request object for a packaging job.
+    # Args:
+    #   output_path (str): where in S3 to store the output of the job
+    # role (str): what role to use when executing the job
+    # packaging_job_name (str): what to name the packaging job
+    # compilation_job_name (str): what compilation job to source the model from
+    # resource_key (str): the kms key to encrypt the disk with
+    # s3_kms_key (str): the kms key to encrypt the output with
+    # tags (list[dict]): List of tags for labeling an edge packaging job. For
+    # more, see
+    # https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
+    # Returns:
+    #   dict: the request object to use when creating a packaging job
+    .edge_packaging_job_config = function(output_path,
+                                          role,
+                                          model_name,
+                                          model_version,
+                                          packaging_job_name,
+                                          compilation_job_name,
+                                          resource_key,
+                                          s3_kms_key,
+                                          tags){
+      output_model_config = list(
+        "S3OutputLocation"= output_path)
+      output_model_config$KmsKeyId = s3_kms_key
+      return(list(
+        "output_model_config"= output_model_config,
+          "role"= role,
+          "tags"= tags,
+          "model_name"= model_name,
+          "model_version"= model_version,
+          "job_name"= packaging_job_name,
+          "compilation_job_name"= compilation_job_name,
+          "resource_key"= resource_key)
+      )
+    },
 
     .compilation_job_config = function(target_instance_type,
                                        input_shape,
@@ -498,11 +721,19 @@ Model = R6Class("Model",
                                        target_platform_os=NULL,
                                        target_platform_arch=NULL,
                                        target_platform_accelerator=NULL,
-                                       compiler_options=NULL){
+                                       compiler_options=NULL,
+                                       framework_version=NULL){
       input_model_config = list(
         "S3Uri" = self$model_data,
         "DataInputConfig" = input_shape,
-        "Framework" = toupper(framework))
+        "Framework" = toupper(framework)
+      )
+
+      if(tolower(framework) == "pytorch"
+         && grepl("(?=^ml_)(?!ml_inf)", target_instance_type, perl = TRUE)
+         && !is.null(framework_version)){
+        input_model_config[["FrameworkVersion"]] = get_short_version(framework_version)
+      }
       role = self$sagemaker_session$expand_role(role)
       output_model_config = list(
         "S3OutputLocation" = output_path)
@@ -511,8 +742,9 @@ Model = R6Class("Model",
         output_model_config$TargetDevice = target_instance_type
       } else {
         if (is.null(target_platform_os) && is.null(target_platform_arch))
-          stop("target_instance_type or (target_platform_os and target_platform_arch) ",
-               "should be provided", call. = F)
+          ValueError$new("target_instance_type or (target_platform_os and target_platform_arch) ",
+               "should be provided"
+          )
         target_platform = list(
           "Os"= target_platform_os,
           "Arch"= target_platform_arch
@@ -552,16 +784,17 @@ Model = R6Class("Model",
 
       if (framework == "xgboost")
         framework_suffix = "-neo"
-      else if (startsWith("ml_inf", target_instance_type))
+      else if (grepl("^ml_inf", target_instance_type))
         framework_prefix = "inferentia-"
       else
         framework_prefix = "neo-"
+
       return(ImageUris$new()$retrieve(
-        sprintf("%s%s", framework_prefix, framework),
+        sprintf("%s%s%s", framework_prefix, framework, framework_suffix),
         region,
         instance_type=target_instance_type,
-        version=framework_version,
-        py_version = self$py_version))
+        version=framework_version)
+        )
       }
     ),
   lock_objects = F
@@ -761,8 +994,8 @@ FrameworkModel = R6Class("FrameworkModel",
    #'              model. For example, 'ml.eia1.medium'.
    #' @return dict[str, str]: A container definition object usable with the
    #'              CreateModel API.
-   prepare_container = function(instance_type=NULL,
-                                 accelerator_type=NULL){
+   prepare_container_def = function(instance_type=NULL,
+                                    accelerator_type=NULL){
      deploy_key_prefix = model_code_key_prefix(
        self$key_prefix, self$name, self$image_uri
      )
@@ -869,20 +1102,22 @@ ModelPackage = R6Class("ModelPackage",
      super$initialize(role = role, model_data = model_data, image_uri = NULL, ...)
 
      if(!is.null(model_package_arn) && !is.null(algorithm_arn))
-       stop("model_package_arn and algorithm_arn are mutually exclusive.",
-            sprintf("Both were provided: model_package_arn: %s algorithm_arn: %s", model_package_arn, algorithm_arn),
-            call. = F)
+       ValueError$new(
+         "model_package_arn and algorithm_arn are mutually exclusive.",
+         sprintf("Both were provided: model_package_arn: %s algorithm_arn: %s",
+         model_package_arn, algorithm_arn))
 
      if (is.null(model_package_arn) && is.null(algorithm_arn))
-       stop("either model_package_arn or algorithm_arn is required. NULL was provided.",
-            call. = F)
+       ValueError$new(
+         "either model_package_arn or algorithm_arn is required. NULL was provided."
+       )
 
      self$algorithm_arn = algorithm_arn
      if (!is.null(self$algorithm_arn)){
        if (is.null(model_data))
-         stop("model_data must be provided with algorithm_arn", call. = F)
-       self$model_data = model_data}
-
+         ValueError$new("model_data must be provided with algorithm_arn")
+       self$model_data = model_data
+     }
      self$model_package_arn = model_package_arn
      self$.created_model_package_name = NULL
    },
@@ -925,16 +1160,21 @@ ModelPackage = R6Class("ModelPackage",
        container_def,
        vpc_config=self$vpc_config,
        enable_network_isolation=self$enable_network_isolation())
-   },
-
-   #' @description Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     cat("<ModelPackage>")
-     invisible(self)
    }
+
   ),
   private = list(
+    .create_sagemaker_model_package = function(){
+      if (is.null(self$algorithm_arn))
+        ValueError$new("No algorithm_arn was provided to create a SageMaker Model Package")
+
+      name = self$name %||% name_from_base(split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))])
+      description = sprintf("Model Package created from training with %s", self$algorithm_arn)
+      self$sagemaker_session$create_model_package_from_algorithm(
+        name, description, self$algorithm_arn, self$model_data)
+      return(name)
+    },
+
    .is_marketplace = function(){
      model_package_name = self$model_package_arn %||% self$.created_model_package_name
      if (is.null(model_package_name))
@@ -947,21 +1187,10 @@ ModelPackage = R6Class("ModelPackage",
      model_package_desc = sagemaker_session$sagemaker_client$describe_model_package(
        ModelPackageName=model_package_name)
 
-     for (container in model_package_desc$InferenceSpecification$Containers){
+     for (container in model_package_desc[["InferenceSpecification"]][["Containers"]]){
        if ("ProductId" %in% names(container))
          return(TRUE)}
      return(FALSE)
-   },
-
-   .create_sagemaker_model_package = function(){
-     if (is.null(self$algorithm_arn))
-       stop("No algorithm_arn was provided to create a SageMaker Model Package", call.= F)
-
-     name = self$name %||% name_from_base(split_str(self$algorithm_arn, "/")[length(split_str(self$algorithm_arn, "/"))])
-     description = sprintf("Model Package created from training with %s", self$algorithm_arn)
-     self$sagemaker_session$create_model_package_from_algorithm(
-       name, description, self$algorithm_arn, self$model_data)
-     return(name)
    },
 
    # Set the base name if there is no model name provided.
@@ -972,4 +1201,3 @@ ModelPackage = R6Class("ModelPackage",
   ),
   lock_objects =  F
 )
-

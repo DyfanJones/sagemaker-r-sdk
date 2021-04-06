@@ -1,4 +1,4 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/6a8bb6df1a0c34990a52fbfe4bbc6ec840d1bdcd/src/sagemaker/vpc_utils.py
+# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/vpc_utils.py
 
 
 # """Checks that an instance of VpcConfig has the expected keys and values,

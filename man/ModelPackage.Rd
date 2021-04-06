@@ -15,7 +15,6 @@ A SageMaker ``Model`` that can be deployed to an ``Endpoint``.
 \item \href{#method-new}{\code{ModelPackage$new()}}
 \item \href{#method-enable_network_isolation}{\code{ModelPackage$enable_network_isolation()}}
 \item \href{#method-.create_sagemaker_model}{\code{ModelPackage$.create_sagemaker_model()}}
-\item \href{#method-print}{\code{ModelPackage$print()}}
 \item \href{#method-clone}{\code{ModelPackage$clone()}}
 }
 }
@@ -26,7 +25,10 @@ A SageMaker ``Model`` that can be deployed to an ``Endpoint``.
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="compile">}\href{../../R6sagemaker/html/Model.html#method-compile}{\code{R6sagemaker::Model$compile()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="delete_model">}\href{../../R6sagemaker/html/Model.html#method-delete_model}{\code{R6sagemaker::Model$delete_model()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker/html/Model.html#method-deploy}{\code{R6sagemaker::Model$deploy()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="package_for_edge">}\href{../../R6sagemaker/html/Model.html#method-package_for_edge}{\code{R6sagemaker::Model$package_for_edge()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="prepare_container_def">}\href{../../R6sagemaker/html/Model.html#method-prepare_container_def}{\code{R6sagemaker::Model$prepare_container_def()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="register">}\href{../../R6sagemaker/html/Model.html#method-register}{\code{R6sagemaker::Model$register()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
 }
 \out{</details>}
@@ -99,23 +101,6 @@ Create a SageMaker Model Entity
 \describe{
 \item{\code{...}}{: Positional arguments coming from the caller. This class does not require
 any so they are ignored.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelPackage$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

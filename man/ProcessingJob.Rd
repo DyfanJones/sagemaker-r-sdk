@@ -38,13 +38,13 @@ Other Processor:
 \item \href{#method-wait}{\code{ProcessingJob$wait()}}
 \item \href{#method-describe}{\code{ProcessingJob$describe()}}
 \item \href{#method-stop}{\code{ProcessingJob$stop()}}
-\item \href{#method-print}{\code{ProcessingJob$print()}}
 \item \href{#method-clone}{\code{ProcessingJob$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="print">}\href{../../R6sagemaker/html/.Job.html#method-print}{\code{R6sagemaker::.Job$print()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -204,23 +204,6 @@ the processing job.
 \if{html}{\out{<div class="r">}}\preformatted{ProcessingJob$stop()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProcessingJob$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

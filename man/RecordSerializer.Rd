@@ -6,8 +6,8 @@
 \description{
 Serialize a matrices and array for an inference request.
 }
-\section{Super class}{
-\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{RecordSerializer}
+\section{Super classes}{
+\code{\link[R6sagemaker:BaseSerializer]{R6sagemaker::BaseSerializer}} -> \code{\link[R6sagemaker:SimpleBaseSerializer]{R6sagemaker::SimpleBaseSerializer}} -> \code{RecordSerializer}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -28,11 +28,19 @@ Serialize a matrices and array for an inference request.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-intialize RecordSerializer class
+Intialize RecordSerializer class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RecordSerializer$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RecordSerializer$new(content_type = "application/x-recordio-protobuf")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{content_type}}{(str): The MIME type to signal to the inference endpoint when sending
+request data (default: "application/x-recordio-protobuf").}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-serialize"></a>}}

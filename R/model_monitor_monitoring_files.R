@@ -5,6 +5,7 @@
 #' @include s3.R
 
 #' @import R6
+#' @import lgr
 #' @import jsonlite
 #' @import uuid
 
@@ -100,7 +101,7 @@ Statistics = R6Class("Statistics",
                           sagemaker_session=NULL){
      tryCatch({body = S3Downloader$new()$read_file(s3_uri=statistics_file_s3_uri, sagemaker_session=sagemaker_session)},
               error = function(e) {
-                log_error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
+                LOGGER$error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
                                   "To manually retrieve Statistics object from a given uri, ",
                                   "use 'my_model_monitor.statistics(my_s3_uri)' or ",
                                   "'Statistics.from_s3_uri(my_s3_uri)'") , statistics_file_s3_uri)
@@ -131,7 +132,7 @@ Statistics = R6Class("Statistics",
      sagemaker_session = sagemaker_session %||% Session$new()
      file_name = file_name %||% "statistics.json"
      desired_s3_uri = file.path(
-       "s3://", sagemaker_session$default_bucket(), "monitoring", UUIDgenerate(), file_name)
+       "s3:/", sagemaker_session$default_bucket(), "monitoring", UUIDgenerate(), file_name)
      s3_uri = S3Uploader$new()$upload_string_as_file_body(
        body=statistics_file_string,
        desired_s3_uri=desired_s3_uri,
@@ -162,13 +163,6 @@ Statistics = R6Class("Statistics",
               file_name=file_name,
               kms_key=kms_key,
               sagemaker_session=sagemaker_session))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     print_class(self)
    }
   ),
   lock_objects = F
@@ -214,11 +208,11 @@ Constraints = R6Class("Constraints",
                            sagemaker_session=NULL){
       tryCatch({body = S3Downloader$new()$read_file(s3_uri=constraints_file_s3_uri, sagemaker_session=sagemaker_session)},
                error = function(e) {
-                 log_error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
+                 LOGGER$error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
                                    "To manually retrieve Statistics object from a given uri, ",
                                    "use 'my_model_monitor.statistics(my_s3_uri)' or ",
                                    "'Statistics.from_s3_uri(my_s3_uri)'") , constraints_file_s3_uri)
-                 stop(e$message)})
+                 stop(e)})
       body_dict = fromJSON(body)
 
       cls = self$clone()
@@ -299,13 +293,6 @@ Constraints = R6Class("Constraints",
           }
         }
       }
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
     }
   ),
   lock_objects = F
@@ -350,11 +337,11 @@ ConstraintViolations = R6Class("ConstraintViolations",
                           sagemaker_session=NULL){
      tryCatch({body = S3Downloader$new()$read_file(s3_uri=constraint_violations_file_s3_uri, sagemaker_session=sagemaker_session)},
               error = function(e) {
-                log_error(paste0( "\nCould not retrieve statistics file at location '%s'. ",
+                LOGGER$error(paste0("\nCould not retrieve statistics file at location '%s'. ",
                                   "To manually retrieve Statistics object from a given uri, ",
                                   "use 'my_model_monitor.statistics(my_s3_uri)' or ",
                                   "'Statistics.from_s3_uri(my_s3_uri)'") , constraints_file_s3_uri)
-                stop(e$message)})
+                stop(e)})
      body_dict = fromJSON(body)
 
      cls = self$clone()
@@ -412,13 +399,6 @@ ConstraintViolations = R6Class("ConstraintViolations",
        file_name=file_name,
        kms_key=kms_key,
        sagemaker_session=sagemaker_session))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     print_class(self)
    }
   ),
   lock_objects = F

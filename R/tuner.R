@@ -7,7 +7,7 @@
 #' @include parameter.R
 
 #' @import jsonlite
-#' @import logger
+#' @import lgr
 #' @import R6
 
 AMAZON_ESTIMATOR_MODULE <- "R6sagemaker"
@@ -579,7 +579,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     #'              endpoint that shares a name with the best training job for deletion.
     #' @param endpoint_name (str): Name of the endpoint to delete
     delete_endpoint = function(endpoint_name = NULL){
-      log_warn(paste(
+      LOGGER$warn(paste(
         "HyperparameterTuner.delete_endpoint() will be deprecated in SageMaker Python SDK v2.",
         "Please use the delete_endpoint() function on your predictor instead."))
 
@@ -1344,7 +1344,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
     # information about the started job.
     start_new = function(inputs){
 
-      log_info("_TuningJob.start_new!!!")
+      LOGGER$info("_TuningJob.start_new!!!")
 
       warm_start_config_req = NULL
       if (!is.null(self$warm_start_config))
@@ -1413,7 +1413,7 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
 
       if (inherits(inputs, "TrainingInput")){
         if ("InputMode" %in% names(inputs$config)){
-          log_debug(
+          LOGGER$debug(
             "Selecting TrainingInput's input_mode (%s) for TrainingInputMode.",
             toJSON(inputs$config$InputMode, pretty = T, auto_unbox = T))
           training_config$input_mode = inputs$config$InputMode}

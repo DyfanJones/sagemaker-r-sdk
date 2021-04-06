@@ -7,7 +7,7 @@
 #' @include session.R
 #' @include utils.R
 
-#' @import logger
+#' @import lgr
 #' @import R6
 
 #' @title AutoML Class
@@ -93,7 +93,7 @@ AutoML = R6Class("AutoML",
                    job_name=NULL){
       if (!wait && logs){
         logs = FALSE
-        log_warn("Setting `logs` to FALSE. `logs` is only meaningful when `wait` is TRUE.")}
+        LOGGER$warn("Setting `logs` to FALSE. `logs` is only meaningful when `wait` is TRUE.")}
 
       # upload data for users if provided local path
       # validations are done in .Job._format_inputs_to_input_config

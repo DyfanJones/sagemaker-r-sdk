@@ -8,7 +8,7 @@
 #' @include utils.R
 
 #' @import R6
-#' @import logger
+#' @import lgr
 
 #' @title MXNetPredictor Class
 #' @description A Predictor for inference against MXNet Endpoints.
@@ -102,7 +102,7 @@ MXNetModel = R6Class("MXNetModel",
       attr(self, "_framework_name") = "mxnet"
 
       if (identical(py_version, "py2"))
-        log_warn(
+        LOGGER$warn(
           python_deprecation_warning(attr(self, "_framework_name"), MXNET_LATEST_PY2_VERSION)
         )
     },

@@ -10,6 +10,12 @@ For introduction to model training and deployment, see
              what hyperparameters to use, and how to create an appropriate predictor
              instance.
 }
+\note{
+Updating the profiling configuration for TensorFlow dataloader profiling
+             is currently not available. If you started a TensorFlow training job only with
+             monitoring and want to enable profiling while the training job is running,
+             the dataloader profiling cannot be updated.
+}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
@@ -29,17 +35,22 @@ For introduction to model training and deployment, see
 \item \href{#method-prepare_workflow_for_training}{\code{EstimatorBase$prepare_workflow_for_training()}}
 \item \href{#method-latest_job_debugger_artifacts_path}{\code{EstimatorBase$latest_job_debugger_artifacts_path()}}
 \item \href{#method-latest_job_tensorboard_artifacts_path}{\code{EstimatorBase$latest_job_tensorboard_artifacts_path()}}
+\item \href{#method-latest_job_profiler_artifacts_path}{\code{EstimatorBase$latest_job_profiler_artifacts_path()}}
 \item \href{#method-fit}{\code{EstimatorBase$fit()}}
 \item \href{#method-wait}{\code{EstimatorBase$wait()}}
 \item \href{#method-compile_model}{\code{EstimatorBase$compile_model()}}
 \item \href{#method-attach}{\code{EstimatorBase$attach()}}
 \item \href{#method-logs}{\code{EstimatorBase$logs()}}
 \item \href{#method-deploy}{\code{EstimatorBase$deploy()}}
+\item \href{#method-register}{\code{EstimatorBase$register()}}
 \item \href{#method-create_model}{\code{EstimatorBase$create_model()}}
 \item \href{#method-delete_endpoint}{\code{EstimatorBase$delete_endpoint()}}
 \item \href{#method-transformer}{\code{EstimatorBase$transformer()}}
 \item \href{#method-get_vpc_config}{\code{EstimatorBase$get_vpc_config()}}
 \item \href{#method-.prepare_for_training}{\code{EstimatorBase$.prepare_for_training()}}
+\item \href{#method-enable_default_profiling}{\code{EstimatorBase$enable_default_profiling()}}
+\item \href{#method-disable_profiling}{\code{EstimatorBase$disable_profiling()}}
+\item \href{#method-update_profiler}{\code{EstimatorBase$update_profiler()}}
 \item \href{#method-print}{\code{EstimatorBase$print()}}
 \item \href{#method-clone}{\code{EstimatorBase$clone()}}
 }
@@ -78,6 +89,8 @@ Initialize an ``EstimatorBase`` instance.
   tensorboard_output_config = NULL,
   enable_sagemaker_metrics = NULL,
   enable_network_isolation = FALSE,
+  profiler_config = NULL,
+  disable_profiler = FALSE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -229,6 +242,18 @@ isolation mode restricts the container access to outside networks
 (such as the Internet). The container does not make any inbound or
 outbound network calls. Also known as Internet-free mode.}
 
+\item{\code{profiler_config}}{(:class:`~sagemaker.debugger.ProfilerConfig`):
+Configuration for how SageMaker Debugger collects
+monitoring and profiling information from your training job.
+If not specified, a default configuration is created using
+the estimator's ``output_path``, unless the region does not
+support SageMaker Debugger. To disable SageMaker Debugger
+monitoring and profiling, set the
+``disable_profiler`` parameter to ``True``.}
+
+\item{\code{disable_profiler}}{(bool): Specifies whether Debugger monitoring and profiling
+will be disabled (default: ``False``).}
+
 \item{\code{...}}{: update any deprecated parameters passed into class.}
 }
 \if{html}{\out{</div>}}
@@ -317,6 +342,19 @@ str: An S3 path to the output artifacts.
 Gets the path to the TensorBoardOutputConfig output artifacts.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$latest_job_tensorboard_artifacts_path()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+str: An S3 path to the output artifacts.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-latest_job_profiler_artifacts_path"></a>}}
+\if{latex}{\out{\hypertarget{method-latest_job_profiler_artifacts_path}{}}}
+\subsection{Method \code{latest_job_profiler_artifacts_path()}}{
+Gets the path to the profiling output artifacts.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$latest_job_profiler_artifacts_path()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -640,6 +678,81 @@ sagemaker.predictor.Predictor: A predictor that provides a ``predict()`` method,
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-register"></a>}}
+\if{latex}{\out{\hypertarget{method-register}{}}}
+\subsection{Method \code{register()}}{
+Creates a model package for creating SageMaker models or listing on Marketplace.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$register(
+  content_types,
+  response_types,
+  inference_instances,
+  transform_instances,
+  image_uri = NULL,
+  model_package_name = NULL,
+  model_package_group_name = NULL,
+  model_metrics = NULL,
+  metadata_properties = NULL,
+  marketplace_cert = FALSE,
+  approval_status = NULL,
+  description = NULL,
+  compile_model_family = NULL,
+  model_name = NULL,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{content_types}}{(list): The supported MIME types for the input data.}
+
+\item{\code{response_types}}{(list): The supported MIME types for the output data.}
+
+\item{\code{inference_instances}}{(list): A list of the instance types that are used to
+generate inferences in real-time.}
+
+\item{\code{transform_instances}}{(list): A list of the instance types on which a transformation
+job can be run or on which an endpoint can be deployed.}
+
+\item{\code{image_uri}}{(str): The container image uri for Model Package, if not specified,
+Estimator's training container image will be used (default: None).}
+
+\item{\code{model_package_name}}{(str): Model Package name, exclusive to `model_package_group_name`,
+using `model_package_name` makes the Model Package un-versioned (default: None).}
+
+\item{\code{model_package_group_name}}{(str): Model Package Group name, exclusive to
+`model_package_name`, using `model_package_group_name` makes the Model Package
+versioned (default: None).}
+
+\item{\code{model_metrics}}{(ModelMetrics): ModelMetrics object (default: None).}
+
+\item{\code{metadata_properties}}{(MetadataProperties): MetadataProperties (default: None).}
+
+\item{\code{marketplace_cert}}{(bool): A boolean value indicating if the Model Package is certified
+for AWS Marketplace (default: False).}
+
+\item{\code{approval_status}}{(str): Model Approval Status, values can be "Approved", "Rejected",
+or "PendingManualApproval" (default: "PendingManualApproval").}
+
+\item{\code{description}}{(str): Model Package description (default: None).}
+
+\item{\code{compile_model_family}}{(str): Instance family for compiled model, if specified, a compiled
+model will be used (default: None).}
+
+\item{\code{model_name}}{(str): User defined model name (default: None).}
+
+\item{\code{...}}{: Passed to invocation of ``create_model()``. Implementations may customize
+``create_model()`` to accept ``**kwargs`` to customize model creation during
+deploy. For more, see the implementation docs.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+str: A string of SageMaker Model Package ARN.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-create_model"></a>}}
 \if{latex}{\out{\hypertarget{method-create_model}{}}}
 \subsection{Method \code{create_model()}}{
@@ -799,6 +912,84 @@ Set any values in the estimator that need to be set before training.
 \item{\code{job_name}}{(str): Name of the training job to be created. If not
 specified, one is generated, using the base name given to the
 constructor if applicable.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-enable_default_profiling"></a>}}
+\if{latex}{\out{\hypertarget{method-enable_default_profiling}{}}}
+\subsection{Method \code{enable_default_profiling()}}{
+Update training job to enable Debugger monitoring.
+             This method enables Debugger monitoring with
+             the default ``profiler_config`` parameter to collect system
+             metrics and the default built-in ``profiler_report`` rule.
+             Framework metrics won't be saved.
+             To update training job to emit framework metrics, you can use
+             :class:`~sagemaker.estimator.Estimator.update_profiler`
+             method and specify the framework metrics you want to enable.
+             This method is callable when the training job is in progress while
+             Debugger monitoring is disabled.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$enable_default_profiling()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-disable_profiling"></a>}}
+\if{latex}{\out{\hypertarget{method-disable_profiling}{}}}
+\subsection{Method \code{disable_profiling()}}{
+Update the current training job in progress to disable profiling.
+             Debugger stops collecting the system and framework metrics
+             and turns off the Debugger built-in monitoring and profiling rules.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$disable_profiling()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-update_profiler"></a>}}
+\if{latex}{\out{\hypertarget{method-update_profiler}{}}}
+\subsection{Method \code{update_profiler()}}{
+Update training jobs to enable profiling.
+             This method updates the ``profiler_config`` parameter
+             and initiates Debugger built-in rules for profiling.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$update_profiler(
+  rules = NULL,
+  system_monitor_interval_millis = NULL,
+  s3_output_path = NULL,
+  framework_profile_params = NULL,
+  disable_framework_metrics = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{rules}}{(list[:class:`~sagemaker.debugger.ProfilerRule`]): A list of
+:class:`~sagemaker.debugger.ProfilerRule` objects to define
+rules for continuous analysis with SageMaker Debugger. Currently, you can
+only add new profiler rules during the training job. (default: ``None``)}
+
+\item{\code{system_monitor_interval_millis}}{(int): How often profiling system metrics are
+collected; Unit: Milliseconds (default: ``None``)}
+
+\item{\code{s3_output_path}}{(str): The location in S3 to store the output. If profiler is enabled
+once, s3_output_path cannot be changed. (default: ``None``)}
+
+\item{\code{framework_profile_params}}{(:class:`~sagemaker.debugger.FrameworkProfile`):
+A parameter object for framework metrics profiling. Configure it using
+the :class:`~sagemaker.debugger.FrameworkProfile` class.
+To use the default framework profile parameters, pass ``FrameworkProfile()``.
+For more information about the default values,
+see :class:`~sagemaker.debugger.FrameworkProfile`. (default: ``None``)}
+
+\item{\code{disable_framework_metrics}}{(bool): Specify whether to disable all the framework metrics.
+This won't update system metrics and the Debugger built-in rules for monitoring.
+To stop both monitoring and profiling,
+use the :class:`~sagemaker.estimator.Estimator.desable_profiling`
+method. (default: ``False``)}
 }
 \if{html}{\out{</div>}}
 }

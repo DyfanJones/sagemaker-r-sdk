@@ -1,10 +1,11 @@
 # NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/image_uris.py
 
 #' @include utils.R
+#' @include error.R
 
 #' @import jsonlite
 #' @import R6
-#' @import logger
+#' @import lgr
 #' @import paws
 #' @import data.table
 
@@ -13,7 +14,6 @@
 #' @export
 ImageUris = R6Class("ImageUris",
   public = list(
-
     #' @field sagemaker_session
     #' Session object which manages interactions with Amazon SageMaker APIs
     sagemaker_session = NULL,
@@ -25,7 +25,6 @@ ImageUris = R6Class("ImageUris",
     #'              using the default AWS configuration chain.
     initialize = function(sagemaker_session = NULL){
       self$sagemaker_session = sagemaker_session %||% Session$new()
-
     },
 
     #' @description Retrieves the ECR URI for the Docker image matching the given arguments of inbuilt AWS Sagemaker models.
@@ -43,6 +42,10 @@ ImageUris = R6Class("ImageUris",
     #' @param image_scope (str): The image type, i.e. what it is used for.
     #'              Valid values: "training", "inference", "eia". If ``accelerator_type`` is set,
     #'              ``image_scope`` is ignored.
+    #' @param container_version (str): the version of docker image
+    #' @param distribution (dict): A dictionary with information on how to run distributed training
+    #'              (default: None).
+    #' @param base_framework_version (str):
     #' @return str: the ECR URI for the corresponding SageMaker Docker image.
     retrieve = function(framework,
                         region=NULL,
@@ -50,12 +53,24 @@ ImageUris = R6Class("ImageUris",
                         py_version=NULL,
                         instance_type=NULL,
                         accelerator_type=NULL,
-                        image_scope=NULL){
+                        image_scope=NULL,
+                        container_version=NULL,
+                        distribution=NULL,
+                        base_framework_version=NULL){
       config = private$.config_for_framework_and_scope(framework, image_scope, accelerator_type)
 
+      original_version = version
       version = private$.validate_version_and_set_if_needed(version, config, framework)
+      version_config = config[["versions"]][[private$.version_for_config(version, config)]]
 
-      version_config = config$versions[[private$.version_for_config(version, config)]]
+      if(framework == private$HUGGING_FACE_FRAMEWORK){
+        if (!islistempty(version_config[["version_aliases"]])){
+          full_base_framework_version = version_config[["version_aliases"]][[
+            base_framework_version]] %||% base_framework_version
+          }
+        private$.validate_arg(full_base_framework_version, list(names(version_config)), "base framework")
+        version_config = version_config[[full_base_framework_version]]
+      }
 
       py_version = private$.validate_py_version_and_set_if_needed(py_version, version_config)
       version_config = if(is.null(py_version)) version_config else {version_config[[py_version]] %||% version_config}
@@ -63,20 +78,50 @@ ImageUris = R6Class("ImageUris",
       region = region %||% self$sagemaker_session$paws_region_name
 
       registry = private$.registry_from_region(region, version_config$registries)
-
       hostname = private$.hostname(region)
 
-      repo = version_config$repository
+      repo = version_config[["repository"]]
 
+      avialable_processors = (config[["processors"]] %||% version_config[["processors"]])
       processor = private$.processor(
-        instance_type, config$processors %||% version_config$processors
+        instance_type=instance_type,
+        available_processors=avialable_processors
       )
 
-      version = if(!islistempty(version_config$tag_prefix)) version_config$tag_prefix else version
+      if(framework == private$HUGGING_FACE_FRAMEWORK){
+        pt_or_tf_version = private$.str_match(instance_type, "^(pytorch|tensorflow)(.*)$")
+        tag_prefix = sprintf("%s-transformers%s", pt_or_tf_version, original_version)
+      } else {
+        tag_prefix = version_config[["tag_prefix"]] %||% version
+      }
 
-      tag = private$.format_tag(version, processor, py_version)
+      tag = private$.format_tag(
+        tag_prefix,
+        processor,
+        py_version,
+        container_version)
 
-      repo = sprintf("%s:%s", repo, tag)
+      if(private$.should_auto_select_container_version(instance_type, distribution)){
+        container_versions = list(
+          "tensorflow-2.3-gpu-py37"="cu110-ubuntu18.04-v3",
+          "tensorflow-2.3.1-gpu-py37"="cu110-ubuntu18.04",
+          "tensorflow-2.3.2-gpu-py37"="cu110-ubuntu18.04",
+          "tensorflow-1.15-gpu-py37"="cu110-ubuntu18.04-v8",
+          "tensorflow-1.15.4-gpu-py37"="cu110-ubuntu18.04",
+          "tensorflow-1.15.5-gpu-py37"="cu110-ubuntu18.04",
+          "mxnet-1.8-gpu-py37"="cu110-ubuntu16.04-v1",
+          "mxnet-1.8.0-gpu-py37"="cu110-ubuntu16.04",
+          "pytorch-1.6-gpu-py36"="cu110-ubuntu18.04-v3",
+          "pytorch-1.6.0-gpu-py36"="cu110-ubuntu18.04",
+          "pytorch-1.6-gpu-py3"="cu110-ubuntu18.04-v3",
+          "pytorch-1.6.0-gpu-py3"="cu110-ubuntu18.04")
+        key = paste(list(framework, tag), collapse = "-", sep= "-")
+        if (key %in% names(container_versions))
+          tag = paste(list(tag, container_versions[[key]]), collapse = "-", sep = "-")
+      }
+
+      if(!is.null(tag))
+        repo = sprintf("%s:%s", repo, tag)
 
       return(sprintf(private$ECR_URI_TEMPLATE, registry, hostname, repo))
     },
@@ -124,7 +169,7 @@ ImageUris = R6Class("ImageUris",
 
       # check if repo_name exists in registered ecr repositories
       if(nrow(private$.list_ecr_uris[repositoryName == repo_name]) == 0)
-        stop(sprintf("Custom repository %s doesn't exist in AWS ECR", repo_name))
+        ValueError$new(sprintf("Custom repository %s doesn't exist in AWS ECR", repo_name))
 
       # after repo_name check only use repo_name
       repos = private$.list_ecr_uris[repositoryName == repo_name]
@@ -166,12 +211,12 @@ ImageUris = R6Class("ImageUris",
 
       # check if repo tag matches given tag parameter
       if(!is.null(tag) && nrow(image_meta[imageTags == tag]) == 0)
-        stop(sprintf("Repository version %s doesn't exist", tag))
+        ValueError$new(sprintf("Repository version %s doesn't exist", tag))
 
       if(is.null(tag)) {
         # get latest tag if not provided
         tag = image_meta[1, imageTags]
-        log_info("Defaulting to latest version of framework: %s.", repo_name)
+        LOGGER$info("Defaulting to latest version of framework: %s.", repo_name)
       }
 
       paste(repos$repositoryUri, tag, sep = ":")
@@ -187,6 +232,7 @@ ImageUris = R6Class("ImageUris",
 
   private = list(
     ECR_URI_TEMPLATE = "%s.dkr.%s/%s",
+    HUGGING_FACE_FRAMEWORK = "huggingface",
 
     .list_ecr_uris= NULL,
 
@@ -201,7 +247,7 @@ ImageUris = R6Class("ImageUris",
         private$.validate_accelerator_type(accelerator_type)
 
         if (!(is.null(image_scope) || image_scope %in% c("eia", "inference")))
-          log_warn(
+          LOGGER$warn(
             "Elastic inference is for inference only. Ignoring image scope: %s.", image_scope
             )
         image_scope = "eia"
@@ -210,7 +256,7 @@ ImageUris = R6Class("ImageUris",
       available_scopes = if(!islistempty(config$scope)) config$scope else names(config)
       if (length(available_scopes) == 1){
         if (!islistempty(image_scope) && image_scope != available_scopes[[1]])
-          log_warn(
+          LOGGER$warn(
             "Defaulting to only supported image scope: %s. Ignoring image scope: %s.",
             available_scopes[1],
             image_scope
@@ -219,10 +265,9 @@ ImageUris = R6Class("ImageUris",
       }
 
       if(islistempty(image_scope) && "scope" %in% names(config) && any(unique(available_scopes) %in% list("training", "inference"))){
-        log_info(
+        LOGGER$info(
           "Same images used for training and inference. Defaulting to image scope: %s.",
-          available_scopes[[1]]
-        )
+          available_scopes[[1]])
         image_scope = available_scopes[[1]]
       }
 
@@ -233,9 +278,8 @@ ImageUris = R6Class("ImageUris",
     # Raises a ``ValueError`` if ``accelerator_type`` is invalid.
     .validate_accelerator_type = function(accelerator_type){
       if (!startsWith(accelerator_type, "ml.eia") && accelerator_type != "local_sagemaker_notebook")
-        stop(sprintf("Invalid SageMaker Elastic Inference accelerator type: %s. ",accelerator_type),
-          "See https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html", call. = F
-          )
+        ValueError$new(sprintf("Invalid SageMaker Elastic Inference accelerator type: %s. ",accelerator_type),
+          "See https://docs.aws.amazon.com/sagemaker/latest/dg/ei.html")
     },
 
     # Checks if the framework/algorithm version is one of the supported versions.
@@ -249,9 +293,9 @@ ImageUris = R6Class("ImageUris",
       if (length(available_versions) == 1 && !(version %in% aliased_versions)){
         log_message = sprintf("Defaulting to the only supported framework/algorithm version: %s.", available_versions[[1]])
         if (!is.na(version) && version != available_versions[[1]])
-          log_warn("%s Ignoring framework/algorithm version: %s.", log_message, version)
-        if (is.na(version))
-          log_info(log_message)
+          LOGGER$warn("%s Ignoring framework/algorithm version: %s.", log_message, version)
+        if (is.na(version)){
+          LOGGER$info(log_message)}
 
         return(available_versions[[1]])
       }
@@ -281,27 +325,28 @@ ImageUris = R6Class("ImageUris",
     .processor = function(instance_type = NULL,
                           available_processors = NULL){
       if (is.null(available_processors)){
-        log_info("Ignoring unnecessary instance type: %s.", instance_type)
+        if(!is.null(instance_type))
+          LOGGER$info("Ignoring unnecessary instance type: %s.", instance_type)
         return(NULL)
       }
 
       if (length(available_processors) == 1 && is.null(instance_type)){
-        log_info("Defaulting to only supported image scope: %s.", available_processors[[1]])
+        LOGGER$info("Defaulting to only supported image scope: %s.", available_processors[[1]])
         return(available_processors[[1]])
       }
 
       if (islistempty(instance_type)){
-        stop("Empty SageMaker instance type. For options, see: ",
-             "https://aws.amazon.com/sagemaker/pricing/instance-types",
-             call. = F)
+        ValueError$new(
+          "Empty SageMaker instance type. For options, see: ",
+          "https://aws.amazon.com/sagemaker/pricing/instance-types")
       }
 
       if (startsWith(instance_type,"local")){
         processor = if(instance_type == "local") "cpu" else "gpu"
       } else {
         # looks for either "ml.<family>.<size>" or "ml_<family>"
-        match = regmatches(instance_type,regexec("^ml[\\._]([a-z0-9]+)\\.?\\w*$",instance_type))[[1]][2]
-        if (!is.na(match)){
+        match = private$.str_match(instance_type, "^ml[\\._]([a-z0-9]+)\\.?\\w*$")[2]
+        if (length(match) != 0){
           family = match
 
           # For some frameworks, we have optimized images for specific families, e.g c5 or p3.
@@ -316,13 +361,32 @@ ImageUris = R6Class("ImageUris",
           else
             processor = "cpu"
         } else {
-            stop(sprintf("Invalid SageMaker instance type: %s. For options, see: ", instance_type),
-              "https://aws.amazon.com/sagemaker/pricing/instance-types", call. = F
-            )
+            ValueError$new(sprintf("Invalid SageMaker instance type: %s. For options, see: ", instance_type),
+              "https://aws.amazon.com/sagemaker/pricing/instance-types")
         }
       }
       private$.validate_arg(processor, available_processors, "processor")
       return(processor)
+    },
+
+    # Returns a boolean that indicates whether to use an auto-selected container version.
+    .should_auto_select_container_version = function(instance_type=NULL,
+                                                     distribution=NULL){
+      p4d = FALSE
+      if (!is.null(instance_type)){
+        # looks for either "ml.<family>.<size>" or "ml_<family>"
+        match = private$.str_match(instance_type, "^ml[\\._]([a-z0-9]+)\\.?\\w*$")
+        if (length(match) != 0){
+          family = match[2]
+          p4d = (family == "p4d")
+        }
+      }
+
+      smdistributed = FALSE
+      if (!islistempty(distribution))
+        smdistributed = ("smdistributed" %in% names(distribution))
+
+      return((p4d || smdistributed))
     },
 
     # # Checks if the Python version is one of the supported versions.
@@ -335,13 +399,13 @@ ImageUris = R6Class("ImageUris",
       }
 
       if (islistempty(available_versions)){
-        if(!is.null(py_version))
-          log_info("Ignoring unnecessary Python version: %s.", py_version)
+        if(!is.null(py_version)){
+          LOGGER$info("Ignoring unnecessary Python version: %s.", py_version)}
         return(NULL)
       }
 
       if (is.null(py_version) && length(available_versions) == 1){
-        log_info("Defaulting to only available Python version: %s", available_versions[[1]])
+        LOGGER$info("Defaulting to only available Python version: %s", available_versions[[1]])
         return(available_versions[[1]])
       }
 
@@ -352,14 +416,11 @@ ImageUris = R6Class("ImageUris",
     # Checks if the arg is in the available options, and raises a ``ValueError`` if not.
     .validate_arg = function(arg, available_options, arg_name){
       if (!(arg %in% available_options) || is.null(arg))
-        stop(sprintf(paste(
+        ValueError$new(sprintf(paste(
           "Unsupported %s: %s. You may need to upgrade your SDK version",
           "(remotes::install_github('dyfanjones/R6sagemaker')) for newer %ss.",
           "\nSupported %s(s): {%s}."), arg_name, arg %||% "NULL", arg_name, arg_name,
-          paste(available_options, collapse = ", ")
-          ),
-          call. = F
-        )
+          paste(available_options, collapse = ", ")))
     },
 
     .hostname = function(region){
@@ -369,10 +430,16 @@ ImageUris = R6Class("ImageUris",
     # Creates a tag for the image URI.
     .format_tag = function(tag_prefix,
                           processor,
-                          py_version){
-      tag_list = list(tag_prefix, processor, py_version)
+                          py_version,
+                          container_version){
+      tag_list = list(tag_prefix, processor, py_version,container_version)
       tag_list = Filter(Negate(is.null), tag_list)
       return (paste(tag_list, collapse = "-"))
+    },
+
+    .str_match = function(string, pattern){
+      m = regexec(pattern, string)
+      return(unlist(regmatches(string, m)))
     }
   )
 )
@@ -383,11 +450,10 @@ config_for_framework = function(framework){
 
   # check if framework json file exists first
   if(!file.exists(fname))
-    stop(sprintf(paste(
+    ValueError$new(sprintf(paste(
       "Unsupported framework: %s. You may need to upgrade your SDK version",
       "(remotes::install_github('dyfanjones/R6sagemaker')) for newer frameworks."),
-      framework),
-    call. = F)
+      framework))
 
   return(read_json(fname))
 }
