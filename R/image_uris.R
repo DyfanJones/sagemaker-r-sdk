@@ -89,8 +89,7 @@ ImageUris = R6Class("ImageUris",
       )
 
       if(framework == private$HUGGING_FACE_FRAMEWORK){
-        m = gregexpr("^(pytorch|tensorflow)(.*)$", base_framework_version)
-        pt_or_tf_version = unlist(regmatches(base_framework_version, m))
+        pt_or_tf_version = private$.str_match(instance_type, "^(pytorch|tensorflow)(.*)$")
         tag_prefix = sprintf("%s-transformers%s", pt_or_tf_version, original_version)
       } else {
         tag_prefix = version_config[["tag_prefix"]] %||% version
@@ -346,7 +345,7 @@ ImageUris = R6Class("ImageUris",
         processor = if(instance_type == "local") "cpu" else "gpu"
       } else {
         # looks for either "ml.<family>.<size>" or "ml_<family>"
-        match = unlist(regmatches(instance_type,regexec("^ml[\\._]([a-z0-9]+)\\.?\\w*$",instance_type)))[2]
+        match = private$.str_match(instance_type, "^ml[\\._]([a-z0-9]+)\\.?\\w*$")[2]
         if (length(match) != 0){
           family = match
 
@@ -376,8 +375,7 @@ ImageUris = R6Class("ImageUris",
       p4d = FALSE
       if (!is.null(instance_type)){
         # looks for either "ml.<family>.<size>" or "ml_<family>"
-        m = regexpr("^ml[\\._]([a-z\\d]+)\\.?\\w*$", instance_type)
-        match = unlist(regmatches(instance_type, m))
+        match = private$.str_match(instance_type, "^ml[\\._]([a-z0-9]+)\\.?\\w*$")
         if (length(match) != 0){
           family = match[2]
           p4d = (family == "p4d")
@@ -437,6 +435,11 @@ ImageUris = R6Class("ImageUris",
       tag_list = list(tag_prefix, processor, py_version,container_version)
       tag_list = Filter(Negate(is.null), tag_list)
       return (paste(tag_list, collapse = "-"))
+    },
+
+    .str_match = function(string, pattern){
+      m = regexec(pattern, string)
+      return(unlist(regmatches(string, m)))
     }
   )
 )
