@@ -197,7 +197,6 @@ TensorFlow = R6Class("TensorFlow",
         )
         additional_hyperparameters$model_dir = self$model_dir
       }
-
       hyperparameters = c(hyperparameters, additional_hyperparameters)
       return(hyperparameters)
     },
@@ -416,7 +415,7 @@ TensorFlow = R6Class("TensorFlow",
       if (mpi)
         return("/opt/ml/model")
       if (!is.null(self$.current_job_name))
-        return(file.path(self$output_path, self$.current_job_name, directory))
+        return(s3_path_join(self$output_path, self$.current_job_name, directory))
       return(NULL)
     },
 
