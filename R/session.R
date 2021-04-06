@@ -2848,18 +2848,23 @@ Session = R6Class("Session",
 #'                \item{\strong{MultiModel:} Indicates that model container can support hosting multiple models}
 #'                \item{\strong{SingleModel:} Indicates that model container can support hosting a single model
 #'                              This is the default model container mode when container_mode = None}}
+#' @param image_config (dict[str, str]): Specifies whether the image of model container is pulled
+#'              from ECR, or private registry in your VPC. By default it is set to pull model
+#'              container image from ECR. (default: None).
 #' @return dict[str, str]: A complete container definition object usable with the CreateModel API if
 #'              passed via `PrimaryContainers` field.
 #' @export
 container_def <- function(image_uri,
                           model_data_url=NULL,
                           env=NULL,
-                          container_mode=NULL){
+                          container_mode=NULL,
+                          image_config=NULL){
   if(is.null(env)) env = list()
   c_def = list("Image" = image_uri, "Environment"= env)
 
   c_def$ModelDataUrl = model_data_url
   c_def$Mode = container_mode
+  c_def$ImageConfig = image_config
   return(c_def)
 }
 
