@@ -6,7 +6,7 @@ Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("
              person("Amazon.com, Inc.", role = "cph"))
 Description: A library for training and deploying machine learning models on 
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
-Imports: 
+Imports:
     data.table,
     fs,
     jsonlite,
@@ -21,6 +21,7 @@ Imports:
     utils,
     uuid
 Suggests: 
+    crayon,
     testthat,
     RProtoBuf,
     readr,
