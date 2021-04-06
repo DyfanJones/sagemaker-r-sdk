@@ -101,6 +101,16 @@ get_config_value <- function(key_path, config = NULL){
   return(NULL)
 }
 
+# Return short version in the format of x.x
+# Args:
+#   framework_version: The version string to be shortened.
+# Returns:
+#   str: The short version string
+get_short_version = function(framework_version){
+  fm_vs = split_str(framework_version, "\\.")
+  return(paste(fm_vs[1:min(3,length(fm_vs))], collapse = "."))
+}
+
 # Write large raw connections in chunks
 write_bin <- function(
   obj,
