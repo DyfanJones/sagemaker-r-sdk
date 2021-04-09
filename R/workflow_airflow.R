@@ -291,7 +291,7 @@ AirFlow = R6Class("AirFlow",
       if (!is.null(tuner$estimator)){
         ll = private$.extract_training_config_from_estimator(
           tuner, inputs, include_cls_metadata, mini_batch_size)
-        tune_config["TrainingJobDefinition"] = ll$TrainingJobDefinitions
+        tune_config[["TrainingJobDefinition"]] = ll$TrainingJobDefinitions
         s3_operations = ll$s3_operations
       } else {
         ll = private$.extract_training_config_list_from_estimator_dict(
