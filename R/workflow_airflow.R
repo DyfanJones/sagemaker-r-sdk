@@ -523,6 +523,107 @@ AirFlow = R6Class("AirFlow",
       return (self$model_config(model, instance_type, role, image_uri))
     },
 
+    #' @description Export Airflow transform config from a SageMaker transformer
+    #' @param transformer (sagemaker.transformer.Transformer): The SageMaker
+    #'              transformer to export Airflow config from.
+    #' @param data (str): Input data location in S3.
+    #' @param data_type (str): What the S3 location defines (default: 'S3Prefix').
+    #'              Valid values:
+    #'              * 'S3Prefix' - the S3 URI defines a key name prefix. All objects with this prefix will
+    #'              be used as inputs for the transform job.
+    #'              * 'ManifestFile' - the S3 URI points to a single manifest file listing each S3 object
+    #'              to use as an input for the transform job.
+    #' @param content_type (str): MIME type of the input data (default: None).
+    #' @param compression_type (str): Compression type of the input data, if
+    #'              compressed (default: None). Valid values: 'Gzip', None.
+    #' @param split_type (str): The record delimiter for the input object (default:
+    #'              'None'). Valid values: 'None', 'Line', 'RecordIO', and 'TFRecord'.
+    #' @param job_name (str): job name (default: None). If not specified, one will be
+    #'              generated.
+    #' @param input_filter (str): A JSONPath to select a portion of the input to
+    #'              pass to the algorithm container for inference. If you omit the
+    #'              field, it gets the value '$', representing the entire input.
+    #'              For CSV data, each row is taken as a JSON array,
+    #'              so only index-based JSONPaths can be applied, e.g. $[0], $[1:].
+    #'              CSV data should follow the `RFC format <https://tools.ietf.org/html/rfc4180>`_.
+    #'              See `Supported JSONPath Operators
+    #'              <https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform-data-processing.html#data-processing-operators>`_
+    #'              for a table of supported JSONPath operators.
+    #'              For more information, see the SageMaker API documentation for
+    #'              `CreateTransformJob
+    #'              <https://docs.aws.amazon.com/sagemaker/latest/dg/API_CreateTransformJob.html>`_.
+    #'              Some examples: "$[1:]", "$.features" (default: None).
+    #' @param output_filter (str): A JSONPath to select a portion of the
+    #'              joined/original output to return as the output.
+    #'              For more information, see the SageMaker API documentation for
+    #'              `CreateTransformJob
+    #'              <https://docs.aws.amazon.com/sagemaker/latest/dg/API_CreateTransformJob.html>`_.
+    #'              Some examples: "$[1:]", "$.prediction" (default: None).
+    #' @param join_source (str): The source of data to be joined to the transform
+    #'              output. It can be set to 'Input' meaning the entire input record
+    #'              will be joined to the inference result. You can use OutputFilter
+    #'              to select the useful portion before uploading to S3. (default:
+    #'              None). Valid values: Input, None.
+    #' @return dict: Transform config that can be directly used by
+    #'              SageMakerTransformOperator in Airflow.
+    transform_config = function(
+      transformer,
+      data,
+      data_type="S3Prefix",
+      content_type=NULL,
+      compression_type=NULL,
+      split_type=NULL,
+      job_name=NULL,
+      input_filter=NULL,
+      output_filter=NULL,
+      join_source=NULL){
+      if (!is.null(job_name)) {
+        transformer$.current_job_name = job_name
+      } else {
+        base_name = transformer$base_transform_job_name
+        transformer$.current_job_name = (if (!is.null(base_name))
+          name_from_base(base_name) else transformer$model_name)
+      }
+      if (is.null(transformer$output_path)){
+        transformer$output_path = sprintf("s3://%s/%s",
+          transformer$sagemaker_session$default_bucket(), transformer$.current_job_name
+        )
+      }
+      job_config = transformer$.__enclose_env__$.load_config(
+        data, data_type, content_type, compression_type, split_type, transformer
+      )
+
+      config = list(
+        "TransformJobName"=transformer$.current_job_name,
+        "ModelName"=transformer$model_name,
+        "TransformInput"=job_config[["input_config"]],
+        "TransformOutput"=job_config[["output_config"]],
+        "TransformResources"=job_config[["resource_config"]])
+
+      data_processing = sagemaker.transformer._TransformJob._prepare_data_processing(
+        input_filter, output_filter, join_source
+      )
+      if (!is.null(data_processing))
+        config[["DataProcessing"]] = data_processing
+
+      if (!is.null(transformer$strategy))
+        config[["BatchStrategy"]] = transformer$strategy
+
+      if (!is.null(transformer$max_concurrent_transforms))
+        config[["MaxConcurrentTransforms"]] = transformer$max_concurrent_transforms
+
+      if (!is.null(transformer$max_payload))
+        config[["MaxPayloadInMB"]] = transformer$max_payload
+
+      if (!is.null(transformer$env))
+        config[["Environment"]] = transformer$env
+
+      if (!is.null(transformer$tags))
+        config[["Tags"]] = transformer$tags
+
+      return(config)
+    },
+
     #' @description
     #' Printer.
     #' @param ... (ignored).
