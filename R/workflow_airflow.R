@@ -312,6 +312,217 @@ AirFlow = R6Class("AirFlow",
       return(tune_config)
     },
 
+
+    #' @description Updated the S3 URI of the framework source directory in given estimator.
+    #' @param estimator (sagemaker.estimator.Framework): The Framework estimator to
+    #'              update.
+    #' @param job_name (str): The new job name included in the submit S3 URI
+    #' @return str: The updated S3 URI of framework source directory
+    update_submit_s3_uri=function(estimator, job_name){
+      if (islistempty(estimator$uploaded_code))
+        return(NULL)
+
+      pattern = "(?<=/)[^/]+?(?=/source/sourcedir.tar.gz)"
+
+      # update the S3 URI with the latest training job.
+      # s3://path/old_job/source/sourcedir.tar.gz will become s3://path/new_job/source/sourcedir.tar.gz
+      submit_uri = estimator$uploaded_code$s3_prefix
+      submit_uri = gsub(pattern, job_name, submit_uri)
+      script_name = estimator$uploaded_code$script_name
+      UploadedCode$s3_prefix=submit_uri
+      UploadedCode$script_name=script_name
+      estimator$uploaded_code = UploadedCode
+    },
+
+    #' @description Update training job of the estimator from a task in the DAG
+    #' @param estimator (sagemaker.estimator.EstimatorBase): The estimator to update
+    #' @param task_id (str): The task id of any
+    #'              airflow.contrib.operators.SageMakerTrainingOperator or
+    #'              airflow.contrib.operators.SageMakerTuningOperator that generates
+    #'              training jobs in the DAG.
+    #' @param task_type (str): Whether the task is from SageMakerTrainingOperator or
+    #'              SageMakerTuningOperator. Values can be 'training', 'tuning' or None
+    #'              (which means training job is not from any task).
+    update_estimator_from_task = function(estimator,
+                                          task_id,
+                                          task_type){
+      if (is.null(task_type))
+        return(NULL)
+      if (tolower(task_type) == "training"){
+        training_job = sprintf(
+          "{{ ti.xcom_pull(task_ids='%s')['Training']['TrainingJobName'] }}", task_id)
+        job_name = training_job
+      } else if (tolower(task_type) == "tuning"){
+        training_job = sprintf(
+          "{{ ti.xcom_pull(task_ids='%s')['Tuning']['BestTrainingJob']['TrainingJobName'] }}",
+          task_id)
+        # need to strip the double quotes in json to get the string
+        job_name = sprintf(paste0(
+          "{{ ti.xcom_pull(task_ids='%s')['Tuning']['TrainingJobDefinition']",
+          "['StaticHyperParameters']['sagemaker_job_name'].strip('%s') }}"), task_id, '"')
+      } else {
+        ValueError$new("task_type must be either 'training', 'tuning' or None.")}
+      estimator$.current_job_name = training_job
+      if (inherits(estimator, "Framework"))
+        self$update_submit_s3_uri(estimator, job_name)
+    },
+
+    #' @description This prepares the framework model container information and specifies related S3 operations.
+    #'              Prepare the framework model container information. Specify related S3
+    #'              operations for Airflow to perform. (Upload `source_dir` )
+    #' @param model (sagemaker.model.FrameworkModel): The framework model
+    #' @param instance_type (str): The EC2 instance type to deploy this Model to. For
+    #'              example, 'ml.p2.xlarge'.
+    #' @param s3_operations (dict): The dict to specify S3 operations (upload
+    #'              `source_dir` ).
+    #' @return dict: The container information of this framework model.
+    prepare_framework_container_def = function(model,
+                                               instance_type,
+                                               s3_operations){
+      deploy_image = model$image_uri
+      if (islistempty(deploy_image)){
+        region_name = model$sagemaker_session$paws_region_name
+        deploy_image = model$serving_image_uri(region_name, instance_type)}
+      base_name = base_name_from_image(deploy_image)
+      model$name = model$name %||% name_from_base(base_name)
+
+      bucket = model$bucket %||% model$sagemaker_session$.default_bucket
+      if (!is.null(model$entry_point)){
+        script = basename(model$entry_point)
+        key = sprintf("%s/source/sourcedir.tar.gz", model$name)
+
+        if (!islistempty(model$source_dir) && grepl("^s3://", tolower(model$source_dir))){
+          code_dir = model$source_dir
+          UploadedCode$s3_prefix=code_dir
+          UploadedCode$script_name= script
+          model$uploaded_code = UploadedCode
+        } else {
+          code_dir = sprintf("s3://%s/%s", bucket, key)
+          UploadedCode$s3_prefix=code_dir
+          UploadedCode$script_name= script
+          model$uploaded_code = UploadedCode
+          s3_operations[["S3Upload"]] = list(
+            list("Path"=(model$source_dir %||% script), "Bucket"=bucket, "Key"=key, "Tar"=TRUE)
+          )
+        }
+      }
+      deploy_env = list(model$env)
+      deploy_env = modifyList(deploy_env, model$.__enclos_env__$.framework_env_vars())
+
+      tryCatch({
+        if (!islistempty(model$model_server_workers))
+          deploy_env[[toupper(MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(
+            model$model_server_workers)
+      }, error = function(e) {
+        # This applies to a FrameworkModel which is not SageMaker Deep Learning Framework Model
+        NULL
+      })
+
+      return (container_def(deploy_image, model$model_data, deploy_env))
+    },
+
+    #' @description Export Airflow model config from a SageMaker model
+    #' @param model (sagemaker.model.Model): The Model object from which to export the Airflow config
+    #' @param instance_type (str): The EC2 instance type to deploy this Model to. For
+    #'              example, 'ml.p2.xlarge'
+    #' @param role (str): The ``ExecutionRoleArn`` IAM Role ARN for the model
+    #' @param image_uri (str): An Docker image URI to use for deploying the model
+    #' @return dict: Model config that can be directly used by SageMakerModelOperator
+    #'              in Airflow. It can also be part of the config used by
+    #'              SageMakerEndpointOperator and SageMakerTransformOperator in Airflow.
+    model_config = function(model,
+                            instance_type=NULL,
+                            role=NULL,
+                            image_uri=NULL){
+      s3_operations = list()
+      model.image_uri = image_uri %||% model$image_uri
+
+      if (inherits(model, "FrameworkModel")){
+        container_def = prepare_framework_container_def(model, instance_type, s3_operations)
+      } else {
+        container_def = model.prepare_container_def()
+        base_name = base_name_from_image(container_def[["Image"]])
+        model$name = model$name %||% name_from_base(base_name)
+      }
+      primary_container = session$.__enclos_env__$.expand_container_def(container_def)
+
+      config = list(
+        "ModelName"=model$name,
+        "PrimaryContainer"=primary_container,
+        "ExecutionRoleArn"=role %||% model$role)
+
+      if (!islistempty(model$vpc_config))
+        config[["VpcConfig"]] = model$vpc_config
+
+      if (!islistempty(s3_operations))
+        config[["S3Operations"]] = s3_operations
+
+      return(config)
+    },
+
+    #' @description Export Airflow model config from a SageMaker estimator
+    #' @param estimator (sagemaker.model.EstimatorBase): The SageMaker estimator to
+    #'              export Airflow config from. It has to be an estimator associated
+    #'              with a training job.
+    #' @param task_id (str): The task id of any
+    #'              airflow.contrib.operators.SageMakerTrainingOperator or
+    #'              airflow.contrib.operators.SageMakerTuningOperator that generates
+    #'              training jobs in the DAG. The model config is built based on the
+    #'              training job generated in this operator.
+    #' @param task_type (str): Whether the task is from SageMakerTrainingOperator or
+    #'              SageMakerTuningOperator. Values can be 'training', 'tuning' or None
+    #'              (which means training job is not from any task).
+    #' @param instance_type (str): The EC2 instance type to deploy this Model to. For
+    #'              example, 'ml.p2.xlarge'
+    #' @param role (str): The ``ExecutionRoleArn`` IAM Role ARN for the model
+    #' @param image_uri (str): A Docker image URI to use for deploying the model
+    #' @param name (str): Name of the model
+    #' @param model_server_workers (int): The number of worker processes used by the
+    #'              inference server. If None, server will use one worker per vCPU. Only
+    #'              effective when estimator is a SageMaker framework.
+    #' @param vpc_config_override (dict[str, list[str]]): Override for VpcConfig set on
+    #'              the model. Default: use subnets and security groups from this Estimator.
+    #'              * 'Subnets' (list[str]): List of subnet ids.
+    #'              * 'SecurityGroupIds' (list[str]): List of security group ids.
+    #' @return dict: Model config that can be directly used by SageMakerModelOperator in Airflow. It can
+    #'              also be part of the config used by SageMakerEndpointOperator in Airflow.
+    model_config_from_estimator = function(
+      estimator,
+      task_id,
+      task_type,
+      instance_type=None,
+      role=None,
+      image_uri=None,
+      name=None,
+      model_server_workers=None,
+      vpc_config_override="VPC_CONFIG_DEFAULT"){
+      self$update_estimator_from_task(estimator, task_id, task_type)
+      if (inherits(estimator, "Estimator")){
+        model = estimator$create_model(
+          role=role, image_uri=image_uri, vpc_config_override=vpc_config_override
+        )
+      } else if (inherits(estimator, "AmazonAlgorithmEstimatorBase")){
+        model = estimator.create_model(vpc_config_override=vpc_config_override)
+      } else if (inherits(estimator, "TensorFlow")){
+        model = estimator$create_model(
+          role=role, vpc_config_override=vpc_config_override, entry_point=estimator$entry_point
+        )
+      } else if (inherits(estimator, "Framework")){
+        model = estimator$create_model(
+          model_server_workers=model_server_workers,
+          role=role,
+          vpc_config_override=vpc_config_override,
+          entry_point=estimator$entry_point)
+      } else {
+        TypeError$new(paste(
+          "Estimator must be one of sagemaker.estimator.Estimator, sagemaker.estimator.Framework",
+          "or AmazonAlgorithmEstimatorBase."))
+      }
+      model$name = name
+
+      return (self$model_config(model, instance_type, role, image_uri))
+    },
+
     #' @description
     #' Printer.
     #' @param ... (ignored).
@@ -320,6 +531,120 @@ AirFlow = R6Class("AirFlow",
     }
   ),
   private = list(
+    # Extract tuning job config from a HyperparameterTuner
+    .extract_tuning_job_config = function(tuner){
+      tuning_job_config = list(
+        "Strategy"=tuner$strategy,
+        "ResourceLimits"=list(
+          "MaxNumberOfTrainingJobs"=tuner$max_jobs,
+          "MaxParallelTrainingJobs"=tuner$max_parallel_jobs),
+        "TrainingJobEarlyStoppingType"=tuner$early_stopping_type
+      )
+
+      if (!islistempty(tuner$objective_metric_name))
+        tuning_job_config[["HyperParameterTuningJobObjective"]] = list(
+          "Type"=tuner$objective_type,
+          "MetricName"=tuner$objective_metric_name
+        )
+
+      parameter_ranges = tuner$hyperparameter_ranges()
+      if (!islistempty(parameter_ranges))
+        tuning_job_config[["ParameterRanges"]] = parameter_ranges
+
+      return(tuning_job_config)
+    },
+
+    # Extract training job config from a HyperparameterTuner that uses the ``estimator`` field
+    .extract_training_config_from_estimator = function(tuner,
+                                                       inputs,
+                                                       include_cls_metadata,
+                                                       mini_batch_size){
+      train_config = self$training_base_config(tuner$estimator, inputs, mini_batch_size)
+      train_config[["HyperParameters"]] = NULL
+
+      tuner$.__enclos_env__$.prepare_static_hyperparameters_for_tuning(
+        include_cls_metadata=include_cls_metadata)
+      train_config[["StaticHyperParameters"]] = tuner$static_hyperparameters
+
+      if (!islistempty(tuner$metric_definitions))
+        train_config[["AlgorithmSpecification"]][["MetricDefinitions"]] = tuner$metric_definitions
+
+      s3_operations = train_config[["S3Operations"]]
+      train_config[["S3Operations"]] = NULL
+
+      return(list(train_config, s3_operations))
+    },
+
+    # Extracts a list of training job configs from a Hyperparameter Tuner.
+    # It uses the ``estimator_dict`` field.
+    .extract_training_config_list_from_estimator_dict = function(
+      tuner, inputs, include_cls_metadata, mini_batch_size){
+      estimator_names = sort(names(tuner$estimator_dict))
+      tuner$.__enclos_env__$.validate_dict_argument(
+        name="inputs", value=inputs, allowed_keys=estimator_names)
+      tuner$.__enclos_env__$.validate_dict_argument(
+        name="include_cls_metadata", value=include_cls_metadata, allowed_keys=estimator_names
+      )
+      tuner$.__enclos_env__$.validate_dict_argument(
+        name="mini_batch_size", value=mini_batch_size, allowed_keys=estimator_names
+      )
+
+      train_config_dict = list()
+      for (estimator_name in names(tuner$estimator_dict)){
+        estimator = tuner$estimator_dict[[estimator_name]]
+        train_config_dict[[estimator_name]] = self$training_base_config(
+          estimator=estimator,
+          inputs=if(!islistempty(inputs)) inputs[[estimator_name]] else NULL,
+          mini_batch_size=if(!islistempty(mini_batch_size)) mini_batch_size[[estimator_name]] else NULL
+        )
+      }
+
+      tuner$.__enclos_env__$.prepare_static_hyperparameters_for_tuning(
+        include_cls_metadata=include_cls_metadata)
+
+      train_config_list = list()
+      s3_operations_list = list()
+
+      for (estimator_name in sort(names(train_config_dict))){
+        train_config = train_config_dict[[estimator_name]]
+        train_config[["HyperParameters"]]=NULL
+        train_config[["StaticHyperParameters"]] = tuner$static_hyperparameters_dict[[estimator_name]]
+
+        train_config[["AlgorithmSpecification"]][[
+          "MetricDefinitions"
+        ]] = tuner$metric_definitions_dict[[estimator_name]]
+
+        train_config[["DefinitionName"]] = estimator_name
+        train_config[["TuningObjective"]] = list(
+          "Type"=tuner$objective_type,
+          "MetricName"=tuner$objective_metric_name_dict[[estimator_name]])
+        train_config[["HyperParameterRanges"]] = tuner$hyperparameter_ranges_dict()[[estimator_name]]
+
+        s3_operations_list = c(s3_operations_list, (train_config[["S3Operations"]] %||% list()))
+        train_config[["S3Operations"]] = NULL
+
+        train_config_list = c(train_config_list, train_config)
+      }
+
+      return(list(train_config_list, private$.merge_s3_operations(s3_operations_list)))
+    },
+
+    # Merge a list of S3 operation dictionaries into one
+    .merge_s3_operations(s3_operations_list){
+      s3_operations_merged =list()
+      for (s3_operations in s3_operations_list){
+        for (key in names(s3_operations)){
+          operations = s3_operations[[key]]
+          if (!(key %in% names(s3_operations_merged)))
+            s3_operations_merged[[key]] = list()
+          for (operation in operations){
+            if (!(operation %in% names(s3_operations_merged[[key]])))
+             s3_operations_merged[[key]] = c(s3_operations_merged[[key]], operation)
+          }
+        }
+      }
+      return(s3_operations_merged)
+    }
 
   ),
   lock_object = F
