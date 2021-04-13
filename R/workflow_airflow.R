@@ -74,7 +74,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #'              This is done by adding the required `feature_dim` hyperparameter from training data.
     #' @param estimator (sagemaker.amazon.amazon_estimator.AmazonAlgorithmEstimatorBase): An estimator
     #'              for a built-in Amazon algorithm to get information from and update.
-    #' @param inputs: The training data.
+    #' @param inputs : The training data.
     #'              * (sagemaker.amazon.amazon_estimator.RecordSet) - A collection of
     #'              Amazon :class:~`Record` objects serialized and stored in S3. For
     #'              use with an estimator for an Amazon algorithm.
@@ -104,7 +104,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #' @param estimator (sagemaker.estimator.EstimatorBase): The estimator to export
     #'              training config from. Can be a BYO estimator, Framework estimator or
     #'              Amazon algorithm estimator.
-    #'              inputs: Information about the training data. Please refer to the ``fit()``
+    #' @param inputs : Information about the training data. Please refer to the ``fit()``
     #'              method of
     #'              the associated estimator, as this can take any of the following
     #'              forms:
@@ -189,7 +189,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #' @param estimator (sagemaker.estimator.EstimatorBase): The estimator to export
     #'              training config from. Can be a BYO estimator, Framework estimator or
     #'              Amazon algorithm estimator.
-    #' @param inputs: Information about the training data. Please refer to the ``fit()``
+    #' @param inputs : Information about the training data. Please refer to the ``fit()``
     #'              method of the associated estimator, as this can take any of the following forms:
     #'              * (str) - The S3 location where training data is saved.
     #'              * (dict[str, str] or dict[str, sagemaker.inputs.TrainingInput]) - If using multiple
@@ -230,7 +230,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #' @description Export Airflow tuning config from a HyperparameterTuner
     #' @param tuner (sagemaker.tuner.HyperparameterTuner): The tuner to export tuning
     #'              config from.
-    #' @param inputs: Information about the training data. Please refer to the ``fit()``
+    #' @param inputs : Information about the training data. Please refer to the ``fit()``
     #'              method of the associated estimator in the tuner, as this can take any of the
     #'              following forms:
     #'              * (str) - The S3 location where training data is saved.
@@ -251,7 +251,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #'              same estimator names as keys for the ``estimator_dict`` argument of the
     #'              ``HyperparameterTuner.create()`` method.
     #' @param job_name (str): Specify a tuning job name if needed.
-    #' @param include_cls_metadata: It can take one of the following two forms.
+    #' @param include_cls_metadata : It can take one of the following two forms.
     #'              * (bool) - Whether or not the hyperparameter tuning job should include information
     #'              about the estimator class (default: False). This information is passed as a
     #'              hyperparameter, so if the algorithm you are using cannot handle unknown
@@ -264,7 +264,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #'              would be the same estimator names as in ``estimator_dict``. If one estimator
     #'              doesn't need the flag set, then no need to include it in the dictionary. If none
     #'              of the estimators need the flag set, then an empty dictionary ``{}`` must be used.
-    #' @param mini_batch_size: It can take one of the following two forms.
+    #' @param mini_batch_size : It can take one of the following two forms.
     #'              * (int) - Specify this argument only when estimator is a built-in estimator of an
     #'              Amazon algorithm. For other estimators, batch size should be specified in the
     #'              estimator.
@@ -272,7 +272,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     #'              method ``HyperparameterTuner.create()``, to specify the value for individual
     #'              estimators provided in the ``estimator_dict`` argument of the method. The keys
     #'              would be the same estimator names as in ``estimator_dict``. If one estimator
-    #' doesn't need the value set, then no need to include it in the dictionary. If
+    #'              doesn't need the value set, then no need to include it in the dictionary. If
     #'              none of the estimators need the value set, then an empty dictionary ``{}``
     #'              must be used.
     #' @return dict: Tuning config that can be directly used by SageMakerTuningOperator in Airflow.
@@ -896,6 +896,95 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
       return(config)
     },
 
+    #' @description Export Airflow processing config from a SageMaker processor
+    #' @param processor (sagemaker.processor.Processor): The SageMaker
+    #'              processor to export Airflow config from.
+    #' @param inputs (list[:class:`~sagemaker.processing.ProcessingInput`]): Input files for
+    #'              the processing job. These must be provided as
+    #'              :class:`~sagemaker.processing.ProcessingInput` objects (default: None).
+    #' @param outputs (list[:class:`~sagemaker.processing.ProcessingOutput`]): Outputs for
+    #'              the processing job. These can be specified as either path strings or
+    #'              :class:`~sagemaker.processing.ProcessingOutput` objects (default: None).
+    #' @param job_name (str): Processing job name. If not specified, the processor generates
+    #'              a default job name, based on the base job name and current timestamp.
+    #' @param experiment_config (dict[str, str]): Experiment management configuration.
+    #'              Dictionary contains three optional keys:
+    #'              'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.
+    #' @param container_arguments ([str]): The arguments for a container used to run a processing job.
+    #' @param container_entrypoint ([str]): The entrypoint for a container used to run a processing job.
+    #' @param kms_key_id (str): The AWS Key Management Service (AWS KMS) key that Amazon SageMaker
+    #'              uses to encrypt the processing job output. KmsKeyId can be an ID of a KMS key,
+    #'              ARN of a KMS key, alias of a KMS key, or alias of a KMS key.
+    #'              The KmsKeyId is applied to all outputs.
+    #' @return dict: Processing config that can be directly used by
+    #'            SageMakerProcessingOperator in Airflow.
+    processing_config = function(
+      processor,
+      inputs=NULL,
+      outputs=NULL,
+      job_name=NULL,
+      experiment_config=NULL,
+      container_arguments=NULL,
+      container_entrypoint=NULL,
+      kms_key_id=NULL){
+      if (!is.null(job_name)){
+        processor$.current_job_name = job_name
+      } else {
+        base_name = processor$base_job_name
+      }
+      processor$.current_job_name = (if (!is.null(base_name)) {
+        name_from_base(base_name)
+      } else base_name_from_image(processor$image_uri))
+
+      config = list(
+        "ProcessingJobName"=processor$.current_job_name,
+        "ProcessingInputs"=self$input_output_list_converter(inputs))
+
+      processing_output_config = ProcessingJob$public_methods$prepare_output_config(
+        kms_key_id, self$input_output_list_converter(outputs))
+
+      config[["ProcessingOutputConfig"]] = processing_output_config
+
+      if (!is.null(experiment_config))
+        config[["ExperimentConfig"]] = experiment_config
+
+      app_specification = ProcessingJob$public_methods$prepare_app_specification(
+        container_arguments, container_entrypoint, processor$image_uri)
+      config[["AppSpecification"]] = app_specification
+
+      config[["RoleArn"]] = processor$role
+
+      config[["Environment"]]= processor.env
+
+      if (!is.null(processor$network_config))
+        config[["NetworkConfig"]] = processor$network_config$to_request_list()
+
+      processing_resources = ProcessingJob$public_methods$prepare_processing_resources(
+        instance_count=processor$instance_count,
+        instance_type=processor$instance_type,
+        volume_kms_key_id=processor$volume_kms_key,
+        volume_size_in_gb=processor$volume_size_in_gb)
+      config[["ProcessingResources"]] = processing_resources
+
+      if (!is.null(processor$max_runtime_in_seconds))
+        stopping_condition = ProcessingJob$public_methods$prepare_stopping_condition(
+          processor$max_runtime_in_seconds)
+      config[["StoppingCondition"]] = stopping_condition
+
+      config[["Tags"]] = processor$tags
+
+      return(config)
+    },
+
+    #' @description Converts a list of ProcessingInput or ProcessingOutput objects to a list of dicts
+    #' @param object_list (list[ProcessingInput or ProcessingOutput]
+    #' @return List of dicts
+    input_output_list_converter = function(object_list){
+      if (!islistempty(object_list))
+        return(lapply(object_list, function(obj) obj$to_request_list()))
+      return(object_list)
+    },
+
     #' @description
     #' Printer.
     #' @param ... (ignored).
@@ -1003,7 +1092,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
     },
 
     # Merge a list of S3 operation dictionaries into one
-    .merge_s3_operations(s3_operations_list){
+    .merge_s3_operations = function(s3_operations_list){
       s3_operations_merged =list()
       for (s3_operations in s3_operations_list){
         for (key in names(s3_operations)){
