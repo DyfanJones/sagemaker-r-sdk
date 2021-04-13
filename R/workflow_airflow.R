@@ -13,10 +13,10 @@
 
 #' @import R6
 
-#' @title AirFlow helper class
+#' @title AirFlowWorkFlow helper class
 #' @description Helper class to take sagemaker classes and format output for Airflow.
 #' @export
-AirFlow = R6Class("AirFlow",
+AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
   public = list(
 
     #' @description Prepare S3 operations and environment variables related to framework.
@@ -849,6 +849,50 @@ AirFlow = R6Class("AirFlow",
       if (!is.null(s3_operations))
         config[["S3Operations"]] = s3_operations
 
+      return(config)
+    },
+
+    #' @description Export Airflow deploy config from a SageMaker estimator
+    #' @param estimator (sagemaker.model.EstimatorBase): The SageMaker estimator to
+    #'              export Airflow config from. It has to be an estimator associated
+    #'              with a training job.
+    #' @param task_id (str): The task id of any
+    #'              airflow.contrib.operators.SageMakerTrainingOperator or
+    #'              airflow.contrib.operators.SageMakerTuningOperator that generates
+    #'              training jobs in the DAG. The endpoint config is built based on the
+    #'              training job generated in this operator.
+    #' @param task_type (str): Whether the task is from SageMakerTrainingOperator or
+    #'              SageMakerTuningOperator. Values can be 'training', 'tuning' or None
+    #'              (which means training job is not from any task).
+    #' @param initial_instance_count (int): Minimum number of EC2 instances to deploy
+    #'              to an endpoint for prediction.
+    #' @param instance_type (str): Type of EC2 instance to deploy to an endpoint for
+    #'              prediction, for example, 'ml.c4.xlarge'.
+    #' @param model_name (str): Name to use for creating an Amazon SageMaker model. If
+    #'              not specified, one will be generated.
+    #' @param endpoint_name (str): Name to use for creating an Amazon SageMaker
+    #'              endpoint. If not specified, the name of the SageMaker model is used.
+    #' @param tags (list[dict]): List of tags for labeling a training job. For more,
+    #'              see https://docs.aws.amazon.com/sagemaker/latest/dg/API_Tag.html.
+    #' @param ... : Passed to invocation of ``create_model()``. Implementations
+    #'              may customize ``create_model()`` to accept ``**kwargs`` to customize
+    #'              model creation during deploy. For more, see the implementation docs.
+    #' @return dict: Deploy config that can be directly used by
+    #'              SageMakerEndpointOperator in Airflow.
+    deploy_config_from_estimator = function(
+      estimator,
+      task_id,
+      task_type,
+      initial_instance_count,
+      instance_type,
+      model_name=NULL,
+      endpoint_name=NULL,
+      tags=NULL,
+      ...){
+      self$update_estimator_from_task(estimator, task_id, task_type)
+      model = estimator$create_model(...)
+      model.name = model_name
+      config = self$deploy_config(model, initial_instance_count, instance_type, endpoint_name, tags)
       return(config)
     },
 
