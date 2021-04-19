@@ -123,6 +123,7 @@ Collate:
     'tensorflow_estimator.R'
     'tuner.R'
     'workflow_airflow.R'
+    'workflow_entries.R'
     'xgboost_default.R'
     'xgboost_model.R'
     'xgboost_estimator.R'
