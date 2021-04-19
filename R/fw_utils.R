@@ -384,7 +384,12 @@ warn_if_parameter_server_with_multi_gpu <- function(training_instance_type, dist
 #             multiple strategies are requested simultaneously or
 #             an unsupported strategy is requested or
 #             strategy-specific inputs are incorrect/unsupported
-validate_smdistributed <- function(instance_type, framework_name, framework_version, py_version, distribution, image_uri=NULL){
+validate_smdistributed <- function(instance_type,
+                                   framework_name,
+                                   framework_version,
+                                   py_version,
+                                   distribution,
+                                   image_uri=NULL){
   if (!("smdistributed" %in% names(distribution))){
     # Distribution strategy other than smdistributed is selected
     return(NULL)
