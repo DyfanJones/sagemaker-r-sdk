@@ -94,6 +94,7 @@ Collate:
     'debugger_framework_profile.R'
     'debugger_profiler_config.R'
     'deprecations.R'
+    'huggingface_estimator.R'
     'lineage_action.R'
     'lineage_artifact.R'
     'lineage_visualizer.R'
