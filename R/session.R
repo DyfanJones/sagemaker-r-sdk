@@ -2520,6 +2520,12 @@ Session = R6Class("Session",
       return(training_job_definition)
     },
 
+    .expand_container_def = function(c_def){
+      if (is.character("character"))
+        return(container_def(c_def))
+      return(c_def)
+    },
+
     .vpc_config_from_training_job = function(training_job_desc,
                                              vpc_config_override="VPC_CONFIG_DEFAULT"){
 

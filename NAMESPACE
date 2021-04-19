@@ -2,6 +2,7 @@
 
 S3method(predict,Predictor)
 export(.SparkProcessorBase)
+export(AirFlowWorkFlow)
 export(AlgorithmEstimator)
 export(AmazonAlgorithmEstimatorBase)
 export(AnalyticsMetricsBase)
