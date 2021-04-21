@@ -220,13 +220,13 @@ HuggingFace = R6Class("HuggingFace",
         ValueError$new(
           "transformers_version, and image_uri are both NULL. ",
           "Specify either transformers_version or image_uri")
-      if (!is.null(self$tensorflow_version) && !is.null(self.pytorch_version))
+      if (!is.null(self$tensorflow_version) && !is.null(self$pytorch_version))
         ValueError$new(
-          "tensorflow_version and pytorch_version are both not None. ",
+          "tensorflow_version and pytorch_version are both not NULL. ",
           "Specify only tensorflow_version or pytorch_version.")
       if (is.null(self$tensorflow_version) && is.null(self$pytorch_version))
         ValueError$new(
-          "tensorflow_version and pytorch_version are both None. ",
+          "tensorflow_version and pytorch_version are both NULL. ",
           "Specify either tensorflow_version or pytorch_version.")
       base_framework_version_len = (
         if (!is.null(self$tensorflow_version))
