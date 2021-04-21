@@ -113,27 +113,27 @@ HuggingFace = R6Class("HuggingFace",
 
       private$.validate_args(image_uri=image_uri)
 
-      if (!is.null(distribution))
+      if (!is.null(distribution)){
         instance_type = renamed_kwargs(
-          "train_instance_type", "instance_type", kwargs["instance_type"], kwargs
+          "train_instance_type", "instance_type", kwargs[["instance_type"]], kwargs
         )
 
-      base_framework_name = if (!is.null(tensorflow_version)) "tensorflow" else "pytorch"
-      base_framework_version = (if (!is.null(tensorflow_version))
-        tensorflow_version else pytorch_version)
+        base_framework_name = if (!is.null(tensorflow_version)) "tensorflow" else "pytorch"
+        base_framework_version = (if (!is.null(tensorflow_version))
+          tensorflow_version else pytorch_version)
 
-      validate_smdistributed(
-        instance_type=instance_type,
-        framework_name=base_framework_name,
-        framework_version=base_framework_version,
-        py_version=self.py_version,
-        distribution=distribution,
-        image_uri=image_ur)
+        validate_smdistributed(
+          instance_type=instance_type,
+          framework_name=base_framework_name,
+          framework_version=base_framework_version,
+          py_version=self.py_version,
+          distribution=distribution,
+          image_uri=image_ur)
 
-      warn_if_parameter_server_with_multi_gpu(
-        training_instance_type=instance_type, distribution=distribution
-      )
-
+        warn_if_parameter_server_with_multi_gpu(
+          training_instance_type=instance_type, distribution=distribution
+        )
+      }
       if (!("enable_sagemaker_metrics" %in% names(kwargs)))
         kwargs[["enable_sagemaker_metrics"]] = TRUE
 
