@@ -67,8 +67,9 @@ ImageUris = R6Class("ImageUris",
         if (!islistempty(version_config[["version_aliases"]])){
           full_base_framework_version = version_config[["version_aliases"]][[
             base_framework_version]] %||% base_framework_version
-          }
-        private$.validate_arg(full_base_framework_version, list(names(version_config)), "base framework")
+        }
+
+        private$.validate_arg(full_base_framework_version, names(version_config), "base framework")
         version_config = version_config[[full_base_framework_version]]
       }
 
