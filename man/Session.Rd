@@ -315,7 +315,8 @@ Create an Amazon SageMaker training job. Train the learner on a set of observati
   tensorboard_output_config = NULL,
   enable_sagemaker_metrics = NULL,
   profiler_rule_configs = NULL,
-  profiler_config = NULL
+  profiler_config = NULL,
+  environment = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -416,6 +417,9 @@ https://docs.aws.amazon.com/sagemaker/latest/dg/API_AlgorithmSpecification.html#
 
 \item{\code{profiler_config}}{(dict): Configuration for how profiling information is emitted
 with SageMaker Profiler. (default: ``None``).}
+
+\item{\code{environment}}{(dict[str, str]) : Environment variables to be set for
+use during training job (default: ``None``)}
 }
 \if{html}{\out{</div>}}
 }

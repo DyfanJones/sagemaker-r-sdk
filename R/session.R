@@ -317,6 +317,8 @@ Session = R6Class("Session",
     #' @param profiler_rule_configs (list[dict]): A list of profiler rule configurations.
     #' @param profiler_config (dict): Configuration for how profiling information is emitted
     #'              with SageMaker Profiler. (default: ``None``).
+    #' @param environment (dict[str, str]) : Environment variables to be set for
+    #'              use during training job (default: ``None``)
     #' @return
     #' str: ARN of the training job, if it is created.
     train = function(input_mode,
@@ -343,7 +345,8 @@ Session = R6Class("Session",
                      tensorboard_output_config=NULL,
                      enable_sagemaker_metrics=NULL,
                      profiler_rule_configs=NULL,
-                     profiler_config=NULL){
+                     profiler_config=NULL,
+                     environment=NULL){
 
       tags = .append_project_tags(tags)
       train_request = private$.get_train_request(
@@ -371,7 +374,8 @@ Session = R6Class("Session",
         tensorboard_output_config=tensorboard_output_config,
         enable_sagemaker_metrics=enable_sagemaker_metrics,
         profiler_rule_configs=profiler_rule_configs,
-        profiler_config=profiler_config)
+        profiler_config=profiler_config,
+        environment=enviornment)
 
       LOGGER$info("Creating training-job with name: %s", job_name)
       LOGGER$debug("train request: %s", toJSON(train_request, pretty = T, auto_unbox = T))
@@ -385,6 +389,8 @@ Session = R6Class("Session",
                              ResourceConfig = train_request$ResourceConfig,
                              VpcConfig = train_request$VpcConfig,
                              StoppingCondition = train_request$StoppingCondition,
+                             # Currently not implemented in paws
+                             # Environment = train_request$Environment,
                              Tags = train_request$Tags,
                              EnableNetworkIsolation = train_request$EnableNetworkIsolation,
                              EnableInterContainerTrafficEncryption = train_request$EnableInterContainerTrafficEncryption,
@@ -2377,33 +2383,36 @@ Session = R6Class("Session",
     # profiler_rule_configs (list[dict]): A list of profiler rule configurations.
     # profiler_config(dict): Configuration for how profiling information is emitted with
     # SageMaker Profiler. (default: ``None``).
+    # environment (dict[str, str]) : Environment variables to be set for
+    # use during training job (default: ``None``)
     # Returns:
     #   Dict: a training request dict
-    .get_train_args = function(input_mode,
-                               input_config,
-                               role,
-                               job_name,
-                               output_config,
-                               resource_config,
-                               vpc_config,
-                               hyperparameters,
-                               stop_condition,
-                               tags,
-                               metric_definitions,
-                               enable_network_isolation=FALSE,
-                               image_uri=NULL,
-                               algorithm_arn=NULL,
-                               encrypt_inter_container_traffic=FALSE,
-                               use_spot_instances=FALSE,
-                               checkpoint_s3_uri=NULL,
-                               checkpoint_local_path=NULL,
-                               experiment_config=NULL,
-                               debugger_rule_configs=NULL,
-                               debugger_hook_config=NULL,
-                               tensorboard_output_config=NULL,
-                               enable_sagemaker_metrics=NULL,
-                               profiler_rule_configs=NULL,
-                               profiler_config=NULL){
+    .get_train_request = function(input_mode,
+                                  input_config,
+                                  role,
+                                  job_name,
+                                  output_config,
+                                  resource_config,
+                                  vpc_config,
+                                  hyperparameters,
+                                  stop_condition,
+                                  tags,
+                                  metric_definitions,
+                                  enable_network_isolation=FALSE,
+                                  image_uri=NULL,
+                                  algorithm_arn=NULL,
+                                  encrypt_inter_container_traffic=FALSE,
+                                  use_spot_instances=FALSE,
+                                  checkpoint_s3_uri=NULL,
+                                  checkpoint_local_path=NULL,
+                                  experiment_config=NULL,
+                                  debugger_rule_configs=NULL,
+                                  debugger_hook_config=NULL,
+                                  tensorboard_output_config=NULL,
+                                  enable_sagemaker_metrics=NULL,
+                                  profiler_rule_configs=NULL,
+                                  profiler_config=NULL,
+                                  environment=NULL){
       train_request = list(
         "AlgorithmSpecification"=list("TrainingInputMode"= input_mode),
         "OutputDataConfig"= output_config,
@@ -2413,28 +2422,35 @@ Session = R6Class("Session",
         "RoleArn"= role)
 
       if (!is.null(image_uri) && !is.null(algorithm_arn))
-        stop("image_uri and algorithm_arn are mutually exclusive.",
-             sprintf("Both were provided: image_uri: %s algorithm_arn: %s", image_uri, algorithm_arn),
-             call. = F)
+        ValueError$new(
+          "image_uri and algorithm_arn are mutually exclusive.",
+          sprintf("Both were provided: image_uri: %s algorithm_arn: %s", image_uri, algorithm_arn))
       if (is.null(image_uri) && is.null(algorithm_arn))
-        stop("either image_uri or algorithm_arn is required. None was provided.", call. = F)
+        ValueError$new("either image_uri or algorithm_arn is required. None was provided.")
 
       train_request$AlgorithmSpecification$TrainingImage = image_uri
       train_request$AlgorithmSpecification$AlgorithmName = algorithm_arn
       train_request$InputDataConfig = input_config
       train_request$AlgorithmSpecification$MetricDefinitions = metric_definitions
       train_request$AlgorithmSpecification$EnableSageMakerMetricsTimeSeries = enable_sagemaker_metrics
-      train_request$HyperParameters = hyperparameters
+
+      if(!islistempty(hyperparameters))
+        train_request$HyperParameters = hyperparameters
+
+      train_request$Environment = environment
       train_request$Tags = tags
       train_request$VpcConfig = vpc_config
+
       if (!islistempty(experiment_config))
         train_request$ExperimentConfig = experiment_config
+
       train_request$EnableNetworkIsolation = enable_network_isolation
       train_request$EnableInterContainerTrafficEncryption = encrypt_inter_container_traffic
       train_request$EnableManagedSpotTraining = use_spot_instances
+
       if (!is.null(checkpoint_s3_uri)){
         checkpoint_config = list("S3Uri"= checkpoint_s3_uri)
-        checkpoint_config["LocalPath"] = checkpoint_local_path
+        checkpoint_config[["LocalPath"]] = checkpoint_local_path
         train_request$CheckpointConfig = checkpoint_config
       }
       train_request$DebugRuleConfigurations = debugger_rule_configs
