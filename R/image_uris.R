@@ -90,7 +90,7 @@ ImageUris = R6Class("ImageUris",
       )
 
       if(framework == private$HUGGING_FACE_FRAMEWORK){
-        pt_or_tf_version = private$.str_match(instance_type, "^(pytorch|tensorflow)(.*)$")
+        pt_or_tf_version = private$.str_match(base_framework_version, "^(pytorch|tensorflow)(.*)$")[[3]]
         tag_prefix = sprintf("%s-transformers%s", pt_or_tf_version, original_version)
       } else {
         tag_prefix = version_config[["tag_prefix"]] %||% version
@@ -346,7 +346,7 @@ ImageUris = R6Class("ImageUris",
         processor = if(instance_type == "local") "cpu" else "gpu"
       } else {
         # looks for either "ml.<family>.<size>" or "ml_<family>"
-        match = private$.str_match(instance_type, "^ml[\\._]([a-z0-9]+)\\.?\\w*$")[2]
+        match = private$.str_match(instance_type, "^ml[\\._]([a-z0-9]+)\\.?\\w*$")[[2]]
         if (length(match) != 0){
           family = match
 
