@@ -126,7 +126,7 @@ HuggingFace = R6Class("HuggingFace",
           instance_type=instance_type,
           framework_name=base_framework_name,
           framework_version=base_framework_version,
-          py_version=self.py_version,
+          py_version=self$py_version,
           distribution=distribution,
           image_uri=image_ur)
 
@@ -281,7 +281,7 @@ HuggingFace = R6Class("HuggingFace",
         }
       }
       init_params[["transformers_version"]] = framework_version
-      init_params[["py_version"]] = py_version
+      init_params = append(init_params, list("py_version"=img_split$py_version))
 
       if (is.null(img_split$framework)){
         # If we were unable to parse the framework name from the image it is not one of our
