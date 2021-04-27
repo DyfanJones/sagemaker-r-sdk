@@ -233,15 +233,20 @@ tar_and_upload_dir <- function(sagemaker_session,
 # - str: If the TensorFlow image is script mode
 framework_name_from_image <- function(image_uri){
   sagemaker_pattern = ECR_URI_PATTERN
-  sagemaker_match = regmatches(image_uri,regexec(ECR_URI_PATTERN,image_uri))[[1]]
+  sagemaker_match = unlist(regmatches(image_uri,regexec(ECR_URI_PATTERN,image_uri)))
   sagemaker_match = sagemaker_match[length(sagemaker_match)]
   if (is.na(sagemaker_match) || length(sagemaker_match) == 0)
     return(list(NULL, NULL, NULL, NULL))
 
   # extract framework, python version and image tag
   # We must support both the legacy and current image name format.
-  name_pattern = "^(?:sagemaker(?:-rl)?-)?(tensorflow|mxnet|chainer|pytorch|scikit-learn|xgboost)(?:-)?(scriptmode|training)?:(.*)-(.*?)-(py2|py3[67]?)$"
-  name_match = regmatches(sagemaker_match,regexec(name_pattern,sagemaker_match))[[1]]
+  name_pattern = paste0(
+    "^(?:sagemaker(?:-rl)?-)?",
+    "(tensorflow|mxnet|chainer|pytorch|scikit-learn|xgboost",
+    "|huggingface-tensorflow|huggingface-pytorch)(?:-)?",
+    "(scriptmode|training)?",
+    ":(.*)-(.*?)-(py2|py3[67]?)(?:.*)$")
+  name_match = unlist(regmatches(sagemaker_match,regexec(name_pattern,sagemaker_match)))
   if (length(name_match) > 0){
     fw_pts = as.list(name_match[-1])
     fw_pts = lapply(fw_pts, function(x) if(x =="") NULL else x)
@@ -250,7 +255,7 @@ framework_name_from_image <- function(image_uri){
   }
 
   legacy_name_pattern = "^sagemaker-(tensorflow|mxnet)-(py2|py3)-(cpu|gpu):(.*)$"
-  legacy_match = regmatches(sagemaker_match,regexec(legacy_name_pattern,sagemaker_match))[[1]]
+  legacy_match = unlist(regmatches(sagemaker_match,regexec(legacy_name_pattern,sagemaker_match)))
   if (length(legacy_match) > 0){
     lg_pts = legacy_match[-1]
     return (list(lg_pts[1], lg_pts[2], lg_pts[4], NULL))
@@ -384,7 +389,12 @@ warn_if_parameter_server_with_multi_gpu <- function(training_instance_type, dist
 #             multiple strategies are requested simultaneously or
 #             an unsupported strategy is requested or
 #             strategy-specific inputs are incorrect/unsupported
-validate_smdistributed <- function(instance_type, framework_name, framework_version, py_version, distribution, image_uri=NULL){
+validate_smdistributed <- function(instance_type,
+                                   framework_name,
+                                   framework_version,
+                                   py_version,
+                                   distribution,
+                                   image_uri=NULL){
   if (!("smdistributed" %in% names(distribution))){
     # Distribution strategy other than smdistributed is selected
     return(NULL)

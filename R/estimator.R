@@ -156,6 +156,8 @@ EstimatorBase = R6Class("EstimatorBase",
     #'              ``disable_profiler`` parameter to ``True``.
     #' @param disable_profiler (bool): Specifies whether Debugger monitoring and profiling
     #'              will be disabled (default: ``False``).
+    #' @param environment (dict[str, str]) : Environment variables to be set for
+    #'              use during training job (default: ``None``)
     #' @param ... : update any deprecated parameters passed into class.
     initialize = function(role,
                           instance_count,
@@ -186,6 +188,7 @@ EstimatorBase = R6Class("EstimatorBase",
                           enable_network_isolation = FALSE,
                           profiler_config=NULL,
                           disable_profiler=FALSE,
+                          environment=NULL,
                           ...) {
 
       kwargs = list(...)
@@ -272,6 +275,11 @@ EstimatorBase = R6Class("EstimatorBase",
       self$profiler_config = profiler_config
       self$disable_profiler = disable_profiler
 
+      self$environment = environment
+
+      if (!.region_supports_profiler(self$sagemaker_session$paws_region_name)){
+        self$disable_profiler = TRUE
+      }
       self$profiler_rule_configs = NULL
       self$profiler_rules = NULL
       self$debugger_rules = NULL
@@ -1058,7 +1066,7 @@ EstimatorBase = R6Class("EstimatorBase",
 
     # Prepare debugger rules and debugger configs for training.
     .prepare_debugger_for_training = function(){
-      if (!islistempty(self$debugger_rules) && is.null(self.debugger_hook_config)){
+      if (!is.null(self$debugger_rules) && is.null(self$debugger_hook_config)){
         self$debugger_hook_config = DebuggerHookConfig$new(s3_output_path=self$output_path)
       }
       # If debugger_hook_config was provided without an S3 URI, default it for the customer.
@@ -1232,6 +1240,7 @@ EstimatorBase = R6Class("EstimatorBase",
       train_args$tags = self$tags
       train_args$metric_definitions = self$metric_definitions
       train_args$experiment_config = experiment_config
+      train_args$environment = self$environment
 
       if (inherits(inputs, "TrainingInputs")){
         if ("InputMode" %in% names(inputs$config)){
@@ -1581,6 +1590,8 @@ Estimator = R6Class("Estimator",
     #'              ``disable_profiler`` parameter to ``True``.
     #' @param disable_profiler (bool): Specifies whether Debugger monitoring and profiling
     #'              will be disabled (default: ``False``).
+    #' @param environment (dict[str, str]) : Environment variables to be set for
+    #'              use during training job (default: ``None``)
     #' @param ... : additional arguements for parent class `EstimatorBase`.
     initialize = function(image_uri,
                           role,
@@ -1613,6 +1624,7 @@ Estimator = R6Class("Estimator",
                           enable_sagemaker_metrics=NULL,
                           profiler_config=NULL,
                           disable_profiler=FALSE,
+                          environment=NULL,
                           ...){
 
       self$image_uri = image_uri
@@ -1647,6 +1659,7 @@ Estimator = R6Class("Estimator",
         enable_network_isolation=enable_network_isolation,
         profiler_config=profiler_config,
         disable_profiler=disable_profiler,
+        environment=environment,
         ...)
       attr(self, "__module__") = environmentName(Estimator$parent_env)
     },
@@ -2017,7 +2030,7 @@ Framework = R6Class("Framework",
         return (self$image_uri)
 
       if (!is.null(self$tensorflow_version) || !is.null(self$pytorch_version)){
-        processor = ImageUris$new()$.__enclos_env__$.processor(self$instance_type, list("cpu", "gpu"))
+        processor = ImageUris$new()$.__enclos_env__$private$.processor(self$instance_type, list("cpu", "gpu"))
         container_version = if ( processor == "gpu")"cu110-ubuntu18.04"  else NULL
         if (!is.null(self$tensorflow_version)){
           base_framework_version = sprintf(

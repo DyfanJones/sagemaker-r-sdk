@@ -91,6 +91,7 @@ Initialize an ``EstimatorBase`` instance.
   enable_network_isolation = FALSE,
   profiler_config = NULL,
   disable_profiler = FALSE,
+  environment = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -253,6 +254,9 @@ monitoring and profiling, set the
 
 \item{\code{disable_profiler}}{(bool): Specifies whether Debugger monitoring and profiling
 will be disabled (default: ``False``).}
+
+\item{\code{environment}}{(dict[str, str]) : Environment variables to be set for
+use during training job (default: ``None``)}
 
 \item{\code{...}}{: update any deprecated parameters passed into class.}
 }
