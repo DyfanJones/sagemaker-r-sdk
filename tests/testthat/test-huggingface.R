@@ -238,37 +238,66 @@ test_that("test huggingface",{
   }
 })
 
-# test_that("test attach", {
-#   training_image = sprintf(paste0(
-#     "1.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-training:%s-",
-#     f"transformers{huggingface_training_version}-gpu-py36-cu110-ubuntu18.04"
-#   )
-#   returned_job_description = {
-#     "AlgorithmSpecification": {"TrainingInputMode": "File", "TrainingImage": training_image},
-#     "HyperParameters": {
-#       "sagemaker_submit_directory": '"s3://some/sourcedir.tar.gz"',
-#       "sagemaker_program": '"iris-dnn-classifier.py"',
-#       "sagemaker_s3_uri_training": '"sagemaker-3/integ-test-data/tf_iris"',
-#       "sagemaker_container_log_level": '"logging.INFO"',
-#       "sagemaker_job_name": '"neo"',
-#       "training_steps": "100",
-#       "sagemaker_region": '"us-east-1"',
-#     },
-#     "RoleArn": "arn:aws:iam::366:role/SageMakerRole",
-#     "ResourceConfig": {
-#       "VolumeSizeInGB": 30,
-#       "InstanceCount": 1,
-#       "InstanceType": "ml.c4.xlarge",
-#     },
-#     "StoppingCondition": {"MaxRuntimeInSeconds": 24 * 60 * 60},
-#     "TrainingJobName": "neo",
-#     "TrainingJobStatus": "Completed",
-#     "TrainingJobArn": "arn:aws:sagemaker:us-west-2:336:training-job/neo",
-#     "OutputDataConfig": {"KmsKeyId": "", "S3OutputPath": "s3://place/output/neo"},
-#     "TrainingJobOutput": {"S3TrainingJobOutput": "s3://here/output.tar.gz"},
-#   }
-#   sagemaker_session.sagemaker_client.describe_training_job = Mock(
-#     name="describe_training_job", return_value=returned_job_description
-#   )
-# })
+test_that("test attach", {
+  training_image = sprintf(paste0(
+    "1.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-training:%s-",
+    "transformers%s-gpu-py36-cu110-ubuntu18.04"),
+    huggingface_pytorch_version, huggingface_training_version)
+
+  returned_job_description = list(
+    "AlgorithmSpecification"=list("TrainingInputMode"="File", "TrainingImage"=training_image),
+    "HyperParameters"=list(
+      "sagemaker_submit_directory"='s3://some/sourcedir.tar.gz',
+      "sagemaker_program"='iris-dnn-classifier.py',
+      "sagemaker_s3_uri_training"='sagemaker-3/integ-test-data/tf_iris',
+      "sagemaker_container_log_level"='INFO',
+      "sagemaker_job_name"='neo',
+      "training_steps"="100",
+      "sagemaker_region"='us-east-1'),
+    "RoleArn"="arn:aws:iam::366:role/SageMakerRole",
+    "ResourceConfig"=list(
+      "VolumeSizeInGB"=30,
+      "InstanceCount"=1,
+      "InstanceType"="ml.c4.xlarge"),
+    "StoppingCondition"=list("MaxRuntimeInSeconds"=24 * 60 * 60),
+    "TrainingJobName"="neo",
+    "TrainingJobStatus"="Completed",
+    "TrainingJobArn"="arn:aws:sagemaker:us-west-2:336:training-job/neo",
+    "OutputDataConfig"=list("KmsKeyId"="", "S3OutputPath"="s3://place/output/neo"),
+    "TrainingJobOutput"=list("S3TrainingJobOutput"="s3://here/output.tar.gz")
+  )
+
+  sm = sagemaker_session$clone(TRUE)
+  sm$sagemaker$describe_training_job = Mock$new()$return_value(
+    returned_job_description
+  )
+
+  hf=HuggingFace$new(
+    py_version="py36",
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    transformers_version=huggingface_training_version,
+    pytorch_version=huggingface_pytorch_version,
+    enable_sagemaker_metrics=FALSE
+  )
+
+  estimator = hf$attach(training_job_name="neo", sagemaker_session=sm)
+  expect_equal(estimator$latest_training_job, "neo")
+  expect_equal(estimator$py_version, "py36")
+  expect_equal(estimator$framework_version, huggingface_training_version)
+  expect_equal(estimator$pytorch_version, huggingface_pytorch_version)
+  expect_equal(estimator$role, "arn:aws:iam::366:role/SageMakerRole")
+  expect_equal(estimator$instance_count, 1)
+  expect_equal(estimator$max_run, 24 * 60 * 60)
+  expect_equal(estimator$input_mode, "File")
+  expect_equal(estimator$base_job_name, "neo")
+  expect_equal(estimator$output_path, "s3://place/output/neo")
+  expect_equal(estimator$output_kms_key,"")
+  expect_equal(estimator$hyperparameters()[["training_steps"]], "100")
+  expect_equal(estimator$source_dir, "s3://some/sourcedir.tar.gz")
+  expect_equal(estimator$entry_point, "iris-dnn-classifier.py")
+})
 
