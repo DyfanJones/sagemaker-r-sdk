@@ -137,7 +137,13 @@ HuggingFace = R6Class("HuggingFace",
       if (!("enable_sagemaker_metrics" %in% names(kwargs)))
         kwargs[["enable_sagemaker_metrics"]] = TRUE
 
-      kwargs = c(entry_point, source_dir, hyperparameters, image_uri=image_uri, kwargs)
+      kwargs = c(
+        entry_point=entry_point,
+        source_dir=source_dir,
+        hyperparameters=list(hyperparameters),
+        image_uri=image_uri,
+        kwargs)
+
       do.call(super$initialize, kwargs)
 
       self$distribution = distribution %||% list()
@@ -264,11 +270,11 @@ HuggingFace = R6Class("HuggingFace",
         fmwk = split_str(img_split$framework,"-")
         names(fmwk) = c("framework", "pt_or_tf")
         tag_pattern = "^(.*)-transformers(.*)-(cpu|gpu)-(py2|py3[67]?)$"
-        m = regexec(tag_pattern, tag)
-        tag_match = unlist(regmatches(tag, m))
+        m = regexec(tag_pattern, img_split$tag)
+        tag_match = unlist(regmatches(img_split$tag, m))
         pt_or_tf_version = tag_match[2]
         framework_version = tag_match[3]
-        if (fmwk$pt_or_tf == "pytorch"){
+        if (fmwk[["pt_or_tf"]] == "pytorch"){
           init_params[["pytorch_version"]] = pt_or_tf_version
         } else {
           init_params[["tensorflow_version"]] = pt_or_tf_version
@@ -283,7 +289,7 @@ HuggingFace = R6Class("HuggingFace",
         init_params[["image_uri"]] = image_uri
         return(init_params)
       }
-      if (img_split$framework != attr(self, "_framework_name"))
+      if (fmwk[["framework"]] != attr(self, "_framework_name"))
         ValueError$new(
           sprintf("Training job: %s didn't use image for requested framework",
             job_details[["TrainingJobName"]])
