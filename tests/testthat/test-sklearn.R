@@ -100,8 +100,8 @@ sagemaker_session$call_args("compile_model")
     "experiment_config"= NULL,
     "image_uri"= .get_full_cpu_image_uri(version),
     "debugger_hook_config"= list(
-      "CollectionConfigurations"= list(),
-      "S3OutputPath"= sprintf("s3://%s/",BUCKET_NAME)),
+      "S3OutputPath"= sprintf("s3://%s/",BUCKET_NAME),
+      "CollectionConfigurations"= list()),
     "profiler_rule_configs"=list(list(
         "RuleConfigurationName"="ProfilerReport-[0-9]+",
         "RuleEvaluatorImage"="895741380848.dkr.ecr.us-west-2.amazonaws.com/sagemaker-debugger-rules:latest",
@@ -285,7 +285,6 @@ test_that("test sklearn", {
   expected_train_args = .create_train_job(sklearn_version)
   expected_train_args$input_config[[1]]$DataSource$S3DataSource$S3Uri = inputs
   expected_train_args$experiment_config = EXPERIMENT_CONFIG
-  expected_train_args$debugger_hook_config = NULL
 
   actual_train_args = sagemaker_session$train()$.call_args
 
