@@ -229,7 +229,7 @@ test_that("test huggingface",{
 
   expect_true(grepl(exp_RuleConfigurationName, act_RuleConfigurationName))
 
-  for (i in l_name){
+  for (i in names(expected_train_args)){
     if(i != "job_name") {
       expect_identical(expected_train_args[[i]], actual_train_args[[i]])
     } else {
@@ -239,6 +239,9 @@ test_that("test huggingface",{
 })
 
 test_that("test attach", {
+  huggingface_pytorch_version = "1.6"
+  huggingface_training_version = "4.4"
+
   training_image = sprintf(paste0(
     "1.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-training:%s-",
     "transformers%s-gpu-py36-cu110-ubuntu18.04"),
@@ -301,3 +304,51 @@ test_that("test attach", {
   expect_equal(estimator$entry_point, "iris-dnn-classifier.py")
 })
 
+
+test_that("test attach custom image", {
+  huggingface_training_version = "4.4"
+  huggingface_pytorch_version = "1.6"
+  training_image = "pytorch:latest"
+  returned_job_description = list(
+    "AlgorithmSpecification"=list("TrainingInputMode"="File", "TrainingImage"=training_image),
+    "HyperParameters"=list(
+      "sagemaker_submit_directory"='s3://some/sourcedir.tar.gz',
+      "sagemaker_program"='iris-dnn-classifier.py',
+      "sagemaker_s3_uri_training"='sagemaker-3/integ-test-data/tf_iris',
+      "sagemaker_container_log_level"='INFO',
+      "sagemaker_job_name"='neo',
+      "training_steps"="100",
+      "sagemaker_region"='us-east-1'),
+    "RoleArn"="arn:aws:iam::366:role/SageMakerRole",
+    "ResourceConfig"=list(
+      "VolumeSizeInGB"=30,
+      "InstanceCount"=1,
+      "InstanceType"="ml.c4.xlarge"),
+    "StoppingCondition"=list("MaxRuntimeInSeconds"=24 * 60 * 60),
+    "TrainingJobName"="neo",
+    "TrainingJobStatus"="Completed",
+    "TrainingJobArn"="arn:aws:sagemaker:us-west-2:336:training-job/neo",
+    "OutputDataConfig"=list("KmsKeyId"="", "S3OutputPath"="s3://place/output/neo"),
+    "TrainingJobOutput"=list("S3TrainingJobOutput"="s3://here/output.tar.gz")
+  )
+  sm = sagemaker_session$clone(TRUE)
+  sm$sagemaker$describe_training_job = Mock$new()$return_value(
+    returned_job_description)
+
+  hf=HuggingFace$new(
+    py_version="py36",
+    entry_point=SCRIPT_PATH,
+    role=ROLE,
+    sagemaker_session=sagemaker_session,
+    instance_count=INSTANCE_COUNT,
+    instance_type=INSTANCE_TYPE,
+    transformers_version=huggingface_training_version,
+    pytorch_version=huggingface_pytorch_version,
+    enable_sagemaker_metrics=FALSE
+  )
+
+  estimator = hf$attach(training_job_name="neo", sagemaker_session=sm)
+
+  expect_equal(estimator$latest_training_job, "neo")
+  expect_equal(estimator$image_uri, training_image)
+})
