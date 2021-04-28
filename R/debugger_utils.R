@@ -1,7 +1,8 @@
 
+#' @include utils.R
+
 # Store all possible messages during failures in validation of user arguments.
-ErrorMessages = R6Class("ErrorMessages",
-  public = list(
+ErrorMessages = Enum(
     INVALID_LOCAL_PATH = "local_path must be a string!",
     INVALID_FILE_MAX_SIZE = "file_max_size must be an integer greater than 0!",
     INVALID_FILE_CLOSE_INTERVAL = "file_close_interval must be a float/integer greater than 0!",
@@ -15,39 +16,26 @@ ErrorMessages = R6Class("ErrorMessages",
     INVALID_METRICS_REGEX = "metrics_regex is invalid!",
     INVALID_PYTHON_PROFILER = "python_profiler must be of type PythonProfiler!",
     INVALID_CPROFILE_TIMER = "cprofile_timer must be of type cProfileTimer"
-  )
 )
 
-# List the Python profiler options for Python profiling.
-# .. py:attribute:: CPROFILE
-# Use to choose ``"cProfile"``.
-# .. py:attribute:: PYINSTRUMENT
-# Use to choose ``"Pyinstrument"``.
-PythonProfiler = R6Class("PythonProfiler",
-  public = list(
-    CPROFILE = "cprofile",
-    PYINSTRUMENT = "pyinstrument",
-    print = function(...){
-      return(print_class(self))
-    }
-  )
+#' @title PythonProfiler enum environment list
+#' @description List the Python profiler options for Python profiling.
+#' @return environment containing [CPROFILE, PYINSTRUMENT]
+#' @export
+PythonProfiler = Enum(
+  CPROFILE = "cprofile",
+  PYINSTRUMENT = "pyinstrument",
+  .class = "PythonProfiler"
 )
 
-# List the possible cProfile timers for Python profiling.
-# .. py:attribute:: TOTAL_TIME
-# Use to choose ``"total_time"``.
-# .. py:attribute:: CPU_TIME
-# Use to choose ``"cpu_time"``.
-# .. py:attribute:: OFF_CPU_TIME
-# Use to choose ``"off_cpu_time"``.
-cProfileTimer = R6Class("cProfileTimer",
-  public =list(
-    TOTAL_TIME = "total_time",
-    CPU_TIME = "cpu_time",
-    OFF_CPU_TIME = "off_cpu_time",
-    DEFAULT = "default",
-    print = function(...){
-      return(print_class(self))
-    }
-  )
+#' @title cProfileTimer enum environment list
+#' @description List the possible cProfile timers for Python profiling.
+#' @return environment containing [TOTAL_TIME, CPU_TIME, OFF_CPU_TIME, DEFAULT]
+#' @export
+cProfileTimer = Enum(
+  TOTAL_TIME = "total_time",
+  CPU_TIME = "cpu_time",
+  OFF_CPU_TIME = "off_cpu_time",
+  DEFAULT = "default",
+  .class = "cProfileTimer"
 )
