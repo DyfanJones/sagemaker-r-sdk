@@ -458,3 +458,18 @@ retries <- function(max_retry_count,
   }
 }
 
+Enum <- function(...) {
+  kwargs = list(...)
+  env = list2env(kwargs, parent = emptyenv())
+  lockEnvironment(env, bindings = TRUE)
+  class(env) <- c("Enum", "environment")
+  return(env)
+}
+
+print.Enum <- function(env){
+  l_env = as.list(env)
+  values = paste(names(env), shQuote(unname(l_env)), sep = ": ")
+  cat(sprintf("<Enum environment: %s>\n", data.table::address(env)))
+  cat("Values:\n")
+  cat(paste("  -", values, collapse = "\n"))
+}
