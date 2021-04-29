@@ -121,7 +121,7 @@ TensorFlow = R6Class("TensorFlow",
       kwargs = c(image_uri = image_uri,
                  kwargs)
       do.call(super$initialize, kwargs)
-      super$initialize(image_uri=image_uri, ...)
+
       self$model_dir = model_dir
       self$distribution = distribution %||% list()
 
