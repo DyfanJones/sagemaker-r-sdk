@@ -99,11 +99,11 @@ RLEstimator = R6Class("RLEstimator",
     #'              reinforcement learning training.
     #' @param source_dir (str): Path (absolute, relative or an S3 URI) to a directory
     #'              with any other training source code dependencies aside from the entry
-    #'              point file (default: None). If ``source_dir`` is an S3 URI, it must
+    #'              point file (default: NULL). If ``source_dir`` is an S3 URI, it must
     #'              point to a tar.gz file. Structure within this directory are preserved
     #'              when training on Amazon SageMaker.
     #' @param hyperparameters (dict): Hyperparameters that will be used for
-    #'              training (default: None). The hyperparameters are made
+    #'              training (default: NULL). The hyperparameters are made
     #'              accessible as a dict[str, str] to the training code on
     #'              SageMaker. For convenience, this accepts other types for keys
     #'              and values.
@@ -135,18 +135,19 @@ RLEstimator = R6Class("RLEstimator",
                           ...){
       private$.validate_images_args(toolkit, toolkit_version, framework, image_uri)
 
-      if (is.null(image_uri))
+      if (is.null(image_uri)){
         private$.validate_toolkit_support(toolkit, toolkit_version, framework)
-      self$toolkit = toolkit
-      self$toolkit_version = toolkit_version
-      self$framework = framework
-      self$framework_version = TOOLKIT_FRAMEWORK_VERSION_MAP[[self$toolkit]][[
-        self$toolkit_version
-      ]][[self$framework]]
+        self$toolkit = toolkit
+        self$toolkit_version = toolkit_version
+        self$framework = framework
+        self$framework_version = TOOLKIT_FRAMEWORK_VERSION_MAP[[self$toolkit]][[
+          self$toolkit_version
+        ]][[self$framework]]
 
-      # set default metric_definitions based on the toolkit
-      if (is.null(metric_definitions))
-        metric_definitions = self$default_metric_definitions(toolkit)
+        # set default metric_definitions based on the toolkit
+        if (is.null(metric_definitions))
+          metric_definitions = self$default_metric_definitions(toolkit)
+      }
 
       super$initialize(
         entry_point,
@@ -191,7 +192,7 @@ RLEstimator = R6Class("RLEstimator",
     #'                                  MXNet is used as the RL backend;
     #'              * :class:`~sagemaker.tensorflow.model.TensorFlowModel` - if ``image_uri`` isn't
     #'              specified and TensorFlow is used as the RL backend.
-    create_model = function(role=None,
+    create_model = function(role=NULL,
                             vpc_config_override="VPC_CONFIG_DEFAULT",
                             entry_point=NULL,
                             source_dir=NULL,
@@ -208,7 +209,7 @@ RLEstimator = R6Class("RLEstimator",
 
       base_args[["name"]] = private$.get_or_create_name(kwargs[["name"]])
 
-      if (is.null(entry_point) && (!is.null(source_dir) || is.null(dependencies)))
+      if (is.null(entry_point) && (!is.null(source_dir) || !is.null(dependencies)))
         AttributeError$new("Please provide an `entry_point`.")
 
       entry_point = entry_point %||% private$.model_entry_point()
@@ -221,7 +222,7 @@ RLEstimator = R6Class("RLEstimator",
         code_location=self$code_location,
         dependencies=dependencies
       )
-      extended_args = modifyList(extended_args, base_args)
+      extended_args = modifyList(base_args, extended_args)
 
       if (!is.null(self$image_uri))
         return(do.call(FrameworkModel$new, extended_args))
@@ -351,18 +352,20 @@ RLEstimator = R6Class("RLEstimator",
     },
 
     .validate_framework_format = function(framework){
-      if (!is.null(framework) && !(framework %in% names(RLFramework)))
+      rl_framework = unname(as.list(RLFramework))
+      if (!is.null(framework) && !(framework %in% rl_framework))
         ValueError$new(sprintf(
           "Invalid type: %s, valid RL frameworks types are: %s",
-          framework, paste(names(RLFramework), collapse = ", "))
+          framework, paste(rl_framework, collapse = ", "))
         )
     },
 
     .validate_toolkit_format = function(toolkit){
-      if (!is.null(toolkit) && !(toolkit %in% names(RLToolkit)))
+      rl_toolkit = unname(as.list(RLToolkit))
+      if (!is.null(toolkit) && !(toolkit %in% rl_toolkit))
         ValueError$new(sprintf(
           "Invalid type: %s, valid RL toolkits types are: %s",
-          toolkit, paste(names(RLToolkit), collapse = ", "))
+          toolkit, paste(rl_toolkit, collapse = ", "))
         )
     },
 
@@ -425,7 +428,7 @@ RLEstimator = R6Class("RLEstimator",
 
     # Toolkit name and framework name for retrieving Docker image URI config.
     .image_framework = function(){
-      return(paste(self$toolkit, self$framework, collapse = "-"))
+      return(paste(self$toolkit, self$framework, sep = "-", collapse = "-"))
     }
   ),
   lock_objects = F
