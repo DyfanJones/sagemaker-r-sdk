@@ -234,8 +234,8 @@ RLEstimator = R6Class("RLEstimator",
           " in the TrainingJob output.")
 
       if (self$framework == RLFramework$TENSORFLOW){
-        base_args = c(framework_version=self$framework_version, base_args)
-        return(do.call(TensorFlowModel$new, base_args))}
+        extended_args = c(framework_version=self$framework_version, extended_args)
+        return(do.call(TensorFlowModel$new, extended_args))}
       if (self$framework == RLFramework$MXNET){
         extended_args = c(framework_version=self$framework_version, py_version=RL_PYTHON_VERSION, extended_args)
         return(do.call(MXNetModel$new, extended_args))
@@ -326,26 +326,26 @@ RLEstimator = R6Class("RLEstimator",
         init_params[["image_uri"]] = image_uri
         return(init_params)
       }
-      ll_tag = private$.toolkit_and_version_from_tag(tag)
+      ll_tag = private$.toolkit_and_version_from_tag(img_split$tag)
       names(ll_tag) <- c("toolkit", "toolkit_version")
 
-      if (!private$.is_combination_supported(toolkit, toolkit_version, framework))
+      if (!private$.is_combination_supported(ll_tag$toolkit, ll_tag$toolkit_version, img_split$framework))
         ValueError$new(sprintf(
           "Training job: %s didn't use image for requested framework",
             job_details[["TrainingJobName"]])
           )
 
-      init_params[["toolkit"]] = RLToolkit[[toolkit]]
-      init_params[["toolkit_version"]] = toolkit_version
-      init_params[["framework"]] = RLFramework[[framework]]
+      init_params[["toolkit"]] = ll_tag$toolkit
+      init_params[["toolkit_version"]] = ll_tag$toolkit_version
+      init_params[["framework"]] = img_split$framework
 
       return(init_params)
     },
 
     .toolkit_and_version_from_tag = function(image_tag){
       tag_pattern = "^([A-Z]*|[a-z]*)(\\d.*)-(cpu|gpu)-(py2|py3)$"
-      m = regexec(tag_pattern, img_split$tag)
-      tag_match = unlist(regmatches(img_split$tag, m))
+      m = regexec(tag_pattern, image_tag)
+      tag_match = unlist(regmatches(image_tag, m))
       if (length(tag_match) > 0)
         return(list(tag_match[[2]], tag_match[[3]]))
       return(list(NULL, NULL))
@@ -408,11 +408,12 @@ RLEstimator = R6Class("RLEstimator",
     .is_combination_supported = function(toolkit,
                                          toolkit_version,
                                          framework){
-      supported_versions = TOOLKIT_FRAMEWORK_VERSION_MAP[[toolkit]]
-      if (!is.null(supported_versions))
+      supported_versions = if(is.null(toolkit)) NULL else TOOLKIT_FRAMEWORK_VERSION_MAP[[toolkit]]
+      if (!is.null(supported_versions)){
         supported_frameworks = supported_versions[[toolkit_version]]
         if (!is.null(supported_frameworks) && !is.null(supported_frameworks[[framework]]))
           return(TRUE)
+      }
       return(FALSE)
     },
 
