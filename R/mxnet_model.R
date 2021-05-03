@@ -95,8 +95,12 @@ MXNetModel = R6Class("MXNetModel",
       self$py_version = py_version
 
       super$initialize(
-        model_data, image_uri, role, entry_point, predictor_cls=predictor_cls, ...
-      )
+        model_data=model_data,
+        image_uri=image_uri,
+        role=role,
+        entry_point=entry_point,
+        predictor_cls=predictor_cls,
+        ...)
 
       self$model_server_workers = model_server_workers
       attr(self, "_framework_name") = "mxnet"

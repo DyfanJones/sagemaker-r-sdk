@@ -1060,6 +1060,7 @@ CollectionConfig = R6Class("CollectionConfig",
 # Equal method override.
 # Args:
 #   other: Object to test equality against.
+#' @export
 `==.CollectionConfig` <- function(self, other){
   if (!inherits(other, "CollectionConfig"))
     stop("CollectionConfig is only comparable with other CollectionConfig objects.",
@@ -1081,6 +1082,7 @@ CollectionConfig = R6Class("CollectionConfig",
 # Not-equal method override.
 # Args:
 #   other: Object to test equality against.
+#' @export
 `!=.CollectionConfig` <- function(self, other){
   if (!inherits(other, "CollectionConfig"))
     stop("CollectionConfig is only comparable with other CollectionConfig objects.",

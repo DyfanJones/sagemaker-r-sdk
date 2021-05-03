@@ -45,8 +45,8 @@ Choose a Python profiler: cProfile or Pyinstrument.
   start_unix_time = NULL,
   duration = NULL,
   profile_default_steps = FALSE,
-  python_profiler = PythonProfiler$public_fields$CPROFILE,
-  cprofile_timer = cProfileTimer$public_fields$TOTAL_TIME
+  python_profiler = PythonProfiler$CPROFILE,
+  cprofile_timer = cProfileTimer$TOTAL_TIME
 )}\if{html}{\out{</div>}}
 }
 

@@ -110,22 +110,22 @@ MetricsConfigBase = R6Class("MetricsConfigBase",
       self$name = name
 
       if(!is.null(start_step) || !(inherits(start_step, "integer") && start_step >= 0))
-        stop(ErrorMessages$public_fields$INVALID_START_STEP, call. = F)
+        stop(ErrorMessages$INVALID_START_STEP, call. = F)
 
       if(!is.null(num_steps) || !(inherits(num_steps, "integer") && num_steps > 0))
-        stop(ErrorMessages$public_fields$INVALID_NUM_STEPS, call. = F)
+        stop(ErrorMessages$INVALID_NUM_STEPS, call. = F)
 
       if(!is.null(start_unix_time) || inherits(start_unix_time, "integer"))
-        stop(ErrorMessages$public_fields$INVALID_START_UNIX_TIME, call. = F)
+        stop(ErrorMessages$INVALID_START_UNIX_TIME, call. = F)
 
       if(!is.null(duration) || !(inherits(duration, c("numeric", "integer")) && duration > 0))
-        stop(ErrorMessages$public_fields$INVALID_DURATION, call. = F)
+        stop(ErrorMessages$INVALID_DURATION, call. = F)
 
       has_step_range = (!is.null(start_step) || !is.null(num_steps))
       has_time_range = (!is.null(start_unix_time) || !is.null(duration))
 
       if(has_step_range && has_time_range)
-        stop(ErrorMessages$public_fields$FOUND_BOTH_STEP_AND_TIME_FIELDS, call. = F)
+        stop(ErrorMessages$FOUND_BOTH_STEP_AND_TIME_FIELDS, call. = F)
 
       self$range = if (has_step_range) StepRange$new(start_step, num_steps) else TimeRange$new(start_unix_time, duration)
     },
@@ -183,7 +183,7 @@ DetailedProfilingConfig = R6Class("DetailedProfilingConfig",
                           duration=NULL,
                           profile_default_steps=FALSE){
       if(!inherits(profile_default_steps, "logical"))
-        stop(ErrorMessages$public_fields$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
+        stop(ErrorMessages$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
 
       if (profile_default_steps || (is.null(start_step) && is.null(num_steps) && is.null(start_unix_time) && is.null(duration))){
         start_step = DETAILED_PROFILING_START_STEP_DEFAULT
@@ -223,7 +223,7 @@ DataloaderProfilingConfig = R6Class("DataloaderProfilingConfig",
                           metrics_regex=".*"){
 
       if(!inherits(profile_default_steps, "logical"))
-        stop(ErrorMessages$public_fields$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
+        stop(ErrorMessages$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
 
       if (profile_default_steps || (is.null(start_step) && is.null(num_steps) && is.null(start_unix_time) && is.null(duration))){
         start_step = DETAILED_PROFILING_START_STEP_DEFAULT
@@ -235,7 +235,7 @@ DataloaderProfilingConfig = R6Class("DataloaderProfilingConfig",
       )
 
       if(!is.character(metrix_regex))
-        stop(ErrorMessages$public_fields$INVALID_METRICS_REGEX, call. = F)
+        stop(ErrorMessages$INVALID_METRICS_REGEX, call. = F)
 
       self$metrics_regex = metrics_regex
     }
@@ -301,11 +301,11 @@ PythonProfilingConfig = R6Class("PythonProfilingConfig",
                          start_unix_time=NULL,
                          duration=NULL,
                          profile_default_steps=FALSE,
-                         python_profiler=PythonProfiler$public_fields$CPROFILE,
-                         cprofile_timer=cProfileTimer$public_fields$TOTAL_TIME){
+                         python_profiler=PythonProfiler$CPROFILE,
+                         cprofile_timer=cProfileTimer$TOTAL_TIME){
 
       if(!inherits(profile_default_steps, "logical"))
-        stop(ErrorMessages$public_fields$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
+        stop(ErrorMessages$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
 
       if (profile_default_steps || (is.null(start_step) && is.null(num_steps) && is.null(start_unix_time) && is.null(duration))){
         start_step = DETAILED_PROFILING_START_STEP_DEFAULT
@@ -313,22 +313,22 @@ PythonProfilingConfig = R6Class("PythonProfilingConfig",
       }
 
       if (profile_default_steps)
-        cprofile_timer = cProfileTimer.DEFAULT
+        cprofile_timer = cProfileTimer$DEFAULT
 
       super$initialize(
         PYTHON_PROFILING_CONFIG_NAME, start_step, num_steps, start_unix_time, duration
         )
 
       if(!inherits(python_profiler, "PythonProfiler"))
-        stop(ErrorMessages$public_fields$INVALID_PYTHON_PROFILER, call. = F)
+        stop(ErrorMessages$INVALID_PYTHON_PROFILER, call. = F)
 
       if(!inherits(cprofile_timer, "cProfileTimer"))
-        stop(ErrorMessages$public_fields$INVALID_CPROFILE_TIMER, call. = F)
+        stop(ErrorMessages$INVALID_CPROFILE_TIMER, call. = F)
 
       self$python_profiler = python_profiler
 
       # The cprofile timer can only be used when the python profiler is cProfile.
-      if (python_profiler == PythonProfiler$public_fields$PYINSTRUMENT)
+      if (python_profiler == PythonProfiler$PYINSTRUMENT)
         self$cprofile_timer = NULL
       else
         self$cprofile_timer = cprofile_timer
@@ -343,9 +343,9 @@ PythonProfilingConfig = R6Class("PythonProfilingConfig",
     #   dict: The python profiling config as a dictionary.
     .to_json = function(){
       python_profiling_config = super$.to_json()
-      python_profiling_config[["ProfilerName"]] = which(self$python_profiler %in% PythonProfiler$public_fields)
+      python_profiling_config[["ProfilerName"]] = which(self$python_profiler %in% names(PythonProfiler))
       if(!is.null(self$cprofile_timer))
-        python_profiling_config[["cProfileTimer"]] = which(self$cprofile_timer %in% cProfileTimer$public_fields)
+        python_profiling_config[["cProfileTimer"]] = which(self$cprofile_timer %in% names(cProfileTimer))
       return(python_profiling_config)
     }
   ),
@@ -375,9 +375,10 @@ HorovodProfilingConfig = R6Class("HorovodProfilingConfig",
                           duration=NULL,
                           profile_default_steps=FALSE){
       if(!inherits(profile_default_steps, "logical"))
-        stop(ErrorMessages$public_fields$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
+        stop(ErrorMessages$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
 
-      if (profile_default_steps || (is.null(start_step) && is.null(num_steps) && is.null(start_unix_time) && is.null(duration))){
+      if (profile_default_steps ||
+          (is.null(start_step) && is.null(num_steps) && is.null(start_unix_time) && is.null(duration))){
         start_step = DETAILED_PROFILING_START_STEP_DEFAULT
         num_steps = PROFILING_NUM_STEPS_DEFAULT
       }
@@ -414,7 +415,7 @@ SMDataParallelProfilingConfig = R6Class("SMDataParallelProfilingConfig",
                           duration=NULL,
                           profile_default_steps=FALSE){
       if(!inherits(profile_default_steps, "logical"))
-        stop(ErrorMessages$public_fields$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
+        stop(ErrorMessages$INVALID_PROFILE_DEFAULT_STEPS, call. = F)
 
       if (profile_default_steps || (is.null(start_step) && is.null(num_steps) && is.null(start_unix_time) && is.null(duration))){
         start_step = DETAILED_PROFILING_START_STEP_DEFAULT

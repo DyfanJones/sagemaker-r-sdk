@@ -59,7 +59,7 @@ TensorFlowPredictor = R6Class("TensorFlowPredictor",
         attributes = c(attributes, sprintf("tfs-model-name=%s",model_name))
       if (!is.null(model_version))
         attributes = c(attributes, sprintf("tfs-model-version=%s",model_version))
-      pirvate$.model_attributes =  if (!islistempty(attributes)) paste(attributes, collapse = ",") else NULL
+      private$.model_attributes =  if (!islistempty(attributes)) paste(attributes, collapse = ",") else NULL
     },
 
     #' @description PlaceHolder
@@ -86,7 +86,7 @@ TensorFlowPredictor = R6Class("TensorFlowPredictor",
     predict = function(data,
                        initial_args=NULL){
       args = if (!islistempty(initial_args)) initial_args else list()
-      if (!islistempty(pirvate$.model_attributes)){
+      if (!islistempty(private$.model_attributes)){
         if ("CustomAttributes" %in% names(args))
           args$CustomAttributes = paste0(args$CustomAttributes, ",", private$.model_attributes)
         else
