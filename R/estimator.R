@@ -1742,7 +1742,7 @@ Estimator = R6Class("Estimator",
       if (!("enable_network_isolation" %in% names(args)))
           args$enable_network_isolation = self$enable_network_isolation()
 
-      return (do.call(Model$new, args))
+      return(do.call(Model$new, args))
     }
   ),
   lock_objects = F
