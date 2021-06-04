@@ -4,7 +4,6 @@
 #' @include deserializers.R
 #' @include serializers.R
 #' @include xgboost_default.R
-#' @include session.R
 
 #' @import R6
 #' @import R6sagemaker.common
@@ -38,7 +37,7 @@ XGBoostPredictor = R6Class("XGBoostPredictor",
 #' @description An XGBoost SageMaker ``Model`` that can be deployed to a SageMaker ``Endpoint``.
 #' @export
 XGBoostModel = R6Class("XGBoostModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @description Initialize an XGBoostModel.

@@ -7,7 +7,7 @@
 A class for interacting with CreateAutoMLJob API.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:.Job]{R6sagemaker::.Job}} -> \code{AutoMLJob}
+\code{\link[R6sagemaker.common:.Job]{R6sagemaker.common::.Job}} -> \code{AutoMLJob}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -23,7 +23,7 @@ A class for interacting with CreateAutoMLJob API.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="stop">}\href{../../R6sagemaker/html/.Job.html#method-stop}{\code{R6sagemaker::.Job$stop()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic=".Job" data-id="stop">}\href{../../R6sagemaker.common/html/.Job.html#method-stop}{\code{R6sagemaker.common::.Job$stop()}}\out{</span>}
 }
 \out{</details>}
 }

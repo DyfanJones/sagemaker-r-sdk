@@ -2,8 +2,6 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/spark/processing.py
 
 #' @include processing.R
-#' @include s3.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -719,13 +717,13 @@ PySparkProcessor = R6Class("PySparkProcessor",
                                          ...){
          kwargs = list(...)
          extended_inputs = private$.handle_script_dependencies(
-            inputs, kwargs$submit_py_files, FileType$new()$PYTHON
+            inputs, kwargs$submit_py_files, FileType$PYTHON
          )
          extended_inputs = private$.handle_script_dependencies(
-            extended_inputs, kwargs$submit_jars, FileType$new()$JAR
+            extended_inputs, kwargs$submit_jars, FileType$JAR
          )
          extended_inputs = private$.handle_script_dependencies(
-            extended_inputs, kwargs$submit_files, FileType$new()$FILE
+            extended_inputs, kwargs$submit_files, FileType$FILE
          )
 
          return(super$.extend_processing_args(extended_inputs, outputs, ...))
@@ -896,10 +894,10 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
             stop("submit_class is required", call. = F)
 
          extended_inputs = private$.handle_script_dependencies(
-            inputs, kwargs$submit_jars, FileType$new()$JAR
+            inputs, kwargs$submit_jars, FileType$JAR
          )
          extended_inputs = private$.handle_script_dependencies(
-            extended_inputs, kwargs$submit_files, FileType$new()$FILE
+            extended_inputs, kwargs$submit_files, FileType$FILE
          )
 
          return(super$.extend_processing_args(extended_inputs, outputs, ...))
@@ -969,10 +967,8 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
 )
 
 # Enum of file type
-FileType = R6Class("FileType",
-   public = list(
+FileType = Enum(
       JAR = 1,
       PYTHON = 2,
       FILE = 3
-   )
 )

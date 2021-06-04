@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/estimator.py
 
-#' @include estimator.R
 #' @include sklearn_model.R
 #' @include r_utils.R
 
@@ -13,7 +12,7 @@
 #' @description Handle end-to-end training and deployment of custom Scikit-learn code.
 #' @export
 SKLearn = R6Class("SKLearn",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @description This ``Estimator`` executes an Scikit-learn script in a managed

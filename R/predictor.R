@@ -2,9 +2,6 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/predictor.py
 
 #' @include r_utils.R
-#' @include model.R
-#' @include session.R
-#' @include analytics.R
 #' @include model_monitor_model_monitoring.R
 #' @include serializers.R
 #' @include deserializers.R

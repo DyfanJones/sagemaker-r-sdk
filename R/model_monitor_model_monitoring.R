@@ -2,8 +2,6 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/model_monitoring.py
 
 #' @include r_utils.R
-#' @include s3.R
-#' @include session.R
 
 #' @import R6
 #' @import R6sagemaker.common

@@ -1,9 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pipeline.py
 
-#' @include session.R
 #' @include r_utils.R
-#' @include transformer.R
 
 #' @import R6
 #' @import R6sagemaker.common

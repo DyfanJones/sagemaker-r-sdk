@@ -6,8 +6,6 @@
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -252,7 +250,7 @@ LDAPredictor = R6Class("LDAPredictor",
 #'              Predictor that transforms vectors to a lower-dimensional representation.
 #' @export
 LDAModel = R6Class("LDAModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize LDAModel class

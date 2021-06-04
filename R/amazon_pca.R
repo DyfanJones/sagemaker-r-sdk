@@ -6,8 +6,6 @@
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -251,7 +249,7 @@ PCAPredictor = R6Class("PCAPredictor",
 #'              Predictor that transforms vectors to a lower-dimensional representation.
 #' @export
 PCAModel = R6Class("PCAModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description initialize PCAModel Class

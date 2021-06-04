@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/model.py
 
-#' @include s3.R
 #' @include r_utils.R
 #' @include deserializers.R
 #' @include predictor.R
@@ -117,7 +116,7 @@ TensorFlowPredictor = R6Class("TensorFlowPredictor",
 #' @description A ``FrameworkModel`` implementation for inference with TensorFlow Serving.
 #' @export
 TensorFlowModel = R6Class("TensorFlowModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @field LOG_LEVEL_PARAM_NAME

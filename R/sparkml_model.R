@@ -1,9 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sparkml/model.py
 
-#' @include model.R
 #' @include predictor.R
-#' @include session.R
 #' @include serializers.R
 #' @include r_utils.R
 
@@ -59,7 +57,7 @@ SparkMLPredictor = R6Class("SparkMLPredictor",
 #'              model .
 #' @export
 SparkMLModel = R6Class("SparkMLModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize a SparkMLModel.

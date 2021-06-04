@@ -1,13 +1,9 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/workflow/airflow.py
 
-#' @include job.R
 #' @include r_utils.R
-#' @include s3.R
-#' @include session.R
 #' @include amazon_estimator.R
 #' @include tensorflow_estimator.R
-#' @include model.R
 
 #' @import R6
 #' @import R6sagemaker.common

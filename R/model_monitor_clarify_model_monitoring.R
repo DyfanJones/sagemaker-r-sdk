@@ -1,8 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/clarify_model_monitoring.py
 
-#' @include session.R
-#' @include s3.R
 #' @include r_utils.R
 #' @include clarify.R
 #' @include model_monitor_model_monitoring.R
@@ -748,11 +746,9 @@ BiasAnalysisConfig = R6Class("BiasAnalysisConfig",
       return(self$analysis_config)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   )
 )
@@ -1129,11 +1125,9 @@ ExplainabilityAnalysisConfig = R6Class("ExplainabilityAnalysisConfig",
       return(self$analysis_config)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   )
 )
@@ -1190,11 +1184,9 @@ ClarifyBaseliningConfig = R6Class("ClarifyBaseliningConfig",
       self$probability_threshold_attribute = probability_threshold_attribute
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   )
 )

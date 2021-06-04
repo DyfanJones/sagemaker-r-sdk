@@ -6,8 +6,6 @@
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -307,7 +305,7 @@ KNNPredictor = R6Class("KNNPredictor",
 #'              creates an Endpoint and returns :class:`KNNPredictor`.
 #' @export
 KNNModel = R6Class("KNNModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public= list(
 
     #' @description Initialize KNNModel Class

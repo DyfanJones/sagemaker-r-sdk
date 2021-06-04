@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/chainer/estimator.py
 
-#' @include session.R
 #' @include chainer_default.R
 #' @include chainer_model.R
 #' @include r_utils.R
@@ -14,7 +13,7 @@
 #' @description Handle end-to-end training and deployment of custom Chainer code.
 #' @export
 Chainer = R6Class("Chainer",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     # Hyperparameters

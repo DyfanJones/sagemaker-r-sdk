@@ -6,8 +6,6 @@
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -227,7 +225,7 @@ RandomCutForestPredictor = R6Class("RandomCutForestPredictor",
 #'              Predictor that calculates anomaly scores for datapoints.
 #' @export
 RandomCutForestModel = R6Class("RandomCutForestModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize RandomCutForestModel class

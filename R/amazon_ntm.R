@@ -6,8 +6,6 @@
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -345,7 +343,7 @@ NTMPredictor = R6Class("NTMPredictor",
 #'              Predictor that transforms vectors to a lower-dimensional representation.
 #' @export
 NTMModel = R6Class("NTMModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize NTMModel class

@@ -1,9 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/data_capture_config.py
 
-#' @include s3.R
-#' @include session.R
-
 #' @import R6
 #' @import R6sagemaker.common
 

@@ -1,9 +1,7 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/model.py
 
-#' @include session.R
 #' @include deserializers.R
-#' @include model.R
 #' @include pytorch_defaults.R
 #' @include pytorch_model.R
 #' @include predictor.R
@@ -44,7 +42,7 @@ PyTorchPredictor = R6Class("PyTorchPredictor",
 #'              ``Endpoint``.
 #' @export
 PyTorchModel = R6Class("PyTorchModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @field .LOWEST_MMS_VERSION

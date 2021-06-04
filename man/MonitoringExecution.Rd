@@ -8,7 +8,7 @@ Provides functionality to retrieve monitoring-specific files output from monitor
              executions
 }
 \section{Super classes}{
-\code{\link[R6sagemaker:.Job]{R6sagemaker::.Job}} -> \code{\link[R6sagemaker:ProcessingJob]{R6sagemaker::ProcessingJob}} -> \code{MonitoringExecution}
+\code{\link[R6sagemaker.common:.Job]{R6sagemaker.common::.Job}} -> \code{\link[R6sagemaker:ProcessingJob]{R6sagemaker::ProcessingJob}} -> \code{MonitoringExecution}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -23,7 +23,7 @@ Provides functionality to retrieve monitoring-specific files output from monitor
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="format">}\href{../../R6sagemaker/html/.Job.html#method-format}{\code{R6sagemaker::.Job$format()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic=".Job" data-id="format">}\href{../../R6sagemaker.common/html/.Job.html#method-format}{\code{R6sagemaker.common::.Job$format()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="describe">}\href{../../R6sagemaker/html/ProcessingJob.html#method-describe}{\code{R6sagemaker::ProcessingJob$describe()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="from_processing_name">}\href{../../R6sagemaker/html/ProcessingJob.html#method-from_processing_name}{\code{R6sagemaker::ProcessingJob$from_processing_name()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="start_new">}\href{../../R6sagemaker/html/ProcessingJob.html#method-start_new}{\code{R6sagemaker::ProcessingJob$start_new()}}\out{</span>}

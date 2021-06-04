@@ -1,9 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tuner.py
 
-#' @include job.R
-#' @include estimator.R
-#' @include session.R
 #' @include r_utils.R
 #' @include parameter.R
 

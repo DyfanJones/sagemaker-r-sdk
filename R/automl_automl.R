@@ -1,11 +1,8 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
-#bhttps://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/automl.py
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/automl.py
 
-#' @include model.R
 #' @include pipeline.R
 #' @include automl_candidate_estimator.R
-#' @include job.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -573,7 +570,7 @@ AutoMLInput = R6Class("AutoMLInput",
 #' @description A class for interacting with CreateAutoMLJob API.
 #' @export
 AutoMLJob = R6Class("AutoMLJob",
-  inherit = .Job,
+  inherit = R6sagemaker.common::.Job,
   public = list(
 
     #' @description Initialize AutoMLJob class

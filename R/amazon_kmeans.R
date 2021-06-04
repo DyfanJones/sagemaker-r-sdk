@@ -4,9 +4,7 @@
 #' @include amazon_estimator.R
 #' @include amazon_hyperparameter.R
 #' @include deserializers.R
-#' @include model.R
 #' @include serializers.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -322,7 +320,7 @@ KMeansPredictor = R6Class("KMeansPredictor",
 #'              Predictor to performs k-means cluster assignment.
 #' @export
 KMeansModel = R6Class("KMeansModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize KMeansPredictor Class

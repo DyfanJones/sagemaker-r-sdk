@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/chainer/model.py
 
-#' @include session.R
 #' @include chainer_default.R
 #' @include chainer_model.R
 #' @include r_utils.R
@@ -40,7 +39,7 @@ ChainerPredictor = R6Class("ChainerPredictor",
 #'              ``Endpoint``.
 #' @export
 ChainerModel = R6Class("ChainerModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @description Initialize an ChainerModel.

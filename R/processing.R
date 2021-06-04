@@ -2,8 +2,6 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/processing.py
 
 #' @include r_utils.R
-#' @include s3.R
-#' @include session.R
 
 #' @importFrom urltools url_parse
 #' @import R6
@@ -520,7 +518,7 @@ ScriptProcessor = R6Class("ScriptProcessor",
 #' @description Provides functionality to start, describe, and stop processing jobs.
 #' @export
 ProcessingJob = R6Class("ProcessingJob",
-  inherit = .Job,
+  inherit = R6sagemaker.common::.Job,
   public = list(
     #' @field inputs
     #' A list of :class:`~sagemaker.processing.ProcessingInput` objects.

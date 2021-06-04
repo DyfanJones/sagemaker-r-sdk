@@ -1,8 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/rl/estimator.py
 
-#' @include estimator.R
-#' @include model.R
 #' @include tensorflow_estimator.R
 #' @include r_utils.R
 
@@ -55,7 +53,7 @@ RLFramework = Enum(
 #' @description Handle end-to-end training and deployment of custom RLEstimator code.
 #' @export
 RLEstimator = R6Class("RLEstimator",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @field COACH_LATEST_VERSION_TF

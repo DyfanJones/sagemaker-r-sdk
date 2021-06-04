@@ -2,15 +2,12 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/amazon_estimator.py
 
 #' @include r_utils.R
-#' @include estimator.R
-#' @include s3.R
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include amazon_common.R
 
-#' @import R6sagemaker.common
-
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 #' @importFrom urltools url_parse
 #' @import paws
@@ -21,7 +18,7 @@
 #'              isn't intended to be instantiated directly.
 #' @export
 AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
-  inherit = EstimatorBase,
+  inherit = R6sagemaker.common::EstimatorBase,
   public = list(
     #' @field repo_name
     #' The repo name for the account

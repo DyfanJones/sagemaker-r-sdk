@@ -1,8 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/candidate_estimator.py
 
-#' @include session.R
-#' @include job.R
 #' @include r_utils.R
 
 #' @import R6

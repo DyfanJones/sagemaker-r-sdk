@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/mxnet/estimator.py
 
-#' @include model.R
 #' @include mxnet_default.R
 #' @include serializers.R
 #' @include r_utils.R
@@ -40,7 +39,7 @@ MXNetPredictor = R6Class("MXNetPredictor",
 #' @description An MXNet SageMaker ``Model`` that can be deployed to a SageMaker ``Endpoint``.
 #' @export
 MXNetModel = R6Class("MXNetModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @field .LOWEST_MMS_VERSION

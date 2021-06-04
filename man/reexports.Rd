@@ -3,7 +3,25 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
+\alias{AnalyticsMetricsBase}
+\alias{container_def}
+\alias{Estimator}
+\alias{ExperimentAnalytics}
+\alias{FileSystemInput}
+\alias{get_execution_role}
+\alias{HyperparameterTuningJobAnalytics}
 \alias{ImageUris}
+\alias{Model}
+\alias{ModelPackage}
+\alias{pipeline_container_def}
+\alias{production_variant}
+\alias{Session}
+\alias{ShuffleConfig}
+\alias{S3Downloader}
+\alias{S3Uploader}
+\alias{TrainingJobAnalytics}
+\alias{TrainingInput}
+\alias{Transformer}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -11,6 +29,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{R6sagemaker.common}{\code{\link[R6sagemaker.common]{ImageUris}}}
+  \item{R6sagemaker.common}{\code{\link[R6sagemaker.common]{AnalyticsMetricsBase}}, \code{\link[R6sagemaker.common]{Estimator}}, \code{\link[R6sagemaker.common]{ExperimentAnalytics}}, \code{\link[R6sagemaker.common]{FileSystemInput}}, \code{\link[R6sagemaker.common]{HyperparameterTuningJobAnalytics}}, \code{\link[R6sagemaker.common]{ImageUris}}, \code{\link[R6sagemaker.common]{Model}}, \code{\link[R6sagemaker.common]{ModelPackage}}, \code{\link[R6sagemaker.common]{S3Downloader}}, \code{\link[R6sagemaker.common]{S3Uploader}}, \code{\link[R6sagemaker.common]{Session}}, \code{\link[R6sagemaker.common]{ShuffleConfig}}, \code{\link[R6sagemaker.common]{TrainingInput}}, \code{\link[R6sagemaker.common]{TrainingJobAnalytics}}, \code{\link[R6sagemaker.common]{Transformer}}, \code{\link[R6sagemaker.common]{container_def}}, \code{\link[R6sagemaker.common]{get_execution_role}}, \code{\link[R6sagemaker.common]{pipeline_container_def}}, \code{\link[R6sagemaker.common]{production_variant}}}
 }}
 

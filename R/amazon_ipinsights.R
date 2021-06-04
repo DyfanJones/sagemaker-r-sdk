@@ -4,9 +4,7 @@
 #' @include amazon_estimator.R
 #' @include amazon_hyperparameter.R
 #' @include deserializers.R
-#' @include model.R
 #' @include serializers.R
-#' @include session.R
 
 #' @import R6
 #' @import R6sagemaker.common
@@ -291,7 +289,7 @@ IPInsightsPredictor = R6Class("IPInsightsPredictor",
 #'              Predictor that calculates anomaly scores for data points.
 #' @export
 IPInsightsModel = R6Class("IPInsightsModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize IPInsightsModel class

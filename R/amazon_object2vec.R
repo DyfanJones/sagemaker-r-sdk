@@ -6,8 +6,6 @@
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
 #' @include r_utils.R
 
 #' @import R6
@@ -641,7 +639,7 @@ Object2Vec = R6Class("Object2Vec",
 #'              Predictor that calculates anomaly scores for datapoints.
 #' @export
 Object2VecModel = R6Class("Object2VecModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize Object2VecModel class

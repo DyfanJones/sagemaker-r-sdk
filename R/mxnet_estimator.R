@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/mxnet/estimator.py
 
-#' @include estimator.R
 #' @include mxnet_default.R
 #' @include mxnet_model.R
 
@@ -13,7 +12,7 @@
 #' @description Handle end-to-end training and deployment of custom MXNet code.
 #' @export
 MXNet = R6Class("MXNet",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @field .LOWEST_SCRIPT_MODE_VERSION

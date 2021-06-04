@@ -2,7 +2,6 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/model.py
 
 #' @include deserializers.R
-#' @include model.R
 #' @include predictor.R
 #' @include serializers.R
 #' @include r_utils.R
@@ -40,7 +39,7 @@ SKLearnPredictor = R6Class("SKLearnPredictor",
 #'              ``Endpoint``.
 #' @export
 SKLearnModel = R6Class("SKLearnModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @description Initialize an SKLearnModel.
