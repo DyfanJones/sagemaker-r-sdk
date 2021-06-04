@@ -1,10 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/metrics_config.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/metrics_config.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include debugger_profiler_constants.R
 #' @include debugger_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @importFrom jsonlite toJSON
 
 #' @title Configuration for the range of steps to profile.
@@ -37,11 +39,9 @@ StepRange = R6Class("StepRange",
       return(list("StartStep" = self$start_step, "NumSteps": self$num_steps))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   lock_objects = F
@@ -75,11 +75,10 @@ TimeRange = R6Class("TimeRange",
       return(time_range_json)
     },
 
-    #' @description
-    #' Printer.
+    #' @description format class
     #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    format = function(){
+      return(format_class(self))
     }
   ),
   lock_object = F
@@ -138,11 +137,9 @@ MetricsConfigBase = R6Class("MetricsConfigBase",
       return(toJSON(private$.to_json(), auto_unbox = T))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

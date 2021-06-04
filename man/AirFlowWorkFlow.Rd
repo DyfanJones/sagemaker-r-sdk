@@ -25,7 +25,7 @@ Helper class to take sagemaker classes and format output for Airflow.
 \item \href{#method-deploy_config_from_estimator}{\code{AirFlowWorkFlow$deploy_config_from_estimator()}}
 \item \href{#method-processing_config}{\code{AirFlowWorkFlow$processing_config()}}
 \item \href{#method-input_output_list_converter}{\code{AirFlowWorkFlow$input_output_list_converter()}}
-\item \href{#method-print}{\code{AirFlowWorkFlow$print()}}
+\item \href{#method-format}{\code{AirFlowWorkFlow$format()}}
 \item \href{#method-clone}{\code{AirFlowWorkFlow$clone()}}
 }
 }
@@ -862,21 +862,14 @@ List of dicts
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AirFlowWorkFlow$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AirFlowWorkFlow$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

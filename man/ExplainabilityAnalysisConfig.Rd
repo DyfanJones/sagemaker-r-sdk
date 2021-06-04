@@ -18,7 +18,7 @@ Analysis configuration for ModelExplainabilityMonitor.
 \itemize{
 \item \href{#method-new}{\code{ExplainabilityAnalysisConfig$new()}}
 \item \href{#method-to_list}{\code{ExplainabilityAnalysisConfig$to_list()}}
-\item \href{#method-print}{\code{ExplainabilityAnalysisConfig$print()}}
+\item \href{#method-format}{\code{ExplainabilityAnalysisConfig$format()}}
 \item \href{#method-clone}{\code{ExplainabilityAnalysisConfig$clone()}}
 }
 }
@@ -60,21 +60,14 @@ Generates a request dictionary using the parameters provided to the class.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ExplainabilityAnalysisConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ExplainabilityAnalysisConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -1,18 +1,15 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/huggingface/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/huggingface/estimator.py
 
 #' @import lgr
 #' @import R6
-
-#' @include deprecations.R
-#' @include estimator.R
-#' @include fw_utils.R
-#' @include vpc_utils.R
+#' @import R6sagemaker.common
 
 #' @title HuggingFace estimator class
 #' @description Handle training of custom HuggingFace code.
 #' @export
 HuggingFace = R6Class("HuggingFace",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @description This ``Estimator`` executes a HuggingFace script in a managed execution environment.

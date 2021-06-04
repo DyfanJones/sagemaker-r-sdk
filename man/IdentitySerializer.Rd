@@ -21,7 +21,7 @@ This serializer may be useful if, for example, you're sending raw bytes such as 
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseSerializer" data-id="print">}\href{../../R6sagemaker/html/BaseSerializer.html#method-print}{\code{R6sagemaker::BaseSerializer$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseSerializer" data-id="format">}\href{../../R6sagemaker/html/BaseSerializer.html#method-format}{\code{R6sagemaker::BaseSerializer$format()}}\out{</span>}
 }
 \out{</details>}
 }

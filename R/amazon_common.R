@@ -1,11 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/common.py
-
-#' @import R6
-#' @importFrom methods is as
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/common.py
 
 #' @include amazon_record_pb2.R
 #' @include serializers.R
 #' @include deserializers.R
+
+#' @import R6
+#' @importFrom methods is as
 
 #' @title RecordSerializer Class
 #' @description Serialize a matrices and array for an inference request.

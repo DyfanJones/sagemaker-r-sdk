@@ -18,7 +18,7 @@ Config object related to bias configurations of the input dataset.
 \itemize{
 \item \href{#method-new}{\code{BiasConfig$new()}}
 \item \href{#method-get_config}{\code{BiasConfig$get_config()}}
-\item \href{#method-print}{\code{BiasConfig$print()}}
+\item \href{#method-format}{\code{BiasConfig$format()}}
 \item \href{#method-clone}{\code{BiasConfig$clone()}}
 }
 }
@@ -68,21 +68,14 @@ Returns part of an analysis config dictionary.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BiasConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BiasConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -145,7 +145,7 @@ sagemaker_session$call_args("compile_model")
 }
 
 
-test_that("test create tf model", {
+test_that("test create rl model", {
   container_log_level = 'INFO'
   source_dir = "s3://mybucket/source"
 

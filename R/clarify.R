@@ -1,10 +1,11 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/clarify.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/clarify.py
 
 #' @include processing.R
-#' @include utils.R
-#' @include image_uris.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import jsonlite
 
 #' @title DataConfig Class
@@ -81,11 +82,9 @@ DataConfig = R6Class("DataConfig",
       return(self$analysis_config)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )
@@ -129,10 +128,8 @@ BiasConfig = R6Class("BiasConfig",
       self$analysis_config
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
+    #' @description format class
+    format = function(){
       return(print_class(self))
     }
   )
@@ -202,11 +199,9 @@ ModelConfig = R6Class("ModelConfig",
       return(self$predictor_config)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )
@@ -291,10 +286,8 @@ ModelPredictedLabelConfig = R6Class("ModelPredictedLabelConfig",
       return(list(self$probability_threshold, self$predictor_config))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
+    #' @description format class
+    format = function(){
       return(print_class(self))
     }
   )
@@ -311,10 +304,8 @@ ExplainabilityConfig = R6Class("ExplainabilityConfig",
       return(NULL)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
+    #' @description format class
+    format = function(){
       return(print_class(self))
     }
   )
@@ -675,4 +666,3 @@ SageMakerClarifyProcessor = R6Class("SageMakerClarifyProcessor",
     }
   )
 )
-

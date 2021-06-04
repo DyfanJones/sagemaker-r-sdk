@@ -1,4 +1,5 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/lineage/artifact.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/lineage/artifact.py
 
 #' @include apiutils_base_types.R
 #' @include apiutils_utils.R

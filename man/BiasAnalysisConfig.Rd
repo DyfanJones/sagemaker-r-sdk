@@ -18,7 +18,7 @@ Analysis configuration for ModelBiasMonitor.
 \itemize{
 \item \href{#method-new}{\code{BiasAnalysisConfig$new()}}
 \item \href{#method-to_list}{\code{BiasAnalysisConfig$to_list()}}
-\item \href{#method-print}{\code{BiasAnalysisConfig$print()}}
+\item \href{#method-format}{\code{BiasAnalysisConfig$format()}}
 \item \href{#method-clone}{\code{BiasAnalysisConfig$clone()}}
 }
 }
@@ -56,21 +56,14 @@ Generates a request dictionary using the parameters provided to the class.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BiasAnalysisConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BiasAnalysisConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

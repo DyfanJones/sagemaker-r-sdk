@@ -1,21 +1,18 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/estimator.py
 
-#' @include image_uris.R
-#' @include deprecations.R
-#' @include estimator.R
-#' @include fw_utils.R
 #' @include sklearn_model.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title Scikit-learn Class
 #' @description Handle end-to-end training and deployment of custom Scikit-learn code.
 #' @export
 SKLearn = R6Class("SKLearn",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @description This ``Estimator`` executes an Scikit-learn script in a managed

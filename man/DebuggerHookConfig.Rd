@@ -28,7 +28,7 @@ DebuggerHookConfig provides options to customize how debugging
 \itemize{
 \item \href{#method-new}{\code{DebuggerHookConfig$new()}}
 \item \href{#method-to_request_list}{\code{DebuggerHookConfig$to_request_list()}}
-\item \href{#method-print}{\code{DebuggerHookConfig$print()}}
+\item \href{#method-format}{\code{DebuggerHookConfig$format()}}
 \item \href{#method-clone}{\code{DebuggerHookConfig$clone()}}
 }
 }
@@ -80,21 +80,14 @@ dict: An portion of an API request as a dictionary.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DebuggerHookConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DebuggerHookConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

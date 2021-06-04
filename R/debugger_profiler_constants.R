@@ -1,4 +1,5 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/profiler_constants.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/profiler_constants.py
 
 BASE_FOLDER_DEFAULT <- "/opt/ml/output/profiler"
 MAX_FILE_SIZE_DEFAULT <- 10485760  # default 10MB

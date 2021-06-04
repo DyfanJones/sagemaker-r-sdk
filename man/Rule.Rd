@@ -33,7 +33,7 @@ The SageMaker Debugger Rule class configures *debugging* rules to debug your tra
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="RuleBase" data-id="print">}\href{../../R6sagemaker/html/RuleBase.html#method-print}{\code{R6sagemaker::RuleBase$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="RuleBase" data-id="format">}\href{../../R6sagemaker/html/RuleBase.html#method-format}{\code{R6sagemaker::RuleBase$format()}}\out{</span>}
 }
 \out{</details>}
 }

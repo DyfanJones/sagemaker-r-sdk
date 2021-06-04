@@ -14,6 +14,7 @@ This pipeline can be deployed as an `Endpoint` on SageMaker.
 \item \href{#method-deploy}{\code{PipelineModel$deploy()}}
 \item \href{#method-transformer}{\code{PipelineModel$transformer()}}
 \item \href{#method-delete_model}{\code{PipelineModel$delete_model()}}
+\item \href{#method-format}{\code{PipelineModel$format()}}
 \item \href{#method-clone}{\code{PipelineModel$clone()}}
 }
 }
@@ -252,6 +253,16 @@ Delete the SageMaker model backing this pipeline model. This does not
              the inference pipeline.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PipelineModel$delete_model()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PipelineModel$format()}\if{html}{\out{</div>}}
 }
 
 }

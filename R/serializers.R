@@ -1,6 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/serializers.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/serializers.py
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import jsonlite
 #' @import data.table
 
@@ -16,11 +18,9 @@ BaseSerializer = R6Class("BaseSerializer",
    #' @return object: Serialized data used for a request.
    serialize = function(data) {stop("I'm an abstract interface method", call. = F)},
 
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-      print_class(self)
+   #' @description format class
+   format = function(){
+      format_class(self)
    }
   ),
   active = list(

@@ -1,11 +1,11 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/processing.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/processing.py
 
-#' @include utils.R
-#' @include s3.R
-#' @include session.R
+#' @include r_utils.R
 
 #' @importFrom urltools url_parse
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title Processor Class
 #' @family Processor
@@ -200,11 +200,9 @@ Processor = R6Class("Processor",
       if (wait) self$latest_job$wait(logs=logs)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   private = list(
@@ -429,13 +427,6 @@ ScriptProcessor = R6Class("ScriptProcessor",
       self$jobs = c(self$jobs, self$latest_job)
       if (wait)
         self$latest_job$wait(logs=logs)
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
     }
   ),
   private = list(
@@ -527,7 +518,7 @@ ScriptProcessor = R6Class("ScriptProcessor",
 #' @description Provides functionality to start, describe, and stop processing jobs.
 #' @export
 ProcessingJob = R6Class("ProcessingJob",
-  inherit = .Job,
+  inherit = R6sagemaker.common::.Job,
   public = list(
     #' @field inputs
     #' A list of :class:`~sagemaker.processing.ProcessingInput` objects.
@@ -794,7 +785,6 @@ ProcessingInput = R6Class("ProcessingInput",
         )
       )
 
-
       # Check the compression type, then add it to the dictionary.
       if (self$s3_compression_type == "Gzip" && self$s3_input_mode != "Pipe")
         stop("Data can only be gzipped when the input mode is Pipe.", call. = F)
@@ -805,11 +795,9 @@ ProcessingInput = R6Class("ProcessingInput",
         return (s3_input_request)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   lock_objects = F
@@ -857,11 +845,9 @@ ProcessingOutput = R6Class("ProcessingOutput",
      return(s3_output_request)
    },
 
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     print_class(self)
+   #' @description format class
+   format = function(){
+     format_class(self)
    }
   ),
   lock_objects = F

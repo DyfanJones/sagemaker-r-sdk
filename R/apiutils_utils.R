@@ -1,9 +1,10 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_utils.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_utils.py
 
-#' @include utils.R
-#' @include session.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 ApiUtils = R6Class("ApiUtils",
   public = list(

@@ -22,13 +22,13 @@ Other Processor:
 \itemize{
 \item \href{#method-new}{\code{ScriptProcessor$new()}}
 \item \href{#method-run}{\code{ScriptProcessor$run()}}
-\item \href{#method-print}{\code{ScriptProcessor$print()}}
 \item \href{#method-clone}{\code{ScriptProcessor$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Processor" data-id="format">}\href{../../R6sagemaker/html/Processor.html#method-format}{\code{R6sagemaker::Processor$format()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -160,23 +160,6 @@ a default job name, based on the base job name and current timestamp.}
 \item{\code{experiment_config}}{(dict[str, str]): Experiment management configuration.
 Dictionary contains three optional keys:
 'ExperimentName', 'TrialName', and 'TrialComponentDisplayName'.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ScriptProcessor$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

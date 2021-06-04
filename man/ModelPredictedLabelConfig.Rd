@@ -24,7 +24,7 @@ Config object to extract a predicted label from the model output.
 \itemize{
 \item \href{#method-new}{\code{ModelPredictedLabelConfig$new()}}
 \item \href{#method-get_predictor_config}{\code{ModelPredictedLabelConfig$get_predictor_config()}}
-\item \href{#method-print}{\code{ModelPredictedLabelConfig$print()}}
+\item \href{#method-format}{\code{ModelPredictedLabelConfig$format()}}
 \item \href{#method-clone}{\code{ModelPredictedLabelConfig$clone()}}
 }
 }
@@ -93,21 +93,14 @@ Returns probability_threshold, predictor config.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelPredictedLabelConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelPredictedLabelConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

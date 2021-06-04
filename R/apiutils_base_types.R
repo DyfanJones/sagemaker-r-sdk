@@ -1,6 +1,7 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_base_types.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_base_types.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include apiutils_paws_functions.R
 
 #' @import R6
@@ -56,7 +57,7 @@ ApiObject = R6Class("ApiObject",
         var_dict = as.list(obj)
       else
         var_dict = obj
-      return (PawsFunctions$new()$to_paws(var_dict, private$.custom_paws_names, private$.custom_boto_types))
+      return (PawsFunctions$new()$to_paws(var_dict, private$.custom_paws_names, private$.custom_paws_types))
     },
 
     # Return a string representation of this ApiObject.
@@ -133,7 +134,7 @@ Record = R6Class("Record",
       names(custom_boto_names_to_member_names) = unname(private$.custom_paws_names)
 
       p_l = PawsFunctions$new()$from_paws(
-        paws_list, custom_boto_names_to_member_names, private$.custom_boto_types)
+        paws_list, custom_boto_names_to_member_names, private$.custom_paws_types)
       sapply(names(p_l), function(i) self[[i]] = p_l[[i]])
       return(self)
     }
@@ -164,7 +165,7 @@ Record = R6Class("Record",
       list_method = sagemaker_client[[paws_list_method]] %||% stop("Method not identified.", call. = F)
 
       list_request_kwargs = PawsFunctions$new()$to_paws(
-        kwargs, private$.custom_boto_names, private$.custom_boto_types)
+        kwargs, private$.custom_boto_names, private$.custom_paws_types)
 
       next_token = NULL
       resp_ll <- list()

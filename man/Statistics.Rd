@@ -22,7 +22,7 @@ Represents the statistics JSON file used in Amazon SageMaker Model Monitoring.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ModelMonitoringFile" data-id="print">}\href{../../R6sagemaker/html/ModelMonitoringFile.html#method-print}{\code{R6sagemaker::ModelMonitoringFile$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ModelMonitoringFile" data-id="format">}\href{../../R6sagemaker/html/ModelMonitoringFile.html#method-format}{\code{R6sagemaker::ModelMonitoringFile$format()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ModelMonitoringFile" data-id="save">}\href{../../R6sagemaker/html/ModelMonitoringFile.html#method-save}{\code{R6sagemaker::ModelMonitoringFile$save()}}\out{</span>}
 }
 \out{</details>}

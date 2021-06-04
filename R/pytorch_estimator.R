@@ -1,20 +1,19 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/estimator.py
 
-#' @include estimator.R
-#' @include fw_utils.R
 #' @include pytorch_defaults.R
 #' @include pytorch_model.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title PyTorch Class
 #' @description Handle end-to-end training and deployment of custom PyTorch code.
 #' @export
 PyTorch = R6Class("PyTorch",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @description This ``Estimator`` executes an PyTorch script in a managed PyTorch

@@ -1,16 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/estimator.py
 
-#' @include fw_registry.R
-#' @include estimator.R
-#' @include image_uris.R
-#' @include fw_utils.R
-#' @include session.R
-#' @include vpc_utils.R
 #' @include xgboost_default.R
 #' @include xgboost_model.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title XGBoost Class
@@ -18,7 +14,7 @@
 #'              customer provided XGBoost entry point script.
 #' @export
 XGBoost = R6Class("XGBoost",
-  inherit = Framework,
+  inherit = R6sagemaker.common::Framework,
   public = list(
 
     #' @description This ``Estimator`` executes an XGBoost based SageMaker Training Job.

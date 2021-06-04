@@ -8,7 +8,7 @@ An Scikit-learn SageMaker ``Model`` that can be deployed to a SageMaker
              ``Endpoint``.
 }
 \section{Super classes}{
-\code{\link[R6sagemaker:Model]{R6sagemaker::Model}} -> \code{\link[R6sagemaker:FrameworkModel]{R6sagemaker::FrameworkModel}} -> \code{SKLearnModel}
+\code{\link[R6sagemaker.common:Model]{R6sagemaker.common::Model}} -> \code{\link[R6sagemaker.common:FrameworkModel]{R6sagemaker.common::FrameworkModel}} -> \code{SKLearnModel}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -22,16 +22,16 @@ An Scikit-learn SageMaker ``Model`` that can be deployed to a SageMaker
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id=".create_sagemaker_model">}\href{../../R6sagemaker/html/Model.html#method-.create_sagemaker_model}{\code{R6sagemaker::Model$.create_sagemaker_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="check_neo_region">}\href{../../R6sagemaker/html/Model.html#method-check_neo_region}{\code{R6sagemaker::Model$check_neo_region()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="compile">}\href{../../R6sagemaker/html/Model.html#method-compile}{\code{R6sagemaker::Model$compile()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="delete_model">}\href{../../R6sagemaker/html/Model.html#method-delete_model}{\code{R6sagemaker::Model$delete_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker/html/Model.html#method-deploy}{\code{R6sagemaker::Model$deploy()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker::Model$enable_network_isolation()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="package_for_edge">}\href{../../R6sagemaker/html/Model.html#method-package_for_edge}{\code{R6sagemaker::Model$package_for_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="register">}\href{../../R6sagemaker/html/Model.html#method-register}{\code{R6sagemaker::Model$register()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id=".create_sagemaker_model">}\href{../../R6sagemaker.common/html/Model.html#method-.create_sagemaker_model}{\code{R6sagemaker.common::Model$.create_sagemaker_model()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="check_neo_region">}\href{../../R6sagemaker.common/html/Model.html#method-check_neo_region}{\code{R6sagemaker.common::Model$check_neo_region()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="compile">}\href{../../R6sagemaker.common/html/Model.html#method-compile}{\code{R6sagemaker.common::Model$compile()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="delete_model">}\href{../../R6sagemaker.common/html/Model.html#method-delete_model}{\code{R6sagemaker.common::Model$delete_model()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker.common/html/Model.html#method-deploy}{\code{R6sagemaker.common::Model$deploy()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker.common/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker.common::Model$enable_network_isolation()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="format">}\href{../../R6sagemaker.common/html/Model.html#method-format}{\code{R6sagemaker.common::Model$format()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="package_for_edge">}\href{../../R6sagemaker.common/html/Model.html#method-package_for_edge}{\code{R6sagemaker.common::Model$package_for_edge()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="register">}\href{../../R6sagemaker.common/html/Model.html#method-register}{\code{R6sagemaker.common::Model$register()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker.common/html/Model.html#method-transformer}{\code{R6sagemaker.common::Model$transformer()}}\out{</span>}
 }
 \out{</details>}
 }

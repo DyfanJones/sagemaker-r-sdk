@@ -1,16 +1,20 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger.py
 
 # TODO: Build other python class in debugger
 
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 # **NOTE:** rule_configs object comes from https://github.com/awslabs/sagemaker-debugger-rulesconfig/tree/master
 # Not sure to include this or not
 
 #------------------------------------------------------------
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/awslabs/sagemaker-debugger-rulesconfig/blob/master/smdebug_rulesconfig/profiler_rules/rules.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/awslabs/sagemaker-debugger-rulesconfig/blob/master/smdebug_rulesconfig/profiler_rules/rules.py
+
 validate_positive_integer <- function(key,val){
   out <- val>0
   if(!out)
@@ -477,11 +481,9 @@ RuleBase = R6Class("RuleBase",
       self$rule_parameters = rule_parameters
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(
@@ -520,7 +522,6 @@ RuleBase = R6Class("RuleBase",
   }
   return(rule_config)
 }
-
 
 #' @title Debug Rule Class
 #' @description The SageMaker Debugger Rule class configures *debugging* rules to debug your training job.
@@ -967,11 +968,9 @@ DebuggerHookConfig = R6Class("DebuggerHookConfig",
       return(debugger_hook_config_request)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )
@@ -1007,11 +1006,9 @@ TensorBoardOutputConfig = R6Class("TensorBoardOutputConfig",
       return(tensorboard_output_config_request)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )
@@ -1048,11 +1045,9 @@ CollectionConfig = R6Class("CollectionConfig",
       return(collection_config_request)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )
@@ -1073,7 +1068,9 @@ CollectionConfig = R6Class("CollectionConfig",
     if(is.null(self$parameters) || is.null(other$parameters))
       identical(self$parameters, other$self$parameters)
     else
-      identical(self$parameters[order(names(self$parameters))], other$parameters[order(names(other$parameters))])
+      identical(
+        self$parameters[order(names(self$parameters))],
+        other$parameters[order(names(other$parameters))])
   )
 
   return(eq_name && eq_parm)
@@ -1094,7 +1091,9 @@ CollectionConfig = R6Class("CollectionConfig",
     if(is.null(self$parameters) || is.null(other$parameters))
       !identical(self$parameters, other$self$parameters)
     else
-      !identical(self$parameters[order(names(self$parameters))], other$parameters[order(names(other$parameters))])
+      !identical(
+        self$parameters[order(names(self$parameters))],
+        other$parameters[order(names(other$parameters))])
   )
 
   return(no_eq_name || no_eq_parm)

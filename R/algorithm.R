@@ -1,13 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/algorithm.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/algorithm.py
 
 #' @include parameter.R
-#' @include vpc_utils.R
-#' @include utils.R
-#' @include estimator.R
-#' @include transformer.R
+#' @include r_utils.R
 #' @include predictor.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title AlgorithmEstimator Class
 #' @description A generic Estimator to train using any algorithm object (with an
@@ -16,7 +15,7 @@
 #'              client-side validation on all the inputs.
 #' @export
 AlgorithmEstimator = R6Class("AlgorithmEstimator",
-   inherit = EstimatorBase,
+   inherit = R6sagemaker.common::EstimatorBase,
    public = list(
      #' @field .hyperpameters_with_range
      #' These Hyperparameter Types have a range definition.

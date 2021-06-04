@@ -23,7 +23,7 @@ A class that maintains an AutoML Candidate step's name, inputs, type, and descri
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{CandidateStep$new()}}
-\item \href{#method-print}{\code{CandidateStep$print()}}
+\item \href{#method-format}{\code{CandidateStep$format()}}
 \item \href{#method-clone}{\code{CandidateStep$clone()}}
 }
 }
@@ -51,21 +51,14 @@ Initialize CandidateStep Class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CandidateStep$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CandidateStep$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

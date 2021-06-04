@@ -8,7 +8,7 @@ Base class for Amazon first-party Estimator implementations. This class
              isn't intended to be instantiated directly.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:EstimatorBase]{R6sagemaker::EstimatorBase}} -> \code{AmazonAlgorithmEstimatorBase}
+\code{\link[R6sagemaker.common:EstimatorBase]{R6sagemaker.common::EstimatorBase}} -> \code{AmazonAlgorithmEstimatorBase}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -46,24 +46,24 @@ Base class for Amazon first-party Estimator implementations. This class
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id=".prepare_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-.prepare_for_training}{\code{R6sagemaker::EstimatorBase$.prepare_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="attach">}\href{../../R6sagemaker/html/EstimatorBase.html#method-attach}{\code{R6sagemaker::EstimatorBase$attach()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="compile_model">}\href{../../R6sagemaker/html/EstimatorBase.html#method-compile_model}{\code{R6sagemaker::EstimatorBase$compile_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="create_model">}\href{../../R6sagemaker/html/EstimatorBase.html#method-create_model}{\code{R6sagemaker::EstimatorBase$create_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="delete_endpoint">}\href{../../R6sagemaker/html/EstimatorBase.html#method-delete_endpoint}{\code{R6sagemaker::EstimatorBase$delete_endpoint()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="deploy">}\href{../../R6sagemaker/html/EstimatorBase.html#method-deploy}{\code{R6sagemaker::EstimatorBase$deploy()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="disable_profiling">}\href{../../R6sagemaker/html/EstimatorBase.html#method-disable_profiling}{\code{R6sagemaker::EstimatorBase$disable_profiling()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_default_profiling">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_default_profiling}{\code{R6sagemaker::EstimatorBase$enable_default_profiling()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_network_isolation}{\code{R6sagemaker::EstimatorBase$enable_network_isolation()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker::EstimatorBase$get_vpc_config()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_profiler_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_profiler_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_profiler_artifacts_path()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker/html/EstimatorBase.html#method-logs}{\code{R6sagemaker::EstimatorBase$logs()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="print">}\href{../../R6sagemaker/html/EstimatorBase.html#method-print}{\code{R6sagemaker::EstimatorBase$print()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="register">}\href{../../R6sagemaker/html/EstimatorBase.html#method-register}{\code{R6sagemaker::EstimatorBase$register()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="transformer">}\href{../../R6sagemaker/html/EstimatorBase.html#method-transformer}{\code{R6sagemaker::EstimatorBase$transformer()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="update_profiler">}\href{../../R6sagemaker/html/EstimatorBase.html#method-update_profiler}{\code{R6sagemaker::EstimatorBase$update_profiler()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id=".prepare_for_training">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-.prepare_for_training}{\code{R6sagemaker.common::EstimatorBase$.prepare_for_training()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="attach">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-attach}{\code{R6sagemaker.common::EstimatorBase$attach()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="compile_model">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-compile_model}{\code{R6sagemaker.common::EstimatorBase$compile_model()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="create_model">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-create_model}{\code{R6sagemaker.common::EstimatorBase$create_model()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="delete_endpoint">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-delete_endpoint}{\code{R6sagemaker.common::EstimatorBase$delete_endpoint()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="deploy">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-deploy}{\code{R6sagemaker.common::EstimatorBase$deploy()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="disable_profiling">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-disable_profiling}{\code{R6sagemaker.common::EstimatorBase$disable_profiling()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="enable_default_profiling">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-enable_default_profiling}{\code{R6sagemaker.common::EstimatorBase$enable_default_profiling()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="enable_network_isolation">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-enable_network_isolation}{\code{R6sagemaker.common::EstimatorBase$enable_network_isolation()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="format">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-format}{\code{R6sagemaker.common::EstimatorBase$format()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker.common::EstimatorBase$get_vpc_config()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker.common::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="latest_job_profiler_artifacts_path">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-latest_job_profiler_artifacts_path}{\code{R6sagemaker.common::EstimatorBase$latest_job_profiler_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker.common::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-logs}{\code{R6sagemaker.common::EstimatorBase$logs()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="register">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-register}{\code{R6sagemaker.common::EstimatorBase$register()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="transformer">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-transformer}{\code{R6sagemaker.common::EstimatorBase$transformer()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="update_profiler">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-update_profiler}{\code{R6sagemaker.common::EstimatorBase$update_profiler()}}\out{</span>}
 }
 \out{</details>}
 }

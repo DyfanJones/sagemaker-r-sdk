@@ -20,7 +20,7 @@ Create a tensor ouput configuration object for debugging visualizations on Tenso
 \itemize{
 \item \href{#method-new}{\code{TensorBoardOutputConfig$new()}}
 \item \href{#method-to_request_list}{\code{TensorBoardOutputConfig$to_request_list()}}
-\item \href{#method-print}{\code{TensorBoardOutputConfig$print()}}
+\item \href{#method-format}{\code{TensorBoardOutputConfig$format()}}
 \item \href{#method-clone}{\code{TensorBoardOutputConfig$clone()}}
 }
 }
@@ -57,21 +57,14 @@ dict: An portion of an API request as a dictionary.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TensorBoardOutputConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TensorBoardOutputConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

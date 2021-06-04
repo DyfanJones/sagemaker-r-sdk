@@ -1,8 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/workflow/entities.py
-
-#' @include error.R
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/workflow/entities.py
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title Base object for workflow entities.
 #' @description Entities must implement the to_request method.

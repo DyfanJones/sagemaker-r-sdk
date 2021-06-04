@@ -12,7 +12,7 @@ Accepts network configuration parameters and provides a method to turn these par
 \itemize{
 \item \href{#method-new}{\code{NetworkConfig$new()}}
 \item \href{#method-to_request_list}{\code{NetworkConfig$to_request_list()}}
-\item \href{#method-print}{\code{NetworkConfig$print()}}
+\item \href{#method-format}{\code{NetworkConfig$format()}}
 \item \href{#method-clone}{\code{NetworkConfig$clone()}}
 }
 }
@@ -58,21 +58,14 @@ Generates a request dictionary using the parameters provided to the class.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{NetworkConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{NetworkConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

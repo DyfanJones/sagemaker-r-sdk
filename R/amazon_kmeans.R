@@ -1,16 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/kmeans.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/kmeans.py
 
-#' @include image_uris.R
 #' @include amazon_estimator.R
 #' @include amazon_hyperparameter.R
 #' @include deserializers.R
-#' @include model.R
 #' @include serializers.R
-#' @include session.R
-#' @include utils.R
-#' @include vpc_utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title An unsupervised learning algorithm that attempts to find discrete groupings within data.
 #' @description As the result of KMeans, members of a group are as similar as possible to one another and as
@@ -322,7 +320,7 @@ KMeansPredictor = R6Class("KMeansPredictor",
 #'              Predictor to performs k-means cluster assignment.
 #' @export
 KMeansModel = R6Class("KMeansModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public = list(
 
     #' @description Initialize KMeansPredictor Class

@@ -1,17 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/workflow/airflow.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/workflow/airflow.py
 
-#' @include fw_utils.R
-#' @include job.R
-#' @include utils.R
-#' @include s3.R
-#' @include session.R
-#' @include vpc_utils.R
+#' @include r_utils.R
 #' @include amazon_estimator.R
 #' @include tensorflow_estimator.R
-#' @include model.R
-#' @include error.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title AirFlowWorkFlow helper class
 #' @description Helper class to take sagemaker classes and format output for Airflow.
@@ -985,11 +980,9 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
       return(object_list)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   private = list(

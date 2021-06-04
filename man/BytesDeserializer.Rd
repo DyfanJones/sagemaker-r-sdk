@@ -20,7 +20,7 @@ Deserialize a stream of bytes into a bytes object.
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseDeserializer" data-id="deserialize">}\href{../../R6sagemaker/html/BaseDeserializer.html#method-deserialize}{\code{R6sagemaker::BaseDeserializer$deserialize()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseDeserializer" data-id="print">}\href{../../R6sagemaker/html/BaseDeserializer.html#method-print}{\code{R6sagemaker::BaseDeserializer$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseDeserializer" data-id="format">}\href{../../R6sagemaker/html/BaseDeserializer.html#method-format}{\code{R6sagemaker::BaseDeserializer$format()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="SimpleBaseDeserializer" data-id="initialize">}\href{../../R6sagemaker/html/SimpleBaseDeserializer.html#method-initialize}{\code{R6sagemaker::SimpleBaseDeserializer$initialize()}}\out{</span>}
 }
 \out{</details>}

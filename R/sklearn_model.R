@@ -1,14 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/model.py
 
-#' @include image_uris.R
 #' @include deserializers.R
-#' @include fw_utils.R
-#' @include model.R
 #' @include predictor.R
 #' @include serializers.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title A Predictor for inference against Scikit-learn Endpoints.
@@ -40,7 +39,7 @@ SKLearnPredictor = R6Class("SKLearnPredictor",
 #'              ``Endpoint``.
 #' @export
 SKLearnModel = R6Class("SKLearnModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @description Initialize an SKLearnModel.

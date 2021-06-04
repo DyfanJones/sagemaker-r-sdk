@@ -1,13 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/model.py
 
-#' @include image_uris.R
 #' @include deserializers.R
 #' @include serializers.R
 #' @include xgboost_default.R
-#' @include session.R
-#' @include fw_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title XGBoostPredictor Class
@@ -38,7 +37,7 @@ XGBoostPredictor = R6Class("XGBoostPredictor",
 #' @description An XGBoost SageMaker ``Model`` that can be deployed to a SageMaker ``Endpoint``.
 #' @export
 XGBoostModel = R6Class("XGBoostModel",
-  inherit = FrameworkModel,
+  inherit = R6sagemaker.common::FrameworkModel,
   public = list(
 
     #' @description Initialize an XGBoostModel.

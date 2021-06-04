@@ -27,7 +27,7 @@ Config class of SHAP.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ExplainabilityConfig" data-id="print">}\href{../../R6sagemaker/html/ExplainabilityConfig.html#method-print}{\code{R6sagemaker::ExplainabilityConfig$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ExplainabilityConfig" data-id="format">}\href{../../R6sagemaker/html/ExplainabilityConfig.html#method-format}{\code{R6sagemaker::ExplainabilityConfig$format()}}\out{</span>}
 }
 \out{</details>}
 }

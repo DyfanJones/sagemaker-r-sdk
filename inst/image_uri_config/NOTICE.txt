@@ -1,6 +1,0 @@
-Amazon SageMaker Python SDK
-Copyright 2017-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-NOTE:
-  - ALL json objects have been retrieved from: https://github.com/aws/sagemaker-python-sdk/tree/master/src/sagemaker/image_uri_config
-  - These json files might be moved to a seperate R package so that they are decoupled and updated accordingly

@@ -18,7 +18,7 @@ Config object related to a model and its endpoint to be created.
 \itemize{
 \item \href{#method-new}{\code{ModelConfig$new()}}
 \item \href{#method-get_predictor_config}{\code{ModelConfig$get_predictor_config()}}
-\item \href{#method-print}{\code{ModelConfig$print()}}
+\item \href{#method-format}{\code{ModelConfig$format()}}
 \item \href{#method-clone}{\code{ModelConfig$clone()}}
 }
 }
@@ -76,21 +76,14 @@ Returns part of the predictor dictionary of the analysis config.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

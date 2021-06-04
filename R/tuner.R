@@ -1,14 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tuner.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tuner.py
 
-#' @include job.R
-#' @include estimator.R
-#' @include session.R
-#' @include utils.R
+#' @include r_utils.R
 #' @include parameter.R
 
 #' @import jsonlite
 #' @import lgr
 #' @import R6
+#' @import R6sagemaker.common
 
 AMAZON_ESTIMATOR_MODULE <- "R6sagemaker"
 AMAZON_ESTIMATOR_CLS_NAMES <- list(
@@ -149,12 +148,9 @@ WarmStartConfig = R6Class("WarmStartConfig",
       return(output)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<WarmStartConfig>")
-      invisible(self)
+    #' @description format class
+    format = function(){
+      sprintf("<%s>", class(self)[1])
     }
   )
 )
@@ -814,12 +810,9 @@ HyperparameterTuner = R6Class("HyperparameterTuner",
         self$metric_definitions_list[[estimator_name]] = metric_definitions
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      cat("<HyperparameterTuner>")
-      invisible(self)
+    #' @description format class
+    format = function(){
+      sprintf("<%s>", class(self)[1])
     }
   ),
   private = list(

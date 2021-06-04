@@ -27,7 +27,7 @@ Use this class when you want to provide your own container image containing the 
 \item \href{#method-list_executions}{\code{ModelMonitor$list_executions()}}
 \item \href{#method-attach}{\code{ModelMonitor$attach()}}
 \item \href{#method-monitoring_type}{\code{ModelMonitor$monitoring_type()}}
-\item \href{#method-print}{\code{ModelMonitor$print()}}
+\item \href{#method-format}{\code{ModelMonitor$format()}}
 \item \href{#method-clone}{\code{ModelMonitor$clone()}}
 }
 }
@@ -477,21 +477,14 @@ Type of the monitoring job.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelMonitor$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelMonitor$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

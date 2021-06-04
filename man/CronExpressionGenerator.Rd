@@ -12,7 +12,7 @@ Generates cron expression strings for the SageMaker Model Monitoring Schedule AP
 \item \href{#method-hourly}{\code{CronExpressionGenerator$hourly()}}
 \item \href{#method-daily}{\code{CronExpressionGenerator$daily()}}
 \item \href{#method-daily_every_x_hours}{\code{CronExpressionGenerator$daily_every_x_hours()}}
-\item \href{#method-print}{\code{CronExpressionGenerator$print()}}
+\item \href{#method-format}{\code{CronExpressionGenerator$format()}}
 \item \href{#method-clone}{\code{CronExpressionGenerator$clone()}}
 }
 }
@@ -77,21 +77,14 @@ str: The cron expression format accepted by the Amazon SageMaker Model Monitorin
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CronExpressionGenerator$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CronExpressionGenerator$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -7,7 +7,7 @@
 A class for interacting with CreateAutoMLJob API.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:.Job]{R6sagemaker::.Job}} -> \code{AutoMLJob}
+\code{\link[R6sagemaker.common:.Job]{R6sagemaker.common::.Job}} -> \code{AutoMLJob}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -16,14 +16,14 @@ A class for interacting with CreateAutoMLJob API.
 \item \href{#method-start_new}{\code{AutoMLJob$start_new()}}
 \item \href{#method-describe}{\code{AutoMLJob$describe()}}
 \item \href{#method-wait}{\code{AutoMLJob$wait()}}
-\item \href{#method-print}{\code{AutoMLJob$print()}}
+\item \href{#method-format}{\code{AutoMLJob$format()}}
 \item \href{#method-clone}{\code{AutoMLJob$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="stop">}\href{../../R6sagemaker/html/.Job.html#method-stop}{\code{R6sagemaker::.Job$stop()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic=".Job" data-id="stop">}\href{../../R6sagemaker.common/html/.Job.html#method-stop}{\code{R6sagemaker.common::.Job$stop()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -104,21 +104,14 @@ Wait for the AutoML job to finish.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AutoMLJob$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AutoMLJob$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

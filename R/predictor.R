@@ -1,20 +1,15 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/predictor.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/predictor.py
 
-#' @include utils.R
-#' @include fw_utils.R
-#' @include model.R
-#' @include fw_utils.R
-#' @include session.R
-#' @include vpc_utils.R
-#' @include analytics.R
+#' @include r_utils.R
 #' @include model_monitor_model_monitoring.R
 #' @include serializers.R
 #' @include deserializers.R
 #' @include lineage_context.R
-#' @include error.R
 
 #' @import paws
 #' @import R6
+#' @import R6sagemaker.common
 #' @import utils
 
 #' @title Predictor Class
@@ -326,11 +321,9 @@ Predictor = R6Class("Predictor",
       return (private$.context)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

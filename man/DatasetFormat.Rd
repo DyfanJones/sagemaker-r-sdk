@@ -12,7 +12,7 @@ Represents a Dataset Format that is used when calling a DefaultModelMonitor.
 \item \href{#method-csv}{\code{DatasetFormat$csv()}}
 \item \href{#method-josn}{\code{DatasetFormat$josn()}}
 \item \href{#method-sagemaker_capture_json}{\code{DatasetFormat$sagemaker_capture_json()}}
-\item \href{#method-print}{\code{DatasetFormat$print()}}
+\item \href{#method-format}{\code{DatasetFormat$format()}}
 \item \href{#method-clone}{\code{DatasetFormat$clone()}}
 }
 }
@@ -74,21 +74,14 @@ dict: JSON string containing DatasetFormat to be used by DefaultModelMonitor.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DatasetFormat$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DatasetFormat$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

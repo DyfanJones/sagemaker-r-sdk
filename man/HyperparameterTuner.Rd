@@ -51,7 +51,7 @@ for the ``HyperparameterTuner``.}
 \item \href{#method-identical_dataset_and_algorithm_tuner}{\code{HyperparameterTuner$identical_dataset_and_algorithm_tuner()}}
 \item \href{#method-create}{\code{HyperparameterTuner$create()}}
 \item \href{#method-.attach_estimator}{\code{HyperparameterTuner$.attach_estimator()}}
-\item \href{#method-print}{\code{HyperparameterTuner$print()}}
+\item \href{#method-format}{\code{HyperparameterTuner$format()}}
 \item \href{#method-clone}{\code{HyperparameterTuner$clone()}}
 }
 }
@@ -751,21 +751,14 @@ algorithm.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuner$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuner$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

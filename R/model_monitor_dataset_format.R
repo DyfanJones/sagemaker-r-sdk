@@ -1,6 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/dataset_format.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/dataset_format.py
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title DatasetFormat Class
 #' @description Represents a Dataset Format that is used when calling a DefaultModelMonitor.
@@ -37,11 +39,9 @@ DatasetFormat = R6Class("DatasetFormat",
       return(list("sagemakerCaptureJson"=list()))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )

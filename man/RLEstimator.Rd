@@ -7,7 +7,7 @@
 Handle end-to-end training and deployment of custom RLEstimator code.
 }
 \section{Super classes}{
-\code{\link[R6sagemaker:EstimatorBase]{R6sagemaker::EstimatorBase}} -> \code{\link[R6sagemaker:Framework]{R6sagemaker::Framework}} -> \code{RLEstimator}
+\code{\link[R6sagemaker.common:EstimatorBase]{R6sagemaker.common::EstimatorBase}} -> \code{\link[R6sagemaker.common:Framework]{R6sagemaker.common::Framework}} -> \code{RLEstimator}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -34,26 +34,26 @@ Handle end-to-end training and deployment of custom RLEstimator code.
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="compile_model">}\href{../../R6sagemaker/html/EstimatorBase.html#method-compile_model}{\code{R6sagemaker::EstimatorBase$compile_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="delete_endpoint">}\href{../../R6sagemaker/html/EstimatorBase.html#method-delete_endpoint}{\code{R6sagemaker::EstimatorBase$delete_endpoint()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="deploy">}\href{../../R6sagemaker/html/EstimatorBase.html#method-deploy}{\code{R6sagemaker::EstimatorBase$deploy()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="disable_profiling">}\href{../../R6sagemaker/html/EstimatorBase.html#method-disable_profiling}{\code{R6sagemaker::EstimatorBase$disable_profiling()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_default_profiling">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_default_profiling}{\code{R6sagemaker::EstimatorBase$enable_default_profiling()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/EstimatorBase.html#method-enable_network_isolation}{\code{R6sagemaker::EstimatorBase$enable_network_isolation()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="fit">}\href{../../R6sagemaker/html/EstimatorBase.html#method-fit}{\code{R6sagemaker::EstimatorBase$fit()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker::EstimatorBase$get_vpc_config()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_profiler_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_profiler_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_profiler_artifacts_path()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker/html/EstimatorBase.html#method-logs}{\code{R6sagemaker::EstimatorBase$logs()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="print">}\href{../../R6sagemaker/html/EstimatorBase.html#method-print}{\code{R6sagemaker::EstimatorBase$print()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="register">}\href{../../R6sagemaker/html/EstimatorBase.html#method-register}{\code{R6sagemaker::EstimatorBase$register()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="update_profiler">}\href{../../R6sagemaker/html/EstimatorBase.html#method-update_profiler}{\code{R6sagemaker::EstimatorBase$update_profiler()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker/html/EstimatorBase.html#method-wait}{\code{R6sagemaker::EstimatorBase$wait()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id=".prepare_for_training">}\href{../../R6sagemaker/html/Framework.html#method-.prepare_for_training}{\code{R6sagemaker::Framework$.prepare_for_training()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id="attach">}\href{../../R6sagemaker/html/Framework.html#method-attach}{\code{R6sagemaker::Framework$attach()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Framework" data-id="transformer">}\href{../../R6sagemaker/html/Framework.html#method-transformer}{\code{R6sagemaker::Framework$transformer()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="compile_model">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-compile_model}{\code{R6sagemaker.common::EstimatorBase$compile_model()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="delete_endpoint">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-delete_endpoint}{\code{R6sagemaker.common::EstimatorBase$delete_endpoint()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="deploy">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-deploy}{\code{R6sagemaker.common::EstimatorBase$deploy()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="disable_profiling">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-disable_profiling}{\code{R6sagemaker.common::EstimatorBase$disable_profiling()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="enable_default_profiling">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-enable_default_profiling}{\code{R6sagemaker.common::EstimatorBase$enable_default_profiling()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="enable_network_isolation">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-enable_network_isolation}{\code{R6sagemaker.common::EstimatorBase$enable_network_isolation()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="fit">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-fit}{\code{R6sagemaker.common::EstimatorBase$fit()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="format">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-format}{\code{R6sagemaker.common::EstimatorBase$format()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="get_vpc_config">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-get_vpc_config}{\code{R6sagemaker.common::EstimatorBase$get_vpc_config()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="latest_job_debugger_artifacts_path">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-latest_job_debugger_artifacts_path}{\code{R6sagemaker.common::EstimatorBase$latest_job_debugger_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="latest_job_profiler_artifacts_path">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-latest_job_profiler_artifacts_path}{\code{R6sagemaker.common::EstimatorBase$latest_job_profiler_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="latest_job_tensorboard_artifacts_path">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-latest_job_tensorboard_artifacts_path}{\code{R6sagemaker.common::EstimatorBase$latest_job_tensorboard_artifacts_path()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="logs">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-logs}{\code{R6sagemaker.common::EstimatorBase$logs()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="prepare_workflow_for_training">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-prepare_workflow_for_training}{\code{R6sagemaker.common::EstimatorBase$prepare_workflow_for_training()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="register">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-register}{\code{R6sagemaker.common::EstimatorBase$register()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="update_profiler">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-update_profiler}{\code{R6sagemaker.common::EstimatorBase$update_profiler()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="EstimatorBase" data-id="wait">}\href{../../R6sagemaker.common/html/EstimatorBase.html#method-wait}{\code{R6sagemaker.common::EstimatorBase$wait()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Framework" data-id=".prepare_for_training">}\href{../../R6sagemaker.common/html/Framework.html#method-.prepare_for_training}{\code{R6sagemaker.common::Framework$.prepare_for_training()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Framework" data-id="attach">}\href{../../R6sagemaker.common/html/Framework.html#method-attach}{\code{R6sagemaker.common::Framework$attach()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Framework" data-id="transformer">}\href{../../R6sagemaker.common/html/Framework.html#method-transformer}{\code{R6sagemaker.common::Framework$transformer()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -110,12 +110,12 @@ reinforcement learning training.}
 
 \item{\code{source_dir}}{(str): Path (absolute, relative or an S3 URI) to a directory
 with any other training source code dependencies aside from the entry
-point file (default: None). If ``source_dir`` is an S3 URI, it must
+point file (default: NULL). If ``source_dir`` is an S3 URI, it must
 point to a tar.gz file. Structure within this directory are preserved
 when training on Amazon SageMaker.}
 
 \item{\code{hyperparameters}}{(dict): Hyperparameters that will be used for
-training (default: None). The hyperparameters are made
+training (default: NULL). The hyperparameters are made
 accessible as a dict[str, str] to the training code on
 SageMaker. For convenience, this accepts other types for keys
 and values.}
@@ -150,7 +150,7 @@ You can find additional parameters for initializing this class at
 Create a SageMaker ``RLEstimatorModel`` object that can be deployed to an Endpoint.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RLEstimator$create_model(
-  role = None,
+  role = NULL,
   vpc_config_override = "VPC_CONFIG_DEFAULT",
   entry_point = NULL,
   source_dir = NULL,

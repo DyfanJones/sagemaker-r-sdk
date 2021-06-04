@@ -1,9 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/session.py
-
-#' @include s3.R
-#' @include session.R
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/data_capture_config.py
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title DataCaptureConfig Class
 #' @description Configuration object passed in when deploying models to Amazon SageMaker Endpoints.
@@ -116,11 +115,9 @@ DataCaptureConfig = R6Class("DataCaptureConfig",
       return(request_list)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   private = list(

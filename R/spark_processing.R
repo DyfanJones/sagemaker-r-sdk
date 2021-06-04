@@ -1,17 +1,16 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/spark/processing.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/spark/processing.py
 
-#' @include image_uris.R
 #' @include processing.R
-#' @include s3.R
-#' @include session.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 #' @importFrom jsonlite toJSON fromJSON
 #' @importFrom urltools url_parse
 #' @importFrom httr GET
-#' @importFrom sys exec_background
+#' @importFrom processx process
 
 #' @title Handles Amazon SageMaker processing tasks for jobs using Spark.
 #' @description Base class for either PySpark or SparkJars.
@@ -718,13 +717,13 @@ PySparkProcessor = R6Class("PySparkProcessor",
                                          ...){
          kwargs = list(...)
          extended_inputs = private$.handle_script_dependencies(
-            inputs, kwargs$submit_py_files, FileType$new()$PYTHON
+            inputs, kwargs$submit_py_files, FileType$PYTHON
          )
          extended_inputs = private$.handle_script_dependencies(
-            extended_inputs, kwargs$submit_jars, FileType$new()$JAR
+            extended_inputs, kwargs$submit_jars, FileType$JAR
          )
          extended_inputs = private$.handle_script_dependencies(
-            extended_inputs, kwargs$submit_files, FileType$new()$FILE
+            extended_inputs, kwargs$submit_files, FileType$FILE
          )
 
          return(super$.extend_processing_args(extended_inputs, outputs, ...))
@@ -895,10 +894,10 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
             stop("submit_class is required", call. = F)
 
          extended_inputs = private$.handle_script_dependencies(
-            inputs, kwargs$submit_jars, FileType$new()$JAR
+            inputs, kwargs$submit_jars, FileType$JAR
          )
          extended_inputs = private$.handle_script_dependencies(
-            extended_inputs, kwargs$submit_files, FileType$new()$FILE
+            extended_inputs, kwargs$submit_files, FileType$FILE
          )
 
          return(super$.extend_processing_args(extended_inputs, outputs, ...))
@@ -924,7 +923,7 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
          self$down()
          LOGGER$info("Starting history server...")
          cmd <- split_str(self$run_history_server_command, " ")
-         exec_background(cmd[1], cmd[-1], std_out = TRUE, std_err = TRUE)
+         process$new(cmd[1], args = cmd[-1], stdout = "|", stderr = "|")
       },
 
       # Stops and removes the container.
@@ -968,10 +967,8 @@ SparkJarProcessor = R6Class("SparkJarProcessor",
 )
 
 # Enum of file type
-FileType = R6Class("FileType",
-   public = list(
+FileType = Enum(
       JAR = 1,
       PYTHON = 2,
       FILE = 3
-   )
 )

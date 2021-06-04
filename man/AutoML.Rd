@@ -18,7 +18,7 @@ A class for creating and interacting with SageMaker AutoML jobs.
 \item \href{#method-create_model}{\code{AutoML$create_model()}}
 \item \href{#method-deploy}{\code{AutoML$deploy()}}
 \item \href{#method-validate_and_update_inference_response}{\code{AutoML$validate_and_update_inference_response()}}
-\item \href{#method-print}{\code{AutoML$print()}}
+\item \href{#method-format}{\code{AutoML$format()}}
 \item \href{#method-clone}{\code{AutoML$clone()}}
 }
 }
@@ -407,21 +407,14 @@ Validates the requested inference keys and updates response content.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AutoML$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AutoML$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

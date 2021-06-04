@@ -1,17 +1,15 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/knn.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/knn.py
 
-#' @include image_uris.R
 #' @include amazon_estimator.R
 #' @include amazon_common.R
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include predictor.R
-#' @include model.R
-#' @include session.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title An index-based algorithm. It uses a non-parametric method for classification or regression.
 #' @description For classification problems, the algorithm queries the k points that are closest to the sample
@@ -307,7 +305,7 @@ KNNPredictor = R6Class("KNNPredictor",
 #'              creates an Endpoint and returns :class:`KNNPredictor`.
 #' @export
 KNNModel = R6Class("KNNModel",
-  inherit = Model,
+  inherit = R6sagemaker.common::Model,
   public= list(
 
     #' @description Initialize KNNModel Class

@@ -29,7 +29,7 @@ Warm Start Configuration which defines the nature of the warm start
 \item \href{#method-new}{\code{WarmStartConfig$new()}}
 \item \href{#method-from_job_desc}{\code{WarmStartConfig$from_job_desc()}}
 \item \href{#method-to_input_req}{\code{WarmStartConfig$to_input_req()}}
-\item \href{#method-print}{\code{WarmStartConfig$print()}}
+\item \href{#method-format}{\code{WarmStartConfig$format()}}
 \item \href{#method-clone}{\code{WarmStartConfig$clone()}}
 }
 }
@@ -119,21 +119,14 @@ list: Containing the "WarmStartType" and
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{WarmStartConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{WarmStartConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
