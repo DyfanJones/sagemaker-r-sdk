@@ -1,21 +1,23 @@
 Package: R6sagemaker
 Type: Package
 Title: R SDK for `AWS Sagemaker`
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("aut", "cre")),
              person("Amazon.com, Inc.", role = "cph"))
 Description: A library for training and deploying machine learning models on 
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports:
+    R6sagemaker.common,
     data.table,
     fs,
     jsonlite,
     lgr,
     methods,
     paws,
+    httr,
     R6,
     stats,
-    sys,
+    processx,
     tools,
     urltools,
     utils,
@@ -28,13 +30,13 @@ Suggests:
     Matrix,
     sparsio,
     reticulate
+Remotes: DyfanJones/sagemaker-r-common
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Collate: 
-    'error.R'
-    'utils.R'
+    'r_utils.R'
     'apiutils_paws_functions.R'
     'apiutils_base_types.R'
     'lineage_api_types.R'
@@ -43,18 +45,12 @@ Collate:
     'lineage_context.R'
     'deserializers.R'
     'serializers.R'
-    'image_uris.R'
     'studio.R'
-    'vpc_utils.R'
-    'set_credentials.R'
-    'logs.R'
     'session.R'
     's3.R'
     'model_monitor_model_monitoring.R'
     'analytics.R'
-    'git_utils.R'
     'transformer.R'
-    'fw_utils.R'
     'model.R'
     'predictor.R'
     'input.R'
@@ -66,7 +62,6 @@ Collate:
     'amazon_common.R'
     'amazon_validation.R'
     'amazon_hyperparameter.R'
-    'fw_registry.R'
     'amazon_estimator.R'
     'amazon_factorization_machines.R'
     'amazon_ipinsights.R'
@@ -93,7 +88,6 @@ Collate:
     'debugger_metrics_config.R'
     'debugger_framework_profile.R'
     'debugger_profiler_config.R'
-    'deprecations.R'
     'huggingface_estimator.R'
     'lineage_action.R'
     'lineage_artifact.R'
@@ -113,7 +107,7 @@ Collate:
     'pytorch_defaults.R'
     'pytorch_model.R'
     'pytorch_estimator.R'
-    'r6sagemaker.R'
+    'reexport_r6sagemakercommon.R'
     'tensorflow_model.R'
     'tensorflow_defaults.R'
     'tensorflow_estimator.R'
