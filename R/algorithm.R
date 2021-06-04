@@ -1,8 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/algorithm.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/algorithm.py
 
 #' @include parameter.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 #' @include estimator.R
 #' @include transformer.R
 #' @include predictor.R

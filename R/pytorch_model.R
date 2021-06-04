@@ -1,17 +1,17 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/model.py
 
 #' @include session.R
-#' @include image_uris.R
 #' @include deserializers.R
-#' @include fw_utils.R
 #' @include model.R
 #' @include pytorch_defaults.R
 #' @include pytorch_model.R
 #' @include predictor.R
 #' @include serializers.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title A Predictor for inference against PyTorch Endpoints.

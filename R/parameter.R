@@ -1,11 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/parameter.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/parameter.py
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title ParameterRange Class
 #' @description Base class for representing parameter ranges. This is used to define what
 #'              hyperparameters to tune for an Amazon SageMaker hyperparameter tuning job
 #'              and to verify hyperparameters for Marketplace Algorithms.
+#' @export
 ParameterRange = R6Class("ParameterRange",
   public = list(
     #' @field .all_types
@@ -63,11 +66,9 @@ ParameterRange = R6Class("ParameterRange",
                    "ScalingType"= self$scaling_type))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-       print_class(self)
+    #' @description format class
+    format = function(){
+       format_class(self)
     }
   )
 )
@@ -97,11 +98,9 @@ ContinuousParameter = R6Class("ContinuousParameter",
                        scaling_type)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-       print_class(self)
+    #' @description format class
+    format = function(){
+       format_class(self)
     }
   )
 )
@@ -164,13 +163,6 @@ CategoricalParameter = R6Class("CategoricalParameter",
    #' @param value The value to be verified.
    cast_to_type = function(value){
      return (as.numeric(value))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-      print_class(self)
    }
   )
 )
@@ -204,13 +196,6 @@ IntegerParameter = R6Class("IntegerParameter",
    #' @param value The value to be verified.
    cast_to_type = function(value){
      return(as.integer(value))
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-      print_class(self)
    }
   )
 )

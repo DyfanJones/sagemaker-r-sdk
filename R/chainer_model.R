@@ -1,14 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/chainer/model.py
-
-#' @import R6
-#' @import lgr
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/chainer/model.py
 
 #' @include session.R
-#' @include fw_utils.R
 #' @include chainer_default.R
 #' @include chainer_model.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
+
+#' @import R6
+#' @import R6sagemaker.common
+#' @import lgr
 
 #' @title A Predictor for inference against Chainer Endpoints.
 #' @description This is able to serialize Python lists, dictionaries, and numpy arrays to

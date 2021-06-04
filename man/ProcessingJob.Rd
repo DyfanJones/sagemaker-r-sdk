@@ -44,7 +44,7 @@ Other Processor:
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="print">}\href{../../R6sagemaker/html/.Job.html#method-print}{\code{R6sagemaker::.Job$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic=".Job" data-id="format">}\href{../../R6sagemaker/html/.Job.html#method-format}{\code{R6sagemaker::.Job$format()}}\out{</span>}
 }
 \out{</details>}
 }

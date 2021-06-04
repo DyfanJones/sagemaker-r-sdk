@@ -11,7 +11,7 @@ Provides a method to turn those parameters into a dictionary.
 \itemize{
 \item \href{#method-new}{\code{AutoMLInput$new()}}
 \item \href{#method-to_request_list}{\code{AutoMLInput$to_request_list()}}
-\item \href{#method-print}{\code{AutoMLInput$print()}}
+\item \href{#method-format}{\code{AutoMLInput$format()}}
 \item \href{#method-clone}{\code{AutoMLInput$clone()}}
 }
 }
@@ -50,21 +50,14 @@ Generates a request dictionary using the parameters provided to the class.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AutoMLInput$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AutoMLInput$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

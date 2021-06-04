@@ -1,7 +1,10 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/cron_expression_generator.py
-#' @include utils.R
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/cron_expression_generator.py
+
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title CronExpressionGenerator class
 #' @description Generates cron expression strings for the SageMaker Model Monitoring Schedule API.
@@ -36,11 +39,9 @@ CronExpressionGenerator = R6Class("CronExpressionGenerator",
       return(sprintf("cron(0 %i/%i ? * * *)", starting_hour, hour_interval))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   )
 )

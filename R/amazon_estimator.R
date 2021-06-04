@@ -1,13 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/af7f75ae336f0481e52bb968e4cc6df91b1bac2c/src/sagemaker/amazon/amazon_estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/amazon_estimator.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include estimator.R
-#' @include fw_registry.R
 #' @include s3.R
 #' @include amazon_hyperparameter.R
 #' @include amazon_validation.R
 #' @include amazon_common.R
-#' @include image_uris.R
+
+#' @import R6sagemaker.common
 
 #' @import R6
 #' @import lgr
@@ -63,17 +64,31 @@ AmazonAlgorithmEstimatorBase = R6Class("AmazonAlgorithmEstimatorBase",
                        enable_network_isolation=enable_network_isolation,
                        ...)
 
-      data_location = data_location %||% sprintf("s3://%s/sagemaker-record-sets/", self$sagemaker_session$default_bucket())
-      private$.feature_dim = Hyperparameter$new("feature_dim", Validation$new()$gt(0), data_type=DataTypes$new()$int, obj = self)
-      private$.mini_batch_size = Hyperparameter$new("mini_batch_size", Validation$new()$gt(0), data_type=DataTypes$new()$int, obj = self)
+      data_location = (
+        data_location %||% sprintf("s3://%s/sagemaker-record-sets/", self$sagemaker_session$default_bucket()))
+      private$.feature_dim = (
+        Hyperparameter$new(
+          "feature_dim",
+          Validation$new()$gt(0),
+          data_type=DataTypes$new()$int, obj = self)
+      )
+      private$.mini_batch_size = (
+        Hyperparameter$new(
+          "mini_batch_size",
+          Validation$new()$gt(0),
+          data_type=DataTypes$new()$int,
+          obj = self)
+      )
       self$.data_location = data_location
     },
 
     #' @description Return algorithm image URI for the given AWS region, repository name, and
     #'              repository version
     training_image_uri = function(){
-      image_uri = ImageUris$new(self$sagemaker_session)
-      return(image_uri$retrieve(self$repo_name, version = self$repo_version))
+      return(ImageUris$new()$retrieve(
+        self$repo_name,
+        self$sagemaker_session$paws_region_name,
+        version = self$repo_version))
     },
 
     #' @description Return all non-None ``hyperparameter`` values on ``obj`` as a

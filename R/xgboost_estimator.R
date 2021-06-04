@@ -1,16 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/estimator.py
 
-#' @include fw_registry.R
 #' @include estimator.R
-#' @include image_uris.R
-#' @include fw_utils.R
 #' @include session.R
-#' @include vpc_utils.R
 #' @include xgboost_default.R
 #' @include xgboost_model.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title XGBoost Class

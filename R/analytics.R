@@ -1,10 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/analytics.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/analytics.py
 
 #' @include session.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import lgr
 #' @import R6
+#' @import R6sagemaker.common
 #' @import paws
 #' @import data.table
 
@@ -15,8 +17,7 @@ METRICS_PERIOD_DEFAULT = 60  # seconds
 #' @description Base class for tuning job or training job analytics classes. Understands
 #'              common functionality like persistence and caching.
 #' @export
-AnalyticsMetricsBase = R6Class(
-  "AnalyticsMetricsBase",
+AnalyticsMetricsBase = R6Class("AnalyticsMetricsBase",
   public = list(
     #' @description Initialize a ``AnalyticsMetricsBase`` instance.
     initialize = function() {
@@ -49,11 +50,9 @@ AnalyticsMetricsBase = R6Class(
       self$.dataframe = NULL
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   private = list(
@@ -136,13 +135,6 @@ HyperparameterTuningJobAnalytics = R6Class("HyperparameterTuningJobAnalytics",
      }
      self$.training_job_summaries = output
      return (output)
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
     },
 
     #' @description Clear the object of all local caches of API methods.
@@ -299,13 +291,6 @@ TrainingJobAnalytics = R6Class("TrainingJobAnalytics",
      super$clear_cache()
      self$.data = data.table()
      self$.time_interval = private$.determine_timeinterval()
-   },
-
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-     print_class(self)
    }
  ),
  private = list(
@@ -437,13 +422,6 @@ ExperimentAnalytics = R6Class("ExperimentAnalytics",
     clear_cache = function() {
       super$clear_cache()
       self$.trial_components = NULL
-    },
-
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
     }
   ),
   private = list(

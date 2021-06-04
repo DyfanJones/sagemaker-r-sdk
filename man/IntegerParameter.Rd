@@ -21,7 +21,6 @@ A class for representing hyperparameters that have an integer range of possible 
 \itemize{
 \item \href{#method-new}{\code{IntegerParameter$new()}}
 \item \href{#method-cast_to_type}{\code{IntegerParameter$cast_to_type()}}
-\item \href{#method-print}{\code{IntegerParameter$print()}}
 \item \href{#method-clone}{\code{IntegerParameter$clone()}}
 }
 }
@@ -29,6 +28,7 @@ A class for representing hyperparameters that have an integer range of possible 
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ParameterRange" data-id="as_tuning_range">}\href{../../R6sagemaker/html/ParameterRange.html#method-as_tuning_range}{\code{R6sagemaker::ParameterRange$as_tuning_range()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ParameterRange" data-id="format">}\href{../../R6sagemaker/html/ParameterRange.html#method-format}{\code{R6sagemaker::ParameterRange$format()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ParameterRange" data-id="is_valid">}\href{../../R6sagemaker/html/ParameterRange.html#method-is_valid}{\code{R6sagemaker::ParameterRange$is_valid()}}\out{</span>}
 }
 \out{</details>}
@@ -73,23 +73,6 @@ cast value to integer
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{value}}{The value to be verified.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IntegerParameter$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

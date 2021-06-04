@@ -28,7 +28,7 @@ Base class for representing parameter ranges. This is used to define what
 \item \href{#method-is_valid}{\code{ParameterRange$is_valid()}}
 \item \href{#method-cast_to_type}{\code{ParameterRange$cast_to_type()}}
 \item \href{#method-as_tuning_range}{\code{ParameterRange$as_tuning_range()}}
-\item \href{#method-print}{\code{ParameterRange$print()}}
+\item \href{#method-format}{\code{ParameterRange$format()}}
 \item \href{#method-clone}{\code{ParameterRange$clone()}}
 }
 }
@@ -119,21 +119,14 @@ dict[str, str]: A dictionary that contains the name and values of
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ParameterRange$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ParameterRange$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

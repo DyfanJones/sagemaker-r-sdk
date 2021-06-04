@@ -1,14 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/session.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/session.py
 
-#' @include utils.R
-#' @include logs.R
-#' @include set_credentials.R
-#' @include vpc_utils.R
+#' @include r_utils.R
 #' @include studio.R
 
 #' @import paws
-#' @import jsonlite
 #' @import R6
+#' @import R6sagemaker.common
+#' @import jsonlite
 #' @import lgr
 #' @import utils
 
@@ -158,7 +157,10 @@ Session = R6Class("Session",
       # Loop through the contents of the bucket, 1,000 objects at a time. Gathering all keys into
       # a "keys" list.
       while(!identical(next_token, character(0))){
-        response = self$s3$list_objects_v2(Bucket = bucket, Prefix = key_prefix, ContinuationToken = next_token)
+        response = self$s3$list_objects_v2(
+          Bucket = bucket,
+          Prefix = key_prefix,
+          ContinuationToken = next_token)
         # For each object, save its key or directory.
         keys = c(keys, sapply(response$Contents, function(x) x$Key))
         next_token = response$ContinuationToken
@@ -173,13 +175,14 @@ Session = R6Class("Session",
       list_dir = gsub("^/", "", output[files])
 
       if (path =="") path = getwd()
-      destination_path = sapply(1:length(list_dir),
-                                function(i) {
-                                  if (list_dir[i] == "")
-                                    file.path(path, tail_s3_uri_path[files][i])
-                                  else
-                                    file.path(path, list_dir[i], tail_s3_uri_path[files][i])
-                                })
+      destination_path = sapply(
+        1:length(list_dir),
+        function(i) {
+          if (list_dir[i] == "")
+            file.path(path, tail_s3_uri_path[files][i])
+          else
+            file.path(path, list_dir[i], tail_s3_uri_path[files][i])
+        })
 
       # create directory
       sapply(dirname(destination_path), dir.create, showWarnings = F, recursive = T)
@@ -2243,11 +2246,9 @@ Session = R6Class("Session",
         private$.check_job_status(job_name, description, "TransformJobStatus")}
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description foramt class
+    format = function(){
+      format_class(self)
     }
   ),
   private = list(

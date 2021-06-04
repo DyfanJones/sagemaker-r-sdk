@@ -1,13 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/mxnet/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/mxnet/estimator.py
 
-#' @include deprecations.R
 #' @include model.R
-#' @include fw_utils.R
 #' @include mxnet_default.R
 #' @include serializers.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title MXNetPredictor Class

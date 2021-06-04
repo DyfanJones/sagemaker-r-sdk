@@ -20,7 +20,7 @@ A SageMaker ``Model`` that can be deployed to an ``Endpoint``.
 \item \href{#method-transformer}{\code{Model$transformer()}}
 \item \href{#method-delete_model}{\code{Model$delete_model()}}
 \item \href{#method-.create_sagemaker_model}{\code{Model$.create_sagemaker_model()}}
-\item \href{#method-print}{\code{Model$print()}}
+\item \href{#method-format}{\code{Model$format()}}
 \item \href{#method-clone}{\code{Model$clone()}}
 }
 }
@@ -550,21 +550,14 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagem
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Model$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Model$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

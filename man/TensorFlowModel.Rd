@@ -35,8 +35,8 @@ A ``FrameworkModel`` implementation for inference with TensorFlow Serving.
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="delete_model">}\href{../../R6sagemaker/html/Model.html#method-delete_model}{\code{R6sagemaker::Model$delete_model()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="deploy">}\href{../../R6sagemaker/html/Model.html#method-deploy}{\code{R6sagemaker::Model$deploy()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="enable_network_isolation">}\href{../../R6sagemaker/html/Model.html#method-enable_network_isolation}{\code{R6sagemaker::Model$enable_network_isolation()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="format">}\href{../../R6sagemaker/html/Model.html#method-format}{\code{R6sagemaker::Model$format()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="package_for_edge">}\href{../../R6sagemaker/html/Model.html#method-package_for_edge}{\code{R6sagemaker::Model$package_for_edge()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="print">}\href{../../R6sagemaker/html/Model.html#method-print}{\code{R6sagemaker::Model$print()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Model" data-id="transformer">}\href{../../R6sagemaker/html/Model.html#method-transformer}{\code{R6sagemaker::Model$transformer()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="FrameworkModel" data-id="prepare_container_def">}\href{../../R6sagemaker/html/FrameworkModel.html#method-prepare_container_def}{\code{R6sagemaker::FrameworkModel$prepare_container_def()}}\out{</span>}
 }

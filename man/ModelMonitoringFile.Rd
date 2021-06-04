@@ -11,7 +11,7 @@ Represents a file with a body and an S3 uri.
 \itemize{
 \item \href{#method-new}{\code{ModelMonitoringFile$new()}}
 \item \href{#method-save}{\code{ModelMonitoringFile$save()}}
-\item \href{#method-print}{\code{ModelMonitoringFile$print()}}
+\item \href{#method-format}{\code{ModelMonitoringFile$format()}}
 \item \href{#method-clone}{\code{ModelMonitoringFile$clone()}}
 }
 }
@@ -66,21 +66,14 @@ str: The s3 location to which the file was saved.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelMonitoringFile$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelMonitoringFile$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

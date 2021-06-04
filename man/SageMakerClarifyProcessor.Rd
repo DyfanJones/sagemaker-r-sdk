@@ -24,7 +24,7 @@ Handles SageMaker Processing task to compute bias metrics and explain a model.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Processor" data-id="print">}\href{../../R6sagemaker/html/Processor.html#method-print}{\code{R6sagemaker::Processor$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Processor" data-id="format">}\href{../../R6sagemaker/html/Processor.html#method-format}{\code{R6sagemaker::Processor$format()}}\out{</span>}
 }
 \out{</details>}
 }

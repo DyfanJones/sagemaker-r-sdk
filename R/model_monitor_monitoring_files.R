@@ -1,10 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/f14d70a2dc92ad4b15e2260ee9e01f24a7e0bee4/src/sagemaker/model_monitor/monitoring_files.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/monitoring_files.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include session.R
 #' @include s3.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 #' @import jsonlite
 #' @import uuid
@@ -52,11 +54,9 @@ ModelMonitoringFile = R6Class("ModelMonitoringFile",
           session=self$session))
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   lock_objects = F

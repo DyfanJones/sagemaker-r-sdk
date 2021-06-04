@@ -1,9 +1,11 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/deed079c8f51555b497bc723bd5902ce2a0edf53/src/sagemaker/transformer.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/transformer.py
 
 #' @include session.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title Transformer class
 #' @description A class for handling creating and interacting with Amazon SageMaker
@@ -257,11 +259,9 @@ Transformer = R6Class("Transformer",
       return(transformer)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

@@ -10,7 +10,7 @@ Abstract config class to configure an explainability method.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-get_explainability_config}{\code{ExplainabilityConfig$get_explainability_config()}}
-\item \href{#method-print}{\code{ExplainabilityConfig$print()}}
+\item \href{#method-format}{\code{ExplainabilityConfig$format()}}
 \item \href{#method-clone}{\code{ExplainabilityConfig$clone()}}
 }
 }
@@ -25,21 +25,14 @@ Returns config.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ExplainabilityConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ExplainabilityConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

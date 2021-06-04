@@ -12,7 +12,7 @@ It returns the target time duration in dictionary format that you can pass to th
 \itemize{
 \item \href{#method-new}{\code{TimeRange$new()}}
 \item \href{#method-to_json}{\code{TimeRange$to_json()}}
-\item \href{#method-print}{\code{TimeRange$print()}}
+\item \href{#method-format}{\code{TimeRange$format()}}
 \item \href{#method-clone}{\code{TimeRange$clone()}}
 }
 }
@@ -51,12 +51,12 @@ dict: The time range as a dictionary.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TimeRange$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TimeRange$format()}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

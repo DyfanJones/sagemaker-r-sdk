@@ -1,18 +1,16 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/estimator.py
 
-#' @include image_uris.R
 #' @include s3.R
-#' @include utils.R
+#' @include r_utils.R
 #' @include debugger.R
-#' @include deprecations.R
 #' @include estimator.R
-#' @include fw_utils.R
 #' @include tensorflow_defaults.R
 #' @include tensorflow_model.R
 #' @include transformer.R
-#' @include vpc_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title TensorFlow Class

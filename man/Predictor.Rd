@@ -43,7 +43,7 @@ Make prediction requests to an Amazon SageMaker endpoint.
 \item \href{#method-update_data_capture_config}{\code{Predictor$update_data_capture_config()}}
 \item \href{#method-list_monitors}{\code{Predictor$list_monitors()}}
 \item \href{#method-endpoint_context}{\code{Predictor$endpoint_context()}}
-\item \href{#method-print}{\code{Predictor$print()}}
+\item \href{#method-format}{\code{Predictor$format()}}
 \item \href{#method-clone}{\code{Predictor$clone()}}
 }
 }
@@ -312,21 +312,14 @@ ContextEndpoint: The context for the endpoint.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Predictor$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Predictor$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -1,6 +1,6 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/ntm.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/ntm.py
 
-#' @include image_uris.R
 #' @include amazon_estimator.R
 #' @include amazon_common.R
 #' @include amazon_hyperparameter.R
@@ -8,10 +8,10 @@
 #' @include predictor.R
 #' @include model.R
 #' @include session.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title An unsupervised learning algorithm used to organize a corpus of documents into topics

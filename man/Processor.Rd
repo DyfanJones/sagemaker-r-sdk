@@ -60,7 +60,7 @@ Other Processor:
 \itemize{
 \item \href{#method-new}{\code{Processor$new()}}
 \item \href{#method-run}{\code{Processor$run()}}
-\item \href{#method-print}{\code{Processor$print()}}
+\item \href{#method-format}{\code{Processor$format()}}
 \item \href{#method-clone}{\code{Processor$clone()}}
 }
 }
@@ -192,21 +192,14 @@ Dictionary contains three optional keys:
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Processor$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Processor$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

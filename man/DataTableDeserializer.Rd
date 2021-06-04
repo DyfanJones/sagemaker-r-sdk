@@ -27,7 +27,7 @@ Deserialize CSV or JSON data from an inference endpoint into a data.table.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseDeserializer" data-id="print">}\href{../../R6sagemaker/html/BaseDeserializer.html#method-print}{\code{R6sagemaker::BaseDeserializer$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseDeserializer" data-id="format">}\href{../../R6sagemaker/html/BaseDeserializer.html#method-format}{\code{R6sagemaker::BaseDeserializer$format()}}\out{</span>}
 }
 \out{</details>}
 }

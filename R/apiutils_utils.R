@@ -1,6 +1,7 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_utils.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_utils.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include session.R
 
 #' @import R6

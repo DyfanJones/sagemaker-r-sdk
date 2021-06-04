@@ -1,10 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pipeline.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pipeline.py
 
 #' @include session.R
-#' @include utils.R
+#' @include r_utils.R
 #' @include transformer.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title A pipeline of SageMaker `Model` instances.
 #' @description This pipeline can be deployed as an `Endpoint` on SageMaker.
@@ -240,6 +242,11 @@ PipelineModel = R6Class("PipelineModel",
         stop("The SageMaker model must be created before attempting to delete.", call. = F)
 
       self$sagemaker_session$delete_model(self$name)
+    },
+
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   private = list(

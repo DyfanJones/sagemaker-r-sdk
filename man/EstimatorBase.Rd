@@ -51,7 +51,7 @@ Updating the profiling configuration for TensorFlow dataloader profiling
 \item \href{#method-enable_default_profiling}{\code{EstimatorBase$enable_default_profiling()}}
 \item \href{#method-disable_profiling}{\code{EstimatorBase$disable_profiling()}}
 \item \href{#method-update_profiler}{\code{EstimatorBase$update_profiler()}}
-\item \href{#method-print}{\code{EstimatorBase$print()}}
+\item \href{#method-format}{\code{EstimatorBase$format()}}
 \item \href{#method-clone}{\code{EstimatorBase$clone()}}
 }
 }
@@ -999,21 +999,14 @@ method. (default: ``False``)}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{EstimatorBase$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

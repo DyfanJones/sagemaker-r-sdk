@@ -1,7 +1,9 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_boto_functions.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/apiutils/_boto_functions.py
 
-#' @include utils.R
+#' @include r_utils.R
 
+#' @import R6
 #' @importFrom tools toTitleCase
 
 PawsFunctions = R6Class("PawsFunctions",

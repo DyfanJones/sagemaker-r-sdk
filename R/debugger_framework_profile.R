@@ -1,11 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/framework_profile.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/framework_profile.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include debugger_metrics_config.R
 #' @include debugger_profiler_constants.R
 #' @include debugger_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 ALL_METRIC_CONFIGS <- list(
   DetailedProfilingConfig,
@@ -49,7 +51,7 @@ ALL_METRIC_CONFIGS <- list(
 #'              }
 #' @examples
 #' library(R6sagemaker)
-#' profiler_config=ProfilerConfig(
+#' profiler_config=ProfilerConfig$new(
 #'        framework_profile_params=FrameworkProfile$new(
 #'        start_step=1,
 #'        num_steps=10,
@@ -126,11 +128,10 @@ FrameworkProfile = R6Class("FrameworkProfile",
         private$.create_default_metrics_configs()
     },
 
-    #' @description
-    #' Printer.
+    #' @description format class
     #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    format = function(...){
+      return(format_class(self))
     }
   ),
   private = list(

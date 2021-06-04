@@ -1,15 +1,15 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/ipinsights.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/ipinsights.py
 
-#' @include image_uris.R
 #' @include amazon_estimator.R
 #' @include amazon_hyperparameter.R
 #' @include deserializers.R
 #' @include model.R
 #' @include serializers.R
 #' @include session.R
-#' @include vpc_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title An unsupervised learning algorithm that learns the usage patterns for IPv4 addresses.
 #' @description It is designed to capture associations between IPv4 addresses and various entities, such

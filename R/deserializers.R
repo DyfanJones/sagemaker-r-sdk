@@ -1,6 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/deserializers.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/deserializers.py
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import jsonlite
 #' @import data.table
 
@@ -17,11 +19,9 @@ BaseDeserializer = R6Class("BaseDeserializer",
     #' @return object: The data deserialized into an object.
     deserialize = function(stream, content_type) {stop("I'm an abstract interface method", call. = F)},
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      print_class(self)
+    #' @description format class
+    format = function(){
+      format_class(self)
     }
   ),
   active = list(

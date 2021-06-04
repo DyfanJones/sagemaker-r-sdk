@@ -36,7 +36,7 @@ Configuration object passed in when deploying models to Amazon SageMaker Endpoin
 \itemize{
 \item \href{#method-new}{\code{DataCaptureConfig$new()}}
 \item \href{#method-to_request_list}{\code{DataCaptureConfig$to_request_list()}}
-\item \href{#method-print}{\code{DataCaptureConfig$print()}}
+\item \href{#method-format}{\code{DataCaptureConfig$format()}}
 \item \href{#method-clone}{\code{DataCaptureConfig$clone()}}
 }
 }
@@ -98,21 +98,14 @@ Generates a request named list using the parameters provided to the class.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DataCaptureConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DataCaptureConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

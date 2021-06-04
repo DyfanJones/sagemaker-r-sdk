@@ -39,7 +39,7 @@ Validates user inputs and fills in default values if no input is provided.
 }
 \examples{
 library(R6sagemaker)
-profiler_config=ProfilerConfig(
+profiler_config=ProfilerConfig$new(
        framework_profile_params=FrameworkProfile$new(
        start_step=1,
        num_steps=10,
@@ -53,7 +53,7 @@ profiler_config=ProfilerConfig(
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-intialize}{\code{FrameworkProfile$intialize()}}
-\item \href{#method-print}{\code{FrameworkProfile$print()}}
+\item \href{#method-format}{\code{FrameworkProfile$format()}}
 \item \href{#method-clone}{\code{FrameworkProfile$clone()}}
 }
 }
@@ -123,12 +123,12 @@ Pass ``PythonProfilingConfig()`` to use the default configuration.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkProfile$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FrameworkProfile$format(...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

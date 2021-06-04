@@ -33,7 +33,7 @@ Debugger rule classes inheriting this RuleBase class are
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{RuleBase$new()}}
-\item \href{#method-print}{\code{RuleBase$print()}}
+\item \href{#method-format}{\code{RuleBase$format()}}
 \item \href{#method-clone}{\code{RuleBase$clone()}}
 }
 }
@@ -75,21 +75,14 @@ Initialize RuleBase class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RuleBase$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RuleBase$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

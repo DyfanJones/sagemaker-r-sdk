@@ -16,7 +16,7 @@ It determines the step or time range that needs to be
 \itemize{
 \item \href{#method-new}{\code{MetricsConfigBase$new()}}
 \item \href{#method-to_json_string}{\code{MetricsConfigBase$to_json_string()}}
-\item \href{#method-print}{\code{MetricsConfigBase$print()}}
+\item \href{#method-format}{\code{MetricsConfigBase$format()}}
 \item \href{#method-clone}{\code{MetricsConfigBase$clone()}}
 }
 }
@@ -67,21 +67,14 @@ str: This metrics configuration as a dictionary and formatted as a string.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MetricsConfigBase$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MetricsConfigBase$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

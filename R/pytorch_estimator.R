@@ -1,13 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/estimator.py
 
 #' @include estimator.R
-#' @include fw_utils.R
 #' @include pytorch_defaults.R
 #' @include pytorch_model.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title PyTorch Class

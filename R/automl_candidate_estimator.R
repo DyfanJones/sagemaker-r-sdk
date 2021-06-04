@@ -1,10 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/candidate_estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/candidate_estimator.py
 
 #' @include session.R
 #' @include job.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title CandidateEstimator Class
 #' @description A class for SageMaker AutoML Job Candidate
@@ -157,11 +159,9 @@ CandidateEstimator = R6Class("CandidateEstimator",
       }
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(
@@ -325,11 +325,9 @@ CandidateStep = R6Class("CandidateStep",
       self$description = description
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   )
 )

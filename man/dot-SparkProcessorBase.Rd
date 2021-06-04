@@ -22,7 +22,7 @@ Base class for either PySpark or SparkJars.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ScriptProcessor" data-id="print">}\href{../../R6sagemaker/html/ScriptProcessor.html#method-print}{\code{R6sagemaker::ScriptProcessor$print()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Processor" data-id="format">}\href{../../R6sagemaker/html/Processor.html#method-format}{\code{R6sagemaker::Processor$format()}}\out{</span>}
 }
 \out{</details>}
 }

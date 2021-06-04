@@ -1,13 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/clarify_model_monitoring.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/clarify_model_monitoring.py
 
 #' @include session.R
 #' @include s3.R
-#' @include utils.R
+#' @include r_utils.R
 #' @include clarify.R
 #' @include model_monitor_model_monitoring.R
-#' @include error.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 #' @import uuid
 #' @import jsonlite

@@ -1,9 +1,11 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/profiler_config.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/debugger/profiler_config.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include debugger_framework_profile.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title Configuration for collecting system and framework metrics of SageMaker training jobs.
 #' @description SageMaker Debugger collects system and framework profiling
@@ -67,11 +69,9 @@ ProfilerConfig = R6Class("ProfilerConfig",
       return(profiler_config_request)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

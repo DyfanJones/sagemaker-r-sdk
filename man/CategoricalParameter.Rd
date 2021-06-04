@@ -27,13 +27,13 @@ A class for representing hyperparameters that have a discrete list of
 \item \href{#method-as_json_range}{\code{CategoricalParameter$as_json_range()}}
 \item \href{#method-is_valid}{\code{CategoricalParameter$is_valid()}}
 \item \href{#method-cast_to_type}{\code{CategoricalParameter$cast_to_type()}}
-\item \href{#method-print}{\code{CategoricalParameter$print()}}
 \item \href{#method-clone}{\code{CategoricalParameter$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ParameterRange" data-id="format">}\href{../../R6sagemaker/html/ParameterRange.html#method-format}{\code{R6sagemaker::ParameterRange$format()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -135,23 +135,6 @@ cast value to numeric
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{value}}{The value to be verified.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CategoricalParameter$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
 \if{html}{\out{</div>}}
 }

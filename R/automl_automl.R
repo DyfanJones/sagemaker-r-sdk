@@ -1,14 +1,16 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/automl.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+#bhttps://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/automl/automl.py
 
 #' @include model.R
 #' @include pipeline.R
 #' @include automl_candidate_estimator.R
 #' @include job.R
 #' @include session.R
-#' @include utils.R
+#' @include r_utils.R
 
-#' @import lgr
 #' @import R6
+#' @import R6sagemaker.common
+#' @import lgr
 
 #' @title AutoML Class
 #' @description A class for creating and interacting with SageMaker AutoML jobs.
@@ -416,11 +418,9 @@ AutoML = R6Class("AutoML",
       return(inference_containers)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(
@@ -561,11 +561,9 @@ AutoMLInput = R6Class("AutoMLInput",
       return(auto_ml_input)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   lock_objects = F
@@ -629,11 +627,9 @@ AutoMLJob = R6Class("AutoMLJob",
         self$sagemaker_session$wait_for_auto_ml_job(self$job_name)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

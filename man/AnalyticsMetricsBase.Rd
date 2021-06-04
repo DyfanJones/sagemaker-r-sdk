@@ -14,7 +14,7 @@ Base class for tuning job or training job analytics classes. Understands
 \item \href{#method-export_csv}{\code{AnalyticsMetricsBase$export_csv()}}
 \item \href{#method-dataframe}{\code{AnalyticsMetricsBase$dataframe()}}
 \item \href{#method-clear_cache}{\code{AnalyticsMetricsBase$clear_cache()}}
-\item \href{#method-print}{\code{AnalyticsMetricsBase$print()}}
+\item \href{#method-format}{\code{AnalyticsMetricsBase$format()}}
 \item \href{#method-clone}{\code{AnalyticsMetricsBase$clone()}}
 }
 }
@@ -78,21 +78,14 @@ Clear the object of all local caches of API methods, so that the next
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AnalyticsMetricsBase$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AnalyticsMetricsBase$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

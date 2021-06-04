@@ -1,18 +1,13 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/762b509f711daf4d0d7b759626f614fcf618b74e/src/sagemaker/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model.py
 
 #' @include session.R
-#' @include logs.R
-#' @include vpc_utils.R
-#' @include set_credentials.R
-#' @include fw_utils.R
 #' @include transformer.R
-#' @include git_utils.R
-#' @include image_uris.R
-
 
 #' @import paws
 #' @import jsonlite
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 NEO_ALLOWED_FRAMEWORKS <- list("mxnet", "tensorflow", "keras", "pytorch", "onnx", "xgboost", "tflite")
@@ -565,11 +560,9 @@ Model = R6Class("Model",
         tags=tags)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

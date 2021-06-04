@@ -29,7 +29,6 @@ Fetch training curve data from CloudWatch Metrics for a specific training
 \itemize{
 \item \href{#method-new}{\code{TrainingJobAnalytics$new()}}
 \item \href{#method-clear_cache}{\code{TrainingJobAnalytics$clear_cache()}}
-\item \href{#method-print}{\code{TrainingJobAnalytics$print()}}
 \item \href{#method-clone}{\code{TrainingJobAnalytics$clone()}}
 }
 }
@@ -38,6 +37,7 @@ Fetch training curve data from CloudWatch Metrics for a specific training
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="dataframe">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-dataframe}{\code{R6sagemaker::AnalyticsMetricsBase$dataframe()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="export_csv">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-export_csv}{\code{R6sagemaker::AnalyticsMetricsBase$export_csv()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="format">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-format}{\code{R6sagemaker::AnalyticsMetricsBase$format()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -91,23 +91,6 @@ Clear the object of all local caches of API methods, so that the next
 \if{html}{\out{<div class="r">}}\preformatted{TrainingJobAnalytics$clear_cache()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TrainingJobAnalytics$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -12,7 +12,7 @@ A class for SageMaker AutoML Job Candidate
 \item \href{#method-new}{\code{CandidateEstimator$new()}}
 \item \href{#method-get_steps}{\code{CandidateEstimator$get_steps()}}
 \item \href{#method-fit}{\code{CandidateEstimator$fit()}}
-\item \href{#method-print}{\code{CandidateEstimator$print()}}
+\item \href{#method-format}{\code{CandidateEstimator$format()}}
 \item \href{#method-clone}{\code{CandidateEstimator$clone()}}
 }
 }
@@ -97,21 +97,14 @@ Only meaningful when wait is True (default: True).}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CandidateEstimator$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CandidateEstimator$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

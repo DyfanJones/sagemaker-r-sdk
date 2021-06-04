@@ -85,7 +85,7 @@ bucket based on a naming convention which includes the current AWS account ID.
 \item \href{#method-logs_for_job}{\code{Session$logs_for_job()}}
 \item \href{#method-logs_for_processing_job}{\code{Session$logs_for_processing_job()}}
 \item \href{#method-logs_for_transform_job}{\code{Session$logs_for_transform_job()}}
-\item \href{#method-print}{\code{Session$print()}}
+\item \href{#method-format}{\code{Session$format()}}
 \item \href{#method-clone}{\code{Session$clone()}}
 }
 }
@@ -2365,21 +2365,14 @@ completion (Default: 10).}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+foramt class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Session$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Session$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

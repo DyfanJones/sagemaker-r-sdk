@@ -1,7 +1,9 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/_studio.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/_studio.py
 
-#' @include utils.R
+#' @include r_utils.R
 
+#' @import R6sagemaker.common
 #' @import lgr
 
 STUDIO_PROJECT_CONFIG = ".sagemaker-code-config"

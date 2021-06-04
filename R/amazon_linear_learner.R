@@ -1,6 +1,6 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/linear_learner.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/amazon/linear_learner.py
 
-#' @include image_uris.R
 #' @include amazon_estimator.R
 #' @include amazon_common.R
 #' @include amazon_hyperparameter.R
@@ -8,10 +8,10 @@
 #' @include predictor.R
 #' @include model.R
 #' @include session.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title A supervised learning algorithms used for solving classification or regression problems.
 #' @description For input, you give the model labeled examples (x, y). x is a high-dimensional vector and

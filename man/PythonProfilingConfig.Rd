@@ -19,8 +19,8 @@ The configuration for framework metrics to be collected for Python profiling.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="format">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-format}{\code{R6sagemaker::MetricsConfigBase$format()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="initialize">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-initialize}{\code{R6sagemaker::MetricsConfigBase$initialize()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="print">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-print}{\code{R6sagemaker::MetricsConfigBase$print()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="to_json_string">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-to_json_string}{\code{R6sagemaker::MetricsConfigBase$to_json_string()}}\out{</span>}
 }
 \out{</details>}

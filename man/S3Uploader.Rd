@@ -11,7 +11,7 @@ Contains static methods for uploading directories or files to S3
 \itemize{
 \item \href{#method-upload}{\code{S3Uploader$upload()}}
 \item \href{#method-upload_string_as_file_body}{\code{S3Uploader$upload_string_as_file_body()}}
-\item \href{#method-print}{\code{S3Uploader$print()}}
+\item \href{#method-format}{\code{S3Uploader$format()}}
 \item \href{#method-clone}{\code{S3Uploader$clone()}}
 }
 }
@@ -83,21 +83,14 @@ str: The S3 uri of the uploaded file(s).
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{S3Uploader$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{S3Uploader$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

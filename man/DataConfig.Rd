@@ -30,7 +30,7 @@ Config object related to configurations of the input and output dataset.
 \itemize{
 \item \href{#method-new}{\code{DataConfig$new()}}
 \item \href{#method-get_config}{\code{DataConfig$get_config()}}
-\item \href{#method-print}{\code{DataConfig$print()}}
+\item \href{#method-format}{\code{DataConfig$format()}}
 \item \href{#method-clone}{\code{DataConfig$clone()}}
 }
 }
@@ -89,21 +89,14 @@ Returns part of an analysis config dictionary.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DataConfig$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DataConfig$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

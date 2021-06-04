@@ -57,7 +57,6 @@ https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#Sage
 \item \href{#method-new}{\code{HyperparameterTuningJobAnalytics$new()}}
 \item \href{#method-description}{\code{HyperparameterTuningJobAnalytics$description()}}
 \item \href{#method-training_job_summaries}{\code{HyperparameterTuningJobAnalytics$training_job_summaries()}}
-\item \href{#method-print}{\code{HyperparameterTuningJobAnalytics$print()}}
 \item \href{#method-clear_cache}{\code{HyperparameterTuningJobAnalytics$clear_cache()}}
 \item \href{#method-clone}{\code{HyperparameterTuningJobAnalytics$clone()}}
 }
@@ -67,6 +66,7 @@ https://botocore.readthedocs.io/en/latest/reference/services/sagemaker.html#Sage
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="dataframe">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-dataframe}{\code{R6sagemaker::AnalyticsMetricsBase$dataframe()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="export_csv">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-export_csv}{\code{R6sagemaker::AnalyticsMetricsBase$export_csv()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="AnalyticsMetricsBase" data-id="format">}\href{../../R6sagemaker/html/AnalyticsMetricsBase.html#method-format}{\code{R6sagemaker::AnalyticsMetricsBase$format()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -140,23 +140,6 @@ SageMaker API.}
 \subsection{Returns}{
 dict: The Amazon SageMaker response for
              ``ListTrainingJobsForTuningJob``.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{HyperparameterTuningJobAnalytics$print(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

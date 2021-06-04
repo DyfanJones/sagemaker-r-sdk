@@ -1,10 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/job.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/job.py
 
-#' @include utils.R
+#' @include r_utils.R
 #' @include session.R
 #' @include input.R
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title .Job Class
 #' @description Handle creating, starting and waiting for Amazon SageMaker jobs to
@@ -57,11 +59,9 @@
     #' @description Stop the job.
     stop = function(){stop("I'm an abstract interface method", call. = F)},
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-      return(print_class(self))
+    #' @description format class
+    format = function(){
+      return(format_class(self))
     }
   ),
   private = list(

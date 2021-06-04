@@ -1,13 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sparkml/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sparkml/model.py
 
-#' @include image_uris.R
 #' @include model.R
 #' @include predictor.R
 #' @include session.R
 #' @include serializers.R
-#' @include utils.R
+#' @include r_utils.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 #' @importFrom urltools url_parse
 

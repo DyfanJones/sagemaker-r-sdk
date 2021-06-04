@@ -1,12 +1,12 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/model_monitoring.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/model_monitor/model_monitoring.py
 
-#' @include error.R
-#' @include utils.R
+#' @include r_utils.R
 #' @include s3.R
 #' @include session.R
-#' @include image_uris.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 #' @importFrom urltools url_parse
 #' @import jsonlite
@@ -609,11 +609,9 @@ ModelMonitor = R6Class("ModelMonitor",
       TypeError$new(sprintf("Subclass of %s shall define this property",class(self)[1]))
    },
 
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-      print_class(self)
+   #' @description format class
+   format = function(){
+      format_class(self)
    }
   ),
   private = list(
@@ -3056,11 +3054,9 @@ EndpointInput = R6Class("EndpointInput",
       return (endpoint_input_request)
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-       print_class(self)
+    #' @description format class
+    format = function(){
+       format_class(self)
     }
   ),
   lock_objects = F
@@ -3099,11 +3095,9 @@ EndpointOutput = R6Class("EndpointOutput",
      return(s3_output_request)
    },
 
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-      print_class(self)
+   #' @description format class
+   format = function(){
+      format_class(self)
    }
   ),
   lock_objects = F

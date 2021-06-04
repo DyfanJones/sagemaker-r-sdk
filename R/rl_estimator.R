@@ -1,15 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/rl/estimator.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/rl/estimator.py
 
-#' @import R6
-#' @import lgr
-
-#' @include image_uris.R
 #' @include estimator.R
 #' @include model.R
-#' @include error.R
 #' @include tensorflow_estimator.R
-#' @include vpc_utils.R
-#' @include utils.R
+#' @include r_utils.R
+
+#' @import R6
+#' @import R6sagemaker.common
+#' @import lgr
 
 SAGEMAKER_ESTIMATOR <- "sagemaker_estimator"
 SAGEMAKER_ESTIMATOR_VALUE <- "RLEstimator"
@@ -148,7 +147,6 @@ RLEstimator = R6Class("RLEstimator",
         if (is.null(metric_definitions))
           metric_definitions = self$default_metric_definitions(toolkit)
       }
-
       super$initialize(
         entry_point,
         source_dir,
@@ -398,9 +396,9 @@ RLEstimator = R6Class("RLEstimator",
       if (!is.null(framework))
         found_args = c(found_args, "framework")
       if (!islistempty(found_args))
-        LOGGER$warn(
-          "Parameter `image_uri` is specified, ",
-          "`%s` are going to be ignored when choosing the image.",
+        LOGGER$warn(paste(
+          "Parameter `image_uri` is specified,",
+          "`%s` are going to be ignored when choosing the image."),
           paste(found_args, collapse = "`, `"))
       }
     },

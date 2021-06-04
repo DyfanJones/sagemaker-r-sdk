@@ -1,6 +1,8 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/inputs.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/inputs.py
 
 #' @import R6
+#' @import R6sagemaker.common
 
 #' @title Create a definition for input data used by an SageMaker training job.
 #' @description Amazon SageMaker channel configurations for S3 data sources.
@@ -70,11 +72,9 @@ TrainingInput = R6Class("TrainingInput",
          self$config$ShuffleConfig = list(Seed = shuffle_config$seed)
    },
 
-   #' @description
-   #' Printer.
-   #' @param ... (ignored).
-   print = function(...){
-      return(print_class(self))
+   #' @description format class
+   format = function(){
+      return(format_class(self))
    }
   )
 )
@@ -97,11 +97,9 @@ ShuffleConfig = R6Class("ShuffleConfig",
          self$seed = seed
       },
 
-      #' @description
-      #' Printer.
-      #' @param ... (ignored).
-      print = function(...){
-         return(print_class(self))
+      #' @description format class
+      format = function(){
+         return(format_class(self))
       }
    )
 )
@@ -147,11 +145,9 @@ FileSystemInput = R6Class("FileSystemInput",
       self$config$ContentType = content_type
     },
 
-    #' @description
-    #' Printer.
-    #' @param ... (ignored).
-    print = function(...){
-       return(print_class(self))
+    #' @description format class
+    format = function(){
+       return(format_class(self))
     }
   )
 )

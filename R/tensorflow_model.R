@@ -1,14 +1,14 @@
-# NOTE: This code has been modified from AWS Sagemaker Python: https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/model.py
+# NOTE: This code has been modified from AWS Sagemaker Python:
+# https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/model.py
 
-#' @include image_uris.R
 #' @include s3.R
-#' @include utils.R
-#' @include deprecations.R
+#' @include r_utils.R
 #' @include deserializers.R
 #' @include predictor.R
 #' @include serializers.R
 
 #' @import R6
+#' @import R6sagemaker.common
 #' @import lgr
 
 #' @title TensorFlowPredictor Class
