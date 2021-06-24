@@ -33,27 +33,29 @@ Config object to extract a predicted label from the model output.
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Initializes a model output config to extract the predicted label.
-The following examples show different parameter configurations depending on the endpoint:
-* Regression Task: The model returns the score, e.g. 1.2. we don't need to specify
-anything. For json output, e.g. {'score': 1.2} we can set 'label='score''.
-* Binary classification:
-* The model returns a single probability and we would like to classify as 'yes'
-those with a probability exceeding 0.2.
-We can set 'probability_threshold=0.2, label_headers='yes''.
-* The model returns {'probability': 0.3}, for which we would like to apply a
-threshold of 0.5 to obtain a predicted label in {0, 1}. In this case we can set
-'label='probability''.
-* The model returns a tuple of the predicted label and the probability.
-In this case we can set 'label=0'.
-* Multiclass classification:
-* The model returns
-{'labels': \link{'cat', 'dog', 'fish'}, 'probabilities': \link{0.35, 0.25, 0.4}}.
-In this case we would set the 'probability='probabilities'' and
-'label='labels'' and infer the predicted label to be 'fish.'
-* The model returns {'predicted_label': 'fish', 'probabilities': \link{0.35, 0.25, 0.4}}.
-In this case we would set the 'label='predicted_label''.
-* The model returns \link{0.35, 0.25, 0.4}. In this case, we can set
-'label_headers=\link{'cat','dog','fish'}' and infer the predicted label to be 'fish.'
+             The following examples show different parameter configurations depending on the endpoint:
+    \itemize{
+       \item{Regression Task: The model returns the score, e.g. 1.2. we don't need to specify
+             anything. For json output, e.g. \code{list('score'=1.2)} we can set `'label='score''`}
+       \item{Binary classification:}
+       \item{The model returns a single probability and we would like to classify as 'yes'
+             those with a probability exceeding 0.2.
+             We can set `'probability_threshold=0.2, label_headers='yes''`.}
+       \item{The model returns \code{list('probability'=0.3)}, for which we would like to apply a
+             threshold of 0.5 to obtain a predicted label in \code{list(0, 1)}. In this case we can set
+             `'label='probability''`.}
+       \item{The model returns a tuple of the predicted label and the probability.
+             In this case we can set `'label=0'`.}
+       \item{Multiclass classification:}
+       \item{The model returns
+             \code{list('labels'= c('cat', 'dog', 'fish'), 'probabilities'=c(0.35, 0.25, 0.4))}.
+             In this case we would set the `'probability='probabilities''` and
+             `'label='labels''` and infer the predicted label to be `'fish.'`}
+       \item{The model returns \code{list('predicted_label'='fish', 'probabilities'=c(0.35, 0.25, 0.4]))}.
+             In this case we would set the `'label='predicted_label''`.}
+       \item{The model returns \code{c(0.35, 0.25, 0.4)}. In this case, we can set
+             `'label_headers=['cat','dog','fish']'` and infer the predicted label to be `'fish.'`}
+       }
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelPredictedLabelConfig$new(
   label = NULL,
@@ -66,18 +68,18 @@ In this case we would set the 'label='predicted_label''.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{label}}{(str or int or list\link{int}): Optional index or JSONPath location in the model
+\item{\code{label}}{(str or [integer] or list[integer]): Optional index or JSONPath location in the model
 output for the prediction. In case, this is a predicted label of the same type as
 the label in the dataset no further arguments need to be specified.}
 
-\item{\code{probability}}{(str or int or list\link{int}): Optional index or JSONPath location in the model
+\item{\code{probability}}{(str or [integer] or list[integer]): Optional index or JSONPath location in the model
 output for the predicted scores.}
 
 \item{\code{probability_threshold}}{(float): An optional value for binary prediction tasks in which
 the model returns a probability, to indicate the threshold to convert the
 prediction to a boolean value. Default is 0.5.}
 
-\item{\code{label_headers}}{(list): List of label values - one for each score of the \code{probability}.}
+\item{\code{label_headers}}{(list): List of label values - one for each score of the ``probability``.}
 }
 \if{html}{\out{</div>}}
 }

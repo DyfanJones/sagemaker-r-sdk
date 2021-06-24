@@ -7,7 +7,7 @@
 Provides functionality to retrieve baseline-specific output from Clarify baselining job.
 }
 \section{Super classes}{
-\code{\link[R6sagemaker.common:.Job]{R6sagemaker.common::.Job}} -> \code{\link[R6sagemaker:ProcessingJob]{R6sagemaker::ProcessingJob}} -> \code{\link[R6sagemaker:BaseliningJob]{R6sagemaker::BaseliningJob}} -> \code{ClarifyBaseliningJob}
+\code{\link[R6sagemaker.common:.Job]{R6sagemaker.common::.Job}} -> \code{\link[R6sagemaker.common:ProcessingJob]{R6sagemaker.common::ProcessingJob}} -> \code{\link[R6sagemaker:BaseliningJob]{R6sagemaker::BaseliningJob}} -> \code{ClarifyBaseliningJob}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -22,12 +22,12 @@ Provides functionality to retrieve baseline-specific output from Clarify baselin
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic=".Job" data-id="format">}\href{../../R6sagemaker.common/html/.Job.html#method-format}{\code{R6sagemaker.common::.Job$format()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="describe">}\href{../../R6sagemaker/html/ProcessingJob.html#method-describe}{\code{R6sagemaker::ProcessingJob$describe()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="from_processing_arn">}\href{../../R6sagemaker/html/ProcessingJob.html#method-from_processing_arn}{\code{R6sagemaker::ProcessingJob$from_processing_arn()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="from_processing_name">}\href{../../R6sagemaker/html/ProcessingJob.html#method-from_processing_name}{\code{R6sagemaker::ProcessingJob$from_processing_name()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="start_new">}\href{../../R6sagemaker/html/ProcessingJob.html#method-start_new}{\code{R6sagemaker::ProcessingJob$start_new()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="stop">}\href{../../R6sagemaker/html/ProcessingJob.html#method-stop}{\code{R6sagemaker::ProcessingJob$stop()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ProcessingJob" data-id="wait">}\href{../../R6sagemaker/html/ProcessingJob.html#method-wait}{\code{R6sagemaker::ProcessingJob$wait()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ProcessingJob" data-id="describe">}\href{../../R6sagemaker.common/html/ProcessingJob.html#method-describe}{\code{R6sagemaker.common::ProcessingJob$describe()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ProcessingJob" data-id="from_processing_arn">}\href{../../R6sagemaker.common/html/ProcessingJob.html#method-from_processing_arn}{\code{R6sagemaker.common::ProcessingJob$from_processing_arn()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ProcessingJob" data-id="from_processing_name">}\href{../../R6sagemaker.common/html/ProcessingJob.html#method-from_processing_name}{\code{R6sagemaker.common::ProcessingJob$from_processing_name()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ProcessingJob" data-id="start_new">}\href{../../R6sagemaker.common/html/ProcessingJob.html#method-start_new}{\code{R6sagemaker.common::ProcessingJob$start_new()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ProcessingJob" data-id="stop">}\href{../../R6sagemaker.common/html/ProcessingJob.html#method-stop}{\code{R6sagemaker.common::ProcessingJob$stop()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ProcessingJob" data-id="wait">}\href{../../R6sagemaker.common/html/ProcessingJob.html#method-wait}{\code{R6sagemaker.common::ProcessingJob$wait()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="BaseliningJob" data-id="from_processing_job">}\href{../../R6sagemaker/html/BaseliningJob.html#method-from_processing_job}{\code{R6sagemaker::BaseliningJob$from_processing_job()}}\out{</span>}
 }
 \out{</details>}

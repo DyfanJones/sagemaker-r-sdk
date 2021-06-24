@@ -7,7 +7,7 @@
 Handles Amazon SageMaker processing tasks for jobs using scikit-learn.
 }
 \section{Super classes}{
-\code{\link[R6sagemaker:Processor]{R6sagemaker::Processor}} -> \code{\link[R6sagemaker:ScriptProcessor]{R6sagemaker::ScriptProcessor}} -> \code{SKLearnProcessor}
+\code{\link[R6sagemaker.common:Processor]{R6sagemaker.common::Processor}} -> \code{\link[R6sagemaker.common:ScriptProcessor]{R6sagemaker.common::ScriptProcessor}} -> \code{SKLearnProcessor}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -19,8 +19,8 @@ Handles Amazon SageMaker processing tasks for jobs using scikit-learn.
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Processor" data-id="format">}\href{../../R6sagemaker/html/Processor.html#method-format}{\code{R6sagemaker::Processor$format()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="ScriptProcessor" data-id="run">}\href{../../R6sagemaker/html/ScriptProcessor.html#method-run}{\code{R6sagemaker::ScriptProcessor$run()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="Processor" data-id="format">}\href{../../R6sagemaker.common/html/Processor.html#method-format}{\code{R6sagemaker.common::Processor$format()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.common" data-topic="ScriptProcessor" data-id="run">}\href{../../R6sagemaker.common/html/ScriptProcessor.html#method-run}{\code{R6sagemaker.common::ScriptProcessor$run()}}\out{</span>}
 }
 \out{</details>}
 }

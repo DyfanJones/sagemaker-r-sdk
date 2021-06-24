@@ -18,11 +18,11 @@
 \item{newdata}{data for model to predict}
 
 \item{serializer}{method class to serializer data to sagemaker model. Requires to be
-a class inherited from \link{BaseSerializer}. (Default: \link{csv_serializer})}
+a class inherited from \link{BaseSerializer}. (Default: \link{CSVSerializer})}
 
 \item{deserializer}{method class to deserializer return data streams from sagemaker model.
 Requires to be a class inherited from \link{BaseDeserializer}.
-(Default: \link{csv_deserializer})}
+(Default: \link{CSVDeserializer})}
 
 \item{...}{arguments passed to ``Predictor$predict``}
 }

@@ -12,7 +12,7 @@ The configuration for framework metrics to be collected for Python profiling.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-intialize}{\code{PythonProfilingConfig$intialize()}}
+\item \href{#method-new}{\code{PythonProfilingConfig$new()}}
 \item \href{#method-clone}{\code{PythonProfilingConfig$clone()}}
 }
 }
@@ -20,15 +20,14 @@ The configuration for framework metrics to be collected for Python profiling.
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="format">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-format}{\code{R6sagemaker::MetricsConfigBase$format()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="initialize">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-initialize}{\code{R6sagemaker::MetricsConfigBase$initialize()}}\out{</span>}
 \item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="MetricsConfigBase" data-id="to_json_string">}\href{../../R6sagemaker/html/MetricsConfigBase.html#method-to_json_string}{\code{R6sagemaker::MetricsConfigBase$to_json_string()}}\out{</span>}
 }
 \out{</details>}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-intialize"></a>}}
-\if{latex}{\out{\hypertarget{method-intialize}{}}}
-\subsection{Method \code{intialize()}}{
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
 Choose a Python profiler: cProfile or Pyinstrument.
              Specify target steps or a target duration to profile.
              If no parameter is specified,
@@ -39,7 +38,7 @@ Choose a Python profiler: cProfile or Pyinstrument.
              then the \code{profile_default_steps} parameter
              will be ignored.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PythonProfilingConfig$intialize(
+\if{html}{\out{<div class="r">}}\preformatted{PythonProfilingConfig$new(
   start_step = NULL,
   num_steps = NULL,
   start_unix_time = NULL,

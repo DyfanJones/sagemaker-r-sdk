@@ -52,18 +52,18 @@ profiler_config=ProfilerConfig$new(
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-intialize}{\code{FrameworkProfile$intialize()}}
+\item \href{#method-new}{\code{FrameworkProfile$new()}}
 \item \href{#method-format}{\code{FrameworkProfile$format()}}
 \item \href{#method-clone}{\code{FrameworkProfile$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-intialize"></a>}}
-\if{latex}{\out{\hypertarget{method-intialize}{}}}
-\subsection{Method \code{intialize()}}{
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
 Initialize the FrameworkProfile class object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkProfile$intialize(
+\if{html}{\out{<div class="r">}}\preformatted{FrameworkProfile$new(
   local_path = BASE_FOLDER_DEFAULT,
   file_max_size = MAX_FILE_SIZE_DEFAULT,
   file_close_interval = CLOSE_FILE_INTERVAL_DEFAULT,
@@ -128,16 +128,9 @@ Pass ``PythonProfilingConfig()`` to use the default configuration.}
 \subsection{Method \code{format()}}{
 format class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FrameworkProfile$format(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FrameworkProfile$format()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
