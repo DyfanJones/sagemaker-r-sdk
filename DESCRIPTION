@@ -8,6 +8,7 @@ Description: A library for training and deploying machine learning models on
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports:
     R6sagemaker.common,
+    R6sagemaker.local,
     data.table,
     fs,
     jsonlite,
@@ -30,21 +31,17 @@ Suggests:
     Matrix,
     sparsio,
     reticulate
-Remotes: DyfanJones/sagemaker-r-common
+Remotes: 
+    DyfanJones/sagemaker-r-common,
+    DyfanJones/sagemaker-r-local
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Collate: 
-    'r_utils.R'
-    'apiutils_paws_functions.R'
-    'apiutils_base_types.R'
-    'lineage_api_types.R'
-    'lineage_association.R'
-    'lineage_utils.R'
-    'lineage_context.R'
     'deserializers.R'
     'serializers.R'
+    'r_utils.R'
     'model_monitor_model_monitoring.R'
     'predictor.R'
     'parameter.R'
@@ -64,25 +61,19 @@ Collate:
     'amazon_object2vec.R'
     'amazon_pca.R'
     'amazon_randomcutforest.R'
-    'apiutils_utils.R'
     'automl_candidate_estimator.R'
     'pipeline.R'
     'automl_automl.R'
     'chainer_default.R'
     'chainer_model.R'
     'chainer_estimator.R'
-    'processing.R'
     'clarify.R'
-    'debugger.R'
     'debugger_utils.R'
     'debugger_profiler_constants.R'
     'debugger_metrics_config.R'
     'debugger_framework_profile.R'
     'debugger_profiler_config.R'
     'huggingface_estimator.R'
-    'lineage_action.R'
-    'lineage_artifact.R'
-    'lineage_visualizer.R'
     'model_metrics.R'
     'model_monitor_clarify_model_monitoring.R'
     'model_monitor_cron_expression_generator.R'
@@ -98,6 +89,7 @@ Collate:
     'pytorch_model.R'
     'pytorch_estimator.R'
     'reexport_r6sagemakercommon.R'
+    'reexport_r6sagemakerlocal.R'
     'tensorflow_model.R'
     'tensorflow_defaults.R'
     'tensorflow_estimator.R'
