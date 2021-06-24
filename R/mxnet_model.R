@@ -139,7 +139,7 @@ MXNetModel = R6Class("MXNetModel",
       deploy_env = c(deploy_env, private$.framework_env_vars())
 
       if (!islistempty(self$model_server_workers))
-        deploy_env[[toupper(MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(self$model_server_workers)
+        deploy_env[[toupper(model_parameters$MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(self$model_server_workers)
       return (container_def(
         deploy_image,
         self$repacked_model_data %||% self$model_data,

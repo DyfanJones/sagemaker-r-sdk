@@ -54,14 +54,14 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
               "Tar"=TRUE)
           )
       }
-      estimator$.hyperparameters[[sagemaker$model$DIR_PARAM_NAME]] = code_dir
-      estimator$.hyperparameters[[sagemaker$model$SCRIPT_PARAM_NAME]] = script
+      estimator$.hyperparameters[[model_parameters$DIR_PARAM_NAME]] = code_dir
+      estimator$.hyperparameters[[model_parameters$SCRIPT_PARAM_NAME]] = script
       estimator$.hyperparameters[[
-        sagemaker$model$CONTAINER_LOG_LEVEL_PARAM_NAME
+        model_parameters$CONTAINER_LOG_LEVEL_PARAM_NAME
       ]] = estimator$container_log_level
-      estimator$.hyperparameters[[sagemaker$model$JOB_NAME_PARAM_NAME]] = estimator$.current_job_name
+      estimator$.hyperparameters[[model_parameters$JOB_NAME_PARAM_NAME]] = estimator$.current_job_name
       estimator$.hyperparameters[[
-        sagemaker$model$SAGEMAKER_REGION_PARAM_NAME
+        model_parameters$SAGEMAKER_REGION_PARAM_NAME
       ]] = estimator$sagemaker_session$paws_region_name
     },
 

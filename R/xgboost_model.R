@@ -106,7 +106,7 @@ XGBoostModel = R6Class("XGBoostModel",
       deploy_env = c(deploy_env, private$.framework_env_vars())
 
       if (!is.null(self$model_server_workers))
-        deploy_env[[toupper(MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(self$model_server_workers)
+        deploy_env[[toupper(mode_parameters$MODEL_SERVER_WORKERS_PARAM_NAME)]] = as.character(self$model_server_workers)
       return(container_def(deploy_image, self$model_data, deploy_env))
     },
 

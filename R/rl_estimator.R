@@ -265,7 +265,7 @@ RLEstimator = R6Class("RLEstimator",
         self$output_path,
         # TODO: can be applied to all other estimators
         SAGEMAKER_ESTIMATOR_VALUE)
-      names(additional_hyperparameters) <- c(SAGEMAKER_OUTPUT_LOCATION , SAGEMAKER_ESTIMATOR)
+      names(additional_hyperparameters) <- c(model_parameters$SAGEMAKER_OUTPUT_LOCATION , SAGEMAKER_ESTIMATOR)
 
       # hyperparameters.update(Framework._json_encode_hyperparameters(additional_hyperparameters))
       hyperparameters = modifyList(hyperparameters, additional_hyperparameters)
