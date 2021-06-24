@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/clarify.py
 
-#' @include processing.R
 #' @include r_utils.R
 
 #' @import R6
@@ -365,7 +364,7 @@ SHAPConfig = R6Class("SHAPConfig",
 #' @description Handles SageMaker Processing task to compute bias metrics and explain a model.
 #' @export
 SageMakerClarifyProcessor = R6Class("SageMakerClarifyProcessor",
-  inherit = Processor,
+  inherit = R6sagemaker.common::Processor,
   public = list(
 
     #' @description Initializes a ``Processor`` instance, computing bias metrics and model explanations.
