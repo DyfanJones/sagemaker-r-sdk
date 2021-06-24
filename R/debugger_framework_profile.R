@@ -88,7 +88,7 @@ FrameworkProfile = R6Class("FrameworkProfile",
     #' @param num_steps (int): The number of steps to profile.
     #' @param start_unix_time (int): The Unix time at which to start profiling.
     #' @param duration (float): The duration in seconds to profile.
-    intialize = function(local_path=BASE_FOLDER_DEFAULT,
+    initialize = function(local_path=BASE_FOLDER_DEFAULT,
                          file_max_size=MAX_FILE_SIZE_DEFAULT,
                          file_close_interval=CLOSE_FILE_INTERVAL_DEFAULT,
                          file_open_fail_threshold=FILE_OPEN_FAIL_THRESHOLD_DEFAULT,
@@ -129,8 +129,7 @@ FrameworkProfile = R6Class("FrameworkProfile",
     },
 
     #' @description format class
-    #' @param ... (ignored).
-    format = function(...){
+    format = function(){
       return(format_class(self))
     }
   ),
@@ -147,22 +146,25 @@ FrameworkProfile = R6Class("FrameworkProfile",
     # rotated.
     # file_open_fail_threshold (int): Number of times to attempt to open a trace fail before
     # marking the writer as unhealthy.
-    .process_trace_file_parameters = function(local_path,
-                                              file_max_size,
-                                              file_close_interval,
-                                              file_open_fail_threshold){
+    .process_trace_file_parameters = function(local_path=NULL,
+                                              file_max_size=NULL,
+                                              file_close_interval=NULL,
+                                              file_open_fail_threshold=NULL){
       if(!is.character(local_path))
-        stop(ErrorMessages$public_fields$INVALID_LOCAL_PATH, call. = F)
+        stop(ErrorMessages$INVALID_LOCAL_PATH, call. = F)
 
-      if(!is.integer(file_max_size))
-        stop(ErrorMessages$public_fields$INVALID_FILE_MAX_SIZE, call. = F)
-
-      if(!inherits(file_max_size, c("double", "integer")) && file_close_interval > 0)
-        stop(ErrorMessages$public_fields$INVALID_FILE_CLOSE_INTERVAL, call. = F)
-
-      if(!inherits(file_max_size, "integer") && file_open_fail_threshold > 0)
-        stop(ErrorMessages$public_fields$INVALID_FILE_OPEN_FAIL_THRESHOLD, call. = F)
-
+      if(!is.null(file_max_size)){
+        if(!is.integer(file_max_size) && file_max_size < 0)
+          stop(ErrorMessages$INVALID_FILE_MAX_SIZE, call. = F)
+      }
+      if(!is.null(file_close_interval)){
+        if(!inherits(file_close_interval, c("double", "integer")) && file_close_interval < 0)
+          stop(ErrorMessages$INVALID_FILE_CLOSE_INTERVAL, call. = F)
+      }
+      if(!is.null(file_open_fail_threshold)){
+        if(!inherits(file_open_fail_threshold, "integer") && file_open_fail_threshold < 0)
+          stop(ErrorMessages$INVALID_FILE_OPEN_FAIL_THRESHOLD, call. = F)
+      }
       self$profiling_parameters[["LocalPath"]] = local_path
       self$profiling_parameters[["RotateMaxFileSizeInBytes"]] = as.character(file_max_size)
       self$profiling_parameters[["RotateFileCloseIntervalInSeconds"]] = as.character(file_close_interval)

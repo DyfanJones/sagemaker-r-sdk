@@ -36,7 +36,7 @@ StepRange = R6Class("StepRange",
     #' @description Convert the step range into a dictionary.
     #' @return list: The step range as a dictionary.
     to_json = function(){
-      return(list("StartStep" = self$start_step, "NumSteps": self$num_steps))
+      return(list("StartStep" = self$start_step, "NumSteps"=self$num_steps))
     },
 
     #' @description format class
@@ -107,26 +107,34 @@ MetricsConfigBase = R6Class("MetricsConfigBase",
                           start_unix_time=NULL,
                           duration=NULL){
       self$name = name
+      start_unix_time = if(!is.null(start_unix_time)) as.integer(start_unix_time) else start_unix_time
 
-      if(!is.null(start_step) || !(inherits(start_step, "integer") && start_step >= 0))
-        stop(ErrorMessages$INVALID_START_STEP, call. = F)
-
-      if(!is.null(num_steps) || !(inherits(num_steps, "integer") && num_steps > 0))
-        stop(ErrorMessages$INVALID_NUM_STEPS, call. = F)
-
-      if(!is.null(start_unix_time) || inherits(start_unix_time, "integer"))
+      if(!is.null(start_step)){
+        if(!is.integer(start_step) && start_step < 0)
+          stop(ErrorMessages$INVALID_START_STEP, call. = F)
+      }
+      if(!is.null(start_step)){
+        if(!is.integer(start_step) && num_steps <= 0)
+          stop(ErrorMessages$INVALID_NUM_STEPS, call. = F)
+      }
+      if(!is.null(start_unix_time) && !inherits(start_unix_time, c("integer","numeric")))
         stop(ErrorMessages$INVALID_START_UNIX_TIME, call. = F)
 
-      if(!is.null(duration) || !(inherits(duration, c("numeric", "integer")) && duration > 0))
-        stop(ErrorMessages$INVALID_DURATION, call. = F)
-
+      if(!is.null(duration)){
+        if(!inherits(duration, c("numeric", "integer")) || duration < 0)
+          stop(ErrorMessages$INVALID_DURATION, call. = F)
+      }
       has_step_range = (!is.null(start_step) || !is.null(num_steps))
       has_time_range = (!is.null(start_unix_time) || !is.null(duration))
 
       if(has_step_range && has_time_range)
         stop(ErrorMessages$FOUND_BOTH_STEP_AND_TIME_FIELDS, call. = F)
 
-      self$range = if (has_step_range) StepRange$new(start_step, num_steps) else TimeRange$new(start_unix_time, duration)
+      self$range = (
+        if(has_step_range)
+          StepRange$new(start_step, num_steps)
+        else TimeRange$new(start_unix_time, duration)
+      )
     },
 
     #' @description Convert this metrics configuration to dictionary formatted as a string.
@@ -231,8 +239,7 @@ DataloaderProfilingConfig = R6Class("DataloaderProfilingConfig",
         DATALOADER_PROFILING_CONFIG_NAME, start_step, num_steps, start_unix_time, duration
       )
 
-      if(!is.character(metrix_regex))
-        stop(ErrorMessages$INVALID_METRICS_REGEX, call. = F)
+      if(!is_valid_regex(metrics_regex)) stop(ErrorMessages$INVALID_METRICS_REGEX, call. = F)
 
       self$metrics_regex = metrics_regex
     }
@@ -293,7 +300,7 @@ PythonProfilingConfig = R6Class("PythonProfilingConfig",
     #'              Instead of passing the string values, you can also use the enumerator util,
     #'              :class:`~sagemaker.debugger.utils.cProfileTimer`,
     #'              to choose one of the available options.
-    intialize = function(start_step=NULL,
+    initialize = function(start_step=NULL,
                          num_steps=NULL,
                          start_unix_time=NULL,
                          duration=NULL,
@@ -316,10 +323,10 @@ PythonProfilingConfig = R6Class("PythonProfilingConfig",
         PYTHON_PROFILING_CONFIG_NAME, start_step, num_steps, start_unix_time, duration
         )
 
-      if(!inherits(python_profiler, "PythonProfiler"))
+      if(!(python_profiler %in% unlist(as.list(PythonProfiler))))
         stop(ErrorMessages$INVALID_PYTHON_PROFILER, call. = F)
 
-      if(!inherits(cprofile_timer, "cProfileTimer"))
+      if(!(cprofile_timer %in% unlist(as.list(cProfileTimer))))
         stop(ErrorMessages$INVALID_CPROFILE_TIMER, call. = F)
 
       self$python_profiler = python_profiler

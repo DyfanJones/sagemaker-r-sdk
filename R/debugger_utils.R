@@ -41,3 +41,17 @@ cProfileTimer = Enum(
   DEFAULT = "default",
   .class = "cProfileTimer"
 )
+
+#' @title Helper function to determine whether the provided regex is valid.
+#' @param regex (str): The user provided regex.
+#' @return bool: Indicates whether the provided regex was valid or not.
+#' @return
+is_valid_regex = function(regex){
+  tryCatch({
+    suppressWarnings(regexpr(regex,"regex", perl = TRUE))
+    return(TRUE)
+    },
+    error = function(e)
+      return(FALSE))
+}
+
