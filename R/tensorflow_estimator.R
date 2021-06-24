@@ -2,7 +2,6 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/estimator.py
 
 #' @include r_utils.R
-#' @include debugger.R
 #' @include tensorflow_defaults.R
 #' @include tensorflow_model.R
 
