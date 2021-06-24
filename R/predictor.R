@@ -5,7 +5,6 @@
 #' @include model_monitor_model_monitoring.R
 #' @include serializers.R
 #' @include deserializers.R
-#' @include lineage_context.R
 
 #' @import paws
 #' @import R6
@@ -455,10 +454,10 @@ Predictor = R6Class("Predictor",
 #' @param object a sagemaker model
 #' @param newdata data for model to predict
 #' @param serializer method class to serializer data to sagemaker model. Requires to be
-#'              a class inherited from \link{BaseSerializer}. (Default: \link{csv_serializer})
+#'              a class inherited from \link{BaseSerializer}. (Default: \link{CSVSerializer})
 #' @param deserializer method class to deserializer return data streams from sagemaker model.
 #'              Requires to be a class inherited from \link{BaseDeserializer}.
-#'              (Default: \link{csv_deserializer})
+#'              (Default: \link{CSVDeserializer})
 #' @param ... arguments passed to ``Predictor$predict``
 #' @export
 predict.Predictor <- function(object, newdata, serializer = CSVSerializer$new(), deserializer = CSVDeserializer$new(), ...){
