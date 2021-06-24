@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/model.py
 
-#' @include processing.R
 #' @include r_utils.R
 
 #' @import R6
@@ -12,7 +11,7 @@
 #' @description Handles Amazon SageMaker processing tasks for jobs using scikit-learn.
 #' @export
 SKLearnProcessor = R6Class("SKLearnProcessor",
-  inherit = ScriptProcessor,
+  inherit = R6sagemaker.common::ScriptProcessor,
   public = list(
 
     #' @description Initialize an ``SKLearnProcessor`` instance. The SKLearnProcessor

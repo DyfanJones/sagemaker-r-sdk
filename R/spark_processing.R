@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/spark/processing.py
 
-#' @include processing.R
 #' @include r_utils.R
 
 #' @import R6
@@ -16,7 +15,7 @@
 #' @description Base class for either PySpark or SparkJars.
 #' @export
 .SparkProcessorBase = R6Class(".SparkProcessorBase",
-   inherit = ScriptProcessor,
+   inherit = R6sagemaker.common::ScriptProcessor,
    public = list(
 
      #' @description Initialize a ``_SparkProcessorBase`` instance.
