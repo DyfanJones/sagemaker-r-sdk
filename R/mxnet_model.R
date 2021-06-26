@@ -2,11 +2,11 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/mxnet/estimator.py
 
 #' @include mxnet_default.R
-#' @include serializers.R
 #' @include r_utils.R
 
 #' @import R6
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 #' @import lgr
 
 #' @title MXNetPredictor Class
@@ -15,7 +15,7 @@
 #'              multidimensional tensors for MXNet inference.
 #' @export
 MXNetPredictor = R6Class("MXNetPredictor",
-  inherit = Predictor,
+  inherit = R6sagemaker.mlcore::Predictor,
   public = list(
 
     #' @description Initialize an ``MXNetPredictor``.

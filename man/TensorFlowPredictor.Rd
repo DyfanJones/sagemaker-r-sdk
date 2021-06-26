@@ -8,7 +8,7 @@ A ``Predictor`` implementation for inference against TensorFlow
              Serving endpoints.
 }
 \section{Super class}{
-\code{\link[R6sagemaker:Predictor]{R6sagemaker::Predictor}} -> \code{TensorFlowPredictor}
+\code{\link[R6sagemaker.mlcore:Predictor]{R6sagemaker.mlcore::Predictor}} -> \code{TensorFlowPredictor}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -23,15 +23,15 @@ A ``Predictor`` implementation for inference against TensorFlow
 \if{html}{
 \out{<details ><summary>Inherited methods</summary>}
 \itemize{
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="delete_endpoint">}\href{../../R6sagemaker/html/Predictor.html#method-delete_endpoint}{\code{R6sagemaker::Predictor$delete_endpoint()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="delete_model">}\href{../../R6sagemaker/html/Predictor.html#method-delete_model}{\code{R6sagemaker::Predictor$delete_model()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="disable_data_capture">}\href{../../R6sagemaker/html/Predictor.html#method-disable_data_capture}{\code{R6sagemaker::Predictor$disable_data_capture()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="enable_data_capture">}\href{../../R6sagemaker/html/Predictor.html#method-enable_data_capture}{\code{R6sagemaker::Predictor$enable_data_capture()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="endpoint_context">}\href{../../R6sagemaker/html/Predictor.html#method-endpoint_context}{\code{R6sagemaker::Predictor$endpoint_context()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="format">}\href{../../R6sagemaker/html/Predictor.html#method-format}{\code{R6sagemaker::Predictor$format()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="list_monitors">}\href{../../R6sagemaker/html/Predictor.html#method-list_monitors}{\code{R6sagemaker::Predictor$list_monitors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="update_data_capture_config">}\href{../../R6sagemaker/html/Predictor.html#method-update_data_capture_config}{\code{R6sagemaker::Predictor$update_data_capture_config()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="R6sagemaker" data-topic="Predictor" data-id="update_endpoint">}\href{../../R6sagemaker/html/Predictor.html#method-update_endpoint}{\code{R6sagemaker::Predictor$update_endpoint()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="delete_endpoint">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-delete_endpoint}{\code{R6sagemaker.mlcore::Predictor$delete_endpoint()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="delete_model">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-delete_model}{\code{R6sagemaker.mlcore::Predictor$delete_model()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="disable_data_capture">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-disable_data_capture}{\code{R6sagemaker.mlcore::Predictor$disable_data_capture()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="enable_data_capture">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-enable_data_capture}{\code{R6sagemaker.mlcore::Predictor$enable_data_capture()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="endpoint_context">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-endpoint_context}{\code{R6sagemaker.mlcore::Predictor$endpoint_context()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="format">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-format}{\code{R6sagemaker.mlcore::Predictor$format()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="list_monitors">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-list_monitors}{\code{R6sagemaker.mlcore::Predictor$list_monitors()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="update_data_capture_config">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-update_data_capture_config}{\code{R6sagemaker.mlcore::Predictor$update_data_capture_config()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="R6sagemaker.mlcore" data-topic="Predictor" data-id="update_endpoint">}\href{../../R6sagemaker.mlcore/html/Predictor.html#method-update_endpoint}{\code{R6sagemaker.mlcore::Predictor$update_endpoint()}}\out{</span>}
 }
 \out{</details>}
 }

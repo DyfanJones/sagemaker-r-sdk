@@ -1,15 +1,13 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/pytorch/model.py
 
-#' @include deserializers.R
 #' @include pytorch_defaults.R
 #' @include pytorch_model.R
-#' @include predictor.R
-#' @include serializers.R
 #' @include r_utils.R
 
 #' @import R6
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 #' @import lgr
 
 #' @title A Predictor for inference against PyTorch Endpoints.
@@ -17,7 +15,7 @@
 #'              multidimensional tensors for PyTorch inference.
 #' @export
 PyTorchPredictor = R6Class("PyTorchPredictor",
-  inherit = Predictor,
+  inherit = R6sagemaker.mlcore::Predictor,
   public = list(
 
     #' @description Initialize an ``PyTorchPredictor``.

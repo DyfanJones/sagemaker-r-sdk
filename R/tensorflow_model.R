@@ -2,12 +2,10 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/tensorflow/model.py
 
 #' @include r_utils.R
-#' @include deserializers.R
-#' @include predictor.R
-#' @include serializers.R
 
 #' @import R6
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 #' @import lgr
 
 #' @title TensorFlowPredictor Class
@@ -15,7 +13,7 @@
 #'              Serving endpoints.
 #' @export
 TensorFlowPredictor = R6Class("TensorFlowPredictor",
-  inherit = Predictor,
+  inherit = R6sagemaker.mlcore::Predictor,
   public = list(
 
     #' @description Initialize a ``TensorFlowPredictor``.

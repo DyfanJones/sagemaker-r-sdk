@@ -1,13 +1,11 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sklearn/model.py
 
-#' @include deserializers.R
-#' @include predictor.R
-#' @include serializers.R
 #' @include r_utils.R
 
 #' @import R6
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 #' @import lgr
 
 #' @title A Predictor for inference against Scikit-learn Endpoints.
@@ -15,7 +13,7 @@
 #'              multidimensional tensors for Scikit-learn inference.
 #' @export
 SKLearnPredictor = R6Class("SKLearnPredictor",
-  inherit = Predictor,
+  inherit = R6sagemaker.mlcore::Predictor,
   public = list(
 
     #' @description Initialize an ``SKLearnPredictor``.

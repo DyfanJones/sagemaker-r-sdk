@@ -3,10 +3,10 @@
 
 #' @include parameter.R
 #' @include r_utils.R
-#' @include predictor.R
 
 #' @import R6
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 
 #' @title AlgorithmEstimator Class
 #' @description A generic Estimator to train using any algorithm object (with an
@@ -245,7 +245,7 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
                              ...){
        if (is.null(predictor_cls)) {
          predict_wrapper = function(endpoint, session){
-         return (RealTimePredictor$new(
+         return (R6sagemaker.mlcore::Predictor$new(
            endpoint, session, serializer, deserializer, content_type, accept))}
 
         predictor_cls = predict_wrapper}

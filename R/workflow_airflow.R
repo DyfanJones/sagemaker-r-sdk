@@ -2,11 +2,12 @@
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/workflow/airflow.py
 
 #' @include r_utils.R
-#' @include amazon_estimator.R
 #' @include tensorflow_estimator.R
 
 #' @import R6
+#' @import fs
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 
 #' @title AirFlowWorkFlow helper class
 #' @description Helper class to take sagemaker classes and format output for Airflow.
@@ -25,7 +26,7 @@ AirFlowWorkFlow = R6Class("AirFlowWorkFlow",
       s3_split = list()
       if (!is.null(estimator$code_location)){
         s3_split = split_s3_uri(estimator$code_location)
-        s3_split$key = os.path.join(s3_split$keykey, estimator$.current_job_name, "source", "sourcedir.tar.gz")
+        s3_split$key = fs::path(s3_split$keykey, estimator$.current_job_name, "source", "sourcedir.tar.gz")
       } else if (!is.null(estimator$uploaded_code)){
         s3_split = split_s3_uri(estimator.uploaded_code.s3_prefix)
       } else {

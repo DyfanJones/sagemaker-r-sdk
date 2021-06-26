@@ -1,8 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/xgboost/model.py
 
-#' @include deserializers.R
-#' @include serializers.R
 #' @include xgboost_default.R
 
 #' @import R6
@@ -15,7 +13,7 @@
 #'              for XGBoost inference.
 #' @export
 XGBoostPredictor = R6Class("XGBoostPredictor",
-  inherit = Predictor,
+  inherit = R6sagemaker.mlcore::Predictor,
   public = list(
 
     #' @description Initialize an ``XGBoostPredictor``.

@@ -3,7 +3,6 @@
 
 #' @import R6
 #' @import R6sagemaker.common
-#' @import paws
 #' @importFrom urltools url_parse
 
 MULTI_MODEL_CONTAINER_MODE <- "MultiModel"
@@ -68,7 +67,7 @@ MultiDataModel = R6Class("MultiDataModel",
       self$container_mode = MULTI_MODEL_CONTAINER_MODE
       self$sagemaker_session = sagemaker_session %||% Session$new()
 
-      self$s3_client = paws::s3(config = self$paws_credentials$credentials)
+      self$s3_client = self$sagemaker_session$s3
 
       # Set the ``Model`` parameters if the model parameter is not specified
       if (is.null(self.model))

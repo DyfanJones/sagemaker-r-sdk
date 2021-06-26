@@ -1,12 +1,11 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/sparkml/model.py
 
-#' @include predictor.R
-#' @include serializers.R
 #' @include r_utils.R
 
 #' @import R6
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 #' @import lgr
 #' @importFrom urltools url_parse
 
@@ -19,7 +18,7 @@
 #'              list.
 #' @export
 SparkMLPredictor = R6Class("SparkMLPredictor",
-  inherit = Predictor,
+  inherit = R6sagemaker.mlcore::Predictor,
   public = list(
 
     #' @description Initializes a SparkMLPredictor which should be used with SparkMLModel

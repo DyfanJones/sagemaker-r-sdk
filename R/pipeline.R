@@ -260,7 +260,7 @@ PipelineModel = R6Class("PipelineModel",
 
       containers = self$pipeline_container_def(instance_type)
 
-      self$name = self.$name %||% name_from_image(containers[[1]]$Image)
+      self$name = self$name %||% name_from_image(containers[[1]]$Image)
       self$sagemaker_session$create_model(
         self$name,
         self$role,

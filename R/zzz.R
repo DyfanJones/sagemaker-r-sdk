@@ -5,6 +5,7 @@
 #' @import jsonlite
 #' @import lgr
 #' @import R6sagemaker.common
+#' @import R6sagemaker.mlcore
 #' @importFrom urltools url_parse
 #' @import data.table
 #' @import uuid

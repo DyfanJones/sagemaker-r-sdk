@@ -73,3 +73,46 @@ R6sagemaker.common::TrainingInput
 #' @importFrom R6sagemaker.common Transformer
 #' @export
 R6sagemaker.common::Transformer
+
+
+# ---- debugger ----
+
+#' @importFrom R6sagemaker.common ProfilerConfig
+#' @export
+R6sagemaker.common::ProfilerConfig
+
+#' @importFrom R6sagemaker.common FrameworkProfile
+#' @export
+R6sagemaker.common::FrameworkProfile
+
+#' @importFrom R6sagemaker.common StepRange
+#' @export
+R6sagemaker.common::StepRange
+
+#' @importFrom R6sagemaker.common TimeRange
+#' @export
+R6sagemaker.common::TimeRange
+
+#' @importFrom R6sagemaker.common MetricsConfigBase
+#' @export
+R6sagemaker.common::MetricsConfigBase
+
+#' @importFrom R6sagemaker.common DetailedProfilingConfig
+#' @export
+R6sagemaker.common::DetailedProfilingConfig
+
+#' @importFrom R6sagemaker.common DetailedProfilingConfig
+#' @export
+R6sagemaker.common::DataloaderProfilingConfig
+
+#' @importFrom R6sagemaker.common PythonProfilingConfig
+#' @export
+R6sagemaker.common::PythonProfilingConfig
+
+#' @importFrom R6sagemaker.common HorovodProfilingConfig
+#' @export
+R6sagemaker.common::HorovodProfilingConfig
+
+#' @importFrom R6sagemaker.common SMDataParallelProfilingConfig
+#' @export
+R6sagemaker.common::SMDataParallelProfilingConfig
