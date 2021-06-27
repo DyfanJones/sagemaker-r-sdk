@@ -42,7 +42,6 @@ LazyData: true
 RoxygenNote: 7.1.1
 Collate: 
     'r_utils.R'
-    'parameter.R'
     'algorithm.R'
     'automl_candidate_estimator.R'
     'pipeline.R'
@@ -72,7 +71,6 @@ Collate:
     'sklearn_processing.R'
     'spark_processing.R'
     'sparkml_model.R'
-    'tuner.R'
     'workflow_airflow.R'
     'workflow_entries.R'
     'xgboost_default.R'
