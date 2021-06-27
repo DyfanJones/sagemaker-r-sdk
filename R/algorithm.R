@@ -1,7 +1,6 @@
 # NOTE: This code has been modified from AWS Sagemaker Python:
 # https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/algorithm.py
 
-#' @include parameter.R
 #' @include r_utils.R
 
 #' @import R6
@@ -495,9 +494,9 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
          # and just create an Instance of Parameter. Note that the range is optional for all
          # the Parameter Types.
          if (parameter_type == "Integer")
-           parameter_class = IntegerParameter
+           parameter_class = R6sagemaker.mlcore::IntegerParameter
          else
-           parameter_class = ContinuousParameter
+           parameter_class = R6sagemaker.mlcore::ContinuousParameter
 
          if ("Range" %in% names(hyperparameter)){
            min_value = parameter_class$public_methods$cast_to_type(
@@ -507,10 +506,10 @@ AlgorithmEstimator = R6Class("AlgorithmEstimator",
            parameter_range = parameter_class$new(min_value, max_value)
            }
          } else if(parameter_type == "Categorical") {
-             parameter_class = CategoricalParameter
+             parameter_class = R6sagemaker.mlcore::CategoricalParameter
              if("Range" %in% names(hyperparameter)){
                values = hyperparameter$Range[[range_name]][["Values"]]
-               parameter_range = CategoricalParameter$new(values)}
+               parameter_range = R6sagemaker.mlcore::CategoricalParameter$new(values)}
           } else if(parameter_type == "FreeText") {
             NULL
           } else
