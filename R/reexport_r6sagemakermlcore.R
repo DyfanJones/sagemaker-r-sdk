@@ -327,3 +327,31 @@ R6sagemaker.mlcore::Constraints
 #' @importFrom R6sagemaker.mlcore ConstraintViolations
 #' @export
 R6sagemaker.mlcore::ConstraintViolations
+
+# ---- Parameter ----
+
+#' @importFrom R6sagemaker.mlcore ParameterRange
+#' @export
+R6sagemaker.mlcore::ParameterRange
+
+#' @importFrom R6sagemaker.mlcore ContinuousParameter
+#' @export
+R6sagemaker.mlcore::ContinuousParameter
+
+#' @importFrom R6sagemaker.mlcore CategoricalParameter
+#' @export
+R6sagemaker.mlcore::CategoricalParameter
+
+#' @importFrom R6sagemaker.mlcore IntegerParameter
+#' @export
+R6sagemaker.mlcore::IntegerParameter
+
+# ---- Tuner ----
+
+#' @importFrom R6sagemaker.mlcore WarmStartConfig
+#' @export
+R6sagemaker.mlcore::WarmStartConfig
+
+#' @importFrom R6sagemaker.mlcore HyperparameterTuner
+#' @export
+R6sagemaker.mlcore::HyperparameterTuner
