@@ -7,21 +7,12 @@ Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("
 Description: A library for training and deploying machine learning models on 
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports:
-    R6sagemaker.common,
-    data.table,
-    fs,
-    jsonlite,
     lgr,
-    methods,
-    paws,
-    httr,
-    R6,
-    stats,
-    processx,
-    tools,
-    urltools,
-    utils,
-    uuid
+    R6sagemaker.common,
+    R6sagemaker.local,
+    R6sagemaker.mlframework,
+    R6sagemaker.mlcore,
+    R6sagemaker.workflow
 Suggests: 
     crayon,
     testthat,
@@ -30,87 +21,21 @@ Suggests:
     Matrix,
     sparsio,
     reticulate
-Remotes: DyfanJones/sagemaker-r-common
+Remotes: 
+    DyfanJones/sagemaker-r-common,
+    DyfanJones/sagemaker-r-mlcore,
+    DyfanJones/sagemaker-r-local,
+    DyfanJones/sagemaker-r-workflow,
+    DyfanJones/sagemaker-r-mlframework
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-Collate: 
+Collate:
     'r_utils.R'
-    'apiutils_paws_functions.R'
-    'apiutils_base_types.R'
-    'lineage_api_types.R'
-    'lineage_association.R'
-    'lineage_utils.R'
-    'lineage_context.R'
-    'deserializers.R'
-    'serializers.R'
-    'model_monitor_model_monitoring.R'
-    'predictor.R'
-    'parameter.R'
-    'algorithm.R'
-    'amazon_record_pb2.R'
-    'amazon_common.R'
-    'amazon_validation.R'
-    'amazon_hyperparameter.R'
-    'amazon_estimator.R'
-    'amazon_factorization_machines.R'
-    'amazon_ipinsights.R'
-    'amazon_kmeans.R'
-    'amazon_knn.R'
-    'amazon_lda.R'
-    'amazon_linear_learner.R'
-    'amazon_ntm.R'
-    'amazon_object2vec.R'
-    'amazon_pca.R'
-    'amazon_randomcutforest.R'
-    'apiutils_utils.R'
-    'automl_candidate_estimator.R'
-    'pipeline.R'
-    'automl_automl.R'
-    'chainer_default.R'
-    'chainer_model.R'
-    'chainer_estimator.R'
-    'processing.R'
-    'clarify.R'
-    'debugger.R'
-    'debugger_utils.R'
-    'debugger_profiler_constants.R'
-    'debugger_metrics_config.R'
-    'debugger_framework_profile.R'
-    'debugger_profiler_config.R'
-    'huggingface_estimator.R'
-    'lineage_action.R'
-    'lineage_artifact.R'
-    'lineage_visualizer.R'
-    'model_metrics.R'
-    'model_monitor_clarify_model_monitoring.R'
-    'model_monitor_cron_expression_generator.R'
-    'model_monitor_data_capture_config.R'
-    'model_monitor_dataset_format.R'
-    'model_monitor_monitoring_files.R'
-    'multidatamodel.R'
-    'mxnet_default.R'
-    'mxnet_model.R'
-    'mxnet_estimator.R'
-    'network.R'
-    'pytorch_defaults.R'
-    'pytorch_model.R'
-    'pytorch_estimator.R'
     'reexport_r6sagemakercommon.R'
-    'tensorflow_model.R'
-    'tensorflow_defaults.R'
-    'tensorflow_estimator.R'
-    'rl_estimator.R'
-    'sklearn_model.R'
-    'sklearn_estimator.R'
-    'sklearn_processing.R'
-    'spark_processing.R'
-    'sparkml_model.R'
-    'tuner.R'
-    'workflow_airflow.R'
-    'workflow_entries.R'
-    'xgboost_default.R'
-    'xgboost_model.R'
-    'xgboost_estimator.R'
+    'reexport_r6sagemakerlocal.R'
+    'reexport_r6sagemakermlamazon.R'
+    'reexport_r6sagemakermlcore.R'
+    'reexport_r6sagemakerworkflow.R'
     'zzz.R'
