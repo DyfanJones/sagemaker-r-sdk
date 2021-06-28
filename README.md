@@ -1,25 +1,33 @@
 # Warning!!!
 This repo is in constantly under development and is not currently stable. R6sagemaker is currently aligning it's api with sagemaker v2, apologises for any code breaking this causes.
 
-# Brief overview
+# Brief overview:
 
 The idea is to rebuild [AWS Sagemaker Python SDK](https://github.com/aws/sagemaker-python-sdk) using [R6](https://github.com/r-lib/R6) classes and [paws](https://github.com/paws-r/paws) behind the scenes.
 
-# API overview
+# API overview:
 
 This package aims to mimic python's AWS Sagemaker SDK api, but using `R6` and `paws`
 
-# Installation:
+# Architecture Design:
 
-Currently `R6sagemaker` can only be installed from Github. 
+![](architecture.png)
+
+`R6sagemaker` is a metadata package that contains all methods to interact with Amazon Sagemaker.
+
+* [R6sagemaker.common](https://github.com/DyfanJones/sagemaker-r-common): Contains core components of sdk for example `Session` R6 class
+* [R6sagemaker.local](https://github.com/DyfanJones/sagemaker-r-local): Containse local sessions
+* [R6sagemaker.mlcore](https://github.com/DyfanJones/sagemaker-r-mlcore): Contains core components for machine learning (ML) and amazon developed ML.
+* [R6sagemaker.mlframework](https://github.com/DyfanJones/sagemaker-r-mlframework): Contains ML frameworks developed for Amazon Sagemaker i.e. `SKLearn`
+* [R6sagemaker.workflow](https://github.com/DyfanJones/sagemaker-r-workflow): Contains sagemaker pipeline and workflows
+* [R6sagemaker.debugger](https://github.com/DyfanJones/sagemaker-r-debugger): Contains debugging methods (https://github.com/awslabs/sagemaker-debugger-rulesconfig)
+
+
+# Installation:
+Thanks to `remotes` package, the entire `R6sagemaker` ecosystem can be installed with the following command:
 ```r
 remotes::install_github("DyfanJones/sagemaker-r-sdk")
 ```
-
-# Architecture Design:
-
-
-
 
 # Learn from examples:
 
