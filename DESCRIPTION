@@ -10,7 +10,7 @@ Imports:
     lgr,
     R6sagemaker.common,
     R6sagemaker.local,
-    R6sagemaker.mlamazon,
+    R6sagemaker.mlframework,
     R6sagemaker.mlcore,
     R6sagemaker.workflow
 Suggests: 
@@ -26,7 +26,7 @@ Remotes:
     DyfanJones/sagemaker-r-mlcore,
     DyfanJones/sagemaker-r-local,
     DyfanJones/sagemaker-r-workflow,
-    DyfanJones/sagemaker-r-mlamazon
+    DyfanJones/sagemaker-r-mlframework
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true

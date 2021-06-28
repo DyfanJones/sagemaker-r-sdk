@@ -16,6 +16,11 @@ Currently `R6sagemaker` can only be installed from Github.
 remotes::install_github("DyfanJones/sagemaker-r-sdk")
 ```
 
+# Architecture Design:
+
+
+
+
 # Learn from examples:
 
 ## Amazon Algorithms:
