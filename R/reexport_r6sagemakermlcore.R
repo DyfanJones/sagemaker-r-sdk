@@ -94,7 +94,7 @@ R6sagemaker.mlcore::LDAModel
 #' @export
 R6sagemaker.mlcore::LinearLearner
 
-#' @importFrom R6sagemaker.mlcore LDAModel
+#' @importFrom R6sagemaker.mlcore LinearLearnerPredictor
 #' @export
 R6sagemaker.mlcore::LinearLearnerPredictor
 
@@ -138,7 +138,7 @@ R6sagemaker.mlcore::PCAModel
 #' @export
 R6sagemaker.mlcore::RandomCutForest
 
-#' @importFrom R6sagemaker.mlcore PCAModel
+#' @importFrom R6sagemaker.mlcore RandomCutForestPredictor
 #' @export
 R6sagemaker.mlcore::RandomCutForestPredictor
 

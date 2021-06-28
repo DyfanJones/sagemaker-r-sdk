@@ -101,7 +101,7 @@ R6sagemaker.common::MetricsConfigBase
 #' @export
 R6sagemaker.common::DetailedProfilingConfig
 
-#' @importFrom R6sagemaker.common DetailedProfilingConfig
+#' @importFrom R6sagemaker.common DataloaderProfilingConfig
 #' @export
 R6sagemaker.common::DataloaderProfilingConfig
 
