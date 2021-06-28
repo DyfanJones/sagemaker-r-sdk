@@ -7,23 +7,12 @@ Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("
 Description: A library for training and deploying machine learning models on 
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports:
+    lgr,
     R6sagemaker.common,
     R6sagemaker.local,
+    R6sagemaker.mlamazon,
     R6sagemaker.mlcore,
-    data.table,
-    fs,
-    jsonlite,
-    lgr,
-    methods,
-    paws,
-    httr,
-    R6,
-    stats,
-    processx,
-    tools,
-    urltools,
-    utils,
-    uuid
+    R6sagemaker.workflow
 Suggests: 
     crayon,
     testthat,
@@ -34,46 +23,19 @@ Suggests:
     reticulate
 Remotes: 
     DyfanJones/sagemaker-r-common,
+    DyfanJones/sagemaker-r-mlcore,
     DyfanJones/sagemaker-r-local,
-    DyfanJones/sagemaker-r-mlcore
+    DyfanJones/sagemaker-r-workflow,
+    DyfanJones/sagemaker-r-mlamazon
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-Collate: 
+Collate:
     'r_utils.R'
-    'algorithm.R'
-    'automl_candidate_estimator.R'
-    'pipeline.R'
-    'automl_automl.R'
-    'chainer_default.R'
-    'chainer_model.R'
-    'chainer_estimator.R'
-    'huggingface_estimator.R'
-    'model_metrics.R'
-    'multidatamodel.R'
-    'mxnet_default.R'
-    'mxnet_model.R'
-    'mxnet_estimator.R'
-    'network.R'
-    'pytorch_defaults.R'
-    'pytorch_model.R'
-    'pytorch_estimator.R'
     'reexport_r6sagemakercommon.R'
     'reexport_r6sagemakerlocal.R'
+    'reexport_r6sagemakermlamazon.R'
     'reexport_r6sagemakermlcore.R'
-    'tensorflow_model.R'
-    'tensorflow_defaults.R'
-    'tensorflow_estimator.R'
-    'rl_estimator.R'
-    'sklearn_model.R'
-    'sklearn_estimator.R'
-    'sklearn_processing.R'
-    'spark_processing.R'
-    'sparkml_model.R'
-    'workflow_airflow.R'
-    'workflow_entries.R'
-    'xgboost_default.R'
-    'xgboost_model.R'
-    'xgboost_estimator.R'
+    'reexport_r6sagemakerworkflow.R'
     'zzz.R'
