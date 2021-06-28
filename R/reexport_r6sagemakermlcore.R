@@ -355,3 +355,25 @@ R6sagemaker.mlcore::WarmStartConfig
 #' @importFrom R6sagemaker.mlcore HyperparameterTuner
 #' @export
 R6sagemaker.mlcore::HyperparameterTuner
+
+# ---- Algorithm ----
+
+#' @importFrom R6sagemaker.mlcore AlgorithmEstimator
+#' @export
+R6sagemaker.mlcore::AlgorithmEstimator
+
+# ---- Model Metric ----
+
+#' @importFrom R6sagemaker.mlcore ModelMetrics
+#' @export
+R6sagemaker.mlcore::ModelMetrics
+
+#' @importFrom R6sagemaker.mlcore MetricsSource
+#' @export
+R6sagemaker.mlcore::MetricsSource
+
+# ---- Mutli Data Model ----
+
+#' @importFrom R6sagemaker.mlcore MultiDataModel
+#' @export
+R6sagemaker.mlcore::MultiDataModel

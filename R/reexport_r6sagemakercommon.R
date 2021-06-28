@@ -116,3 +116,7 @@ R6sagemaker.common::HorovodProfilingConfig
 #' @importFrom R6sagemaker.common SMDataParallelProfilingConfig
 #' @export
 R6sagemaker.common::SMDataParallelProfilingConfig
+
+#' @importFrom R6sagemaker.common NetworkConfig
+#' @export
+R6sagemaker.common::NetworkConfig
