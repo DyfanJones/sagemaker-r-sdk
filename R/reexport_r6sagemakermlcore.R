@@ -372,8 +372,13 @@ R6sagemaker.mlcore::ModelMetrics
 #' @export
 R6sagemaker.mlcore::MetricsSource
 
-# ---- Mutli Data Model ----
+# ---- Multi Data Model ----
 
 #' @importFrom R6sagemaker.mlcore MultiDataModel
 #' @export
 R6sagemaker.mlcore::MultiDataModel
+
+# ---- Pipeline ----
+#' @importFrom R6sagemaker.mlcore PipelineModel
+#' @export
+R6sagemaker.mlcore::PipelineModel
