@@ -46,6 +46,10 @@ R6sagemaker.common::pipeline_container_def
 #' @export
 R6sagemaker.common::production_variant
 
+#' @importFrom R6sagemaker.common PawsSession
+#' @export
+R6sagemaker.common::PawsSession
+
 #' @importFrom R6sagemaker.common Session
 #' @export
 R6sagemaker.common::Session
