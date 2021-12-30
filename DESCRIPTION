@@ -1,4 +1,4 @@
-Package: R6sagemaker
+Package: sagemaker
 Type: Package
 Title: R SDK for `AWS Sagemaker`
 Version: 1.0.0
@@ -8,11 +8,11 @@ Description: A library for training and deploying machine learning models on
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports:
     lgr,
-    R6sagemaker.common,
-    R6sagemaker.local,
-    R6sagemaker.mlframework,
-    R6sagemaker.mlcore,
-    R6sagemaker.workflow
+    sagemaker.common,
+    sagemaker.local,
+    sagemaker.mlframework,
+    sagemaker.mlcore,
+    sagemaker.workflow
 Suggests: 
     crayon,
     testthat,
@@ -30,12 +30,12 @@ Remotes:
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Collate:
     'r_utils.R'
-    'reexport_r6sagemakercommon.R'
-    'reexport_r6sagemakerlocal.R'
-    'reexport_r6sagemakermlamazon.R'
-    'reexport_r6sagemakermlcore.R'
-    'reexport_r6sagemakerworkflow.R'
+    'reexport_sagemakercommon.R'
+    'reexport_sagemakerlocal.R'
+    'reexport_sagemakermlamazon.R'
+    'reexport_sagemakermlcore.R'
+    'reexport_sagemakerworkflow.R'
     'zzz.R'
