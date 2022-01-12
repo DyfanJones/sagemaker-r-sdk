@@ -8,10 +8,11 @@ Description: A library for training and deploying machine learning models on
     Amazon SageMaker <https://aws.amazon.com/sagemaker/> using R through `paws SDK`.
 Imports:
     lgr,
+    sagemaker.debugger,
     sagemaker.common,
+    sagemaker.mlcore,
     sagemaker.local,
     sagemaker.mlframework,
-    sagemaker.mlcore,
     sagemaker.workflow
 Suggests: 
     crayon,
@@ -22,11 +23,12 @@ Suggests:
     sparsio,
     reticulate
 Remotes: 
+    DyfanJones/sagemaker-r-debugger,
     DyfanJones/sagemaker-r-common,
     DyfanJones/sagemaker-r-mlcore,
     DyfanJones/sagemaker-r-local,
-    DyfanJones/sagemaker-r-workflow,
-    DyfanJones/sagemaker-r-mlframework
+    DyfanJones/sagemaker-r-mlframework,
+    DyfanJones/sagemaker-r-workflow
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
