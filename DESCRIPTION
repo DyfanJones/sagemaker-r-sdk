@@ -9,35 +9,21 @@ Description: A library for training and deploying machine learning models on
 Imports:
     lgr,
     sagemaker.debugger,
+    sagemaker.core,
     sagemaker.common,
     sagemaker.mlcore,
-    sagemaker.local,
     sagemaker.mlframework,
     sagemaker.workflow
 Suggests: 
-    crayon,
-    testthat,
-    RProtoBuf,
-    readr,
-    Matrix,
-    sparsio,
-    reticulate
+    testthat
 Remotes: 
     DyfanJones/sagemaker-r-debugger,
+    DyfanJones/sagemaker-r-core,
     DyfanJones/sagemaker-r-common,
     DyfanJones/sagemaker-r-mlcore,
-    DyfanJones/sagemaker-r-local,
     DyfanJones/sagemaker-r-mlframework,
     DyfanJones/sagemaker-r-workflow
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
-Collate:
-    'r_utils.R'
-    'reexport_sagemakercommon.R'
-    'reexport_sagemakerlocal.R'
-    'reexport_sagemakermlamazon.R'
-    'reexport_sagemakermlcore.R'
-    'reexport_sagemakerworkflow.R'
-    'zzz.R'

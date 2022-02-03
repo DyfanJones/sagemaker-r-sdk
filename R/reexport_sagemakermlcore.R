@@ -28,6 +28,32 @@ sagemaker.mlcore::SHAPConfig
 #' @export
 sagemaker.mlcore::SageMakerClarifyProcessor
 
+# ---- Core ----
+
+#' @importFrom sagemaker.mlcore Estimator
+#' @export
+sagemaker.mlcore::Estimator
+
+#' @importFrom sagemaker.mlcore Framework
+#' @export
+sagemaker.mlcore::Framework
+
+#' @importFrom sagemaker.mlcore Model
+#' @export
+sagemaker.mlcore::Model
+
+#' @importFrom sagemaker.mlcore FrameworkModel
+#' @export
+sagemaker.mlcore::FrameworkModel
+
+#' @importFrom sagemaker.mlcore ModelPackage
+#' @export
+sagemaker.mlcore::ModelPackage
+
+#' @importFrom sagemaker.mlcore Predictor
+#' @export
+sagemaker.mlcore::Predictor
+
 # ---- Amazon Models ----
 
 #' @importFrom sagemaker.mlcore FactorizationMachines
