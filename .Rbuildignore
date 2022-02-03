@@ -6,3 +6,5 @@
 ^LICENSE.txt
 ^.*\.drawio$
 ^.*\.png$
+^architecture$
+^README\.Rmd$
