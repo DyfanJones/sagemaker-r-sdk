@@ -6,7 +6,10 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of sagemaker is to …
+The idea is to rebuild [AWS Sagemaker Python
+SDK](https://github.com/aws/sagemaker-python-sdk) using
+[R6](https://github.com/r-lib/R6) classes and
+[paws](https://github.com/paws-r/paws) behind the scenes.
 
 ## Installation
 
@@ -24,13 +27,6 @@ This repo is in constantly under development and is not currently
 stable. sagemaker is currently aligning it’s api with sagemaker v2,
 apologises for any code breaking this causes.
 
-# Brief overview:
-
-The idea is to rebuild [AWS Sagemaker Python
-SDK](https://github.com/aws/sagemaker-python-sdk) using
-[R6](https://github.com/r-lib/R6) classes and
-[paws](https://github.com/paws-r/paws) behind the scenes.
-
 # API overview:
 
 This package aims to mimic python’s AWS Sagemaker SDK api, but using
@@ -43,7 +39,7 @@ This package aims to mimic python’s AWS Sagemaker SDK api, but using
 `sagemaker` is a metadata package that contains all methods to interact
 with Amazon Sagemaker.
 
--   [sagemaker.core](https://github.com/DyfanJones/sagemaker-r-local):
+-   [sagemaker.core](https://github.com/DyfanJones/sagemaker-r-core):
     Containse core components of sdk for example `Session` R6 class
 -   [sagemaker.common](https://github.com/DyfanJones/sagemaker-r-common):
     Contains common components used throughout sagemaker sdk
