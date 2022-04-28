@@ -129,3 +129,120 @@ sagemaker.mlframework::XGBoostPredictor
 #' @importFrom sagemaker.mlframework XGBoostModel
 #' @export
 sagemaker.mlframework::XGBoostModel
+
+#' @importFrom sagemaker.mlframework FactorizationMachines
+#' @export
+sagemaker.mlframework::FactorizationMachines
+
+#' @importFrom sagemaker.mlframework FactorizationMachinesPredictor
+#' @export
+sagemaker.mlframework::FactorizationMachinesPredictor
+
+#' @importFrom sagemaker.mlframework FactorizationMachinesModel
+#' @export
+sagemaker.mlframework::FactorizationMachinesModel
+
+#' @importFrom sagemaker.mlframework IPInsights
+#' @export
+sagemaker.mlframework::IPInsights
+
+#' @importFrom sagemaker.mlframework IPInsightsPredictor
+#' @export
+sagemaker.mlframework::IPInsightsPredictor
+
+#' @importFrom sagemaker.mlframework IPInsightsModel
+#' @export
+sagemaker.mlframework::IPInsightsModel
+
+#' @importFrom sagemaker.mlframework KMeans
+#' @export
+sagemaker.mlframework::KMeans
+
+#' @importFrom sagemaker.mlframework KMeansPredictor
+#' @export
+sagemaker.mlframework::KMeansPredictor
+
+#' @importFrom sagemaker.mlframework KMeansModel
+#' @export
+sagemaker.mlframework::KMeansModel
+
+#' @importFrom sagemaker.mlframework KNN
+#' @export
+sagemaker.mlframework::KNN
+
+#' @importFrom sagemaker.mlframework KNNPredictor
+#' @export
+sagemaker.mlframework::KNNPredictor
+
+#' @importFrom sagemaker.mlframework KNNModel
+#' @export
+sagemaker.mlframework::KNNModel
+
+#' @importFrom sagemaker.mlframework LDA
+#' @export
+sagemaker.mlframework::LDA
+
+#' @importFrom sagemaker.mlframework LDAPredictor
+#' @export
+sagemaker.mlframework::LDAPredictor
+
+#' @importFrom sagemaker.mlframework LDAModel
+#' @export
+sagemaker.mlframework::LDAModel
+
+#' @importFrom sagemaker.mlframework LinearLearner
+#' @export
+sagemaker.mlframework::LinearLearner
+
+#' @importFrom sagemaker.mlframework LinearLearnerPredictor
+#' @export
+sagemaker.mlframework::LinearLearnerPredictor
+
+#' @importFrom sagemaker.mlframework LinearLearnerModel
+#' @export
+sagemaker.mlframework::LinearLearnerModel
+
+#' @importFrom sagemaker.mlframework NTM
+#' @export
+sagemaker.mlframework::NTM
+
+#' @importFrom sagemaker.mlframework NTMPredictor
+#' @export
+sagemaker.mlframework::NTMPredictor
+
+#' @importFrom sagemaker.mlframework NTMModel
+#' @export
+sagemaker.mlframework::NTMModel
+
+#' @importFrom sagemaker.mlframework Object2Vec
+#' @export
+sagemaker.mlframework::Object2Vec
+
+#' @importFrom sagemaker.mlframework Object2VecModel
+#' @export
+sagemaker.mlframework::Object2VecModel
+
+#' @importFrom sagemaker.mlframework PCA
+#' @export
+sagemaker.mlframework::PCA
+
+#' @importFrom sagemaker.mlframework PCAPredictor
+#' @export
+sagemaker.mlframework::PCAPredictor
+
+#' @importFrom sagemaker.mlframework PCAModel
+#' @export
+sagemaker.mlframework::PCAModel
+
+#' @importFrom sagemaker.mlframework RandomCutForest
+#' @export
+sagemaker.mlframework::RandomCutForest
+
+#' @importFrom sagemaker.mlframework RandomCutForestPredictor
+#' @export
+sagemaker.mlframework::RandomCutForestPredictor
+
+#' @importFrom sagemaker.mlframework RandomCutForestModel
+#' @export
+sagemaker.mlframework::RandomCutForestModel
+

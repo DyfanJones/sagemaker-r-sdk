@@ -1,7 +1,7 @@
 Package: sagemaker
 Type: Package
 Title: R SDK for `AWS Sagemaker`
-Version: 1.0.0
+Version: 1.0.9000
 Authors@R: c(person("Dyfan", "Jones", email="dyfan.r.jones@gmail.com", role= c("aut", "cre")),
              person("Amazon.com, Inc.", role = "cph"))
 Description: A library for training and deploying machine learning models on 

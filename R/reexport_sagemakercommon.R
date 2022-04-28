@@ -40,6 +40,7 @@ sagemaker.common::TimeRange
 #' @export
 sagemaker.common::MetricsConfigBase
 
+# ---- Configs -----
 #' @importFrom sagemaker.common DetailedProfilingConfig
 #' @export
 sagemaker.common::DetailedProfilingConfig
@@ -63,3 +64,32 @@ sagemaker.common::SMDataParallelProfilingConfig
 #' @importFrom sagemaker.common NetworkConfig
 #' @export
 sagemaker.common::NetworkConfig
+
+#' @importFrom sagemaker.common BiasConfig
+#' @export
+sagemaker.common::BiasConfig
+
+#' @importFrom sagemaker.common DataConfig
+#' @export
+sagemaker.common::DataConfig
+
+#' @importFrom sagemaker.common ExplainabilityConfig
+#' @export
+sagemaker.common::ExplainabilityConfig
+
+#' @importFrom sagemaker.common ModelConfig
+#' @export
+sagemaker.common::ModelConfig
+
+#' @importFrom sagemaker.common ModelPredictedLabelConfig
+#' @export
+sagemaker.common::ModelPredictedLabelConfig
+
+#' @importFrom sagemaker.common SHAPConfig
+#' @export
+sagemaker.common::SHAPConfig
+
+# ---- Clarify ----
+#' @importFrom sagemaker.common SageMakerClarifyProcessor
+#' @export
+sagemaker.common::SageMakerClarifyProcessor
